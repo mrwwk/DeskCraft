@@ -682,7 +682,7 @@ class UITarsAgent:
 
         self.inference_func = self.inference_with_thinking if use_thinking else self.inference_without_thinking
     
-    def reset(self, _logger=None):
+    def reset(self, _logger=None, vm_ip=None):
         global logger
         logger = _logger if _logger is not None else logging.getLogger("desktopenv.agent")
 
