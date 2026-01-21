@@ -180,7 +180,7 @@ def run_env_tasks(task_queue: Queue, args: argparse.Namespace, shared_scores: li
             headless=args.headless,
             os_type="Ubuntu",
             require_a11y_tree=args.observation_type in ["a11y_tree", "screenshot_a11y_tree", "som"],
-            enable_proxy=False,
+            enable_proxy=True,
             client_password=args.client_password
         )
         active_environments.append(env)
@@ -210,9 +210,9 @@ def run_env_tasks(task_queue: Queue, args: argparse.Namespace, shared_scores: li
                     example = json.load(f)
                 
                 # 跳过需要 proxy 的任务
-                if example.get("proxy", False):
-                    logger.info(f"[{current_process().name}] Skipping proxy-required task: {domain}/{example_id}")
-                    continue
+                # if example.get("proxy", False):
+                #     logger.info(f"[{current_process().name}] Skipping proxy-required task: {domain}/{example_id}")
+                #     continue
                 
                 logger.info(f"[{current_process().name}][Domain]: {domain}")
                 logger.info(f"[{current_process().name}][Example ID]: {example_id}")
@@ -459,6 +459,16 @@ def get_result(action_space, use_model, observation_type, result_dir, total_file
 if __name__ == "__main__":
     ####### The complete version of the list of examples #######
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    
+    # Initialize proxy pool with Tencent proxy (for VM to access external websites)
+    from desktop_env.providers.aws.proxy_pool import get_global_proxy_pool
+    proxy_pool = get_global_proxy_pool()
+    proxy_pool.add_proxy(
+        host="hk-mmhttpproxy.woa.com",
+        port=11113,
+        protocol="http"
+    )
+    logger.info("Proxy pool initialized with Tencent proxy: hk-mmhttpproxy.woa.com:11113")
     
     # Register signal handlers for graceful termination
     signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
