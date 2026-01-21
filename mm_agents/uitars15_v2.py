@@ -745,14 +745,13 @@ class UITarsAgent:
         
         response = requests.post(api_url, headers=headers, json=data)
         
-        print(response.json()["choices"][0])
         if response.status_code == 200:
+            print(response.json()["choices"][0])
             return response.json()["choices"][0]["message"]["content"]
         else:
-            return {
-                "error": f"Request failed with status code {response.status_code}",
-                "details": response.text
-            }
+            error_msg = f"Request failed with status code {response.status_code}: {response.text}"
+            print(error_msg)
+            raise Exception(error_msg)
     
     def inference_without_thinking(self, messages):
         api_key = os.environ['DOUBAO_API_KEY']
@@ -772,16 +771,12 @@ class UITarsAgent:
         
         response = requests.post(api_url, headers=headers, json=data)
         
-        
         if response.status_code == 200:
             return response.json()["choices"][0]["message"]["content"]
         else:
-            print(f"Request failed with status code {response.status_code}")
-            print(response.json())
-            return {
-                "error": f"Request failed with status code {response.status_code}",
-                "details": response.text
-            }
+            error_msg = f"Request failed with status code {response.status_code}: {response.text}"
+            print(error_msg)
+            raise Exception(error_msg)
 
     def predict(self, task_instruction: str, obs: dict) -> Tuple[Union[str, Dict, None], List]:
         """Predict the next action based on the current observation."""
