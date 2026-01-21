@@ -3,7 +3,11 @@
 
 bash $(dirname "$0")/install_taiji_client.sh
 
-# base dir
+# code dir，这里修改一下到自己的文件夹，
+CODE_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
+
+
+# 这里不用修改～已经下载好了
 DATA_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
 MODEL_PATH="${DATA_PATH}/models/models--ByteDance-Seed--UI-TARS-1.5-7B"
 
@@ -12,7 +16,7 @@ export AWS_REGION="us-east-1"
 export AWS_SUBNET_ID="subnet-dummy"
 export AWS_SECURITY_GROUP_ID="sg-dummy"
 
-# set DOUBAO API env vars (使用本地 vLLM 服务)
+# set DOUBAO API env vars (本地 vLLM 服务，不使用 DOUBAO API)，不设置会报错
 export DOUBAO_API_KEY="EMPTY"
 export DOUBAO_API_URL="http://localhost:8000/v1/chat/completions"
 
@@ -21,7 +25,7 @@ mkdir -p ~/.cache/huggingface/hub
 cp -r ${DATA_PATH}/models/models--ByteDance-Seed--UI-TARS-1.5-7B ~/.cache/huggingface/hub/
 
 # 2. OSWorld code
-cd ${DATA_PATH}/code/OSWorld
+cd ${CODE_PATH}/code/OSWorld
 
 # 3. prepare osworld cache file
 if [ ! -d "cache" ]; then
@@ -52,6 +56,10 @@ while ! docker info > /dev/null 2>&1; do
     sleep 2
 done
 echo "Docker daemon is ready!"
+
+# 清理残留的 osworld 容器
+echo "Cleaning up old containers..."
+docker ps -a --filter "ancestor=osworld" -q | xargs -r docker rm -f 2>/dev/null || true
 
 # 6. prepare docker image from local tar
 cp -r ${DATA_PATH}/data/osworld_image.tar ./osworld_image.tar
@@ -87,9 +95,9 @@ while ! curl -s http://localhost:8000/health > /dev/null 2>&1; do
 done
 echo "vLLM server is ready!"
 
-# # 11. run OSWorld evaluation with docker provider, network on, 5 envs
-python ${DATA_PATH}/code/OSWorld/run_multienv_uitars15_v2.py \
+# # 11. run OSWorld evaluation with docker provider, network on, 当前发现开环境多的时候会报 TimeoutError: VM failed to become ready within timeout period 的错误，所以暂时设置为1，缺点是速度慢
+python ${CODE_PATH}/code/OSWorld/run_multienv_uitars15_v2.py \
     --provider_name docker \
     --headless \
-    --num_envs 3 \
+    --num_envs 1 \
     --model "UI-TARS-1.5-7B"
