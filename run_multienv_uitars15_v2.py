@@ -208,6 +208,12 @@ def run_env_tasks(task_queue: Queue, args: argparse.Namespace, shared_scores: li
                 )
                 with open(config_file, "r", encoding="utf-8") as f:
                     example = json.load(f)
+                
+                # 跳过需要 proxy 的任务
+                if example.get("proxy", False):
+                    logger.info(f"[{current_process().name}] Skipping proxy-required task: {domain}/{example_id}")
+                    continue
+                
                 logger.info(f"[{current_process().name}][Domain]: {domain}")
                 logger.info(f"[{current_process().name}][Example ID]: {example_id}")
                 logger.info(f"[{current_process().name}][Instruction]: {example['instruction']}")
