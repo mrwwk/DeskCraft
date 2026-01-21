@@ -27,7 +27,7 @@ def run_single_example(agent, env, example, max_steps, instruction, args, exampl
     step_idx = 0
     env.controller.start_recording()
     with open(os.path.join(example_result_dir, "task_instruction.jsonl"), "a") as f:
-        f.write(json.dumps({"instruction": instruction}))
+        f.write(json.dumps({"instruction": instruction}, ensure_ascii=False))
     while not done and step_idx < max_steps:
         response, actions = agent.predict(
             instruction,
@@ -60,7 +60,7 @@ def run_single_example(agent, env, example, max_steps, instruction, args, exampl
                     "done": done,
                     "info": info,
                     "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png"
-                }))
+                }, ensure_ascii=False))
                 f.write("\n")
             if done:
                 logger.info("The episode is done.")
@@ -100,7 +100,7 @@ def run_single_example_human(env, example, max_steps, instruction, args, example
         f.write(json.dumps({
             "instruction": instruction,
             "initial_state": "initial_state.png"
-        }))
+        }, ensure_ascii=False))
         f.write("\n")
     
     # Evaluate the result
@@ -159,7 +159,7 @@ def run_single_example_agi(agent, env, example, max_steps, instruction, args, ex
                     "done": done,
                     "info": info,
                     "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png"
-                }))
+                }, ensure_ascii=False))
                 f.write("\n")
             if done:
                 logger.info("The episode is done.")
@@ -220,7 +220,7 @@ def run_single_example_openaicua(agent, env, example, max_steps, instruction, ar
                     "done": done,
                     "info": info,
                     "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png"
-                }))
+                }, ensure_ascii=False))
                 f.write("\n")
             if done:
                 logger.info("The episode is done.")
@@ -330,7 +330,7 @@ def run_single_example_autoglm(agent, env, example, max_steps, instruction, args
                     "done": done,
                     "info": info,
                     "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png"
-                }))
+                }, ensure_ascii=False))
                 f.write("\n")
                 
             if done:
@@ -400,7 +400,7 @@ def run_single_example_mano(agent, env, example, max_steps, instruction, args, e
                     "info": info,
                     "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png",
                     "response":response
-                }))
+                }, ensure_ascii=False))
                 f.write("\n")
             if done:
                 logger.info("The episode is done.")
@@ -456,7 +456,7 @@ def run_single_example_uipath(agent, env, example, max_steps, instruction, args,
                     "done": done,
                     "info": info,
                     "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png"
-                }))
+                }, ensure_ascii=False))
                 f.write("\n")
             if done:
                 logger.info("The episode is done.")
