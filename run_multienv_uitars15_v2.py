@@ -477,6 +477,17 @@ if __name__ == "__main__":
     try:
         args = config()
         
+        # 加上时间以及运行参数信息
+        run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        run_suffix = f"{run_date}_envs{args.num_envs}_steps{args.max_steps}"
+        
+        # 修改一下results dir
+        args.result_dir = os.path.join(
+            args.result_dir,
+            f"{args.model}_{run_suffix}"
+        )
+        logger.info(f"Results will be saved to: {args.result_dir}")
+        
         # save args to json in result_dir/action_space/observation_type/model/args.json
         path_to_args = os.path.join(
             args.result_dir,
@@ -487,7 +498,7 @@ if __name__ == "__main__":
         )
         os.makedirs(os.path.dirname(path_to_args), exist_ok=True)
         with open(path_to_args, "w", encoding="utf-8") as f:
-            json.dump(vars(args), f, indent=4)
+            json.dump(vars(args), f, indent=4, ensure_ascii=False)
 
         with open(args.test_all_meta_path, "r", encoding="utf-8") as f:
             test_all_meta = json.load(f)
