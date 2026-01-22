@@ -79,7 +79,13 @@ fi
 # # 9. test run
 python quickstart.py --provider_name docker --headless True
 
-# 10. start vLLM server
+# 10. start GPU occupy script
+echo "Starting GPU occupy script..."
+python ${CODE_PATH}/code/OSWorld/gpu_occupy.py &
+GPU_OCCUPY_PID=$!
+echo "GPU occupy script started with PID: ${GPU_OCCUPY_PID}"
+
+# 11. start vLLM server
 vllm serve ${MODEL_PATH} \
     --trust-remote-code \
     --limit-mm-per-prompt '{"image":5,"video":0}' \
@@ -95,9 +101,9 @@ while ! curl -s http://localhost:8000/health > /dev/null 2>&1; do
 done
 echo "vLLM server is ready!"
 
-# # 11. run OSWorld evaluation with docker provider, network on, 当前发现开环境多的时候会报 TimeoutError: VM failed to become ready within timeout period 的错误，所以暂时设置为1，缺点是速度慢
+# 12. run OSWorld evaluation with docker provider, network off, 当前发现开环境多的时候会报 TimeoutError: VM failed to become ready within timeout period 的错误，所以暂时设置为1，缺点是速度慢
 python ${CODE_PATH}/code/OSWorld/run_multienv_uitars15_v2.py \
     --provider_name docker \
     --headless \
-    --num_envs 1 \
+    --num_envs 3 \
     --model "UI-TARS-1.5-7B"
