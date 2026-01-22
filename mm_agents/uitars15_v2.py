@@ -226,16 +226,19 @@ def parse_action_to_structure_output(text, factor, origin_resized_height, origin
                 # Remove parentheses and split the string by commas
                 numbers = ori_box.replace("(", "").replace(")", "").split(",")
 
-                # Convert to float and scale by 1000
-                # Qwen2.5vl output absolute coordinates, qwen2vl output relative coordinates
-                if model_type == "qwen25vl":
+                # Convert to float and normalize
+                # qwen25vl and doubao (UI-TARS) output absolute coordinates
+                # other models output 0-1000 relative coordinates
+                if model_type in ["qwen25vl", "doubao"]:
                     float_numbers = []
                     for num_idx, num in enumerate(numbers):
                         num = float(num)
                         if (num_idx + 1) % 2 == 0:
-                            float_numbers.append(float(num/smart_resize_height))
+                            # Y coordinate, normalize by height
+                            float_numbers.append(float(num / origin_resized_height))
                         else:
-                            float_numbers.append(float(num/smart_resize_width))
+                            # X coordinate, normalize by width
+                            float_numbers.append(float(num / origin_resized_width))
                 else:
                     float_numbers = [float(num) / factor for num in numbers]
 
