@@ -566,6 +566,8 @@ class SetupController:
                 f"gsettings set org.gnome.system.proxy.socks port {current_proxy.port}",
                 f"gsettings set org.gnome.system.proxy.ftp host {current_proxy.host}",
                 f"gsettings set org.gnome.system.proxy.ftp port {current_proxy.port}",
+                # GNOME ignore-hosts for localhost (避免VM访问自己的端口时走代理)
+                f"gsettings set org.gnome.system.proxy ignore-hosts \"['localhost', '127.0.0.0/8', '28.33.*']\"",
                 # APT commands to set system-wide proxy
                 f"echo '{client_password}' | sudo -S bash -c 'echo \"Acquire::http::Proxy \\\"{proxy_url}\\\";\" > /etc/apt/apt.conf.d/proxy.conf'",
                 # VSCode commands to set system-wide proxy
@@ -578,6 +580,9 @@ class SetupController:
             f"echo 'export https_proxy={proxy_url}' >> ~/.bashrc",
             f"echo 'export HTTP_PROXY={proxy_url}' >> ~/.bashrc",
             f"echo 'export HTTPS_PROXY={proxy_url}' >> ~/.bashrc",
+            # no_proxy for localhost and local network (避免VM访问自己的端口时走代理)
+            f"echo 'export no_proxy=localhost,127.0.0.1,28.33.*' >> ~/.bashrc",
+            f"echo 'export NO_PROXY=localhost,127.0.0.1,28.33.*' >> ~/.bashrc",
         ])
 
         # Execute all proxy configuration commands
