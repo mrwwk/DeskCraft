@@ -106,4 +106,5 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_uitars15_v2.py \
     --provider_name docker \
     --headless \
     --num_envs 3 \
+    --max_steps 15 \
     --model "UI-TARS-1.5-7B"
