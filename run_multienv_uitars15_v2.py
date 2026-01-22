@@ -387,7 +387,8 @@ def test(args: argparse.Namespace, test_all_meta: dict) -> None:
 def get_unfinished(
     action_space, use_model, observation_type, result_dir, total_file_json
 ):
-    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
+    # 外层result_dir已包含model信息，内层不再重复
+    target_dir = os.path.join(result_dir, action_space, observation_type)
 
     if not os.path.exists(target_dir):
         return total_file_json
@@ -422,7 +423,7 @@ def get_unfinished(
 
 
 def get_result(action_space, use_model, observation_type, result_dir, total_file_json):
-    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
+    target_dir = os.path.join(result_dir, action_space, observation_type)
     if not os.path.exists(target_dir):
         print("New experiment, no result yet.")
         return None
@@ -488,12 +489,11 @@ if __name__ == "__main__":
         )
         logger.info(f"Results will be saved to: {args.result_dir}")
         
-        # save args to json in result_dir/action_space/observation_type/model/args.json
+        # save args to json in result_dir/action_space/observation_type/args.json
         path_to_args = os.path.join(
             args.result_dir,
             args.action_space,
             args.observation_type,
-            args.model,
             "args.json",
         )
         os.makedirs(os.path.dirname(path_to_args), exist_ok=True)
