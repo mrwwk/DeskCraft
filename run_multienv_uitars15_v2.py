@@ -74,6 +74,7 @@ def config() -> argparse.Namespace:
 
     # logging related
     parser.add_argument("--result_dir", type=str, default="./results")
+    parser.add_argument("--run_name", type=str, default=None, help="Custom run name for result folder (default: auto-generated with timestamp)")
     parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to run in parallel")  
     parser.add_argument("--log_level", type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], 
                        default='INFO', help="Set the logging level")
@@ -478,15 +479,15 @@ if __name__ == "__main__":
     try:
         args = config()
         
-        # 加上时间以及运行参数信息
-        run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        run_suffix = f"{run_date}_envs{args.num_envs}_steps{args.max_steps}"
-        
-        # 修改一下results dir
-        args.result_dir = os.path.join(
-            args.result_dir,
-            f"{args.model}_{run_suffix}"
-        )
+        # 设置结果目录名称
+        if args.run_name:
+            # 使用自定义名称
+            args.result_dir = os.path.join(args.result_dir, args.run_name)
+        else:
+            # 使用时间戳自动生成
+            run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            run_suffix = f"{run_date}_envs{args.num_envs}_steps{args.max_steps}"
+            args.result_dir = os.path.join(args.result_dir, f"{args.model}_{run_suffix}")
         logger.info(f"Results will be saved to: {args.result_dir}")
         
         # save args to json in result_dir/action_space/observation_type/args.json
