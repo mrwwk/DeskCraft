@@ -522,7 +522,7 @@ if __name__ == "__main__":
             args.result_dir = os.path.join(args.result_dir, args.run_name)
         else:
             # 使用时间戳自动生成
-            run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            run_date = datetime.datetime.now().strftime("%Y%m%d")
             run_suffix = f"{run_date}_envs{args.num_envs}_steps{args.max_steps}"
             args.result_dir = os.path.join(args.result_dir, f"{args.model}_{run_suffix}")
         logger.info(f"Results will be saved to: {args.result_dir}")
