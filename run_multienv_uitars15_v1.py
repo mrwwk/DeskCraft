@@ -81,6 +81,7 @@ def config() -> argparse.Namespace:
 
     # logging related
     parser.add_argument("--result_dir", type=str, default="./results")
+    parser.add_argument("--run_name", type=str, default=None, help="Custom run name for result folder (default: auto-generated with timestamp)")
     parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to run in parallel")  
     parser.add_argument("--log_level", type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], 
                        default='INFO', help="Set the logging level")
@@ -191,7 +192,7 @@ def run_env_tasks(task_queue: Queue, args: argparse.Namespace, shared_scores: li
             headless=args.headless,
             os_type="Ubuntu",
             require_a11y_tree=args.observation_type in ["a11y_tree", "screenshot_a11y_tree", "som"],
-            enable_proxy=False,
+            enable_proxy=True,
             client_password=args.client_password
         )
         active_environments.append(env)
@@ -259,7 +260,6 @@ def run_env_tasks(task_queue: Queue, args: argparse.Namespace, shared_scores: li
                     args.result_dir,
                     args.action_space,
                     args.observation_type,
-                    args.model,
                     domain,
                     example_id,
                 )
@@ -425,7 +425,8 @@ def test(args: argparse.Namespace, test_all_meta: dict) -> None:
 def get_unfinished(
     action_space, use_model, observation_type, result_dir, total_file_json
 ):
-    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
+    # 外层result_dir已包含model信息，内层不再重复
+    target_dir = os.path.join(result_dir, action_space, observation_type)
 
     if not os.path.exists(target_dir):
         return total_file_json
@@ -460,7 +461,7 @@ def get_unfinished(
 
 
 def get_result(action_space, use_model, observation_type, result_dir, total_file_json):
-    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
+    target_dir = os.path.join(result_dir, action_space, observation_type)
     if not os.path.exists(target_dir):
         print("New experiment, no result yet.")
         return None
@@ -498,6 +499,16 @@ if __name__ == "__main__":
     ####### The complete version of the list of examples #######
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     
+    # Initialize proxy pool with Tencent proxy (for VM to access external websites)
+    from desktop_env.providers.aws.proxy_pool import get_global_proxy_pool
+    proxy_pool = get_global_proxy_pool()
+    proxy_pool.add_proxy(
+        host="hk-mmhttpproxy.woa.com",
+        port=11113,
+        protocol="http"
+    )
+    logger.info("Proxy pool initialized with Tencent proxy: hk-mmhttpproxy.woa.com:11113")
+    
     # Register signal handlers for graceful termination
     signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
     signal.signal(signal.SIGTERM, signal_handler)  # Handle termination signal
@@ -505,17 +516,27 @@ if __name__ == "__main__":
     try:
         args = config()
         
-        # save args to json in result_dir/action_space/observation_type/model/args.json
+        # 设置结果目录名称
+        if args.run_name:
+            # 使用自定义名称
+            args.result_dir = os.path.join(args.result_dir, args.run_name)
+        else:
+            # 使用时间戳自动生成
+            run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            run_suffix = f"{run_date}_envs{args.num_envs}_steps{args.max_steps}"
+            args.result_dir = os.path.join(args.result_dir, f"{args.model}_{run_suffix}")
+        logger.info(f"Results will be saved to: {args.result_dir}")
+        
+        # save args to json in result_dir/action_space/observation_type/args.json
         path_to_args = os.path.join(
             args.result_dir,
             args.action_space,
             args.observation_type,
-            args.model,
             "args.json",
         )
         os.makedirs(os.path.dirname(path_to_args), exist_ok=True)
         with open(path_to_args, "w", encoding="utf-8") as f:
-            json.dump(vars(args), f, indent=4)
+            json.dump(vars(args), f, indent=4, ensure_ascii=False)
 
         with open(args.test_all_meta_path, "r", encoding="utf-8") as f:
             test_all_meta = json.load(f)

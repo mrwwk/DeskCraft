@@ -80,6 +80,7 @@ def config() -> argparse.Namespace:
 
     # logging related
     parser.add_argument("--result_dir", type=str, default="./results")
+    parser.add_argument("--run_name", type=str, default=None, help="Custom run name for result folder (default: auto-generated with timestamp)")
     parser.add_argument(
         "--num_envs", type=int, default=1, help="Number of environments to run in parallel"
     )
@@ -188,7 +189,7 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list):
                 "screenshot_a11y_tree",
                 "som",
             ],
-            enable_proxy=False,
+            enable_proxy=True,
             client_password=args.client_password,
         )
         active_environments.append(env)
@@ -215,6 +216,12 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list):
                 )
                 with open(config_file, "r", encoding="utf-8") as f:
                     example = json.load(f)
+                
+                # 跳过需要外网代理的任务
+                # if example.get("proxy", False):
+                #     logger.info(f"[{current_process().name}] Skipping proxy-required task: {domain}/{example_id}")
+                #     continue
+                
                 logger.info(f"[{current_process().name}][Domain]: {domain}")
                 logger.info(f"[{current_process().name}][Example ID]: {example_id}")
                 logger.info(f"[{current_process().name}][Instruction]: {example['instruction']}")
@@ -436,10 +443,34 @@ def get_result(action_space, use_model, observation_type, result_dir, total_file
 
 if __name__ == "__main__":
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    
+    # Initialize proxy pool with Tencent proxy (for VM to access external websites)
+    from desktop_env.providers.aws.proxy_pool import get_global_proxy_pool
+    proxy_pool = get_global_proxy_pool()
+    proxy_pool.add_proxy(
+        host="hk-mmhttpproxy.woa.com",
+        port=11113,
+        protocol="http"
+    )
+    logger.info("Proxy pool initialized with Tencent proxy: hk-mmhttpproxy.woa.com:11113")
+    
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     try:
         args = config()
+        
+        # 设置结果目录名称
+        if args.run_name:
+            # 使用自定义名称
+            args.result_dir = os.path.join(args.result_dir, args.run_name)
+        else:
+            # 使用时间戳自动生成
+            run_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            model_short_name = args.model.split("/")[-1] if "/" in args.model else args.model
+            run_suffix = f"{run_date}_envs{args.num_envs}_steps{args.max_steps}"
+            args.result_dir = os.path.join(args.result_dir, f"{model_short_name}_{run_suffix}")
+        logger.info(f"Results will be saved to: {args.result_dir}")
+        
         path_to_args = os.path.join(
             args.result_dir,
             args.action_space,
