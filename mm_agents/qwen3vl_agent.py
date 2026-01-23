@@ -11,6 +11,7 @@ import dashscope
 from dashscope import MultiModalConversation
 import backoff
 import openai
+import requests
 from PIL import Image
 from requests.exceptions import SSLError
 from google.api_core.exceptions import (
@@ -627,36 +628,41 @@ Previous actions:
             raise ValueError(f"Unknown API backend: {self.api_backend}")
 
     def _call_llm_openai(self, messages, model):
-        """Call LLM using OpenAI SDK (compatible with OpenAI-compatible endpoints)."""
-        base_url = os.environ.get("OPENAI_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
-        api_key = os.environ.get("OPENAI_API_KEY", "sk-123")
-        cookies = os.environ.get("OPENAI_COOKIES", "")
-        if cookies:
-            http_client = httpx.Client(
-                headers={"Cookie": cookies},
-                timeout=3600,
-            )
-            client = openai.OpenAI(
-                api_key=api_key,
-                base_url=base_url,
-                http_client=http_client,
-            )
-        else:
-            client = openai.OpenAI(base_url=base_url, api_key=api_key)
+        """Call LLM using requests (compatible with vLLM server)."""
+        api_url = os.environ.get("OPENAI_BASE_URL", "http://localhost:8000/v1")
+        # 确保 URL 以 /chat/completions 结尾
+        if not api_url.endswith("/chat/completions"):
+            api_url = api_url.rstrip("/") + "/chat/completions"
+        api_key = os.environ.get("OPENAI_API_KEY", "EMPTY")
+        
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json'
+        }
+        data = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": self.max_tokens,
+        }
 
         for attempt in range(1, MAX_RETRY_TIMES + 1):
             logger.info(f"[OpenAI] Generating content with model: {model} (attempt {attempt}/{MAX_RETRY_TIMES})")
+            logger.info(f"[OpenAI] API URL: {api_url}")
             try:
-                response = client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    max_tokens=self.max_tokens,
-                    # temperature=self.temperature,
-                    # top_p=self.top_p,
-                )
-                return response.choices[0].message.content
+                response = requests.post(api_url, headers=headers, json=data, timeout=600)
+                if response.status_code == 200:
+                    return response.json()["choices"][0]["message"]["content"]
+                else:
+                    error_msg = f"Request failed with status code {response.status_code}: {response.text}"
+                    logger.error(f"[OpenAI] {error_msg}")
+                    if attempt < MAX_RETRY_TIMES:
+                        time.sleep(5)
+                        continue
+                    break
             except Exception as e:
+                import traceback
                 logger.error(f"[OpenAI] Error calling model: {e}")
+                logger.error(f"[OpenAI] Traceback: {traceback.format_exc()}")
                 if attempt < MAX_RETRY_TIMES:
                     time.sleep(5)
                     continue
