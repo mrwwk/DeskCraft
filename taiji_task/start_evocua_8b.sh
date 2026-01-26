@@ -9,7 +9,7 @@ CODE_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
 
 # 数据和模型路径
 DATA_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
-MODEL_PATH="/apdcephfs/share_304220499/apdcephfs_fsgm/share_304220499/model/EvoCUA-8B-20260105"
+MODEL_PATH="/apdcephfs_fsgm/share_304220499/model/EvoCUA-8B-20260105"
 
 # set AWS env vars to avoid import error (not actually using AWS)
 export AWS_REGION="us-east-1"
@@ -121,11 +121,12 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_evocua.py \
     --provider_name docker \
     --headless \
     --num_envs 10 \
-    --max_steps 15 \
+    --max_steps 50 \
     --model "EvoCUA-8B" \
-    --run_name "EvoCUA-8B" \
-    --coordinate_type qwen25 \
-    --cot_level l2 \
-    --history_type action_history \
-    --use_old_sys_prompt \
+    --coordinate_type relative \
+    --prompt_style S2 \
+    --max_history_turns 4 \
+    --resize_factor 32 \
+    --temperature 0.01 \
+    --max_tokens 32768 \
     --test_all_meta_path evaluation_examples/test_all.json

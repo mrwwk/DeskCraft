@@ -1,39 +1,39 @@
 """
     EvoCUA Model Evaluation Script for OSWorld
 
-    This script is adapted from run_multienv_opencua.py for evaluating EvoCUA models.
-    EvoCUA models (8B, 32B) are compatible with the OpenCUA agent framework.
+    This script runs EvoCUA native agent model on OSWorld tasks.
 
-    Usage:
-    ```
-        # For EvoCUA-8B
-        python run_multienv_evocua.py \
+    Example Usage (S2):
+        python3 run_multienv_evocua.py \
             --headless \
+            --provider_name docker \
             --observation_type screenshot \
-            --model EvoCUA-8B \
-            --model_path /path/to/EvoCUA-8B-20260105 \
+            --model EvoCUA-S2 \
             --result_dir ./results \
-            --run_name EvoCUA-8B \
             --test_all_meta_path evaluation_examples/test_all.json \
-            --max_steps 15 \
+            --max_steps 50 \
             --num_envs 10 \
-            --coordinate_type qwen25 \
-            --provider_name docker
+            --temperature 0.01 \
+            --max_history_turns 4 \
+            --coordinate_type relative \
+            --resize_factor 32 \
+            --prompt_style S2
 
-        # For EvoCUA-32B
-        python run_multienv_evocua.py \
+    Example Usage (S1):
+        python3 run_multienv_evocua.py \
             --headless \
+            --provider_name docker \
             --observation_type screenshot \
-            --model EvoCUA-32B \
-            --model_path /path/to/EvoCUA-32B-20260105 \
+            --model EvoCUA-S1 \
             --result_dir ./results \
-            --run_name EvoCUA-32B \
             --test_all_meta_path evaluation_examples/test_all.json \
-            --max_steps 15 \
+            --max_steps 50 \
             --num_envs 10 \
+            --max_history_turns 3 \
             --coordinate_type qwen25 \
-            --provider_name docker
-    ```
+            --max_tokens 10240 \
+            --resize_factor 28 \
+            --prompt_style S1
 """
 
 from __future__ import annotations
@@ -45,12 +45,13 @@ import os
 import sys
 import signal
 import time
+import threading
 from typing import List
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, Queue
 from multiprocessing import current_process
 import lib_run_single
 from desktop_env.desktop_env import DesktopEnv
-from mm_agents.evocua import EvoCUAAgent
+from mm_agents.evocua.evocua_agent import EvoCUAAgent
 
 # Global variables for signal handling
 active_environments = []
@@ -91,20 +92,18 @@ def config() -> argparse.Namespace:
     )
 
     # model config
-    parser.add_argument("--model", type=str, default="EvoCUA-8B", help="Model name: EvoCUA-8B or EvoCUA-32B")
-    parser.add_argument("--model_path", type=str, default=None, help="Path to the local model weights")
-    parser.add_argument("--api_base", type=str, default=None, help="API base URL if using remote inference")
-    parser.add_argument("--temperature", type=float, default=0)
+    parser.add_argument("--model", type=str, default="EvoCUA-S2", help="Model name")
+    parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--top_p", type=float, default=0.9)
-    parser.add_argument("--max_tokens", type=int, default=2048)
+    parser.add_argument("--max_tokens", type=int, default=32768)
     parser.add_argument("--stop_token", type=str, default=None)
 
-    # EvoCUA/OpenCUA agent config
-    parser.add_argument("--cot_level", type=str, default="l2", help="CoT version: l1, l2, l3. Default is l2 includes 'thought' and 'action'")
-    parser.add_argument("--history_type", type=str, default="action_history", help="Use action to represent history steps", choices=["action_history", "thought_history", "observation_history"])
-    parser.add_argument("--coordinate_type", type=str, default="qwen25", help="Type of coordinate: 'relative' or 'qwen25'", choices=["relative", "qwen25"])
-    parser.add_argument("--max_image_history_length", type=int, default=3, help="The max number of images in the history.")
-    parser.add_argument("--use_old_sys_prompt", action="store_true", help="Use the old system prompt for smaller models")
+    # EvoCUA agent config
+    parser.add_argument("--prompt_style", type=str, default="S2", choices=["S1", "S2"], help="Prompt style: 'S1' (structured reasoning) or 'S2' (tool calling)")
+    parser.add_argument("--history_type", type=str, default="action_history", help="[S1] History type")
+    parser.add_argument("--coordinate_type", type=str, default="relative", help="Coordinate type: relative, absolute, qwen25")
+    parser.add_argument("--max_history_turns", type=int, default=3, help="Number of history turns to include")
+    parser.add_argument("--resize_factor", type=int, default=32, help="Image resize factor (S1: 28, S2: 32)")
     
     # example config
     parser.add_argument("--domain", type=str, default="all")
@@ -209,7 +208,7 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, log
             headless=args.headless,
             os_type="Ubuntu",
             require_a11y_tree=args.observation_type in ["a11y_tree", "screenshot_a11y_tree", "som"],
-            enable_proxy=False,
+            enable_proxy=True,
             client_password=args.client_password
         )
         active_environments.append(env)
@@ -247,18 +246,16 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, log
                     temperature=args.temperature,
                     action_space=args.action_space,
                     observation_type=args.observation_type,
-                    cot_level=args.cot_level,
-                    history_type=args.history_type,
+                    max_steps=args.max_steps,
+                    prompt_style=args.prompt_style,
+                    max_history_turns=args.max_history_turns,
                     screen_size=(args.screen_width, args.screen_height),
                     coordinate_type=args.coordinate_type,
-                    max_image_history_length=args.max_image_history_length,
-                    max_steps=args.max_steps,
-                    use_old_sys_prompt=args.use_old_sys_prompt,
                     password=args.password,
-                    api_base=args.api_base,
+                    resize_factor=args.resize_factor,
                 )
                 try:
-                    lib_run_single.run_single_example_opencua(
+                    lib_run_single.run_single_example_evocua(
                         agent,
                         env,
                         example,
@@ -478,6 +475,16 @@ def get_result(action_space, observation_type, result_dir, total_file_json):
 
 if __name__ == "__main__":
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    
+    # Initialize proxy pool with Tencent proxy (for VM to access external websites)
+    from desktop_env.providers.aws.proxy_pool import get_global_proxy_pool
+    proxy_pool = get_global_proxy_pool()
+    proxy_pool.add_proxy(
+        host="hk-mmhttpproxy.woa.com",
+        port=11113,
+        protocol="http"
+    )
+    print("Proxy pool initialized with Tencent proxy: hk-mmhttpproxy.woa.com:11113")
     
     # Register signal handlers for graceful termination
     signal.signal(signal.SIGINT, signal_handler)
