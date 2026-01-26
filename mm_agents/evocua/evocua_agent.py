@@ -1,468 +1,653 @@
-"""
-EvoCUA Agent Implementation
-
-This module implements an EvoCUA agent for desktop automation tasks.
-EvoCUA is based on the OpenCUA framework but supports local vLLM deployment.
-
-The agent uses OpenAI-compatible API to communicate with locally deployed vLLM servers.
-"""
-
-import re
 import os
-import ast
-import time
-import math
-import httpx
-import base64
-import traceback
-from loguru import logger
+import re
+import json
+import logging
+import backoff
+import openai
 from typing import Dict, List, Tuple, Optional
 
-# Reuse utilities from OpenCUA
-from mm_agents.opencua.utils import (
+from io import BytesIO
+from PIL import Image
+
+from mm_agents.evocua.utils import (
+    process_image,
     encode_image,
-    smart_resize,
-)
-from mm_agents.opencua.prompts import (
-    INSTRUTION_TEMPLATE,
-    STEP_TEMPLATE,
-    ACTION_HISTORY_TEMPLATE,
-    THOUGHT_HISTORY_TEMPLATE,
-    OBSERVATION_HISTORY_TEMPLATE,
-    SYSTEM_PROMPT_V1_L1,
-    SYSTEM_PROMPT_V1_L2,
-    SYSTEM_PROMPT_V1_L3,
-    build_sys_prompt,
+    rewrite_pyautogui_text_inputs,
+    project_coordinate_to_absolute_scale,
+    log_messages
 )
 
+from mm_agents.evocua.prompts import (
+    S1_SYSTEM_PROMPT,
+    S1_INSTRUTION_TEMPLATE,
+    S1_STEP_TEMPLATE,
+    S1_ACTION_HISTORY_TEMPLATE,
+    S2_ACTION_DESCRIPTION,
+    S2_DESCRIPTION_PROMPT_TEMPLATE,
+    S2_SYSTEM_PROMPT,
+    build_s2_tools_def
+)
 
-def parse_response_to_cot_and_action(input_string, screen_size, coordinate_type) -> Tuple[str, List[str], dict]:
-    """Parse response including Observation, Thought, Action and code block"""
-    sections = {}
-    try:
-        obs_match = re.search(r'^##\s*Observation\s*:?[\n\r]+(.*?)(?=^##\s*Thought:|^##\s*Action:|^##|\Z)', input_string, re.DOTALL | re.MULTILINE)
-        if obs_match:
-            sections['observation'] = obs_match.group(1).strip()
-
-        thought_match = re.search(r'^##\s*Thought\s*:?[\n\r]+(.*?)(?=^##\s*Action:|^##|\Z)', input_string, re.DOTALL | re.MULTILINE)
-        if thought_match:
-            sections['thought'] = thought_match.group(1).strip()
-
-        action_match = re.search(r'^##\s*Action\s*:?[\n\r]+(.*?)(?=^##|\Z)', input_string, re.DOTALL | re.MULTILINE)
-        if action_match:
-            action = action_match.group(1).strip()
-            sections['action'] = action.strip()
-        
-        code_blocks = re.findall(r'```(?:code|python)?\s*(.*?)\s*```', input_string, re.DOTALL | re.IGNORECASE)
-        if not code_blocks:
-            logger.error("No code blocks found in the input string")
-            return f"<Error>: no code blocks found in the input string: {input_string}", ["FAIL"], sections
-        code_block = code_blocks[-1].strip()
-        sections['original_code'] = code_block
-
-        if "computer.wait" in code_block.lower():
-            sections["code"] = "WAIT"
-            return sections['action'], ["WAIT"], sections
-            
-        elif "computer.terminate" in code_block.lower():
-            lower_block = code_block.lower()
-            if ("failure" in lower_block) or ("fail" in lower_block):
-                sections['code'] = "FAIL"
-                return code_block, ["FAIL"], sections
-            elif "success" in lower_block:
-                sections['code'] = "DONE"
-                return code_block, ["DONE"], sections
-            else:
-                logger.error("Terminate action found but no specific status provided in code block")
-                return f"<Error>: terminate action found but no specific status provided in code block: {input_string}", ["FAIL"], sections
-
-        corrected_code = code_block
-        sections['code'] = corrected_code
-        sections['code'] = project_coordinate_to_absolute_scale(corrected_code, screen_width=screen_size[0], screen_height=screen_size[1], coordinate_type=coordinate_type)
-
-        if ('code' not in sections or sections['code'] is None or sections['code'] == "") or ('action' not in sections or sections['action'] is None or sections['action'] == ""):
-            logger.error("Missing required action or code section")
-            return f"<Error>: no code parsed: {input_string}", ["FAIL"], sections
-
-        return sections['action'], [sections['code']], sections
-        
-    except Exception as e:
-        error_message = f"<Error>: parsing response: {str(e)}\nTraceback:\n{traceback.format_exc()}\nInput string: {input_string}"
-        logger.error(error_message)
-        return error_message, ['FAIL'], sections
-
-
-def project_coordinate_to_absolute_scale(pyautogui_code_relative_coordinates, screen_width, screen_height, coordinate_type="relative"):
-    """
-    Convert the relative coordinates in the pyautogui code to absolute coordinates based on the logical screen size.
-    """
-    def _coordinate_projection(x, y, screen_width, screen_height, coordinate_type):
-        if coordinate_type == "relative":
-            return int(round(x * screen_width)), int(round(y * screen_height))
-        elif coordinate_type == "qwen25":
-            height, width = smart_resize(
-                height=screen_height, 
-                width=screen_width, 
-                factor=28, 
-                min_pixels=3136, 
-                max_pixels=12845056
-            )
-            if 0 <= x <= 1 and 0 <= y <= 1:
-                return int(round(x * width)), int(round(y * height))
-            return int(x / width * screen_width), int(y / height * screen_height)
-        else:
-            raise ValueError(f"Invalid coordinate type: {coordinate_type}. Expected one of ['relative', 'qwen25'].")
-
-    pattern = r'(pyautogui\.\w+\([^\)]*\))'
-    matches = re.findall(pattern, pyautogui_code_relative_coordinates)
-
-    new_code = pyautogui_code_relative_coordinates
-
-    for full_call in matches:
-        func_name_pattern = r'(pyautogui\.\w+)\((.*)\)'
-        func_match = re.match(func_name_pattern, full_call, re.DOTALL)
-        if not func_match:
-            continue
-
-        func_name = func_match.group(1)
-        args_str = func_match.group(2)
-
-        try:
-            parsed = ast.parse(f"func({args_str})").body[0].value
-            parsed_args = parsed.args
-            parsed_keywords = parsed.keywords
-        except SyntaxError:
-            return pyautogui_code_relative_coordinates
-
-        function_parameters = {
-            'click': ['x', 'y', 'clicks', 'interval', 'button', 'duration', 'pause'],
-            'rightClick':  ['x', 'y', 'duration', 'tween', 'pause'],
-            'middleClick': ['x', 'y', 'duration', 'tween', 'pause'],
-            'doubleClick': ['x', 'y', 'interval', 'button', 'duration', 'pause'],
-            'tripleClick': ['x', 'y', 'interval', 'button', 'duration', 'pause'],
-            'moveTo': ['x', 'y', 'duration', 'tween', 'pause'],
-            'dragTo': ['x', 'y', 'duration', 'button', 'mouseDownUp', 'pause'],
-        }
-
-        func_base_name = func_name.split('.')[-1]
-        param_names = function_parameters.get(func_base_name, [])
-
-        args = {}
-        for idx, arg in enumerate(parsed_args):
-            if idx < len(param_names):
-                param_name = param_names[idx]
-                arg_value = ast.literal_eval(arg)
-                args[param_name] = arg_value
-
-        try:
-            for kw in parsed_keywords:
-                param_name = kw.arg
-                arg_value = ast.literal_eval(kw.value)
-                args[param_name] = arg_value
-        except Exception as e:
-            logger.error(f"Error parsing keyword arguments: {e}")
-            return pyautogui_code_relative_coordinates
-
-        updated = False
-        if 'x' in args and 'y' in args:
-            try:
-                x_rel = float(args['x'])
-                y_rel = float(args['y'])
-                x_abs, y_abs = _coordinate_projection(x_rel, y_rel, screen_width, screen_height, coordinate_type)
-                logger.warning(f"Projecting coordinates: ({x_rel}, {y_rel}) to ({x_abs}, {y_abs}) using {coordinate_type} projection.")
-                args['x'] = x_abs
-                args['y'] = y_abs
-                updated = True
-            except ValueError:
-                pass
-
-        if updated:
-            reconstructed_args = []
-            for idx, param_name in enumerate(param_names):
-                if param_name in args:
-                    arg_value = args[param_name]
-                    if isinstance(arg_value, str):
-                        arg_repr = f"'{arg_value}'"
-                    else:
-                        arg_repr = str(arg_value)
-                    reconstructed_args.append(arg_repr)
-                else:
-                    break
-
-            used_params = set(param_names[:len(reconstructed_args)])
-            for kw in parsed_keywords:
-                if kw.arg not in used_params:
-                    arg_value = args[kw.arg]
-                    if isinstance(arg_value, str):
-                        arg_repr = f"{kw.arg}='{arg_value}'"
-                    else:
-                        arg_repr = f"{kw.arg}={arg_value}"
-                    reconstructed_args.append(arg_repr)
-
-            new_args_str = ', '.join(reconstructed_args)
-            new_full_call = f"{func_name}({new_args_str})"
-            new_code = new_code.replace(full_call, new_full_call)
-
-    return new_code
-
+logger = logging.getLogger("desktopenv.evocua")
 
 class EvoCUAAgent:
     """
-    EvoCUA Agent for desktop automation tasks.
-    
-    This class implements an EvoCUA Model based agent that can observe 
-    desktop environments through screenshots and execute mouse/keyboard actions 
-    via PyAutoGUI to complete automation tasks.
-    
-    Supports local vLLM deployment via OpenAI-compatible API.
+    EvoCUA - A Native GUI agent model for desktop automation.
     """
+    
     def __init__(
-            self,
-            model: str,
-            history_type: str = "action_history",
-            max_steps: int = 15,
-            max_image_history_length: int = 3,
-            platform: str = "ubuntu",
-            max_tokens: int = 2048,
-            top_p: float = 0.9,
-            temperature: float = 0,
-            action_space: str = "pyautogui",
-            observation_type: str = "screenshot",
-            cot_level: str = "l2",
-            screen_size: Tuple[int, int] = (1920, 1080),
-            coordinate_type: str = "qwen25",
-            use_old_sys_prompt: bool = True,
-            password: str = "password",
-            api_base: str = None,
-            **kwargs
+        self,
+        model: str = "EvoCUA-S2",
+        max_tokens: int = 32768,
+        top_p: float = 0.9,
+        temperature: float = 0.0,
+        action_space: str = "pyautogui",
+        observation_type: str = "screenshot",
+        max_steps: int = 50,
+        prompt_style: str = "S2", # "S1" or "S2"
+        max_history_turns: int = 4,
+        screen_size: Tuple[int, int] = (1920, 1080),
+        coordinate_type: str = "relative",
+        password: str = "osworld-public-evaluation",
+        resize_factor: int = 32,
+        **kwargs
     ):
-        assert coordinate_type in ["relative", "qwen25"]
-        assert action_space in ["pyautogui"], "Invalid action space"
-        assert observation_type in ["screenshot"], "Invalid observation type"
-        assert history_type in ["action_history", "thought_history", "observation_history"]
-        assert model is not None, "Model cannot be None"
-
         self.model = model
-        self.platform = platform
         self.max_tokens = max_tokens
         self.top_p = top_p
         self.temperature = temperature
         self.action_space = action_space
         self.observation_type = observation_type
-        self.history_type = history_type
-        self.coordinate_type = coordinate_type
-        self.cot_level = cot_level
-        self.screen_size = screen_size
-        self.max_image_history_length = max_image_history_length
         self.max_steps = max_steps
+        
+        self.prompt_style = prompt_style
+        assert self.prompt_style in ["S1", "S2"], f"Invalid prompt_style: {self.prompt_style}"
+        
+        self.max_history_turns = max_history_turns
+        
+        self.screen_size = screen_size
+        self.coordinate_type = coordinate_type
         self.password = password
+        self.resize_factor = resize_factor
         
-        # API configuration - use environment variable or provided api_base
-        self.api_base = api_base or os.environ.get('OPENAI_BASE_URL', 'http://localhost:8000/v1')
-        self.api_key = os.environ.get('OPENAI_API_KEY', 'EMPTY')
-
-        if history_type == "action_history":
-            self.HISTORY_TEMPLATE = ACTION_HISTORY_TEMPLATE
-        elif history_type == "thought_history":
-            self.HISTORY_TEMPLATE = THOUGHT_HISTORY_TEMPLATE
-        elif history_type == "observation_history":
-            self.HISTORY_TEMPLATE = OBSERVATION_HISTORY_TEMPLATE
-        else:
-            raise ValueError(f"Invalid history type: {history_type}")
-        
-        # EvoCUA uses old system prompt by default (similar to OpenCUA-7B/32B)
-        if use_old_sys_prompt:
-            if cot_level == "l1":
-                self.system_prompt = SYSTEM_PROMPT_V1_L1
-            elif cot_level == "l2":
-                self.system_prompt = SYSTEM_PROMPT_V1_L2
-            elif cot_level == "l3":
-                self.system_prompt = SYSTEM_PROMPT_V1_L3
-            else:
-                raise ValueError("Invalid cot_level. Choose from 'l1', 'l2', or 'l3'.")
-        else:
-            self.system_prompt = build_sys_prompt(
-                level=self.cot_level, 
-                password=self.password,
-                use_random=False
-            )
-
+        # Action space assertion
+        assert self.action_space == "pyautogui", f"Invalid action space: {self.action_space}"
+        assert self.observation_type == "screenshot", f"Invalid observation type: {self.observation_type}"
+       
+        # State
+        self.thoughts = []
         self.actions = []
         self.observations = []
-        self.cots = []
+        self.responses = []
+        self.screenshots = [] # Stores encoded string
+        self.cots = [] # For S1 style history
 
-    def reset(self, _logger=None):
+    def reset(self, _logger=None, vm_ip=None):
         global logger
-        if _logger is not None:
+        if _logger:
             logger = _logger
         
-        self.observations = []
-        self.cots = []
+        self.thoughts = []
         self.actions = []
-    
-    def _scale_scroll_for_windows(self, code: str, factor: int = 50) -> str:
-        """pyautogui.scroll has a different scale on Ubuntu and Windows"""
-        if self.platform.lower() != "windows":
-            return code
+        self.observations = []
+        self.responses = []
+        self.screenshots = []
+        self.cots = []
 
-        pattern_pos = re.compile(r'(pyautogui\.scroll\()\s*([-+]?\d+)\s*\)')
-        code = pattern_pos.sub(lambda m: f"{m.group(1)}{int(m.group(2))*factor})", code)
-        return code
-    
-    def predict(self, instruction: str, obs: Dict, **kwargs) -> Tuple[str, List[str], Dict]:
+    def predict(self, instruction: str, obs: Dict) -> List:
         """
-        Predict the next action(s) based on the current observation.
+        Main prediction loop.
         """
-        if "step_idx" in kwargs:
-            logger.info(f"========= {self.model} Step {kwargs['step_idx']} =======")
-        else:
-            logger.info(f"========================== {self.model} ===================================")
+        
+        logger.info(f"========================== {self.model} ===================================")
         logger.info(f"Instruction: \n{instruction}")
+        
+        screenshot_bytes = obs["screenshot"]
+ 
+        try:
+            original_img = Image.open(BytesIO(screenshot_bytes))
+            original_width, original_height = original_img.size
+        except Exception as e:
+            logger.warning(f"Failed to read screenshot size, falling back to screen_size: {e}")
+            original_width, original_height = self.screen_size
+        
+        if self.prompt_style == "S1":
+            raw_b64 = encode_image(screenshot_bytes)
+            self.screenshots.append(raw_b64)
+            return self._predict_s1(instruction, obs, raw_b64)
+        else:
+            processed_b64, p_width, p_height = process_image(screenshot_bytes, factor=self.resize_factor)
+            self.screenshots.append(processed_b64)
+            return self._predict_s2(
+                instruction,
+                obs,
+                processed_b64,
+                p_width,
+                p_height,
+                original_width,
+                original_height,
+            )
 
-        messages = []
-        messages.append({
-            "role": "system",
-            "content": self.system_prompt
-        })
-        instruction_prompt = INSTRUTION_TEMPLATE.format(instruction=instruction)
+  
+    def _predict_s2(self, instruction, obs, processed_b64, p_width, p_height, original_width, original_height):
+        current_step = len(self.actions)
+        current_history_n = self.max_history_turns
+        
+        response = None
+        
+        if self.coordinate_type == "absolute":
+             resolution_info = f"* The screen's resolution is {p_width}x{p_height}."
+        else:
+             resolution_info = "* The screen's resolution is 1000x1000."
+             
+        description_prompt = S2_DESCRIPTION_PROMPT_TEMPLATE.format(resolution_info=resolution_info)
 
-        history_step_texts = []
-        for i in range(len(self.actions)):
-            if i > len(self.actions) - self.max_image_history_length:
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/png;base64,{encode_image(self.observations[i]['screenshot'])}"}
-                        }
-                    ]
-                })
+        tools_def = build_s2_tools_def(description_prompt)
 
-                history_content = STEP_TEMPLATE.format(step_num=i+1) + self.HISTORY_TEMPLATE.format(
-                    observation=self.cots[i].get('observation'),
-                    thought=self.cots[i].get('thought'),
-                    action=self.cots[i].get('action')
-                )
+        system_prompt = S2_SYSTEM_PROMPT.format(tools_xml=json.dumps(tools_def))
 
-                messages.append({
-                    "role": "assistant",
-                    "content": history_content
-                })
-            else:
-                history_content = STEP_TEMPLATE.format(step_num=i+1) + self.HISTORY_TEMPLATE.format(
-                    observation=self.cots[i].get('observation'),
-                    thought=self.cots[i].get('thought'),
-                    action=self.cots[i].get('action')
-                )
-                history_step_texts.append(history_content)
-                if i == len(self.actions) - self.max_image_history_length:
-                    messages.append({
-                        "role": "assistant",
-                        "content": "\n".join(history_step_texts)
-                    })
-
-        messages.append({
-            "role": "user",
-            "content": [
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{encode_image(obs['screenshot'])}"}
-                },
-                {
-                    "type": "text",
-                    "text": instruction_prompt
-                }
-            ]
-        })
-
-        max_retry = 5
-        retry_count = 0
-        low_level_instruction = None
-        pyautogui_actions = None
-        other_cot = {}
-
-        while retry_count < max_retry:
+        # Retry loop for context length
+        while True:
+            messages = self._build_s2_messages(
+                instruction, 
+                processed_b64, 
+                current_step, 
+                current_history_n, 
+                system_prompt
+            )
+            
             try:
                 response = self.call_llm({
                     "model": self.model,
                     "messages": messages,
                     "max_tokens": self.max_tokens,
                     "top_p": self.top_p,
-                    "temperature": self.temperature if retry_count == 0 else max(0.2, self.temperature)
+                    "temperature": self.temperature,
                 })
-
-                logger.info(f"Model Output: \n{response}")
-                if not response:
-                    logger.error("No response found in the response.")
-                    raise ValueError(f"No response found in the response:\n{response}.")
-
-                low_level_instruction, pyautogui_actions, other_cot = parse_response_to_cot_and_action(response, self.screen_size, self.coordinate_type)
-                if "<Error>" in low_level_instruction or not pyautogui_actions:
-                    logger.error(f"Error parsing response: {low_level_instruction}")
-                    raise ValueError(f"Error parsing response: {low_level_instruction}")
                 break
-                
             except Exception as e:
-                logger.error(f"Error during message preparation: {e}")
-                retry_count += 1
-                if retry_count == max_retry:
-                    logger.error("Maximum retries reached. Exiting.")
-                    return str(e), ['FAIL'], other_cot
+                # Handle Context Too Large
+                if self._should_giveup_on_context_error(e) and current_history_n > 0:
+                    current_history_n -= 1
+                    logger.warning(f"Context too large, retrying with history_n={current_history_n}")
+                else:
+                    logger.error(f"Error in predict: {e}")
+                    break
+        
+        self.responses.append(response)
+        
+        low_level_instruction, pyautogui_code = self._parse_response_s2(
+            response, p_width, p_height, original_width, original_height
+        )
+        
+        # new added
+        current_step = len(self.actions) + 1
+        first_action = pyautogui_code[0] if pyautogui_code else ""
+        if current_step >= self.max_steps and str(first_action).upper() not in ("DONE", "FAIL"):
+            logger.warning(f"Reached maximum steps {self.max_steps}. Forcing termination with FAIL.")
+            low_level_instruction = "Fail the task because reaching the maximum step limit."
+            pyautogui_code = ["FAIL"]
 
-        pyautogui_actions = [
-            self._scale_scroll_for_windows(code) for code in pyautogui_actions
-        ]
-        logger.info(f"Action: \n{low_level_instruction}")
-        logger.info(f"Code: \n{pyautogui_actions}")
+        logger.info(f"Low level instruction: {low_level_instruction}")
+        logger.info(f"Pyautogui code: {pyautogui_code}")
 
-        self.observations.append(obs)
         self.actions.append(low_level_instruction)
-        self.cots.append(other_cot)
+        return response, pyautogui_code
 
-        current_step = len(self.actions)
-        if current_step >= self.max_steps and 'computer.terminate' not in pyautogui_actions[0].lower():
-            logger.warning(f"Reached maximum steps {self.max_steps}. Forcing termination.")
-            low_level_instruction = 'Fail the task because reaching the maximum step limit.'
-            pyautogui_actions = ['FAIL']
-            other_cot['code'] = 'FAIL'
+    def _build_s2_messages(self, instruction, current_img, step, history_n, system_prompt):
+        messages = [{"role": "system", "content": [{"type": "text", "text": system_prompt}]}]
+        
+        previous_actions = []
+        history_start_idx = max(0, step - history_n)
+        for i in range(history_start_idx):
+             if i < len(self.actions):
+                 previous_actions.append(f"Step {i+1}: {self.actions[i]}")
+        previous_actions_str = "\n".join(previous_actions) if previous_actions else "None"
 
-        return response, pyautogui_actions, other_cot
+        # Add History
+        history_len = min(history_n, len(self.responses))
+        if history_len > 0:
+            hist_responses = self.responses[-history_len:]
+            hist_imgs = self.screenshots[-history_len-1:-1]
             
-    
+            for i in range(history_len):
+                if i < len(hist_imgs):
+                    screenshot_b64 = hist_imgs[i]
+                    if i == 0:
+                        # First history item: Inject Instruction + Previous Actions Context
+                        img_url = f"data:image/png;base64,{screenshot_b64}"
+                        instruction_prompt = f"""
+Please generate the next move according to the UI screenshot, instruction and previous actions.
+
+Instruction: {instruction}
+
+Previous actions:
+{previous_actions_str}"""
+                        messages.append({
+                            "role": "user",
+                            "content": [
+                                {"type": "image_url", "image_url": {"url": img_url}},
+                                {"type": "text", "text": instruction_prompt}
+                            ]
+                        })
+                    else:
+                        img_url = f"data:image/png;base64,{screenshot_b64}"
+                        messages.append({
+                            "role": "user",
+                            "content": [
+                                {"type": "image_url", "image_url": {"url": img_url}},
+                            ]
+                        })
+                
+                messages.append({
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": hist_responses[i]}]
+                })
+        
+        # Current Turn
+        # We re-use previous_actions_str logic for the case where history_len == 0
+        
+        if history_len == 0:
+            # First turn logic: Include Instruction + Previous Actions
+            instruction_prompt = f"""
+Please generate the next move according to the UI screenshot, instruction and previous actions.
+
+Instruction: {instruction}
+
+Previous actions:
+{previous_actions_str}"""
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{current_img}"}},
+                    {"type": "text", "text": instruction_prompt}
+                ]
+            })
+        else:
+            # Subsequent turns logic (context already in first history message): Image Only
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{current_img}"}}
+                ]
+            })
+
+        return messages
+
+
+    def _parse_response_s2(
+        self,
+        response: str,
+        processed_width: int = None,
+        processed_height: int = None,
+        original_width: Optional[int] = None,
+        original_height: Optional[int] = None,
+    ) -> Tuple[str, List[str]]:
+        """
+        Parse LLM response and convert it to low level action and pyautogui code.
+        """
+        # Prefer the real screenshot resolution (passed from predict), fallback to configured screen_size.
+        if not (original_width and original_height):
+            original_width, original_height = self.screen_size
+        low_level_instruction = ""
+        pyautogui_code: List[str] = []
+
+        if response is None or not response.strip():
+            return low_level_instruction, pyautogui_code
+
+        def adjust_coordinates(x: float, y: float) -> Tuple[int, int]:
+            if not (original_width and original_height):
+                return int(x), int(y)
+            if self.coordinate_type == "absolute":
+                # scale from processed pixels to original
+                if processed_width and processed_height:
+                    x_scale = original_width / processed_width
+                    y_scale = original_height / processed_height
+                    return int(x * x_scale), int(y * y_scale)
+                return int(x), int(y)
+            # relative: scale from 0..999 grid
+            x_scale = original_width / 999
+            y_scale = original_height / 999
+            return int(x * x_scale), int(y * y_scale)
+
+        def process_tool_call(json_str: str) -> None:
+            try:
+                tool_call = json.loads(json_str)
+                if tool_call.get("name") == "computer_use":
+                    args = tool_call["arguments"]
+                    action = args["action"]
+
+                    def _clean_keys(raw_keys):
+                        keys = raw_keys if isinstance(raw_keys, list) else [raw_keys]
+                        cleaned_keys = []
+                        for key in keys:
+                            if isinstance(key, str):
+                                if key.startswith("keys=["):
+                                    key = key[6:]
+                                if key.endswith("]"):
+                                    key = key[:-1]
+                                if key.startswith("['") or key.startswith('["'):
+                                    key = key[2:] if len(key) > 2 else key
+                                if key.endswith("']") or key.endswith('"]'):
+                                    key = key[:-2] if len(key) > 2 else key
+                                key = key.strip()
+                                cleaned_keys.append(key)
+                            else:
+                                cleaned_keys.append(key)
+                        return cleaned_keys
+
+                    if action == "left_click" or action == "click":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            pyautogui_code.append(f"pyautogui.click({adj_x}, {adj_y})")
+                        else:
+                            pyautogui_code.append("pyautogui.click()")
+
+                    elif action == "right_click":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            pyautogui_code.append(
+                                f"pyautogui.rightClick({adj_x}, {adj_y})"
+                            )
+                        else:
+                            pyautogui_code.append("pyautogui.rightClick()")
+
+                    elif action == "middle_click":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            pyautogui_code.append(
+                                f"pyautogui.middleClick({adj_x}, {adj_y})"
+                            )
+                        else:
+                            pyautogui_code.append("pyautogui.middleClick()")
+
+                    elif action == "double_click":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            pyautogui_code.append(
+                                f"pyautogui.doubleClick({adj_x}, {adj_y})"
+                            )
+                        else:
+                            pyautogui_code.append("pyautogui.doubleClick()")
+
+                    elif action == "triple_click":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            pyautogui_code.append(
+                                f"pyautogui.tripleClick({adj_x}, {adj_y})"
+                            )
+                        else:
+                            pyautogui_code.append("pyautogui.tripleClick()")
+
+                    elif action == "type":
+                        text = args.get("text", "")
+                        
+                        try:
+                            text = text.encode('latin-1', 'backslashreplace').decode('unicode_escape')
+                        except Exception as e:
+                            logger.error(f"Failed to unescape text: {e}")
+
+                        logger.info(f"Pyautogui code[before rewrite]: {text}")
+                        
+                        result = ""
+                        for char in text:
+                            if char == '\n':
+                                result += "pyautogui.press('enter')\n"
+                            elif char == "'":
+                                result += 'pyautogui.press("\'")\n'
+                            elif char == '\\':
+                                result += "pyautogui.press('\\\\')\n"
+                            elif char == '"':
+                                result += "pyautogui.press('\"')\n"
+                            else:
+                                result += f"pyautogui.press('{char}')\n"
+                                
+                        pyautogui_code.append(result)
+                        logger.info(f"Pyautogui code[after rewrite]: {pyautogui_code}")
+                    
+
+                    elif action == "key":
+                        keys = _clean_keys(args.get("keys", []))
+
+                        keys_str = ", ".join([f"'{key}'" for key in keys])
+                        if len(keys) > 1:
+                            pyautogui_code.append(f"pyautogui.hotkey({keys_str})")
+                        else:
+                            pyautogui_code.append(f"pyautogui.press({keys_str})")
+
+                    elif action == "key_down":
+                        keys = _clean_keys(args.get("keys", []))
+                        for k in keys:
+                            pyautogui_code.append(f"pyautogui.keyDown('{k}')")
+
+                    elif action == "key_up":
+                        keys = _clean_keys(args.get("keys", []))
+                        for k in reversed(keys):
+                            pyautogui_code.append(f"pyautogui.keyUp('{k}')")
+
+                    elif action == "scroll":
+                        pixels = args.get("pixels", 0)
+                        pyautogui_code.append(f"pyautogui.scroll({pixels})")
+
+                    elif action == "wait":
+                        pyautogui_code.append("WAIT")
+
+                    elif action == "terminate":
+                        # Termination should respect status:
+                        # - success -> DONE
+                        # - failure -> FAIL
+                        # Backward compatible: missing status defaults to success.
+                        status = args.get("status", "success")
+                        if str(status).lower() == "failure":
+                            pyautogui_code.append("FAIL")
+                        else:
+                            pyautogui_code.append("DONE")
+
+                    elif action == "mouse_move":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            pyautogui_code.append(
+                                f"pyautogui.moveTo({adj_x}, {adj_y})"
+                            )
+                        else:
+                            pyautogui_code.append("pyautogui.moveTo(0, 0)")
+
+                    elif action == "left_click_drag":
+                        if "coordinate" in args:
+                            x, y = args["coordinate"]
+                            adj_x, adj_y = adjust_coordinates(x, y)
+                            duration = args.get("duration", 0.5)
+                            pyautogui_code.append(
+                                f"pyautogui.dragTo({adj_x}, {adj_y}, duration={duration})"
+                            )
+                        else:
+                            pyautogui_code.append("pyautogui.dragTo(0, 0)")
+            except (json.JSONDecodeError, KeyError) as e:
+                logger.error(f"Failed to parse tool call: {e}")
+
+        lines = response.split("\n")
+        inside_tool_call = False
+        current_tool_call: List[str] = []
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            if line.lower().startswith(("action:")):
+                if not low_level_instruction:
+                    low_level_instruction = line.split("Action:")[-1].strip()
+                continue
+
+            if line.startswith("<tool_call>"):
+                inside_tool_call = True
+                continue
+            elif line.startswith("</tool_call>"):
+                if current_tool_call:
+                    process_tool_call("\n".join(current_tool_call))
+                    current_tool_call = []
+                inside_tool_call = False
+                continue
+
+            if inside_tool_call:
+                current_tool_call.append(line)
+                continue
+
+            if line.startswith("{") and line.endswith("}"):
+                try:
+                    json_obj = json.loads(line)
+                    if "name" in json_obj and "arguments" in json_obj:
+                        process_tool_call(line)
+                except json.JSONDecodeError:
+                    pass
+
+        if current_tool_call:
+            process_tool_call("\n".join(current_tool_call))
+
+        if not low_level_instruction and len(pyautogui_code) > 0:
+            first_action = pyautogui_code[0]
+            if "." in first_action:
+                action_type = first_action.split(".", 1)[1].split("(", 1)[0]
+            else:
+                action_type = first_action.lower()
+            low_level_instruction = f"Performing {action_type} action"
+
+        return low_level_instruction, pyautogui_code
+
+
+
+    def _predict_s1(self, instruction, obs, processed_b64):
+        messages = [{"role": "system", "content": S1_SYSTEM_PROMPT.format(password=self.password)}]
+        
+        # Reconstruct History Logic for S1 mode
+        history_step_texts = []
+        
+        for i in range(len(self.actions)):
+            cot = self.cots[i] if i < len(self.cots) else {}
+            
+            # Step Content string
+            step_content = S1_STEP_TEMPLATE.format(step_num=i+1) + S1_ACTION_HISTORY_TEMPLATE.format(action=cot.get('action', ''))
+            
+            if i > len(self.actions) - self.max_history_turns:
+                # Recent history: Add User(Image) and Assistant(Text)
+                if i < len(self.screenshots) - 1: # Screenshot exists for this step
+                    img = self.screenshots[i]
+                    messages.append({
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{img}"}}
+                        ]
+                    })
+                messages.append({"role": "assistant", "content": step_content})
+            else:
+                # Old history: Collect text
+                history_step_texts.append(step_content)
+                # If this is the last step before the recent window, flush collected texts
+                if i == len(self.actions) - self.max_history_turns:
+                    messages.append({
+                        "role": "assistant",
+                        "content": "\n".join(history_step_texts)
+                    })
+
+        # Current
+        messages.append({
+            "role": "user", 
+            "content": [
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{processed_b64}"}},
+                {"type": "text", "text": S1_INSTRUTION_TEMPLATE.format(instruction=instruction)}
+            ]
+        })
+
+        response = self.call_llm({
+            "model": self.model,
+            "messages": messages,
+            "max_tokens": self.max_tokens
+        })
+        
+        low_level, codes, cot_data = self._parse_response_s1(response)
+        
+        self.observations.append(obs)
+        self.cots.append(cot_data)
+        self.actions.append(low_level)
+        self.responses.append(response)
+        
+        return response, codes
+
+
+    def _parse_response_s1(self, response):
+        sections = {}
+        # Simple Regex Parsing
+        for key, pattern in [
+            ('observation', r'#{1,2}\s*Observation\s*:?[\n\r]+(.*?)(?=^#{1,2}\s|$)'),
+            ('thought', r'#{1,2}\s*Thought\s*:?[\n\r]+(.*?)(?=^#{1,2}\s|$)'),
+            ('action', r'#{1,2}\s*Action\s*:?[\n\r]+(.*?)(?=^#{1,2}\s|$)')
+        ]:
+            m = re.search(pattern, response, re.DOTALL | re.MULTILINE)
+            if m: sections[key] = m.group(1).strip()
+            
+        code_blocks = re.findall(r'```(?:code|python)?\s*(.*?)\s*```', response, re.DOTALL | re.IGNORECASE)
+        code = code_blocks[-1].strip() if code_blocks else "FAIL"
+        
+        sections['code'] = code
+        
+        # Post-process code
+        if "computer.terminate" in code:
+             final_code = ["DONE"] if "success" in code.lower() else ["FAIL"]
+        elif "computer.wait" in code:
+             final_code = ["WAIT"]
+        else:
+             # Project coordinates
+             code = project_coordinate_to_absolute_scale(
+                 code, 
+                 self.screen_size[0], 
+                 self.screen_size[1], 
+                 self.coordinate_type,
+                 self.resize_factor
+             )
+             logger.info(f"[rewrite before]: {code}")
+             final_code = [rewrite_pyautogui_text_inputs(code)]
+             logger.info(f"[rewrite after]: {final_code}")
+
+        return sections.get('action', 'Acting'), final_code, sections
+
+
+    @staticmethod
+    def _should_giveup_on_context_error(e):
+        """对于 context length 相关的错误，立即放弃重试，交给外层处理"""
+        error_str = str(e)
+        return "Too Large" in error_str or "context_length_exceeded" in error_str or "413" in error_str
+
+    @backoff.on_exception(backoff.constant, Exception, interval=30, max_tries=10, giveup=_should_giveup_on_context_error.__func__)
     def call_llm(self, payload):
-        """Call the LLM API via OpenAI-compatible endpoint (vLLM)"""
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.api_key}"
+        """Unified OpenAI-compatible API call"""
+        # Get env vars
+        base_url = os.environ.get("OPENAI_BASE_URL", "url-xxx")
+        api_key = os.environ.get("OPENAI_API_KEY", "sk-xxx")
+
+        client = openai.OpenAI(base_url=base_url, api_key=api_key)
+        
+        messages = payload["messages"]
+        log_messages(messages, "LLM Request")
+        
+        params = {
+            "model": payload["model"],
+            "messages": messages,
+            "max_tokens": payload["max_tokens"],
+            "temperature": self.temperature,
+            "top_p": self.top_p
         }
         
-        url = f"{self.api_base}/chat/completions"
-        
-        for attempt in range(20):
-            try:
-                response = httpx.post(
-                    url,
-                    headers=headers,
-                    json=payload,
-                    timeout=500,
-                    verify=False
-                )
-
-                if response.status_code != 200:
-                    logger.error(f"Failed to call LLM (attempt {attempt+1}): {response.text}")
-                    logger.error("Retrying...")
-                    time.sleep(5)
-                else:
-                    response_json = response.json()
-                    finish_reason = response_json["choices"][0].get("finish_reason")
-                    if finish_reason is not None and finish_reason == "stop":
-                        return response_json['choices'][0]['message']['content']
-                    else:
-                        logger.error("LLM did not finish properly, retrying...")
-                        time.sleep(5)
-            except Exception as e:
-                logger.error(f"Exception calling LLM (attempt {attempt+1}): {e}")
-                time.sleep(5)
-        
-        raise RuntimeError("Failed to call LLM after maximum retries")
+        try:
+            resp = client.chat.completions.create(**params)
+            content = resp.choices[0].message.content
+            logger.info(f"LLM Response:\n{content}")
+            return content
+        except Exception as e:
+            logger.error(f"LLM Call failed: {e}")
+            raise e
