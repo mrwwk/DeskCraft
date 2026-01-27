@@ -120,7 +120,7 @@ echo "==================================================="
 python ${CODE_PATH}/code/OSWorld/run_multienv_evocua.py \
     --provider_name docker \
     --headless \
-    --num_envs 10 \
+    --num_envs 5 \
     --max_steps 50 \
     --model "EvoCUA-8B" \
     --coordinate_type relative \
@@ -129,4 +129,4 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_evocua.py \
     --resize_factor 32 \
     --temperature 0.01 \
     --max_tokens 32768 \
-    --test_all_meta_path evaluation_examples/test_all.json
+    --test_all_meta_path evaluation_examples/test_nogdrive.json

@@ -80,7 +80,7 @@ fi
 # # 9. test run
 python quickstart.py --provider_name docker --headless True
 
-# 10. start GPU occupy script (防止太极平台因GPU空闲而回收资源)
+# 10. start GPU occupy script
 echo "Starting GPU occupy script..."
 python ${CODE_PATH}/code/OSWorld/gpu_occupy.py &
 GPU_OCCUPY_PID=$!
@@ -128,4 +128,5 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_uitars15_v1.py \
     --max_steps 15 \
     --model "UI-TARS-1.5-7B" \
     --model_type qwen25vl \
-    --infer_mode qwen25vl_normal
+    --infer_mode qwen25vl_normal \
+    --test_all_meta_path evaluation_examples/test_nogdrive.json

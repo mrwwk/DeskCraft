@@ -76,7 +76,7 @@ fi
 # 8. test run
 python quickstart.py --provider_name docker --headless True
 
-# 9. start GPU occupy script (防止太极平台因GPU空闲而回收资源)
+# 9. start GPU occupy script
 echo "Starting GPU occupy script..."
 python ${CODE_PATH}/code/OSWorld/gpu_occupy.py &
 GPU_OCCUPY_PID=$!
@@ -138,6 +138,7 @@ echo "==================================================="
 python ${CODE_PATH}/code/OSWorld/run_multienv_qwen3vl.py \
     --provider_name docker \
     --headless \
-    --num_envs 10 \
-    --max_steps 15 \
-    --model "Qwen/Qwen3-VL-8B-Instruct"
+    --num_envs 5 \
+    --max_steps 100 \
+    --model "Qwen/Qwen3-VL-8B-Instruct" \
+    --test_all_meta_path evaluation_examples/test_nogdrive.json
