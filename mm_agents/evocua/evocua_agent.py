@@ -623,7 +623,7 @@ Previous actions:
         error_str = str(e)
         return "Too Large" in error_str or "context_length_exceeded" in error_str or "413" in error_str
 
-    @backoff.on_exception(backoff.constant, Exception, interval=30, max_tries=10, giveup=_should_giveup_on_context_error.__func__)
+    @backoff.on_exception(backoff.constant, Exception, interval=120, max_tries=20, giveup=_should_giveup_on_context_error.__func__)
     def call_llm(self, payload):
         """Unified OpenAI-compatible API call"""
         # Get env vars
