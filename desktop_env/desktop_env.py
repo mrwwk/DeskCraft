@@ -276,13 +276,14 @@ class DesktopEnv(gym.Env):
                 logger.info("Environment is clean, skipping snapshot revert (provider: {}).".format(self.provider_name))
 
             if task_config is not None:
-                if task_config.get("proxy", False) and self.enable_proxy:
-                    # If using proxy and proxy is enabled, set up the proxy configuration
+                if self.enable_proxy:
+                    # If proxy is enabled at system level, always set up the proxy configuration
+                    # This ensures VM can access network regardless of task's proxy setting
                     self.setup_controller._proxy_setup(self.client_password)
                 self._set_task_info(task_config)
                 self.setup_controller.reset_cache_dir(self.cache_dir)
                 logger.info("Setting up environment...")
-                success = self.setup_controller.setup(self.config, task_config.get("proxy", False) and self.enable_proxy)
+                success = self.setup_controller.setup(self.config, self.enable_proxy)
                 if success:
                     # Mark environment as used when setup is successfully executed
                     if self.config:  # Only mark as used if there were actual setup operations
