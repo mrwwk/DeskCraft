@@ -22,10 +22,6 @@ def get_vscode_config(env, config: Dict[str, Any]) -> str:
     else:
         trajectory = [
             {"type": "hotkey", "param": ["ctrl", "shift", "p"]},
-            {"type": "typewrite", "param": "Extensions: Enable All Extensions"},
-            {"type": "press", "param": "enter"},
-            {"type": "press", "param": "enter"},
-            {"type": "hotkey", "param": ["ctrl", "shift", "p"]},
             {"type": "typewrite", "param": vscode_extension_command},
             {"type": "press", "param": "enter"}
         ]
