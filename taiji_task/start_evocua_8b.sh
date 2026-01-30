@@ -65,6 +65,9 @@ rm -f osworld_image.tar
 # 6. activate osworld virtual environment
 . /workspace/osworld/bin/activate
 
+# 6.1 ensure openai is installed (for API client)
+pip install openai -q
+
 # 7. prepare VM data
 mkdir -p docker_vm_data
 if [ ! -f "docker_vm_data/Ubuntu.qcow2" ]; then
