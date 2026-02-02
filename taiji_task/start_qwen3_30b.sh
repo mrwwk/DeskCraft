@@ -1,5 +1,5 @@
-# start_qwen3_32b_thinking.sh
-# Qwen3-VL-32B-Thinking 评测脚本
+# start_qwen3_30b.sh
+# Qwen3-VL-30B-A3B-Instruct 评测脚本
 
 bash $(dirname "$0")/install_taiji_client.sh
 
@@ -7,7 +7,7 @@ bash $(dirname "$0")/install_taiji_client.sh
 CODE_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
 
 # 模型路径
-MODEL_PATH="/apdcephfs_fsgm/share_304220499/model/Qwen3-VL-32B-Thinking"
+MODEL_PATH="/apdcephfs_fsgm/share_304220499/model/Qwen3-VL-30B-A3B-Instruct"
 
 # 这里不用修改～已经下载好了
 DATA_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
@@ -82,7 +82,7 @@ python ${CODE_PATH}/code/OSWorld/gpu_occupy.py &
 GPU_OCCUPY_PID=$!
 echo "GPU occupy script started with PID: ${GPU_OCCUPY_PID}"
 
-# 10. 启动 vLLM 并等待就绪 (32B Thinking 模型需要更多显存，添加显存优化参数)
+# 10. 启动 vLLM 并等待就绪 (30B 模型需要更多显存，添加显存优化参数)
 echo "Starting vLLM server..."
 vllm serve ${MODEL_PATH} \
     --trust-remote-code \
@@ -91,7 +91,7 @@ vllm serve ${MODEL_PATH} \
     --port 8000 \
     --max-model-len 32768 \
     --gpu-memory-utilization 0.92 \
-    --served-model-name "Qwen/Qwen3-VL-32B-Thinking" &
+    --served-model-name "Qwen/Qwen3-VL-30B-A3B-Instruct" &
 
 echo "Waiting for vLLM server to be ready..."
 while ! curl -s http://localhost:8000/health > /dev/null 2>&1; do
@@ -114,7 +114,8 @@ echo "vLLM server is ready!"
                 --port 8000 \
                 --max-model-len 32768 \
                 --gpu-memory-utilization 0.92 \
-                --served-model-name "Qwen/Qwen3-VL-32B-Thinking" &
+                --disable-chunked-prefill \
+                --served-model-name "Qwen/Qwen3-VL-30B-A3B-Instruct" &
             sleep 120  # 等待重启
         fi
     done
@@ -144,5 +145,5 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_qwen3vl.py \
     --headless \
     --num_envs 5 \
     --max_steps 100 \
-    --model "Qwen/Qwen3-VL-32B-Thinking" \
+    --model "Qwen/Qwen3-VL-30B-A3B-Instruct" \
     --test_all_meta_path evaluation_examples/test_nogdrive.json
