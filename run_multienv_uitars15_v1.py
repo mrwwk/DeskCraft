@@ -260,6 +260,7 @@ def run_env_tasks(task_queue: Queue, args: argparse.Namespace, shared_scores: li
                     args.result_dir,
                     args.action_space,
                     args.observation_type,
+                    args.model,
                     domain,
                     example_id,
                 )
@@ -425,8 +426,7 @@ def test(args: argparse.Namespace, test_all_meta: dict) -> None:
 def get_unfinished(
     action_space, use_model, observation_type, result_dir, total_file_json
 ):
-    # 外层result_dir已包含model信息，内层不再重复
-    target_dir = os.path.join(result_dir, action_space, observation_type)
+    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
 
     if not os.path.exists(target_dir):
         return total_file_json
@@ -461,7 +461,7 @@ def get_unfinished(
 
 
 def get_result(action_space, use_model, observation_type, result_dir, total_file_json):
-    target_dir = os.path.join(result_dir, action_space, observation_type)
+    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
     if not os.path.exists(target_dir):
         print("New experiment, no result yet.")
         return None
@@ -527,11 +527,12 @@ if __name__ == "__main__":
             args.result_dir = os.path.join(args.result_dir, f"{args.model}_{run_suffix}")
         logger.info(f"Results will be saved to: {args.result_dir}")
         
-        # save args to json in result_dir/action_space/observation_type/args.json
+        # save args to json in result_dir/action_space/observation_type/model/args.json
         path_to_args = os.path.join(
             args.result_dir,
             args.action_space,
             args.observation_type,
+            args.model,
             "args.json",
         )
         os.makedirs(os.path.dirname(path_to_args), exist_ok=True)

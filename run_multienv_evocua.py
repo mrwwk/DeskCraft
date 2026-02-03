@@ -233,6 +233,7 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, log
                     args.result_dir,
                     args.action_space,
                     args.observation_type,
+                    args.model,
                     domain,
                     example_id,
                 )
@@ -405,8 +406,8 @@ def test(args: argparse.Namespace, test_all_meta: dict, logger) -> None:
     logger.info(f"Average score: {sum(scores) / len(scores) if scores else 0}")
 
 
-def get_unfinished(action_space, observation_type, result_dir, total_file_json):
-    target_dir = os.path.join(result_dir, action_space, observation_type)
+def get_unfinished(action_space, use_model, observation_type, result_dir, total_file_json):
+    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
 
     if not os.path.exists(target_dir):
         return total_file_json
@@ -439,8 +440,8 @@ def get_unfinished(action_space, observation_type, result_dir, total_file_json):
     return total_file_json
 
 
-def get_result(action_space, observation_type, result_dir, total_file_json):
-    target_dir = os.path.join(result_dir, action_space, observation_type)
+def get_result(action_space, use_model, observation_type, result_dir, total_file_json):
+    target_dir = os.path.join(result_dir, action_space, observation_type, use_model)
     if not os.path.exists(target_dir):
         print("New experiment, no result yet.")
         return None
@@ -508,6 +509,7 @@ if __name__ == "__main__":
             args.result_dir,
             args.action_space,
             args.observation_type,
+            args.model,
             "args.json",
         )
         os.makedirs(os.path.dirname(path_to_args), exist_ok=True)
@@ -522,6 +524,7 @@ if __name__ == "__main__":
 
         test_file_list = get_unfinished(
             args.action_space,
+            args.model,
             args.observation_type,
             args.result_dir,
             test_all_meta,
@@ -533,6 +536,7 @@ if __name__ == "__main__":
 
         get_result(
             args.action_space,
+            args.model,
             args.observation_type,
             args.result_dir,
             test_all_meta,
