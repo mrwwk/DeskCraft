@@ -82,14 +82,13 @@ python ${CODE_PATH}/code/OSWorld/gpu_occupy.py &
 GPU_OCCUPY_PID=$!
 echo "GPU occupy script started with PID: ${GPU_OCCUPY_PID}"
 
-# 10. 启动 vLLM 并等待就绪 (30B 模型需要更多显存，添加显存优化参数)
+# 10. 启动 vLLM 并等待就绪
 echo "Starting vLLM server..."
 vllm serve ${MODEL_PATH} \
     --trust-remote-code \
     --limit-mm-per-prompt '{"image":5,"video":0}' \
     --tensor-parallel-size 8 \
     --port 8000 \
-    --max-model-len 32768 \
     --gpu-memory-utilization 0.92 \
     --served-model-name "Qwen/Qwen3-VL-30B-A3B-Instruct" &
 
@@ -112,9 +111,7 @@ echo "vLLM server is ready!"
                 --limit-mm-per-prompt '{"image":5,"video":0}' \
                 --tensor-parallel-size 8 \
                 --port 8000 \
-                --max-model-len 32768 \
                 --gpu-memory-utilization 0.92 \
-                --disable-chunked-prefill \
                 --served-model-name "Qwen/Qwen3-VL-30B-A3B-Instruct" &
             sleep 120  # 等待重启
         fi
