@@ -90,7 +90,7 @@ vllm serve ${MODEL_PATH} \
     --tensor-parallel-size 8 \
     --port 8000 \
     --gpu-memory-utilization 0.92 \
-    --served-model-name "Qwen/Qwen3-VL-30B-A3B-Thinking" &
+    --served-model-name "Qwen3-VL-30B-A3B-Thinking" &
 
 echo "Waiting for vLLM server to be ready..."
 while ! curl -s http://localhost:8000/health > /dev/null 2>&1; do
@@ -112,7 +112,7 @@ echo "vLLM server is ready!"
                 --tensor-parallel-size 8 \
                 --port 8000 \
                 --gpu-memory-utilization 0.92 \
-                --served-model-name "Qwen/Qwen3-VL-30B-A3B-Thinking" &
+                --served-model-name "Qwen3-VL-30B-A3B-Thinking" &
             sleep 120  # 等待重启
         fi
     done
@@ -142,5 +142,5 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_qwen3vl.py \
     --headless \
     --num_envs 5 \
     --max_steps 100 \
-    --model "Qwen/Qwen3-VL-30B-A3B-Thinking" \
+    --model "Qwen3-VL-30B-A3B-Thinking" \
     --test_all_meta_path evaluation_examples/test_nogdrive.json
