@@ -1,0 +1,78 @@
+{
+  "id": "interactive_gimp_progressive_001",
+  "snapshot": "gimp",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户需要编辑一张风景照片，会分多步给出要求：先调亮度，再裁剪，最后导出",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/d16c99dc-2a1e-46f2-b350-d97c86c85c15/dog_with_background.png",
+            "path": "/home/user/Desktop/landscape.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/landscape.png"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我把这张图片调亮一点，感觉太暗了",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "好的，现在帮我把图片裁剪成 800x600 的尺寸",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后帮我导出为 JPEG 格式，保存到桌面，文件名叫 final_landscape.jpg",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_image_size",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/final_landscape.jpg",
+      "dest": "final_landscape.jpg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "width": 800,
+        "height": 600
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
