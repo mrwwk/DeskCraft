@@ -1,0 +1,116 @@
+{
+    "id": "interactive_impress_workflow_001",
+    "snapshot": "libreoffice_impress",
+    "interactive": true,
+    "scenario_type": "multi_step_workflow",
+    "scenario_description": "用户需要用 LibreOffice Impress 制作一个简单的演示文稿，分步给出每一页的要求",
+    "user_persona": {
+        "expertise_level": "beginner",
+        "communication_style": "casual_chinese"
+    },
+    "config": [
+        {
+            "type": "download",
+            "parameters": {
+                "files": [
+                    {
+                        "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/libreoffice_impress/5d901039-a89c-4bfb-967b-bf66f4df075e/CPD_Background_Investigation_Process.pptx",
+                        "path": "/home/user/Desktop/MyPresentation.pptx"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "open",
+            "parameters": {
+                "path": "/home/user/Desktop/MyPresentation.pptx"
+            }
+        }
+    ],
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我打开桌面上的 MyPresentation.pptx，先把第一页的标题改成\"项目汇报\"",
+            "trigger": {
+                "type": "agent_done"
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "好的，现在帮我在第一页的标题下面加一行副标题，写\"2025年第一季度\"",
+            "trigger": {
+                "type": "agent_done"
+            }
+        },
+        {
+            "phase_id": 3,
+            "instruction": "然后帮我新建一页幻灯片，在上面写一个标题\"项目进展\"",
+            "trigger": {
+                "type": "agent_done"
+            }
+        },
+        {
+            "phase_id": 4,
+            "instruction": "最后帮我把整个演示文稿保存一下",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_impress"
+    ],
+    "evaluator": {
+        "postconfig": [
+            {
+                "type": "activate_window",
+                "parameters": {
+                    "window_name": "MyPresentation.pptx - LibreOffice Impress",
+                    "strict": true
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 0.5
+                }
+            },
+            {
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python",
+                        "-c",
+                        "import pyautogui; pyautogui.hotkey('ctrl', 's');"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 0.5
+                }
+            }
+        ],
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "unzip -p /home/user/Desktop/MyPresentation.pptx ppt/slides/slide1.xml ppt/slides/slide2.xml 2>/dev/null"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "项目汇报",
+                    "2025年第一季度",
+                    "项目进展"
+                ],
+                "exclude": []
+            }
+        }
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}
