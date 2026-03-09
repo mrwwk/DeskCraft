@@ -36,3 +36,15 @@ def get_gimp_config_file(env, config: Dict[str, str]):
         f.write(content)
 
     return _path
+
+
+def get_xcf_file(env, config: Dict[str, str]):
+    """
+    Gets an XCF file from the VM.
+
+    Config:
+        path (str): absolute path on the VM to fetch
+        dest (str): file name of the downloaded file
+    """
+    from .file import get_vm_file
+    return get_vm_file(env, config)

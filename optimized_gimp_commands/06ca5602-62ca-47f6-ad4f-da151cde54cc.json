@@ -1,0 +1,98 @@
+{
+  "id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+  "snapshot": "gimp",
+  "instruction": "请将图像转换为基于调色板的模式并导出。操作步骤：1. 打开GIMP软件；2. 打开桌面上的computer.png文件；3. 点击顶部菜单栏的'图像'选项；4. 选择'模式'子菜单；5. 点击'索引'选项；6. 在弹出的对话框中使用默认设置，点击'确定'；7. 使用快捷键Shift+Ctrl+E导出图像；8. 在导出对话框中，将文件名设置为palette_computer.png，点击'导出'；9. 在PNG导出选项对话框中，点击'导出'确认。",
+  "source": "https://stackoverflow.com/questions/74664666/how-to-export-palette-based-png-in-gimp",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/06ca5602-62ca-47f6-ad4f-da151cde54cc/computer.png",
+            "path": "/home/user/Desktop/computer.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/computer.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.write(\"palette_computer\");pyautogui.press([\"enter\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.press([\"enter\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ],
+    "func": "check_palette_and_structure_sim",
+    "expected": {
+      "type": "cloud_file",
+      "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/06ca5602-62ca-47f6-ad4f-da151cde54cc/computer.png",
+      "dest": "computer.png"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/palette_computer.png",
+      "dest": "palette_computer.png"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

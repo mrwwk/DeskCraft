@@ -375,9 +375,17 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
                 stripped_content = stripped_content.rstrip("\\n").rstrip("\n")
             if content:
                 if input_swap:
-                    pyautogui_code += "\nimport pyperclip"
-                    pyautogui_code += f"\npyperclip.copy('{stripped_content}')"
-                    pyautogui_code += "\npyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += "\nimport subprocess, shutil"
+                    pyautogui_code += "\nif shutil.which('xclip'):"
+                    pyautogui_code += f"\n    subprocess.run(['xclip', '-selection', 'clipboard'], input='{stripped_content}'.encode('utf-8'))"
+                    pyautogui_code += "\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += "\nelif shutil.which('xsel'):"
+                    pyautogui_code += f"\n    subprocess.run(['xsel', '-b', '-i'], input='{stripped_content}'.encode('utf-8'))"
+                    pyautogui_code += "\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += "\nelif shutil.which('xdotool'):"
+                    pyautogui_code += f"\n    subprocess.run(['xdotool', 'type', '--clearmodifiers', '--delay', '10', '{stripped_content}'])"
+                    pyautogui_code += "\nelse:"
+                    pyautogui_code += f"\n    pyautogui.write('{stripped_content}', interval=0.05)"
                     pyautogui_code += "\ntime.sleep(0.5)\n"
                     if content.endswith("\n") or content.endswith("\\n"):
                         pyautogui_code += "\npyautogui.press('enter')"

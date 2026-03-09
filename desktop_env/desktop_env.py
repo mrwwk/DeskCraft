@@ -327,7 +327,7 @@ class DesktopEnv(gym.Env):
         self.task_id: str = task_config["id"]
         self.cache_dir: str = os.path.join(self.cache_dir_base, self.task_id)
         os.makedirs(self.cache_dir, exist_ok=True)
-        self.instruction = task_config["instruction"]
+        self.instruction = task_config.get("instruction", task_config.get("phases", [{}])[0].get("instruction", ""))
         self.config = task_config["config"] if "config" in task_config else []
         
         self._set_evaluator_info(task_config)

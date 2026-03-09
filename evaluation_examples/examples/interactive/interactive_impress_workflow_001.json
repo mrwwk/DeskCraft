@@ -30,28 +30,28 @@
     "phases": [
         {
             "phase_id": 1,
-            "instruction": "帮我打开桌面上的 MyPresentation.pptx，先把第一页的标题改成\"项目汇报\"",
+            "instruction": "Please open MyPresentation.pptx on the desktop and change the title of the first slide to \"Project Report\"",
             "trigger": {
                 "type": "agent_done"
             }
         },
         {
             "phase_id": 2,
-            "instruction": "好的，现在帮我在第一页的标题下面加一行副标题，写\"2025年第一季度\"",
+            "instruction": "Okay, now add a subtitle below the title on the first slide, writing \"Q1 2025\"",
             "trigger": {
                 "type": "agent_done"
             }
         },
         {
             "phase_id": 3,
-            "instruction": "然后帮我新建一页幻灯片，在上面写一个标题\"项目进展\"",
+            "instruction": "Then create a new slide and give it the title \"Project Progress\"",
             "trigger": {
                 "type": "agent_done"
             }
         },
         {
             "phase_id": 4,
-            "instruction": "最后帮我把整个演示文稿保存一下",
+            "instruction": "Finally, please save the entire presentation",
             "trigger": {
                 "type": "agent_done"
             }
@@ -96,15 +96,15 @@
         "func": "check_include_exclude",
         "result": {
             "type": "vm_command_line",
-            "command": "unzip -p /home/user/Desktop/MyPresentation.pptx ppt/slides/slide1.xml ppt/slides/slide2.xml 2>/dev/null"
+            "command": "bash -c \"unzip -p /home/user/Desktop/MyPresentation.pptx ppt/slides/slide1.xml ppt/slides/slide2.xml 2>/dev/null\""
         },
         "expected": {
             "type": "rule",
             "rules": {
                 "include": [
-                    "项目汇报",
-                    "2025年第一季度",
-                    "项目进展"
+                    "Project Report",
+                    "Q1 2025",
+                    "Project Progress"
                 ],
                 "exclude": []
             }

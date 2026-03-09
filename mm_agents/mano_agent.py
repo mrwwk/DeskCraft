@@ -402,9 +402,17 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
                 stripped_content = stripped_content.rstrip("\\n").rstrip("\n")
             if content:
                 if input_swap:
-                    pyautogui_code += f"\nimport pyperclip"
-                    pyautogui_code += f"\npyperclip.copy('{stripped_content}')"
-                    pyautogui_code += f"\npyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nimport subprocess, shutil"
+                    pyautogui_code += f"\nif shutil.which('xclip'):"
+                    pyautogui_code += f"\n    subprocess.run(['xclip', '-selection', 'clipboard'], input='{stripped_content}'.encode('utf-8'))"
+                    pyautogui_code += f"\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nelif shutil.which('xsel'):"
+                    pyautogui_code += f"\n    subprocess.run(['xsel', '-b', '-i'], input='{stripped_content}'.encode('utf-8'))"
+                    pyautogui_code += f"\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nelif shutil.which('xdotool'):"
+                    pyautogui_code += f"\n    subprocess.run(['xdotool', 'type', '--clearmodifiers', '--delay', '10', '{stripped_content}'])"
+                    pyautogui_code += f"\nelse:"
+                    pyautogui_code += f"\n    pyautogui.write('{stripped_content}', interval=0.05)"
                     pyautogui_code += f"\ntime.sleep(0.5)\n"
                     if content.endswith("\n") or content.endswith("\\n"):
                         pyautogui_code += f"\npyautogui.press('enter')"
@@ -1011,13 +1019,8 @@ class ManoAgent:
                     return prediction, ["FAIL"]
 
                 elif parsed_response["action_type"] == CALL_USER:
-                    if self.callusr_tolerance > self.cur_callusr_count:
-                        self.actions.append(actions)
-                        self.cur_callusr_count += 1
-                        return prediction, ["WAIT"]
-                    else:
-                        self.actions.append(actions)
-                        return prediction, ["FAIL"]
+                    self.actions.append(actions)
+                    return prediction, ["CALL_USER"]
 
             pyautogui_code = parsing_response_to_pyautogui_code(
                 parsed_response,

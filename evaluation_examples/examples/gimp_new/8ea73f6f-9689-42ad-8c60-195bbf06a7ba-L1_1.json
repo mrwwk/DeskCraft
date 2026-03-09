@@ -1,0 +1,38 @@
+{
+  "id": "8ea73f6f-9689-42ad-8c60-195bbf06a7ba-L1_1",
+  "snapshot": "gimp",
+  "instruction": "Automatically remove all noise from this image while preserving all fine details perfectly.",
+  "source": "https://www.gimp.org/",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/045bf3ff-9077-4b86-b483-a1040a949cff/gate.jpeg",
+            "path": "/home/user/Desktop/noisy_image.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/noisy_image.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "infeasible"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

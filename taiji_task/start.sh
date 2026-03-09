@@ -4,12 +4,12 @@
 bash $(dirname "$0")/install_taiji_client.sh
 
 # code dir，这里修改一下到自己的文件夹，
-CODE_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
+CODE_PATH="/cq_1/share_300000800/user/jackwkwang"
 
 
 # 这里不用修改～已经下载好了
-DATA_PATH="/apdcephfs_fsgm/share_304220499/chenxuwu"
-MODEL_PATH="${DATA_PATH}/models/models--ByteDance-Seed--UI-TARS-1.5-7B"
+DATA_PATH="/apdcephfs/jp_fsgm_cephfs3/apdcephfs_fsgm/share_304220499/chenxuwu"
+MODEL_PATH="/cq_1/share_300000800/user/jackwkwang/models/UI-TARS-1.5-7B"
 
 # set AWS env vars to avoid import error (not actually using AWS)
 export AWS_REGION="us-east-1"
@@ -22,16 +22,16 @@ export DOUBAO_API_URL="http://localhost:8000/v1/chat/completions"
 
 # 1. prepare model file
 mkdir -p ~/.cache/huggingface/hub
-cp -r ${DATA_PATH}/models/models--ByteDance-Seed--UI-TARS-1.5-7B ~/.cache/huggingface/hub/
+#cp -r ${DATA_PATH}/models/models--ByteDance-Seed--UI-TARS-1.5-7B ~/.cache/huggingface/hub/
 
 # 2. OSWorld code
 cd ${CODE_PATH}/code/OSWorld
 
 # 3. prepare osworld cache file
-if [ ! -d "cache" ]; then
-    cp -r ${DATA_PATH}/data/osworld_cache.zip ./osworld_cache.zip
-    unzip -q osworld_cache.zip && mv osworld_cache cache && rm -rf osworld_cache.zip
-fi
+# if [ ! -d "cache" ]; then
+#     cp -r ${DATA_PATH}/data/osworld_cache.zip ./osworld_cache.zip
+#     unzip -q osworld_cache.zip && mv osworld_cache cache && rm -rf osworld_cache.zip
+# fi
 
 # 4. install docker
 if ! command -v docker &> /dev/null; then
@@ -62,19 +62,19 @@ echo "Cleaning up old containers..."
 docker ps -a --filter "ancestor=osworld" -q | xargs -r docker rm -f 2>/dev/null || true
 
 # 6. prepare docker image from local tar
-cp -r ${DATA_PATH}/data/osworld_image.tar ./osworld_image.tar
+#cp -r ${DATA_PATH}/data/osworld_image.tar ./osworld_image.tar
 docker load -i osworld_image.tar
-rm -f osworld_image.tar
+# rm -f osworld_image.tar
 
 # 7. activate osworld virtual environment
 . /workspace/osworld/bin/activate
 
 # 8. prepare VM data
 mkdir -p docker_vm_data
-if [ ! -f "docker_vm_data/Ubuntu.qcow2" ]; then
-    cp -r ${DATA_PATH}/data/Ubuntu.qcow2.zip ./docker_vm_data/
-    cd docker_vm_data && unzip -q Ubuntu.qcow2.zip && rm -f Ubuntu.qcow2.zip && cd ..
-fi
+# if [ ! -f "docker_vm_data/Ubuntu.qcow2" ]; then
+#     cp -r ${DATA_PATH}/data/Ubuntu.qcow2.zip ./docker_vm_data/
+#     cd docker_vm_data && unzip -q Ubuntu.qcow2.zip && rm -f Ubuntu.qcow2.zip && cd ..
+# fi
 
 # # 9. test run
 python quickstart.py --provider_name docker --headless True
@@ -102,9 +102,15 @@ done
 echo "vLLM server is ready!"
 
 # 12. run OSWorld evaluation with docker provider, network off, 当前发现开环境多的时候会报 TimeoutError: VM failed to become ready within timeout period 的错误，所以暂时设置为1，缺点是速度慢
+# Create log directory and set up logging
+LOG_DIR="${CODE_PATH}/code/OSWorld/logs/taiji_task"
+mkdir -p "${LOG_DIR}"
+LOG_FILE="${LOG_DIR}/run_$(date +%Y%m%d_%H%M%S).log"
+echo "Logging to: ${LOG_FILE}"
 python ${CODE_PATH}/code/OSWorld/run_multienv_uitars15_v2.py \
+    --domain gimp_new \
     --provider_name docker \
     --headless \
     --num_envs 3 \
     --max_steps 15 \
-    --model "UI-TARS-1.5-7B"
+    --model "UI-TARS-1.5-7B" 2>&1 | tee -a "${LOG_FILE}"

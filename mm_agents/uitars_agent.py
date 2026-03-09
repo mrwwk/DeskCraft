@@ -245,9 +245,17 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
             content = escape_single_quotes(content)
             if content:
                 if input_swap:
-                    pyautogui_code += f"\nimport pyperclip"
-                    pyautogui_code += f"\npyperclip.copy('{content.strip()}')"
-                    pyautogui_code += f"\npyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nimport subprocess, shutil"
+                    pyautogui_code += f"\nif shutil.which('xclip'):"
+                    pyautogui_code += f"\n    subprocess.run(['xclip', '-selection', 'clipboard'], input='{content.strip()}'.encode('utf-8'))"
+                    pyautogui_code += f"\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nelif shutil.which('xsel'):"
+                    pyautogui_code += f"\n    subprocess.run(['xsel', '-b', '-i'], input='{content.strip()}'.encode('utf-8'))"
+                    pyautogui_code += f"\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nelif shutil.which('xdotool'):"
+                    pyautogui_code += f"\n    subprocess.run(['xdotool', 'type', '--clearmodifiers', '--delay', '10', '{content.strip()}'])"
+                    pyautogui_code += f"\nelse:"
+                    pyautogui_code += f"\n    pyautogui.write('{content.strip()}', interval=0.05)"
                     pyautogui_code += f"\ntime.sleep(0.5)\n"
                     if content.endswith("\n") or content.endswith("\\n"):
                         pyautogui_code += f"\npyautogui.press('enter')"
@@ -721,7 +729,7 @@ class UITARSAgent:
 
                 elif parsed_response["action_type"] == CALL_USER:
                     self.actions.append(actions)
-                    return prediction, ["FAIL"]
+                    return prediction, ["CALL_USER"]
             
             pyautogui_code = parsing_response_to_pyautogui_code(
                 parsed_response,

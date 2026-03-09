@@ -1,0 +1,79 @@
+{
+  "id": "pexels-marvellous-adu-2148798496-36125485-L2_1",
+  "snapshot": "gimp",
+  "instruction": "Complete a verifiable fashion portrait editing workflow using the image at /home/user/Desktop/pexels-marvellous-adu-2148798496-36125485.jpg. Each step produces measurable, verifiable outputs:\n\n1. Create a new layer named exactly 'Subject_Cutout' above the background. Use the Foreground Select tool or Free Select tool to carefully select the person, separating them from the pink container background. Copy the selection to this new layer and hide the original background layer.\n\n2. Create a new layer named exactly 'Background_Pink' below 'Subject_Cutout'. Fill it with solid color #ff6b6b (coral pink) to create a vibrant fashion backdrop.\n\n3. Create a new layer named exactly 'Skin_Tone' above 'Subject_Cutout'. Use the Color Balance adjustment on the person's skin area: add +15 to Red channel and +10 to Yellow channel to enhance the warm skin tones.\n\n4. Create a new layer named exactly 'Clothing_Pop' above 'Skin_Tone'. Use the Hue-Saturation adjustment on the green tank top area: increase Green saturation by exactly +30 to make the clothing more vibrant.\n\n5. Create a new layer named exactly 'Contrast_Boost' above 'Clothing_Pop'. Use the Brightness-Contrast adjustment: increase Contrast by exactly +20 to add depth to the image.\n\n6. Create a new layer named exactly 'Vignette' at the top of the layer stack. Use the Elliptical Select tool to create an oval covering 80% of the image from center, apply Select > Feather with 80px radius, invert selection, and fill with black at 25% opacity.\n\n7. Add a text layer named exactly 'Text_Style' at the top-left corner with these exact specifications:\n   - Content: 'STREET STYLE'\n   - Font size: 32px\n   - Color: #ffffff (white)\n   - Position: 25px from left edge, 25px from top edge\n   - Layer name: exactly 'Text_Style'\n\n8. Add a text layer named exactly 'Text_Season' at the bottom-right corner with these exact specifications:\n   - Content: 'SUMMER 2024'\n   - Font size: 24px\n   - Color: #ffd700 (gold)\n   - Position: 25px from right edge, 25px from bottom edge\n   - Layer name: exactly 'Text_Season'\n\n9. Create a new layer named exactly 'Frame' at the very top. Use Select > All, then Edit > Stroke Selection with a 8px solid color #ff1493 (deep pink) to create a border around the entire image.\n\n10. Export the final image as 'fashion_portrait.jpg' with exact specifications: JPEG format, width 1400 pixels (height auto), quality 93. Save the project as 'fashion_project.xcf' with all layers preserved.",
+  "source": "https://www.pexels.com/",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/high_quality/pic_high/pexels-marvellous-adu-2148798496-36125485.jpg",
+            "path": "/home/user/Desktop/pexels-marvellous-adu-2148798496-36125485.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/pexels-marvellous-adu-2148798496-36125485.jpg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 5
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "pkill",
+            "-f",
+            "gimp"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      }
+    ],
+    "func": "check_fashion_portrait_complete",
+    "result": {
+      "type": "vm_file",
+      "path": [
+        "/home/user/Desktop/fashion_portrait.jpg",
+        "/home/user/Desktop/fashion_project.xcf",
+        "/home/user/Desktop/pexels-marvellous-adu-2148798496-36125485.jpg"
+      ],
+      "dest": [
+        "fashion_portrait.jpg",
+        "fashion_project.xcf",
+        "source_image.jpg"
+      ],
+      "multi": true
+    },
+    "options": {
+      "expected_width": 1400
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -386,9 +386,17 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
                 stripped_content = stripped_content.rstrip("\\n").rstrip("\n")
             if content:
                 if input_swap:
-                    pyautogui_code += f"\nimport pyperclip"
-                    pyautogui_code += f"\npyperclip.copy('{stripped_content}')"
-                    pyautogui_code += f"\npyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nimport subprocess, shutil"
+                    pyautogui_code += f"\nif shutil.which('xclip'):"
+                    pyautogui_code += f"\n    subprocess.run(['xclip', '-selection', 'clipboard'], input='{stripped_content}'.encode('utf-8'))"
+                    pyautogui_code += f"\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nelif shutil.which('xsel'):"
+                    pyautogui_code += f"\n    subprocess.run(['xsel', '-b', '-i'], input='{stripped_content}'.encode('utf-8'))"
+                    pyautogui_code += f"\n    pyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += f"\nelif shutil.which('xdotool'):"
+                    pyautogui_code += f"\n    subprocess.run(['xdotool', 'type', '--clearmodifiers', '--delay', '10', '{stripped_content}'])"
+                    pyautogui_code += f"\nelse:"
+                    pyautogui_code += f"\n    pyautogui.write('{stripped_content}', interval=0.05)"
                     pyautogui_code += f"\ntime.sleep(0.5)\n"
                     if content.endswith("\n") or content.endswith("\\n"):
                         pyautogui_code += f"\npyautogui.press('enter')"
@@ -478,6 +486,9 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
         
         elif action_type in ["finished"]:
             pyautogui_code = f"DONE"
+        
+        elif action_type in ["call_user"]:
+            pyautogui_code = f"CALL_USER"
         
         else:
             pyautogui_code += f"\n# Unrecognized action type: {action_type}"
@@ -606,6 +617,48 @@ finished(content='xxx') # Use escape characters \\', \\", and \\n in content par
 {instruction}
 """
 
+COMPUTER_USE_DOUBAO_INTERACTIVE = """You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.
+
+## Output Format
+You should first think about the reasoning process in the mind and then provide the user with the answer. 
+The reasoning process is enclosed within <think> </think> tags
+After the <think> tags, you should place final answer, which concludes your summarized thought and your action.
+
+For example,
+```
+<think>detailed reasoning content here</think>
+Thought: a small plan and finally summarize your next action (with its target element) in one sentence
+Action: ...
+```
+
+## Action Space
+
+click(point='<point>x1 y1</point>')
+left_double(point='<point>x1 y1</point>')
+right_single(point='<point>x1 y1</point>')
+drag(start_point='<point>x1 y1</point>', end_point='<point>x2 y2</point>')
+hotkey(key='ctrl c') # Split keys with a space and use lowercase. Also, do not use more than 3 keys in one hotkey action.
+type(content='xxx') # Use escape characters \\\\', \\\\\\\", and \\\\n in content part to ensure we can parse the content in normal python string format. If you want to submit your input, use \\\\n at the end of content. 
+scroll(point='<point>x1 y1</point>', direction='down or up or right or left') # Show more information on the `direction` side.
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished(content='xxx') # Use escape characters \\\\', \\\\\\\", and \\\\n in content part to ensure we can parse the content in normal python string format.
+call_user(content='xxx') # When the user's instruction is unclear or ambiguous, use this action to ask the user for clarification before proceeding. Write your question in the content field.
+
+## Output Example
+<think>Now that...</think>
+Thought: Let's click ...
+Action: click(point='<point>100 200</point>')
+
+## Note
+- Use {language} in `Thought` part.
+- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.
+- If you have executed several same actions (like repeatedly clicking the same point) but the screen keeps no change, please try to execute a modified action when necessary.
+- If the user's instruction is vague or missing key details, use call_user to ask clarifying questions BEFORE taking action. Do not guess what the user wants.
+
+## User Instruction
+{instruction}
+"""
+
 class UITarsAgent:
     """
     UI-TARS Agent based on Seed1.5-VL model implementation.
@@ -684,6 +737,9 @@ class UITarsAgent:
         self.use_thinking = use_thinking
 
         self.inference_func = self.inference_with_thinking if use_thinking else self.inference_without_thinking
+
+        # Support for interactive multi-turn user messages
+        self.pending_user_messages = []
     
     def reset(self, _logger=None, vm_ip=None):
         global logger
@@ -694,6 +750,23 @@ class UITarsAgent:
         self.observations = []
         self.history_images = []
         self.history_responses = []
+        self.pending_user_messages = []
+
+    def receive_user_message(self, message: str):
+        """Receive a new user message for multi-turn interactive evaluation.
+        The message will be injected into the next predict() call's instruction."""
+        self.pending_user_messages.append(message)
+
+    def set_interactive_prompt(self, enable: bool = True):
+        """Switch to interactive prompt that includes call_user action.
+        Called by lib_run_interactive when the task has agent_asks phases."""
+        if enable:
+            self.system_prompt = COMPUTER_USE_DOUBAO_INTERACTIVE
+        else:
+            if self.use_thinking:
+                self.system_prompt = COMPUTER_USE_DOUBAO
+            else:
+                self.system_prompt = COMPUTER_USE_NO_THINKING
 
     def pretty_print_messages(self, messages):
         """Pretty print messages while hiding base64 encoded images."""
@@ -784,6 +857,12 @@ class UITarsAgent:
     def predict(self, task_instruction: str, obs: dict) -> Tuple[Union[str, Dict, None], List]:
         """Predict the next action based on the current observation."""
         
+        # Inject pending user messages into the instruction
+        if self.pending_user_messages:
+            extra_messages = "\n".join(self.pending_user_messages)
+            task_instruction = f"{task_instruction}\n\n[用户追加消息]:\n{extra_messages}"
+            self.pending_user_messages.clear()
+        
         self.task_instruction = task_instruction
         
         assert len(self.observations) == len(self.actions) and len(self.actions) == len(
@@ -850,6 +929,8 @@ class UITarsAgent:
         while True:
             if try_times <= 0:
                 self.logger.error(f"Reach max retry times to fetch response from client, as error flag.")
+                self.actions.append(["FAIL"])
+                self.thoughts.append("")
                 return prediction, ["FAIL"]
             try:
                 logger.info(f"Messages: {self.pretty_print_messages(messages[-1])}")
@@ -877,14 +958,15 @@ class UITarsAgent:
             
         except Exception as e:
             self.logger.error(f"Parsing action error: {prediction}, with error:\n{e}")
+            self.actions.append(["FAIL"])
+            self.thoughts.append("")
             return prediction, ["FAIL"]
             
         thoughts = ""
         for parsed_response in parsed_dict:
             if "thought" in parsed_response and parsed_response["thought"]:
                 thoughts += parsed_response["thought"]
-        if thoughts:
-            self.thoughts.append(thoughts)
+        self.thoughts.append(thoughts)
         for parsed_response in parsed_dict:
             if "action_type" in parsed_response:
                 if parsed_response["action_type"] == FINISH_WORD:
@@ -900,6 +982,10 @@ class UITarsAgent:
                 elif parsed_response["action_type"] == ENV_FAIL_WORD:
                     self.actions.append(["FAIL"])
                     return prediction, ["FAIL"]
+                
+                elif parsed_response["action_type"] == CALL_USER:
+                    self.actions.append(["CALL_USER"])
+                    return prediction, ["CALL_USER"]
 
             
         self.actions.append([parsed_pyautogui_code])

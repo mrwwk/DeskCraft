@@ -1,0 +1,26 @@
+{
+  "id": "fbb548ca-c2a6-4601-9204-e39a2efc507b-L1_1",
+  "snapshot": "gimp",
+  "instruction": "Change GIMP's interface language to French without restarting the application.",
+  "source": "https://www.gimp.org/",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "infeasible"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -91,7 +91,8 @@ vllm serve ${MODEL_PATH} \
     --limit-mm-per-prompt '{"image":5,"video":0}' \
     --tensor-parallel-size 8 \
     --port 8000 \
-    --served-model-name "EvoCUA-8B" &
+    --served-model-name "EvoCUA-8B" \
+    --no-enable-chunked-prefill &
 
 # wait for vLLM server to be ready
 echo "Waiting for vLLM server to be ready..."

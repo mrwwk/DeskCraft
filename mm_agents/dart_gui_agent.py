@@ -682,5 +682,5 @@ class DartAgent:
                 elif action_type == ENV_FAIL_WORD:
                     return "FAIL"
                 elif action_type == CALL_USER:
-                    return "FAIL"
+                    return "CALL_USER"
         return None

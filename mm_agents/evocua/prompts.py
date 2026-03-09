@@ -38,7 +38,7 @@ For the action section, you should provide clear, concise, and actionable instru
 For the code section, you should output the corresponding code for the action. The code should be either PyAutoGUI code or one of the following functions warped in the code block:
 - {{"name": "computer.wait", "description": "Make the computer wait for 20 seconds for installation, running code, etc.", "parameters": {{"type": "object", "properties": {{}}, "required": []}}}}
 - {{"name": "computer.terminate", "description": "Terminate the current task and report its completion status", "parameters": {{"type": "object", "properties": {{"status": {{"type": "string", "enum": ["success", "failure"], "description": "The status of the task"}}, {{"answer": {{"type": "string", "description": "The answer of the task"}}}}, "required": ["status"]}}}}
-Examples for the code section:
+{call_user_tool}Examples for the code section:
 ```python
 pyautogui.click(x=123, y=456)
 ```
@@ -50,6 +50,16 @@ computer.terminate(status="success", answer='''text''')
 ```"""
 
 
+S1_CALL_USER_TOOL = """- {{"name": "computer.call_user", "description": "When the user's instruction is unclear or ambiguous, ask the user for clarification before proceeding", "parameters": {{"type": "object", "properties": {{"question": {{"type": "string", "description": "The question to ask the user"}}}}, "required": ["question"]}}}}
+"""
+
+
+def build_s1_system_prompt(password, is_interactive=False):
+    """Build S1 system prompt with conditional call_user tool."""
+    call_user_tool = S1_CALL_USER_TOOL if is_interactive else ""
+    return S1_SYSTEM_PROMPT.format(password=password, call_user_tool=call_user_tool)
+
+
 # S1 prompt templates for generating trajectories
 S1_STEP_TEMPLATE = "# Step {step_num}:\n"
 S1_INSTRUTION_TEMPLATE = "# Task Instruction:\n{instruction}\n\nPlease generate the next move according to the screenshot, task instruction and previous steps (if provided).\n"
@@ -58,7 +68,7 @@ S1_ACTION_HISTORY_TEMPLATE = "## Action:\n{action}\n"
 
 
 # S2 Prompts
-S2_ACTION_DESCRIPTION = """
+S2_ACTION_DESCRIPTION_BASE = """
 * `key`: Performs key down presses on the arguments passed in order, then performs key releases in reverse order.
 * `key_down`: Press and HOLD the specified key(s) down in order (no release). Use this for stateful holds like holding Shift while clicking.
 * `key_up`: Release the specified key(s) in reverse order.
@@ -76,6 +86,12 @@ S2_ACTION_DESCRIPTION = """
 * `terminate`: Terminate the current task and report its completion status.
 * `answer`: Answer a question.
 """
+
+S2_ACTION_CALL_USER = """* `call_user`: When the user's instruction is unclear or ambiguous, ask the user for clarification before proceeding.
+"""
+
+# Keep the combined version for backward compatibility
+S2_ACTION_DESCRIPTION = S2_ACTION_DESCRIPTION_BASE + S2_ACTION_CALL_USER
 
 S2_DESCRIPTION_PROMPT_TEMPLATE = """Use a mouse and keyboard to interact with a computer, and take screenshots.
 * This is an interface to a desktop GUI. You must click on desktop icons to start applications.
@@ -112,37 +128,65 @@ Rules:
 - If finishing, use action=terminate in the tool call."""
 
 
-def build_s2_tools_def(description_prompt):
-    return {
-        "type": "function", 
-        "function": {
-            "name_for_human": "computer_use", 
-            "name": "computer_use", 
-            "description": description_prompt,
-            "parameters": {
-                "properties": {
-                    "action": {
-                        "description": S2_ACTION_DESCRIPTION,
-                        "enum": ["key", "type", "mouse_move", "left_click", "left_click_drag", 
-                                 "right_click", "middle_click", "double_click", "triple_click", "scroll", 
-                                 "wait", "terminate", "key_down", "key_up"], 
-                        "type": "string"
-                    },
-                    "keys": {"description": "Required only by `action=key`.", "type": "array"}, 
-                    "text": {"description": "Required only by `action=type`.", "type": "string"}, 
-                    "coordinate": {"description": "The x,y coordinates for mouse actions.", "type": "array"}, 
-                    "pixels": {"description": "The amount of scrolling.", "type": "number"}, 
-                    "time": {"description": "The seconds to wait.", "type": "number"}, 
-                    "status": {
-                        "description": "The status of the task.", 
-                        "type": "string", 
-                        "enum": ["success", "failure"]
-                    }
-                }, 
-                "required": ["action"], 
-                "type": "object"
-            }, 
-            "args_format": "Format the arguments as a JSON object."
+def build_s2_tools_def(description_prompt, is_interactive=False):
+    """Build S2 tool definition.
+
+    Args:
+        description_prompt: The description prompt for the tool.
+        is_interactive: When True, include the ``call_user`` action so the
+            agent can ask the user for clarification.  When False (default),
+            the action is hidden to prevent the agent from wasting steps on
+            non-interactive tasks.
+    """
+    # Choose action enum and description based on interactive mode
+    base_actions = [
+        "key", "type", "mouse_move", "left_click", "left_click_drag",
+        "right_click", "middle_click", "double_click", "triple_click",
+        "scroll", "wait", "terminate", "key_down", "key_up",
+    ]
+    if is_interactive:
+        action_enum = base_actions + ["call_user"]
+        action_description = S2_ACTION_DESCRIPTION_BASE + S2_ACTION_CALL_USER
+    else:
+        action_enum = base_actions
+        action_description = S2_ACTION_DESCRIPTION_BASE
+
+    properties = {
+        "action": {
+            "description": action_description,
+            "enum": action_enum,
+            "type": "string"
+        },
+        "keys": {"description": "Required only by `action=key`.", "type": "array"},
+        "text": {"description": "Required only by `action=type`.", "type": "string"},
+        "coordinate": {"description": "The x,y coordinates for mouse actions.", "type": "array"},
+        "pixels": {"description": "The amount of scrolling.", "type": "number"},
+        "time": {"description": "The seconds to wait.", "type": "number"},
+        "status": {
+            "description": "The status of the task.",
+            "type": "string",
+            "enum": ["success", "failure"]
         }
     }
 
+    # Only expose the question parameter when call_user is available
+    if is_interactive:
+        properties["question"] = {
+            "description": "The question to ask the user (required only by `action=call_user`).",
+            "type": "string"
+        }
+
+    return {
+        "type": "function",
+        "function": {
+            "name_for_human": "computer_use",
+            "name": "computer_use",
+            "description": description_prompt,
+            "parameters": {
+                "properties": properties,
+                "required": ["action"],
+                "type": "object"
+            },
+            "args_format": "Format the arguments as a JSON object."
+        }
+    }

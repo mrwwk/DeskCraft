@@ -1,0 +1,48 @@
+{
+  "id": "2a729ded-3296-423d-aec4-7dd55ed5fbb3-L1_3",
+  "snapshot": "gimp",
+  "instruction": "Save the image as a PNG file named transparent_output.png to preserve transparency",
+  "source": "https://www.youtube.com/watch?v=lOzSiOIipSM",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/2a729ded-3296-423d-aec4-7dd55ed5fbb3/dog_with_background.png",
+            "path": "/home/user/Desktop/dog_with_background.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/dog_with_background.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_png_format_with_transparency",
+    "expected": {
+      "type": "cloud_file",
+      "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/2a729ded-3296-423d-aec4-7dd55ed5fbb3/dog_with_background.png",
+      "dest": "dog_with_background.png"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/transparent_output.png",
+      "dest": "transparent_output.png"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

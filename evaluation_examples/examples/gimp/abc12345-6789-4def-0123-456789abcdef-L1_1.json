@@ -1,0 +1,98 @@
+{
+  "id": "abc12345-6789-4def-0123-456789abcdef-L1_1",
+  "snapshot": "gimp",
+  "instruction": "Increase the saturation of the image to make it more colorful",
+  "source": "https://www.youtube.com/watch?v=example",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/abc12345-6789-4def-0123-456789abcdef/example_image.png",
+            "path": "/home/user/Desktop/example_image.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/example_image.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1); pyautogui.hotkey(['shift', 'ctrl', 'e']);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1); pyautogui.write('edited_colorful'); time.sleep(1); pyautogui.press(['enter']);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.press(['enter']);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ],
+    "func": "check_045bf3ff_crop",
+    "expected": {
+      "type": "cloud_file",
+      "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/abc12345-6789-4def-0123-456789abcdef/example_image.png",
+      "dest": "example_image.png"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/edited_colorful.png",
+      "dest": "edited_colorful.png"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

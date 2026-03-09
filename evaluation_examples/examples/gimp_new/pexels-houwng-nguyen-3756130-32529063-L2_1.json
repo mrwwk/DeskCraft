@@ -1,0 +1,79 @@
+{
+  "id": "pexels-houwng-nguyen-3756130-32529063-L2_1",
+  "snapshot": "gimp",
+  "instruction": "Complete a verifiable city sunset skyline enhancement workflow using the image at /home/user/Desktop/pexels-houwng-nguyen-3756130-32529063.jpg. Each step produces measurable, verifiable outputs:\n\n1. Create a new layer named exactly 'Sky_Purple' above the background. Use the Free Select tool to select the sky area (top 60% of the image). Apply Hue-Saturation adjustment: increase Purple saturation by exactly +30 to enhance the twilight sky colors.\n\n2. Create a new layer named exactly 'Building_Gold' above 'Sky_Purple'. Use the Hue-Saturation adjustment on the building areas: increase Yellow saturation by exactly +35 to make the golden reflections more vibrant.\n\n3. Create a new layer named exactly 'Rainbow_Enhance' above 'Building_Gold'. Use the Color Balance adjustment on the rainbow arc area: add +20 to Red channel and +15 to Blue channel to make the rainbow more visible.\n\n4. Create a new layer named exactly 'Contrast_Boost' above 'Rainbow_Enhance'. Use the Curves adjustment: create an S-curve to increase overall contrast by 22%, making the buildings stand out against the sky.\n\n5. Create a new layer named exactly 'Vignette' at the top of the layer stack. Use the Elliptical Select tool to create an oval covering 70% of the image from center, apply Select > Feather with 90px radius, invert selection, and fill with black at 25% opacity.\n\n6. Add a text layer named exactly 'Text_Title' at the top-center with these exact specifications:\n   - Content: 'CITY OF GOLD'\n   - Font size: 38px\n   - Color: #ffd700 (gold)\n   - Position: centered horizontally, 30px from top edge\n   - Layer name: exactly 'Text_Title'\n\n7. Add a text layer named exactly 'Text_Time' at the bottom-right corner with these exact specifications:\n   - Content: 'SUNSET'\n   - Font size: 24px\n   - Color: #ff69b4 (hot pink)\n   - Position: 25px from right edge, 25px from bottom edge\n   - Layer name: exactly 'Text_Time'\n\n8. Create a new layer named exactly 'Frame' at the very top. Use Select > All, then Edit > Stroke Selection with a 8px solid color #4b0082 (indigo) to create a border around the entire image.\n\n9. Export the final image as 'city_sunset.jpg' with exact specifications: JPEG format, width 1400 pixels (height auto), quality 94. Save the project as 'city_project.xcf' with all layers preserved.",
+  "source": "https://www.pexels.com/",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/high_quality/pic_high/pexels-houwng-nguyen-3756130-32529063.jpg",
+            "path": "/home/user/Desktop/pexels-houwng-nguyen-3756130-32529063.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/pexels-houwng-nguyen-3756130-32529063.jpg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 5
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "pkill",
+            "-f",
+            "gimp"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      }
+    ],
+    "func": "check_city_sunset_complete",
+    "result": {
+      "type": "vm_file",
+      "path": [
+        "/home/user/Desktop/city_sunset.jpg",
+        "/home/user/Desktop/city_project.xcf",
+        "/home/user/Desktop/pexels-houwng-nguyen-3756130-32529063.jpg"
+      ],
+      "dest": [
+        "city_sunset.jpg",
+        "city_project.xcf",
+        "source_image.jpg"
+      ],
+      "multi": true
+    },
+    "options": {
+      "expected_width": 1400
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
