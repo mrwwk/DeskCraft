@@ -1,0 +1,97 @@
+{
+  "id": "camera-man-donkey-5431685-L2_1",
+  "snapshot": "gimp",
+  "instruction": "Complete a verifiable landscape photo enhancement workflow using the image at /home/user/Desktop/camera-man-donkey-5431685_1920.jpg. Each step produces measurable, verifiable outputs:\n\n1. Create a new layer named exactly 'Sky_Enhance' above the background. Use the Free Select tool to select the sky area (top 35% of the image). Apply Hue-Saturation adjustment: increase Blue saturation by exactly +35 and Lightness by exactly -15 to make the sky more vibrant and dramatic.\n\n2. Create a new layer named exactly 'Mountain_Contrast' above 'Sky_Enhance'. Use the Curves adjustment to create an S-curve: darken shadows by 20% and brighten highlights by 15% to enhance the mountain details.\n\n3. Create a new layer named exactly 'Donkey_Warmth' above 'Mountain_Contrast'. Use the Color Balance adjustment on the donkey and foreground grass area: add +20 to Red channel and +15 to Yellow channel to create a warm golden hour effect.\n\n4. Create a new layer named exactly 'Vignette' at the top of the layer stack. Use the Elliptical Select tool to create an oval covering 75% of the image from center, apply Select > Feather with 80px radius, invert selection, and fill with black at 25% opacity.\n\n5. Add a text layer named exactly 'Text_Title' at the top-left corner with these exact specifications:\n   - Content: 'ALPINE DREAM'\n   - Font size: 36px\n   - Color: #ffffff (white)\n   - Position: 30px from left edge, 30px from top edge\n   - Layer name: exactly 'Text_Title'\n\n6. Add a text layer named exactly 'Text_Location' at the bottom-right corner with these exact specifications:\n   - Content: 'SWISS ALPS'\n   - Font size: 24px\n   - Color: #ffd700 (gold)\n   - Position: 30px from right edge, 30px from bottom edge\n   - Layer name: exactly 'Text_Location'\n\n7. Create a new layer named exactly 'Frame' at the very top. Use Select > All, then Edit > Stroke Selection with a 10px solid color #2f4f4f (dark slate gray) to create a border around the entire image.\n\n8. Export the final image as 'alpine_masterpiece.jpg' with exact specifications: JPEG format, width 1600 pixels (height auto), quality 95. Save the project as 'alpine_project.xcf' with all layers preserved.",
+  "source": "https://www.gimp.org/tutorials/",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/high_quality/pic_high/camera-man-donkey-5431685_1920.jpg",
+            "path": "/home/user/Desktop/camera-man-donkey-5431685_1920.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/camera-man-donkey-5431685_1920.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('shift', 'ctrl', 'e'); time.sleep(1); pyautogui.write('alpine_masterpiece'); time.sleep(0.5); pyautogui.press('enter'); time.sleep(2); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('shift', 'ctrl', 's'); time.sleep(1); pyautogui.write('alpine_project.xcf'); time.sleep(0.5); pyautogui.press('enter'); time.sleep(2); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": "check_alpine_landscape_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [0, 1, 2],
+      "path": [
+        "/home/user/Desktop/alpine_masterpiece.jpg",
+        "/home/user/Desktop/alpine_project.xcf",
+        "/home/user/Desktop/camera-man-donkey-5431685_1920.jpg"
+      ],
+      "dest": [
+        "alpine_masterpiece.jpg",
+        "alpine_project.xcf",
+        "camera-man-donkey-5431685_1920.jpg"
+      ]
+    },
+    "options": {
+      "expected_width": 1600,
+      "expected_layers": ["Sky_Enhance", "Mountain_Contrast", "Donkey_Warmth", "Vignette", "Text_Title", "Text_Location", "Frame"]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

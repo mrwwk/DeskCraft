@@ -43,12 +43,12 @@ def monitor_gpu(gpu_id):
                 stop_tensor_multiplication[gpu_id] = False
                 tensor_thread = threading.Thread(target=tensor_multiplication, args=(gpu_id,))
                 tensor_thread.start()
-                print('started', gpu_id)
+                # print('started', gpu_id)
             elif utilization > 20 and tensor_thread is not None and tensor_thread.is_alive():
                 stop_tensor_multiplication[gpu_id] = True
                 tensor_thread.join()
                 tensor_thread = None
-                print('end', gpu_id)
+                # print('end', gpu_id)
 
         time.sleep(1)
 

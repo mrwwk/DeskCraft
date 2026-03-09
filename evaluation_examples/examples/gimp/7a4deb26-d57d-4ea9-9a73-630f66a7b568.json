@@ -37,7 +37,7 @@
           "command": [
             "python3",
             "-c",
-            "import time; import pyautogui; time.sleep(1);pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
+            "import time; import pyautogui; time.sleep(1); pyautogui.hotkey(['shift', 'ctrl', 'e']);"
           ]
         }
       },
@@ -53,7 +53,7 @@
           "command": [
             "python3",
             "-c",
-            "import time; import pyautogui; time.sleep(1);pyautogui.write(\"edited_darker\");time.sleep(1);pyautogui.press([\"enter\"]);"
+            "import time; import pyautogui; time.sleep(1); pyautogui.write('edited_darker'); time.sleep(1); pyautogui.press(['enter']);"
           ]
         }
       },
@@ -69,7 +69,7 @@
           "command": [
             "python3",
             "-c",
-            "import pyautogui; pyautogui.press([\"enter\"]);"
+            "import pyautogui; pyautogui.press(['enter']);"
           ]
         }
       },
@@ -80,7 +80,7 @@
         }
       }
     ],
-    "func": "check_brightness_decrease_and_structure_sim",
+    "func": "check_045bf3ff_invert",
     "expected": {
       "type": "cloud_file",
       "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/7a4deb26-d57d-4ea9-9a73-630f66a7b568/woman_sitting_by_the_tree.png",

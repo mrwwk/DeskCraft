@@ -407,7 +407,12 @@ def get_unfinished(
                     if "result.txt" not in os.listdir(example_path):
                         # empty all files under example_id
                         for file in os.listdir(example_path):
-                            os.remove(os.path.join(example_path, file))
+                            file_path = os.path.join(example_path, file)
+                            if os.path.isdir(file_path):
+                                import shutil
+                                shutil.rmtree(file_path)
+                            else:
+                                os.remove(file_path)
                     else:
                         finished[domain].append(example_id)
 

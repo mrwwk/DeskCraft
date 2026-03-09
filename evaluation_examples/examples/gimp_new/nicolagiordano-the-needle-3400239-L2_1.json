@@ -1,0 +1,79 @@
+{
+  "id": "nicolagiordano-the-needle-3400239-L2_1",
+  "snapshot": "gimp",
+  "instruction": "Complete a verifiable lake landscape photo enhancement workflow using the image at /home/user/Desktop/nicolagiordano-the-needle-3400239_1920.jpg. Each step produces measurable, verifiable outputs:\n\n1. Create a new layer named exactly 'Sky_Blue' above the background. Use the Free Select tool to select the sky area (top 45% of the image). Apply Hue-Saturation adjustment: increase Blue saturation by exactly +35 to make the sky more vibrant.\n\n2. Create a new layer named exactly 'Water_Reflection' above 'Sky_Blue'. Use the Hue-Saturation adjustment on the water area (middle 35% of the image): increase saturation by exactly +25 to enhance the cloud reflections.\n\n3. Create a new layer named exactly 'Forest_Contrast' above 'Water_Reflection'. Use the Curves adjustment on the forest/tree line area: create an S-curve to increase contrast by 18%, making the tree line more defined.\n\n4. Create a new layer named exactly 'Grass_Vibrant' above 'Forest_Contrast'. Use the Color Balance adjustment on the foreground grass area: add +20 to Green channel and +10 to Yellow channel to make the grass more vibrant.\n\n5. Create a new layer named exactly 'Vignette' at the top of the layer stack. Use the Elliptical Select tool to create an oval covering 75% of the image from center, apply Select > Feather with 90px radius, invert selection, and fill with black at 22% opacity.\n\n6. Add a text layer named exactly 'Text_Title' at the top-center with these exact specifications:\n   - Content: 'SERENE LAKE'\n   - Font size: 38px\n   - Color: #ffffff (white)\n   - Position: centered horizontally, 30px from top edge\n   - Layer name: exactly 'Text_Title'\n\n7. Add a text layer named exactly 'Text_Location' at the bottom-right corner with these exact specifications:\n   - Content: 'THE NEEDLE'\n   - Font size: 22px\n   - Color: #87ceeb (sky blue)\n   - Position: 25px from right edge, 25px from bottom edge\n   - Layer name: exactly 'Text_Location'\n\n8. Create a new layer named exactly 'Frame' at the very top. Use Select > All, then Edit > Stroke Selection with a 10px solid color #2e8b57 (sea green) to create a border around the entire image.\n\n9. Export the final image as 'lake_masterpiece.jpg' with exact specifications: JPEG format, width 1600 pixels (height auto), quality 94. Save the project as 'lake_project.xcf' with all layers preserved.",
+  "source": "https://www.gimp.org/tutorials/",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/high_quality/pic_high/nicolagiordano-the-needle-3400239_1920.jpg",
+            "path": "/home/user/Desktop/nicolagiordano-the-needle-3400239_1920.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/nicolagiordano-the-needle-3400239_1920.jpg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 5
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "pkill",
+            "-f",
+            "gimp"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      }
+    ],
+    "func": "check_lake_landscape_complete",
+    "result": {
+      "type": "vm_file",
+      "path": [
+        "/home/user/Desktop/lake_masterpiece.jpg",
+        "/home/user/Desktop/lake_project.xcf",
+        "/home/user/Desktop/nicolagiordano-the-needle-3400239_1920.jpg"
+      ],
+      "dest": [
+        "lake_masterpiece.jpg",
+        "lake_project.xcf",
+        "source_image.jpg"
+      ],
+      "multi": true
+    },
+    "options": {
+      "expected_width": 1600
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

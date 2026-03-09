@@ -1,0 +1,68 @@
+{
+  "id": "a1b2c3d4-5555-4000-8000-000000000005-L1_5",
+  "snapshot": "kdenlive",
+  "instruction": "Render the current project as an MP4 file with H.264 encoding to /home/user/Desktop/output.mp4",
+  "source": "Custom created for Kdenlive evaluation",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/kdenlive/sample_video.mp4",
+            "path": "/home/user/Desktop/sample_video.mp4"
+          },
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/kdenlive/project_with_timeline.kdenlive",
+            "path": "/home/user/Desktop/project_with_timeline.kdenlive"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "kdenlive",
+          "/home/user/Desktop/project_with_timeline.kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 15
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 60
+        }
+      }
+    ],
+    "func": "check_kdenlive_render_mp4",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "min_duration": 1.0,
+        "expected_codec": "h264"
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/output.mp4",
+      "dest": "output.mp4"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

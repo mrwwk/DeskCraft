@@ -1,0 +1,78 @@
+{
+  "id": "a1b2c3d4-4444-4000-8000-000000000004-L1_4",
+  "snapshot": "kdenlive",
+  "instruction": "Adjust the audio volume of the video clip on the timeline to 50%, then save the project.",
+  "source": "Custom created for Kdenlive evaluation",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/kdenlive/sample_video.mp4",
+            "path": "/home/user/Desktop/sample_video.mp4"
+          },
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/kdenlive/project_with_timeline.kdenlive",
+            "path": "/home/user/Desktop/project_with_timeline.kdenlive"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "kdenlive",
+          "/home/user/Desktop/project_with_timeline.kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 15
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1); pyautogui.hotkey(['ctrl', 's']); time.sleep(3);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      }
+    ],
+    "func": "check_kdenlive_volume_adjustment",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_volume": 0.5,
+        "tolerance": 0.05
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/project_with_timeline.kdenlive",
+      "dest": "project_with_timeline.kdenlive"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

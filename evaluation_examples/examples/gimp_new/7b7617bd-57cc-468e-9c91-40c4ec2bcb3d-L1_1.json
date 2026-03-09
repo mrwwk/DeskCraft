@@ -1,0 +1,57 @@
+{
+  "id": "7b7617bd-57cc-468e-9c91-40c4ec2bcb3d-L1_1",
+  "snapshot": "gimp",
+  "instruction": "Set the maximum number of recent files to display in the menu to 15.",
+  "source": "https://www.youtube.com/watch?v=G_PjQAy0iiU",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.hotkey([\"ctrl\", \"q\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "check_7b7617bd_recent_files",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "type": "key-value",
+        "key": "max-recent-files",
+        "value": "15"
+      }
+    },
+    "result": {
+      "type": "gimp_config_file",
+      "file_name": "gimprc",
+      "dest": "gimprc"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

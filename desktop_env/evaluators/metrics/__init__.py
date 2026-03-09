@@ -101,6 +101,71 @@ from .gimp import (
     check_sharper,
     check_image_file_size
 )
+from .gimp_l2 import (
+    check_image_dimensions,
+    check_png_format,
+    check_transparency_exists,
+    check_saturation_increase,
+    check_contrast_increase,
+    check_file_exists as check_file_exists_gimp_l2,
+    check_xcf_file_exists_and_has_layers,
+    check_text_in_image,
+    check_gradient_colors,
+    check_husky_portrait_complete,
+    check_jpeg_format,
+    check_barn_landscape_complete,
+    check_portrait_edit_complete,
+    check_fashion_portrait_complete,
+    check_city_sunset_complete,
+    check_lake_landscape_complete,
+    check_beach_footprint_art_complete
+)
+from .gimp_l2_2 import (
+    check_file_exists as check_file_exists_gimp_l2_2,
+    check_png_format as check_png_format_gimp_l2_2,
+    check_image_dimensions as check_image_dimensions_gimp_l2_2,
+    check_xcf_file_exists_and_has_layers as check_xcf_gimp_l2_2,
+    check_colors_in_image,
+    check_text_in_image_basic,
+    check_triad_logo_complete,
+    check_triangle_composition,
+    check_jpeg_format,
+    check_alpine_landscape_complete,
+    check_rainforest_enhancement_complete,
+    check_sunrise_landscape_complete
+)
+from .new_gimp import (
+    check_045bf3ff_grayscale,
+    check_045bf3ff_indexed_color,
+    check_white_to_alpha_transparency,
+    check_png_format_with_transparency,
+    check_resize_and_white_to_alpha,
+    check_indexed_palette_128_colors,
+    check_indexed_64_colors_300_dpi,
+    check_rotate_180_and_indexed_256,
+    check_grayscale_then_indexed_256,
+    check_brightness_decrease_30_percent,
+    check_rotate_90_and_invert,
+    check_crop_800x600_and_saturation_increase_15,
+    check_7b7617bd_undo_levels,
+    check_7b7617bd_recent_files,
+    check_8ea73f6f_resize_1920x1080,
+    check_fbb548ca_blue_border,
+    check_f4aec372_text_triangle,
+    check_d16c99dc_resize_layer_800,
+    check_d16c99dc_center_crop_400x400,
+    check_d16c99dc_resize_600_jpg,
+    check_d16c99dc_duplicate_resize_rename,
+    check_d16c99dc_crop_500x500_topleft,
+    check_d16c99dc_opacity_and_layer_order,
+    check_b148e375_new_layer_circle,
+    check_b148e375_duplicate_rename_hide,
+    check_b148e375_resize_50_percent,
+    check_b148e375_rect_select_fill_red,
+    check_554785e9_saturation_increase_40,
+    check_7767eef2_text_copyright,
+    check_734d6579_green_background
+)
 from .libreoffice import check_libre_locale
 from .others import compare_epub, check_mp3_meta
 from .pdf import check_pdf_pages
@@ -141,6 +206,13 @@ from .vlc import (
     check_qt_slider_colours,
     check_global_key_play_pause
 )
+from .kdenlive import (
+    check_kdenlive_import_video,
+    check_kdenlive_add_to_timeline,
+    check_kdenlive_grayscale_effect,
+    check_kdenlive_volume_adjustment,
+    check_kdenlive_render_mp4
+)
 from .vscode import (
     compare_text_file,
     compare_config,
@@ -154,6 +226,7 @@ from .vscode import (
     check_html_background_image,
     compare_zip_files
 )
+from .interactive import check_interactive_final_result
 
 
 def infeasible():

@@ -1,0 +1,98 @@
+{
+  "id": "b148e375-fe0b-4bec-90e7-38632b0d73c2-L1_10",
+  "snapshot": "gimp",
+  "instruction": "Create a rectangular selection from position (100, 100) with width 200 and height 200, then fill it with color #FF0000",
+  "source": "https://www.quora.com/How-do-I-add-layers-in-GIMP",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/b148e375-fe0b-4bec-90e7-38632b0d73c2/white_background.xcf",
+            "path": "/home/user/Desktop/white_background.xcf"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/white_background.xcf"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.hotkey(['shift', 'ctrl', 'e']);time.sleep(1);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; pyautogui.write('filled_rectangle');time.sleep(1);pyautogui.press(['enter']);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.press(['enter']);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ],
+    "func": "check_b148e375_rect_select_fill_red",
+    "expected": {
+      "type": "cloud_file",
+      "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/b148e375-fe0b-4bec-90e7-38632b0d73c2/white_background.xcf",
+      "dest": "white_background.xcf"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/filled_rectangle.png",
+      "dest": "filled_rectangle.png"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

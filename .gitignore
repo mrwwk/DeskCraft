@@ -200,12 +200,14 @@ test2.xlsx
 .vms
 /vm_data
 docker_vm_data
+task_gen
 vmware_vm_data
 .vmware*
 .aws*
 
 # result
 **/result*/**/*
+results/
 
 .vscode
 
@@ -228,3 +230,9 @@ evaluation_examples/test_chrome.json
 
 AgentNet
 calc_success_rate.py
+
+# Screenshot and log directories
+kdenlive_screenshots/
+logs/
+assets/
+blender_screenshots/

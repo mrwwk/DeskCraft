@@ -1,0 +1,97 @@
+{
+  "id": "3a1c1464-1dbf-561b-b53c-a16343233e7d-L2_1",
+  "snapshot": "gimp",
+  "instruction": "Complete a verifiable portrait editing workflow using the image at /home/user/Desktop/woman_sitting_by_the_tree.png. Each step produces measurable, verifiable outputs:\n\n1. Use the Free Select tool (Lasso) to draw a rough selection around the woman and her chair. Copy the selection to a new layer named exactly 'Subject', then hide the original background layer by clicking the eye icon.\n\n2. Create a new layer named exactly 'Solid_BG' below the 'Subject' layer. Fill this layer with solid color #1a237e (dark blue) using the Bucket Fill tool.\n\n3. Create a new layer named exactly 'Warm_Overlay' above the 'Subject' layer. Fill it with solid color #ff9966 (orange), set the layer blending mode to 'Overlay', and set opacity to exactly 25%.\n\n4. Use the Brightness-Contrast adjustment on the 'Subject' layer: increase Brightness by exactly +20 and Contrast by exactly +30.\n\n5. Create a new layer named exactly 'Vignette' at the top of the layer stack. Use the Elliptical Select tool to create an oval selection from center, then apply 'Select > Feather' with 100px radius, invert selection, and fill with black. Set layer opacity to exactly 40%.\n\n6. Add three text layers with exact specifications:\n   - Layer name: 'Text_Title', content: 'FASHION', font size 48px, color #ffffff (white), position at top-center\n   - Layer name: 'Text_Subtitle', content: 'WEEKLY', font size 36px, color #ffffff (white), position below 'FASHION'\n   - Layer name: 'Text_Year', content: '2024', font size 24px, color #ffcc00 (gold), position at bottom-right\n\n7. Export the image as 'portrait_final.jpg' with exact specifications: JPEG format, width 1600 pixels (height auto), quality 90. Save the project as 'portrait_edit.xcf' with all layers preserved.",
+  "source": "https://www.youtube.com/watch?v=lOzSiOIipSM",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/3a1c1464-1dbf-561b-b53c-a16343233e7d_woman_sitting_by_the_tree.png",
+            "path": "/home/user/Desktop/woman_sitting_by_the_tree.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/woman_sitting_by_the_tree.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('shift', 'ctrl', 'e'); time.sleep(1); pyautogui.write('portrait_final'); time.sleep(0.5); pyautogui.press('enter'); time.sleep(2); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('shift', 'ctrl', 's'); time.sleep(1); pyautogui.write('portrait_edit.xcf'); time.sleep(0.5); pyautogui.press('enter'); time.sleep(2); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": "check_portrait_edit_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [0, 1, 2],
+      "path": [
+        "/home/user/Desktop/portrait_final.jpg",
+        "/home/user/Desktop/portrait_edit.xcf",
+        "/home/user/Desktop/woman_sitting_by_the_tree.png"
+      ],
+      "dest": [
+        "portrait_final.jpg",
+        "portrait_edit.xcf",
+        "woman_sitting_by_the_tree.png"
+      ]
+    },
+    "options": {
+      "expected_width": 1600,
+      "expected_layers": ["Subject", "Solid_BG", "Warm_Overlay", "Vignette", "Text_Title", "Text_Subtitle", "Text_Year"]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,38 @@
+{
+  "id": "58d3eeeb-e9d0-499f-962e-fd0db2a744d8-L1_1",
+  "snapshot": "gimp",
+  "instruction": "Use GIMP to create a 3D model from this 2D image.",
+  "source": "https://www.gimp.org/",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce/Triangle_On_The_Side.png",
+            "path": "/home/user/Desktop/flat_image.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/flat_image.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "infeasible"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

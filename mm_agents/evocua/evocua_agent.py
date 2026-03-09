@@ -25,7 +25,8 @@ from mm_agents.evocua.prompts import (
     S2_ACTION_DESCRIPTION,
     S2_DESCRIPTION_PROMPT_TEMPLATE,
     S2_SYSTEM_PROMPT,
-    build_s2_tools_def
+    build_s2_tools_def,
+    build_s1_system_prompt
 )
 
 logger = logging.getLogger("desktopenv.evocua")
@@ -81,6 +82,9 @@ class EvoCUAAgent:
         self.responses = []
         self.screenshots = [] # Stores encoded string
         self.cots = [] # For S1 style history
+        
+        self.pending_user_messages = []
+        self.is_interactive = False
 
     def reset(self, _logger=None, vm_ip=None):
         global logger
@@ -93,6 +97,30 @@ class EvoCUAAgent:
         self.responses = []
         self.screenshots = []
         self.cots = []
+        self.pending_user_messages = []
+        self.is_interactive = False
+
+    def receive_user_message(self, message: str):
+        """Receive a new user message for multi-turn interactive evaluation."""
+        self.pending_user_messages.append(message)
+
+    def set_interactive_prompt(self, enable: bool = True):
+        """Switch to interactive prompt that includes call_user action."""
+        self.is_interactive = enable
+
+    def clear_done_from_history(self):
+        """Remove the trailing DONE/FAIL action from history so that the agent
+        does not see a previous terminate when continuing after a phase transition."""
+        if self.actions and self.actions[-1] in ("DONE", "FAIL",
+                                                   "Performing terminate action",
+                                                   "Terminate the task with success",
+                                                   "Terminate the task with failure"):
+            self.actions.pop()
+        # Also trim the corresponding response/screenshot so lengths stay in sync
+        if len(self.responses) > len(self.actions):
+            self.responses.pop()
+        if len(self.screenshots) > len(self.actions):
+            self.screenshots.pop()
 
     def predict(self, instruction: str, obs: Dict) -> List:
         """
@@ -100,6 +128,13 @@ class EvoCUAAgent:
         """
         
         logger.info(f"========================== {self.model} ===================================")
+        
+        if self.pending_user_messages:
+            extra_messages = "\n".join(self.pending_user_messages)
+            instruction = f"{instruction}\n\n[用户追加消息]:\n{extra_messages}"
+            self.pending_user_messages.clear()
+        self.task_instruction = instruction
+
         logger.info(f"Instruction: \n{instruction}")
         
         screenshot_bytes = obs["screenshot"]
@@ -142,7 +177,7 @@ class EvoCUAAgent:
              
         description_prompt = S2_DESCRIPTION_PROMPT_TEMPLATE.format(resolution_info=resolution_info)
 
-        tools_def = build_s2_tools_def(description_prompt)
+        tools_def = build_s2_tools_def(description_prompt, is_interactive=self.is_interactive)
 
         system_prompt = S2_SYSTEM_PROMPT.format(tools_xml=json.dumps(tools_def))
 
@@ -247,6 +282,15 @@ Previous actions:
         # Current Turn
         # We re-use previous_actions_str logic for the case where history_len == 0
         
+        # Interactive hint: remind the agent it can call_user when confused
+        interactive_hint = ""
+        if self.is_interactive:
+            interactive_hint = (
+                "\n\nNote: This is an interactive session. "
+                "If the user's instruction is unclear or you need more information, "
+                "use the `call_user` action to ask the user for clarification."
+            )
+
         if history_len == 0:
             # First turn logic: Include Instruction + Previous Actions
             instruction_prompt = f"""
@@ -255,7 +299,7 @@ Please generate the next move according to the UI screenshot, instruction and pr
 Instruction: {instruction}
 
 Previous actions:
-{previous_actions_str}"""
+{previous_actions_str}{interactive_hint}"""
             messages.append({
                 "role": "user",
                 "content": [
@@ -437,6 +481,9 @@ Previous actions:
                     elif action == "wait":
                         pyautogui_code.append("WAIT")
 
+                    elif action == "call_user":
+                        pyautogui_code.append("CALL_USER")
+
                     elif action == "terminate":
                         # Termination should respect status:
                         # - success -> DONE
@@ -523,7 +570,7 @@ Previous actions:
 
 
     def _predict_s1(self, instruction, obs, processed_b64):
-        messages = [{"role": "system", "content": S1_SYSTEM_PROMPT.format(password=self.password)}]
+        messages = [{"role": "system", "content": build_s1_system_prompt(self.password, is_interactive=self.is_interactive)}]
         
         # Reconstruct History Logic for S1 mode
         history_step_texts = []
@@ -601,6 +648,8 @@ Previous actions:
              final_code = ["DONE"] if "success" in code.lower() else ["FAIL"]
         elif "computer.wait" in code:
              final_code = ["WAIT"]
+        elif "computer.call_user" in code:
+             final_code = ["CALL_USER"]
         else:
              # Project coordinates
              code = project_coordinate_to_absolute_scale(

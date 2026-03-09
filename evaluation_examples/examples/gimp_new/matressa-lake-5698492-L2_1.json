@@ -1,0 +1,97 @@
+{
+  "id": "matressa-lake-5698492-L2_1",
+  "snapshot": "gimp",
+  "instruction": "Complete a verifiable sunrise landscape photo enhancement workflow using the image at /home/user/Desktop/matressa-lake-5698492_1920.jpg. Each step produces measurable, verifiable outputs:\n\n1. Create a new layer named exactly 'Sky_Golden' above the background. Use the Free Select tool to select the sky area (top 50% of the image). Apply Color Balance adjustment: add +25 to Red channel and +20 to Yellow channel to enhance the golden sunrise tones.\n\n2. Create a new layer named exactly 'Water_Reflection' above 'Sky_Golden'. Use the Hue-Saturation adjustment on the water area (bottom 40% of the image): increase saturation by exactly +30 to make the reflections more vibrant.\n\n3. Create a new layer named exactly 'Mountain_Detail' above 'Water_Reflection'. Use the Curves adjustment on the mountain silhouette area: create a slight S-curve to increase contrast by 20%, making the mountain outlines more defined.\n\n4. Create a new layer named exactly 'Building_Warmth' above 'Mountain_Detail'. Use the Color Balance adjustment on the building areas: add +15 to Red and +10 to Yellow to warm up the building tones.\n\n5. Create a new layer named exactly 'Vignette' at the top of the layer stack. Use the Elliptical Select tool to create an oval covering 75% of the image from center, apply Select > Feather with 120px radius, invert selection, and fill with black at 25% opacity.\n\n6. Add a text layer named exactly 'Text_Title' at the top-center with these exact specifications:\n   - Content: 'SUNRISE SERENITY'\n   - Font size: 36px\n   - Color: #ffffff (white)\n   - Position: centered horizontally, 30px from top edge\n   - Layer name: exactly 'Text_Title'\n\n7. Add a text layer named exactly 'Text_Location' at the bottom-right corner with these exact specifications:\n   - Content: 'LAKE MATRESSA'\n   - Font size: 22px\n   - Color: #ffd700 (gold)\n   - Position: 25px from right edge, 25px from bottom edge\n   - Layer name: exactly 'Text_Location'\n\n8. Create a new layer named exactly 'Frame' at the very top. Use Select > All, then Edit > Stroke Selection with a 10px solid color #8b4513 (saddle brown) to create a border around the entire image.\n\n9. Export the final image as 'sunrise_masterpiece.jpg' with exact specifications: JPEG format, width 1600 pixels (height auto), quality 95. Save the project as 'sunrise_project.xcf' with all layers preserved.",
+  "source": "https://www.gimp.org/tutorials/",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/high_quality/pic_high/matressa-lake-5698492_1920.jpg",
+            "path": "/home/user/Desktop/matressa-lake-5698492_1920.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/matressa-lake-5698492_1920.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('shift', 'ctrl', 'e'); time.sleep(1); pyautogui.write('sunrise_masterpiece'); time.sleep(0.5); pyautogui.press('enter'); time.sleep(2); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('shift', 'ctrl', 's'); time.sleep(1); pyautogui.write('sunrise_project.xcf'); time.sleep(0.5); pyautogui.press('enter'); time.sleep(2); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": "check_sunrise_landscape_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [0, 1, 2],
+      "path": [
+        "/home/user/Desktop/sunrise_masterpiece.jpg",
+        "/home/user/Desktop/sunrise_project.xcf",
+        "/home/user/Desktop/matressa-lake-5698492_1920.jpg"
+      ],
+      "dest": [
+        "sunrise_masterpiece.jpg",
+        "sunrise_project.xcf",
+        "matressa-lake-5698492_1920.jpg"
+      ]
+    },
+    "options": {
+      "expected_width": 1600,
+      "expected_layers": ["Sky_Golden", "Water_Reflection", "Mountain_Detail", "Building_Warmth", "Vignette", "Text_Title", "Text_Location", "Frame"]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
