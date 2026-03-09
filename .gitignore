@@ -1,6 +1,7 @@
 # Model checkpoints
 *.pth
 *.pt
+*.tar
 
 # Image files
 *.png
