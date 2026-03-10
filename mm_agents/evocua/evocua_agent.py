@@ -84,6 +84,7 @@ class EvoCUAAgent:
         self.cots = [] # For S1 style history
         
         self.pending_user_messages = []
+        self.accumulated_user_messages = []  # 累积的所有用户追加消息
         self.is_interactive = False
 
     def reset(self, _logger=None, vm_ip=None):
@@ -98,11 +99,13 @@ class EvoCUAAgent:
         self.screenshots = []
         self.cots = []
         self.pending_user_messages = []
+        self.accumulated_user_messages = []  # 重置累积消息
         self.is_interactive = False
 
     def receive_user_message(self, message: str):
         """Receive a new user message for multi-turn interactive evaluation."""
         self.pending_user_messages.append(message)
+        self.accumulated_user_messages.append(message)  # 累积消息，不会在predict中清空
 
     def set_interactive_prompt(self, enable: bool = True):
         """Switch to interactive prompt that includes call_user action."""
@@ -129,10 +132,13 @@ class EvoCUAAgent:
         
         logger.info(f"========================== {self.model} ===================================")
         
-        if self.pending_user_messages:
-            extra_messages = "\n".join(self.pending_user_messages)
-            instruction = f"{instruction}\n\n[用户追加消息]:\n{extra_messages}"
-            self.pending_user_messages.clear()
+        # 构建instruction：使用累积的用户消息（而不是pending，因为pending会被清空）
+        # 每条追加消息都有独立的[User Additional Message]:前缀
+        if self.accumulated_user_messages:
+            extra_messages = "\n\n".join(
+                f"[User Additional Message]:\n{msg}" for msg in self.accumulated_user_messages
+            )
+            instruction = f"{instruction}\n\n{extra_messages}"
         self.task_instruction = instruction
 
         logger.info(f"Instruction: \n{instruction}")

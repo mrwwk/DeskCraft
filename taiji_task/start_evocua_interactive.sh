@@ -89,7 +89,7 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_evocua_interactive.py \
     --test_all_meta_path evaluation_examples/interactive_all.json \
     --provider_name docker \
     --headless \
-    --num_envs 3 \
+    --num_envs 15 \
     --max_steps 100 \
     --model "EvoCUA-32B-20260105" \
     --prompt_style S2 \
