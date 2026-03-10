@@ -114,7 +114,7 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_interactive.py \
     --test_all_meta_path evaluation_examples/interactive_all.json \
     --provider_name docker \
     --headless \
-    --num_envs 3 \
+    --num_envs 5 \
     --max_steps 50 \
     --model "UI-TARS-1.5-7B" \
     --user_base_url "http://29.160.43.141:8000/v1" \

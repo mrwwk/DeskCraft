@@ -203,13 +203,13 @@ def run_interactive_example(
                 user_response["message"][:100],
             )
 
-            # Advance phase if the user/LLM judged it complete
-            if user_response["phase_complete"]:
-                # Defer actual advance_phase until after done-flag handling below,
-                # so that the current trigger type is still in effect for this check.
-                phase_just_completed = True
-            else:
+            # Advance phase if triggered (no longer waiting for phase_complete)
+            # As long as should_intervene() returned True, we proceed to next phase
+            if is_unexpected_call_user:
+                # Guard: prevent accidental phase advancement on unexpected CALL_USER
                 phase_just_completed = False
+            else:
+                phase_just_completed = True
 
             # Check if all phases are done (peek ahead)
             final_phase_idx = user_sim.current_phase_idx + (1 if phase_just_completed else 0)
