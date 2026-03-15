@@ -1,0 +1,87 @@
+{
+  "id": "a387d18f-0263-4100-8f06-657c40d70f51",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Please insert the image file \"company_logo.png\" from the desktop at the end of this document.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/a387d18f-0263-4100-8f06-657c40d70f51/Report_InsertLogo.docx",
+            "path": "/home/user/Desktop/Report_InsertLogo.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Report_InsertLogo.docx"
+      }
+    },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/a387d18f-0263-4100-8f06-657c40d70f51/company_logo.png",
+            "path": "/home/user/Desktop/company_logo.png"
+          }
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/a387d18f-0263-4100-8f06-657c40d70f51",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Report_InsertLogo.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_images",
+    "expected": {
+      "type": "cache_file",
+      "path": "Report_InsertLogo_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Report_InsertLogo.docx",
+      "dest": "Report_InsertLogo.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

@@ -1,0 +1,78 @@
+{
+  "id": "3da9deea-5a3f-4fe9-8dd0-458e2482761a",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Please make \"Times New Roman\" the default font in LibreOffice Writer.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/3da9deea-5a3f-4fe9-8dd0-458e2482761a/Template_DefaultFont.docx",
+            "path": "/home/user/Desktop/Template_DefaultFont.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Template_DefaultFont.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/3da9deea-5a3f-4fe9-8dd0-458e2482761a",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Template_DefaultFont.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "find_default_font",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "font_name": "Times New Roman"
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/libreoffice/4/user/registrymodifications.xcu",
+      "dest": "registrymodifications.xcu"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

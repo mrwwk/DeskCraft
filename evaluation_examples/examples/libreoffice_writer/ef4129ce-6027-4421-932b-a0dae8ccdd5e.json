@@ -1,0 +1,76 @@
+{
+  "id": "ef4129ce-6027-4421-932b-a0dae8ccdd5e",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Could you help me insert a 5 (rows) × 4 (columns) empty table at the end of this document?",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/ef4129ce-6027-4421-932b-a0dae8ccdd5e/Template_InsertTable.docx",
+            "path": "/home/user/Desktop/Template_InsertTable.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Template_InsertTable.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/ef4129ce-6027-4421-932b-a0dae8ccdd5e",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Template_InsertTable.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_tables",
+    "expected": {
+      "type": "cache_file",
+      "path": "Template_InsertTable_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Template_InsertTable.docx",
+      "dest": "Template_InsertTable.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

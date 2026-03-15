@@ -1,0 +1,84 @@
+{
+  "id": "a1d243af-6773-487a-a46b-b46211de2902",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Fill the missing values in the \"Total\" column and the \"Total\" row with the correct sums.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/a1d243af-6773-487a-a46b-b46211de2902/Zone_Quarterly_Sales.xlsx",
+            "path": "/home/user/Zone_Quarterly_Sales.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Zone_Quarterly_Sales.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/a1d243af-6773-487a-a46b-b46211de2902",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Zone_Quarterly_Sales.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Zone_Quarterly_Sales_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Zone_Quarterly_Sales.xlsx",
+      "dest": "Zone_Quarterly_Sales.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

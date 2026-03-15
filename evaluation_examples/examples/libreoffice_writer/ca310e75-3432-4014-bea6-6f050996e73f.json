@@ -1,0 +1,76 @@
+{
+  "id": "ca310e75-3432-4014-bea6-6f050996e73f",
+  "snapshot": "libreoffice_writer",
+  "instruction": "I have been practicing professional writing. Please change the line spacing of the entire document to double line spacing.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/ca310e75-3432-4014-bea6-6f050996e73f/Essay_DoubleSpacing.docx",
+            "path": "/home/user/Desktop/Essay_DoubleSpacing.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Essay_DoubleSpacing.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/ca310e75-3432-4014-bea6-6f050996e73f",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Essay_DoubleSpacing.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_line_spacing",
+    "expected": {
+      "type": "cache_file",
+      "path": "Essay_DoubleSpacing_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Essay_DoubleSpacing.docx",
+      "dest": "Essay_DoubleSpacing.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}
