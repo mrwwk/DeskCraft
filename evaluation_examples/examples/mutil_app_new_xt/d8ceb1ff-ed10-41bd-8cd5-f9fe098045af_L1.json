@@ -1,0 +1,89 @@
+{
+  "id": "d8ceb1ff-ed10-41bd-8cd5-f9fe098045af",
+  "task_slug": "slugify_bugfix_from_issue_and_docs",
+  "difficulty": "L1",
+  "snapshot": "multi_apps",
+  "instruction": "A small Python utility in ~/Desktop/slug_tool/ is generating the wrong slug format. Read the bug report in BUG_REPORT.txt, open the Python string methods documentation in Chrome, and then use VS Code to fix slugify.py so the tests pass. When you are done, create ~/Desktop/slug_tool/FIX_DONE.txt containing exactly `slugify fixed`.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/slug_tool')\nbase.mkdir(parents=True, exist_ok=True)\n(base / 'BUG_REPORT.txt').write_text('The slug should use lowercase words joined by hyphens, not underscores.\\n')\n(base / 'slugify.py').write_text(\"\"\"def slugify(text):\n    return text.strip().lower().replace(' ', '_')\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from slugify import slugify\n\ndef test():\n    assert slugify(' Hello World ') == 'hello-world'\n    assert slugify('Data Science Notes') == 'data-science-notes'\n\"\"\")\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://docs.python.org/3/library/stdtypes.html#string-methods"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code", "/home/user/Desktop/slug_tool"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode", "os"],
+  "evaluator": {
+    "func": ["check_python_file_by_test_suite", "is_expected_active_tab_approximate", "check_include_exclude"],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": ["/home/user/Desktop/slug_tool/slugify.py"],
+        "dest": ["slugify.py"],
+        "multi": true
+      },
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/slug_tool/FIX_DONE.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/slug_tool/test.py",
+        "dest": "test_suite.py"
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://docs.python.org/3/library/stdtypes.html#string-methods"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["slugify fixed"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

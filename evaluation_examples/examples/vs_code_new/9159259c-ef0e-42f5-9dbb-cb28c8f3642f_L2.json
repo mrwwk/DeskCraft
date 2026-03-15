@@ -1,0 +1,30 @@
+{
+  "id": "9159259c-ef0e-42f5-9dbb-cb28c8f3642f",
+  "task_slug": "workspace_tasks_and_testing_settings",
+  "difficulty": "L2",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/service-app in VS Code and set up test tooling for the project. Create .vscode/tasks.json with two shell tasks named Run Tests using `pytest` and Lint using `ruff check .`. Also create .vscode/settings.json so python.testing.pytestEnabled is true, python.testing.unittestEnabled is false, and python.testing.pytestArgs is [\"tests\"].",
+  "source": "https://code.visualstudio.com/docs/editor/tasks",
+  "config": [
+    {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/service-app/tests"]}},
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/service-app"]}},
+    {"type": "activate_window", "parameters": {"window_name": "Visual Studio Code"}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode"],
+  "evaluator": {
+    "func": ["compare_config", "check_json_settings"],
+    "result": [
+      {"type": "vm_file", "path": "/home/user/service-app/.vscode/tasks.json", "dest": "tasks.json"},
+      {"type": "vm_file", "path": "/home/user/service-app/.vscode/settings.json", "dest": "settings.json"}
+    ],
+    "expected": [
+      {"type": "rule", "rules": {"expected": "{\n  \"version\": \"2.0.0\",\n  \"tasks\": [\n    {\n      \"label\": \"Run Tests\",\n      \"type\": \"shell\",\n      \"command\": \"pytest\"\n    },\n    {\n      \"label\": \"Lint\",\n      \"type\": \"shell\",\n      \"command\": \"ruff check .\"\n    }\n  ]\n}"}},
+      {"type": "rule", "rules": {"expected": {"python.testing.pytestEnabled": true, "python.testing.unittestEnabled": false, "python.testing.pytestArgs": ["tests"]}}}
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "fe41f596-a71b-4c2f-9b2f-9dcd40b568c3",
+  "task_slug": "battery_power_config",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Show battery percentage in the top bar and keep power mode balanced (if available). Save ~/Desktop/power_ui_status.txt with: show-battery-percentage=true on the first line, and power-profile=<value> on the second line where <value> is balanced if supported, otherwise unsupported.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {"type": "execute", "parameters": {"command": "gsettings set org.gnome.desktop.interface show-battery-percentage false; rm -f ~/Desktop/power_ui_status.txt", "shell": true}},
+    {"type": "execute", "parameters": {"command": ["python", "-c", "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"]}}
+  ],
+  "related_apps": ["os"],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; sb=$(gsettings get org.gnome.desktop.interface show-battery-percentage 2>/dev/null); [ \"$sb\" = \"true\" ] || ok=0; profile='unsupported'; if command -v powerprofilesctl >/dev/null 2>&1; then cur=$(powerprofilesctl get 2>/dev/null || true); if [ -n \"$cur\" ]; then profile=$cur; fi; [ \"$profile\" = \"balanced\" ] || ok=0; fi; expected1='show-battery-percentage=true'; expected2=\"power-profile=$profile\"; line1=$(sed -n '1p' ~/Desktop/power_ui_status.txt 2>/dev/null); line2=$(sed -n '2p' ~/Desktop/power_ui_status.txt 2>/dev/null); [ \"$line1\" = \"$expected1\" ] || ok=0; [ \"$line2\" = \"$expected2\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {"type": "rule", "rules": {"expected": "PASS\n"}}
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

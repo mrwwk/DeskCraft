@@ -1,0 +1,48 @@
+{
+  "id": "28cc3b7e-b194-4bc9-8353-d04c0f4d56d2",
+  "task_slug": "audio_config_volume",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "My audio is too quiet and sometimes muted. Please configure the default output sink so that volume is exactly 100%, mute is off, and then save the active sink name into /home/user/Desktop/audio_status/active_sink.txt.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "mkdir -p /home/user/Desktop/audio_status && rm -f /home/user/Desktop/audio_status/active_sink.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5);"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "pulseaudio --start >/dev/null 2>&1 || true; sink=$(pactl get-default-sink 2>/dev/null); [ -n \"$sink\" ] || sink=$(pactl list short sinks 2>/dev/null | head -n1 | awk '{print $2}'); vol=$(pactl get-sink-volume \"$sink\" 2>/dev/null | head -n1 | awk '{print $5}' | sed 's/%//'); mute=$(pactl get-sink-mute \"$sink\" 2>/dev/null | awk '{print $2}'); ok=1; [ \"$vol\" = \"100\" ] || ok=0; [ \"$mute\" = \"no\" ] || ok=0; [ -f /home/user/Desktop/audio_status/active_sink.txt ] || ok=0; [ \"$(cat /home/user/Desktop/audio_status/active_sink.txt 2>/dev/null)\" = \"$sink\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

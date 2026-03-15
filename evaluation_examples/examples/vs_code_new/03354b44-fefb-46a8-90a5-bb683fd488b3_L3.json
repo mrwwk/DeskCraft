@@ -1,0 +1,31 @@
+{
+  "id": "03354b44-fefb-46a8-90a5-bb683fd488b3",
+  "task_slug": "ops_workspace_and_tasks_bundle",
+  "difficulty": "L3",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/ops-toolkit in VS Code, add /home/user/runbooks and /home/user/scripts into the same workspace, and save it as /home/user/ops-toolkit.code-workspace. In that workspace configure files.exclude so .terraform and .cache are hidden, and add extension recommendations for redhat.vscode-yaml and ms-python.python. Also create .vscode/tasks.json inside /home/user/ops-toolkit with two shell tasks named Validate JSON running `python -m json.tool config.json` and Search TODO running `grep -R TODO .`.",
+  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "config": [
+    {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/ops-toolkit/.terraform", "/home/user/ops-toolkit/.cache", "/home/user/runbooks", "/home/user/scripts"]}},
+    {"type": "execute", "parameters": {"command": ["/bin/bash", "-c", "echo '{\"ok\": true}' > /home/user/ops-toolkit/config.json"]}},
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/ops-toolkit"]}},
+    {"type": "activate_window", "parameters": {"window_name": "Visual Studio Code"}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode"],
+  "evaluator": {
+    "func": ["compare_config", "compare_config"],
+    "result": [
+      {"type": "vm_file", "path": "/home/user/ops-toolkit.code-workspace", "dest": "ops-toolkit.code-workspace"},
+      {"type": "vm_file", "path": "/home/user/ops-toolkit/.vscode/tasks.json", "dest": "tasks.json"}
+    ],
+    "expected": [
+      {"type": "rule", "rules": {"expected": "{\n  \"folders\": [\n    {\"path\": \"ops-toolkit\"},\n    {\"path\": \"runbooks\"},\n    {\"path\": \"scripts\"}\n  ],\n  \"settings\": {\n    \"files.exclude\": {\n      \".terraform\": true,\n      \".cache\": true\n    }\n  },\n  \"extensions\": {\n    \"recommendations\": [\n      \"redhat.vscode-yaml\",\n      \"ms-python.python\"\n    ]\n  }\n}"}},
+      {"type": "rule", "rules": {"expected": "{\n  \"version\": \"2.0.0\",\n  \"tasks\": [\n    {\n      \"label\": \"Validate JSON\",\n      \"type\": \"shell\",\n      \"command\": \"python -m json.tool config.json\"\n    },\n    {\n      \"label\": \"Search TODO\",\n      \"type\": \"shell\",\n      \"command\": \"grep -R TODO .\"\n    }\n  ]\n}"}}
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "b6781586-6346-41cd-935a-a6b1487918fc",
+  "task_slug": "set_timezone_utc",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Set system time zone to UTC (UTC+0), keep automatic time synchronization enabled, and write ~/Desktop/timezone_report.txt with exactly: timezone=Etc/UTC and ntp=active on separate lines.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -f ~/Desktop/timezone_report.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "tz=$(timedatectl show -p Timezone --value 2>/dev/null); ntp=$(timedatectl show -p NTPSynchronized --value 2>/dev/null); ok=1; [ \"$tz\" = \"Etc/UTC\" ] || ok=0; [ \"$ntp\" = \"yes\" ] || ok=0; expected=$(cat <<'EOF'\ntimezone=Etc/UTC\nntp=active\nEOF\n); actual=$(cat ~/Desktop/timezone_report.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

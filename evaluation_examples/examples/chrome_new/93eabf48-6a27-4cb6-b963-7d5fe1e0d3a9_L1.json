@@ -1,0 +1,106 @@
+{
+  "id": "93eabf48-6a27-4cb6-b963-7d5fe1e0d3a9",
+  "task_slug": "bing_large_font_safe",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "Please make Chrome easier and safer for reading: set the default search engine to Bing, increase the default font size to the largest option, and enable Safe Browsing protection.",
+  "source": "https://support.google.com/chrome/answer/96810",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "pkill",
+            "chrome"
+          ]
+        }
+      },
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "google-chrome",
+            "--remote-debugging-port=1337"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": [
+      "match_in_list",
+      "check_font_size",
+      "exact_match"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "default_search_engine"
+      },
+      {
+        "type": "chrome_font_size"
+      },
+      {
+        "type": "enable_safe_browsing"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": [
+            "Microsoft Bing",
+            "Bing"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "range",
+          "min": 22,
+          "max": 99999
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

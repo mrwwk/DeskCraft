@@ -1,0 +1,54 @@
+{
+  "id": "4783cc41-c03c-4e1b-89b4-50658f642bd5",
+  "task_slug": "copy_dir_hierarchy",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Copy only the directory hierarchy from /home/user/Desktop/source_tree to /home/user/Desktop/target_tree_hard recursively. Exclude any directory named tmp or .git and exclude any path under cache/. Do not copy any regular files. After finishing, create /home/user/Desktop/target_tree_hard/manifest_dirs.txt containing all copied relative directory paths, one per line, sorted alphabetically.",
+  "source": "OSWorld custom hard task",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf /home/user/Desktop/source_tree /home/user/Desktop/target_tree_hard; mkdir -p /home/user/Desktop/source_tree/projectA/src /home/user/Desktop/source_tree/projectA/tmp/a /home/user/Desktop/source_tree/projectA/.git/hooks /home/user/Desktop/source_tree/projectB/docs/api /home/user/Desktop/source_tree/projectB/cache/x /home/user/Desktop/source_tree/projectC/empty/sub; touch /home/user/Desktop/source_tree/projectA/src/main.py /home/user/Desktop/source_tree/projectB/docs/readme.md /home/user/Desktop/source_tree/projectC/empty/sub/keep.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl','alt','t'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; base=/home/user/Desktop/target_tree_hard; [ -d \"$base/projectA/src\" ] || ok=0; [ -d \"$base/projectB/docs/api\" ] || ok=0; [ -d \"$base/projectC/empty/sub\" ] || ok=0; [ ! -d \"$base/projectA/tmp\" ] || ok=0; [ ! -d \"$base/projectA/.git\" ] || ok=0; [ ! -d \"$base/projectB/cache\" ] || ok=0; files_count=$(find \"$base\" -type f ! -name manifest_dirs.txt | wc -l); [ \"$files_count\" = \"0\" ] || ok=0; expected=$(cat <<'EOF'\nprojectA\nprojectA/src\nprojectB\nprojectB/docs\nprojectB/docs/api\nprojectC\nprojectC/empty\nprojectC/empty/sub\nEOF\n); actual=$(cat \"$base/manifest_dirs.txt\" 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

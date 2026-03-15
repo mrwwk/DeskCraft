@@ -1,0 +1,71 @@
+{
+  "id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+  "task_slug": "deploy_to_nodes",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/deploy_lab/clusters, copy source/file1 into every directory matching node* recursively, excluding any path containing /backup/. Keep the copied file name as file1, preserve the source file modification time, and set copied file permission to 600.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/deploy_lab && mkdir -p ~/Desktop/deploy_lab/source ~/Desktop/deploy_lab/clusters/node1 ~/Desktop/deploy_lab/clusters/node2/sub/node2a ~/Desktop/deploy_lab/clusters/group/node3 ~/Desktop/deploy_lab/clusters/backup/node4 ~/Desktop/deploy_lab/clusters/node5/backup/deep",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf 'deploy_payload_v2\\n' > ~/Desktop/deploy_lab/source/file1; touch -d '2024-11-11 10:11:12' ~/Desktop/deploy_lab/source/file1",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.write('cd ~/Desktop/deploy_lab'); time.sleep(0.5); pyautogui.press('enter')"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "src=~/Desktop/deploy_lab/source/file1; ok=1; for p in ~/Desktop/deploy_lab/clusters/node1/file1 ~/Desktop/deploy_lab/clusters/node2/sub/node2a/file1 ~/Desktop/deploy_lab/clusters/group/node3/file1; do [ -f \"$p\" ] || ok=0; cmp -s \"$src\" \"$p\" || ok=0; [ \"$(stat -c '%a' \"$p\")\" = \"600\" ] || ok=0; [ \"$(stat -c '%Y' \"$p\")\" = \"$(stat -c '%Y' \"$src\")\" ] || ok=0; done; [ ! -f ~/Desktop/deploy_lab/clusters/backup/node4/file1 ] || ok=0; [ ! -f ~/Desktop/deploy_lab/clusters/node5/backup/deep/file1 ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

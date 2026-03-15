@@ -1,0 +1,32 @@
+{
+  "id": "cf058642-f90e-469a-9aef-d065c5717ba1",
+  "task_slug": "research_workspace_bundle",
+  "difficulty": "L3",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/research-core in VS Code, add /home/user/notebooks and /home/user/reports into the same workspace, and save it as /home/user/research.code-workspace. In that workspace, configure settings so editor.rulers is [88], files.exclude hides .ipynb_checkpoints and __pycache__, and search.exclude hides data/cache. Also add workspace extension recommendations for ms-python.python and ms-toolsai.jupyter.",
+  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "config": [
+    {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/research-core", "/home/user/notebooks", "/home/user/reports", "/home/user/data/cache"]}},
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/research-core"]}},
+    {"type": "activate_window", "parameters": {"window_name": "Visual Studio Code"}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode"],
+  "evaluator": {
+    "func": "compare_config",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "{\n  \"folders\": [\n    {\"path\": \"research-core\"},\n    {\"path\": \"notebooks\"},\n    {\"path\": \"reports\"}\n  ],\n  \"settings\": {\n    \"editor.rulers\": [88],\n    \"files.exclude\": {\n      \".ipynb_checkpoints\": true,\n      \"__pycache__\": true\n    },\n    \"search.exclude\": {\n      \"data/cache\": true\n    }\n  },\n  \"extensions\": {\n    \"recommendations\": [\n      \"ms-python.python\",\n      \"ms-toolsai.jupyter\"\n    ]\n  }\n}"
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/research.code-workspace",
+      "dest": "research.code-workspace"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

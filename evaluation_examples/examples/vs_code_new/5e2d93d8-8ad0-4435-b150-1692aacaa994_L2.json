@@ -1,0 +1,88 @@
+{
+  "id": "5e2d93d8-8ad0-4435-b150-1692aacaa994",
+  "task_slug": "multi_root_workspace_docs_scripts",
+  "difficulty": "L2",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/project in VS Code, add /home/user/docs and /home/user/scripts into the same workspace, then save the multi-root workspace as /home/user/project_advanced.code-workspace.",
+  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "config": [
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/project"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/docs"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/scripts"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/project"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "folders": [
+            {
+              "path": "project"
+            },
+            {
+              "path": "docs"
+            },
+            {
+              "path": "scripts"
+            }
+          ]
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/project_advanced.code-workspace",
+      "dest": "project_advanced.code-workspace"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

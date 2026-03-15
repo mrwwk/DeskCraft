@@ -1,0 +1,116 @@
+{
+  "id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+  "task_slug": "set_wikipedia_homepage_safe",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "Fix Chrome startup so it opens with a clean homepage on https://www.wikipedia.org/ instead of random sites, and enable Safe Browsing protection.",
+  "source": "https://support.google.com/chrome/answer/95314",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S apt update -y && echo {CLIENT_PASSWORD} | sudo -S apt install jq -y",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cd /home/user/.config/google-chrome/Default && jq '. + {\"session\":{\"restore_on_startup\":4, \"startup_urls\":[\"http://funbrain.com/\"]}, \"safebrowsing\":{\"enabled\":false,\"enhanced\":false}}' Preferences > temp && mv temp Preferences",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "pkill",
+            "chrome"
+          ]
+        }
+      },
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "google-chrome",
+            "--remote-debugging-port=1337"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 4
+        }
+      }
+    ],
+    "func": [
+      "exact_match",
+      "is_expected_active_tab",
+      "exact_match"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "new_startup_page"
+      },
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "enable_safe_browsing"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://www.wikipedia.org/"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      }
+    ]
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

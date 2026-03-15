@@ -1,0 +1,38 @@
+{
+  "id": "367a8a96-74bc-4037-baf9-da9ec38d6a85",
+  "task_slug": "organize_flat_finance_exports",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/finance_exports, move only the .csv files from the top level into ~/Desktop/finance_exports/csv_ready. Leave .txt files and nested files untouched. Then create ~/Desktop/finance_exports/csv_ready/manifest.txt listing the moved csv filenames in alphabetical order, one per line.",
+  "source": "OSWorld custom task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/finance_exports && mkdir -p ~/Desktop/finance_exports/nested && printf 'a\n' > ~/Desktop/finance_exports/jan.csv && printf 'b\n' > ~/Desktop/finance_exports/feb.csv && printf 'notes\n' > ~/Desktop/finance_exports/readme.txt && printf 'nested\n' > ~/Desktop/finance_exports/nested/mar.csv",
+        "shell": true
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; [ -f ~/Desktop/finance_exports/csv_ready/jan.csv ] || ok=0; [ -f ~/Desktop/finance_exports/csv_ready/feb.csv ] || ok=0; [ ! -f ~/Desktop/finance_exports/csv_ready/readme.txt ] || ok=0; [ -f ~/Desktop/finance_exports/readme.txt ] || ok=0; [ -f ~/Desktop/finance_exports/nested/mar.csv ] || ok=0; expected=$(printf 'feb.csv\njan.csv\n'); actual=$(cat ~/Desktop/finance_exports/csv_ready/manifest.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
