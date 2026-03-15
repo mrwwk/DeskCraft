@@ -1,0 +1,84 @@
+{
+  "id": "79872a2b-ef63-4bda-96e5-790310f5be45",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Copy the \"Expenses ($)\" column along with its header to a new sheet named \"Sheet2\".",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/79872a2b-ef63-4bda-96e5-790310f5be45/Financial_Data_CopyCol.xlsx",
+            "path": "/home/user/Financial_Data_CopyCol.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Financial_Data_CopyCol.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/79872a2b-ef63-4bda-96e5-790310f5be45",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Financial_Data_CopyCol.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Financial_Data_CopyCol_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Financial_Data_CopyCol.xlsx",
+      "dest": "Financial_Data_CopyCol.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNSheet2",
+          "sheet_idx1": "ENSheet2"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

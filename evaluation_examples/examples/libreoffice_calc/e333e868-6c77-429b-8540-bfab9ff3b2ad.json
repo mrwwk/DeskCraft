@@ -1,0 +1,84 @@
+{
+  "id": "e333e868-6c77-429b-8540-bfab9ff3b2ad",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Sort the data according to the \"Date\" column in ascending order.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/e333e868-6c77-429b-8540-bfab9ff3b2ad/Sales_Log_Sort_Date.xlsx",
+            "path": "/home/user/Sales_Log_Sort_Date.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Sales_Log_Sort_Date.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/e333e868-6c77-429b-8540-bfab9ff3b2ad",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Sales_Log_Sort_Date.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Sales_Log_Sort_Date_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Sales_Log_Sort_Date.xlsx",
+      "dest": "Sales_Log_Sort_Date.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

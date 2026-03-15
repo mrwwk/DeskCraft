@@ -1,0 +1,84 @@
+{
+  "id": "27fdf845-4947-48cf-a282-8163a3941abf",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Check the names in the \"Customer Names with Duplicates\" column and put the unique ones in the \"Unique Customers\" column. Keep the original order of first occurrences. Finish the work and don't touch irrelevant regions, even if they are blank.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/27fdf845-4947-48cf-a282-8163a3941abf/Customer_Deduplicate.xlsx",
+            "path": "/home/user/Customer_Deduplicate.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Customer_Deduplicate.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/27fdf845-4947-48cf-a282-8163a3941abf",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Customer_Deduplicate.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Customer_Deduplicate_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Customer_Deduplicate.xlsx",
+      "dest": "Customer_Deduplicate.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}

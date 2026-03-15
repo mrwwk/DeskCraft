@@ -1,0 +1,76 @@
+{
+  "id": "1927a072-2676-4ad8-8bec-aef126fb428e",
+  "snapshot": "libreoffice_writer",
+  "instruction": "I am currently engaged in text processing and require assistance in converting all uppercase characters to their respective lowercase equivalents throughout the entire document.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/1927a072-2676-4ad8-8bec-aef126fb428e/Notice_Lowercase.docx",
+            "path": "/home/user/Desktop/Notice_Lowercase.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Notice_Lowercase.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/1927a072-2676-4ad8-8bec-aef126fb428e",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Notice_Lowercase.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Notice_Lowercase_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Notice_Lowercase.docx",
+      "dest": "Notice_Lowercase.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "source": ""
+}
