@@ -1,0 +1,61 @@
+{
+  "id": "cd3cbf4e-c32e-412d-b74c-ce0633e9d7f5",
+  "task_slug": "vscode_autosave_delay_alias_bashrc",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Configure VS Code to automatically save files in 'afterDelay' mode with a 1000ms delay in User Settings. Also, add the line `alias gs='git status'` to your ~/.bashrc file so the shortcut is available in future terminal sessions.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode", "os"],
+  "evaluator": {
+    "func": ["check_json_settings", "check_include_exclude"],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/.bashrc",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "files.autoSave": "afterDelay",
+            "files.autoSaveDelay": 1000
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["alias gs='git status'"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

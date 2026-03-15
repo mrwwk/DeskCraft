@@ -1,0 +1,48 @@
+{
+  "id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+  "task_slug": "collect_jpg_manifest",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/photos_hard, recursively collect only .jpg files into ~/Desktop/cpjpg_hard while preserving directory hierarchy. Exclude any file under a private directory and any filename containing _raw. Then create ~/Desktop/cpjpg_hard/manifest.txt containing sha256 and relative path for copied jpgs only, sorted by relative path.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/photos_hard ~/Desktop/cpjpg_hard; mkdir -p ~/Desktop/photos_hard/trip/a ~/Desktop/photos_hard/trip/private ~/Desktop/photos_hard/family ~/Desktop/photos_hard/events/sub; printf 'img1\n' > ~/Desktop/photos_hard/trip/a/sun.jpg; printf 'img2\n' > ~/Desktop/photos_hard/events/sub/night.jpg; printf 'img3\n' > ~/Desktop/photos_hard/family/portrait_raw.jpg; printf 'img4\n' > ~/Desktop/photos_hard/trip/private/secret.jpg; printf 'png\n' > ~/Desktop/photos_hard/family/us.png",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; [ -f ~/Desktop/cpjpg_hard/trip/a/sun.jpg ] || ok=0; [ -f ~/Desktop/cpjpg_hard/events/sub/night.jpg ] || ok=0; [ ! -f ~/Desktop/cpjpg_hard/family/portrait_raw.jpg ] || ok=0; [ ! -f ~/Desktop/cpjpg_hard/trip/private/secret.jpg ] || ok=0; expected=$(printf '%s\n' \"$(sha256sum ~/Desktop/cpjpg_hard/events/sub/night.jpg | awk '{print $1}')  events/sub/night.jpg\" \"$(sha256sum ~/Desktop/cpjpg_hard/trip/a/sun.jpg | awk '{print $1}')  trip/a/sun.jpg\" | sort); actual=$(cat ~/Desktop/cpjpg_hard/manifest.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

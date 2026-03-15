@@ -1,0 +1,54 @@
+{
+  "id": "4e60007a-f5be-4bfc-9723-c39affa0a6d3",
+  "task_slug": "python_format_on_save_tab_size",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please update VS Code User Settings to improve Python editing workflow: turn on format-on-save, organize imports on save explicitly, set Python as the default formatter, and set editor tab size to 2.",
+  "source": "https://code.visualstudio.com/docs/python/formatting",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+          },
+          "[python]": {
+            "editor.defaultFormatter": "ms-python.black-formatter"
+          },
+          "editor.tabSize": 2
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

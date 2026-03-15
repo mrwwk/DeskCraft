@@ -1,0 +1,58 @@
+{
+  "id": "54318a50-1de1-4179-b9db-f3dbd5d80d9f",
+  "task_slug": "chrome_dnt_vscode_fontsize",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "In Chrome, go to Settings → Privacy and security and enable 'Do Not Track'. Then open VS Code and set the editor font size to 16 in User Settings.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode"],
+  "evaluator": {
+    "func": ["check_include_exclude", "check_json_settings"],
+    "result": [
+      {
+        "type": "enable_do_not_track"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["true"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.fontSize": 16
+          }
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,38 @@
+{
+  "id": "dac177c7-2dff-4ec9-94b1-a30ea2d11ea6",
+  "task_slug": "create_meeting_template",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Create a user document template at ~/Templates/meeting_minutes.txt containing exactly these three lines: Meeting Title:, Attendees:, Action Items:. Also create ~/Desktop/template_status.txt containing exactly template=meeting_minutes.txt.",
+  "source": "OSWorld custom task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "mkdir -p ~/Templates && rm -f ~/Templates/meeting_minutes.txt ~/Desktop/template_status.txt",
+        "shell": true
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; expected_tpl=$(cat <<'EOF'\nMeeting Title:\nAttendees:\nAction Items:\nEOF\n); actual_tpl=$(cat ~/Templates/meeting_minutes.txt 2>/dev/null); [ \"$actual_tpl\" = \"$expected_tpl\" ] || ok=0; status=$(cat ~/Desktop/template_status.txt 2>/dev/null); [ \"$status\" = \"template=meeting_minutes.txt\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

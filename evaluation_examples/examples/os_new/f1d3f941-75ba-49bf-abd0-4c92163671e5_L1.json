@@ -1,0 +1,48 @@
+{
+  "id": "f1d3f941-75ba-49bf-abd0-4c92163671e5",
+  "task_slug": "night_light_status_report",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Enable Night Light, set the color temperature to 3700, and create ~/Desktop/night_light_status.txt with exactly two lines: enabled=true and temperature=3700.",
+  "source": "OSWorld custom task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -f ~/Desktop/night_light_status.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "enabled=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d ' '); temp=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | tr -d ' '); ok=1; [ \"$enabled\" = \"true\" ] || ok=0; [ \"$temp\" = \"uint323700\" ] || [ \"$temp\" = \"3700\" ] || ok=0; expected=$(cat <<'EOF'\nenabled=true\ntemperature=3700\nEOF\n); actual=$(cat ~/Desktop/night_light_status.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

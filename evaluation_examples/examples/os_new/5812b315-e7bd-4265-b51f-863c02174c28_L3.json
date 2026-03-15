@@ -1,0 +1,38 @@
+{
+  "id": "5812b315-e7bd-4265-b51f-863c02174c28",
+  "task_slug": "create_sftp_user",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Create an SFTP-only user named charles with password Ex@mpleP@55w0rd!, home directory /home/test1, shell /usr/sbin/nologin, and primary group sftpusers. Set /home/test1 ownership to root:root with permission 755, then create /home/test1/upload owned by charles:sftpusers with permission 750.",
+  "source": "OSWorld custom hard task",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'userdel -r charles >/dev/null 2>&1 || true; groupdel sftpusers >/dev/null 2>&1 || true; rm -rf /home/test1; mkdir -p /home/test1'",
+        "shell": true
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; getent group sftpusers >/dev/null 2>&1 || ok=0; getent passwd charles >/dev/null 2>&1 || ok=0; [ \"$(getent passwd charles | cut -d: -f6)\" = \"/home/test1\" ] || ok=0; [ \"$(getent passwd charles | cut -d: -f7)\" = \"/usr/sbin/nologin\" ] || ok=0; id -nG charles 2>/dev/null | tr ' ' '\n' | grep -qx 'sftpusers' || ok=0; [ \"$(stat -c '%U:%G %a' /home/test1 2>/dev/null)\" = \"root:root 755\" ] || ok=0; [ \"$(stat -c '%U:%G %a' /home/test1/upload 2>/dev/null)\" = \"charles:sftpusers 750\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

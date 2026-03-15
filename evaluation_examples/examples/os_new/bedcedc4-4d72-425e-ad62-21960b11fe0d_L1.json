@@ -1,0 +1,41 @@
+{
+  "id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+  "task_slug": "power_no_dim",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Configure power behavior for presentations: turn off dim screen when inactive, disable automatic screen blanking (idle-delay=0), and save ~/Desktop/power_policy_audit.txt with exactly two lines: idle-dim=false and idle-delay=0.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.settings-daemon.plugins.power idle-dim true; gsettings set org.gnome.desktop.session idle-delay 300; rm -f ~/Desktop/power_policy_audit.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": ["os"],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "dim=$(gsettings get org.gnome.settings-daemon.plugins.power idle-dim 2>/dev/null); idle=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null | tr -d '[:space:]'); ok=1; [ \"$dim\" = \"false\" ] || ok=0; [ \"$idle\" = \"uint320\" ] || ok=0; expected=$(cat <<'EOF'\nidle-dim=false\nidle-delay=0\nEOF\n); actual=$(cat ~/Desktop/power_policy_audit.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {"type": "rule", "rules": {"expected": "PASS\n"}}
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,38 @@
+{
+  "id": "b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa",
+  "task_slug": "enable_bluetooth",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "Enable Bluetooth service and make it persistent across reboot by enabling the bluetooth systemd unit. Also create ~/Desktop/bluetooth_status.txt with two lines: enabled=yes and active=yes.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'apt-get update >/dev/null 2>&1 || true; apt-get install -y bluez >/dev/null 2>&1 || true; systemctl disable bluetooth >/dev/null 2>&1 || true; systemctl stop bluetooth >/dev/null 2>&1 || true'; rm -f ~/Desktop/bluetooth_status.txt",
+        "shell": true
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "enabled=$(systemctl is-enabled bluetooth 2>/dev/null || true); active=$(systemctl is-active bluetooth 2>/dev/null || true); ok=1; [ \"$enabled\" = \"enabled\" ] || ok=0; [ \"$active\" = \"active\" ] || ok=0; expected=$(cat <<'EOF'\nenabled=yes\nactive=yes\nEOF\n); actual=$(cat ~/Desktop/bluetooth_status.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "high"
+}

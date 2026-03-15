@@ -1,0 +1,54 @@
+{
+  "id": "4127319a-8b79-4410-b58a-7a151e15f3d7",
+  "task_slug": "php_line_count",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "In /home/user/project_hard, count total lines from all .php files recursively, excluding any path under vendor/ and any file ending with .test.php. Save the exact result as TOTAL=<number> into /home/user/project_hard/php_line_total.txt, and also print the same line in terminal.",
+  "source": "OSWorld custom hard task",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf /home/user/project_hard; mkdir -p /home/user/project_hard/src /home/user/project_hard/vendor/lib /home/user/project_hard/tests /home/user/project_hard/module/sub; cat > /home/user/project_hard/src/a.php <<'EOF'\n<?php\n$a=1;\necho $a;\nEOF\ncat > /home/user/project_hard/src/b.php <<'EOF'\n<?php\nfunction f(){\n  return 1;\n}\nEOF\ncat > /home/user/project_hard/vendor/lib/v.php <<'EOF'\n<?php\n$x=1;\n$y=2;\n$z=3;\nEOF\ncat > /home/user/project_hard/tests/t.test.php <<'EOF'\n<?php\n// test\nEOF\ncat > /home/user/project_hard/module/sub/c.php <<'EOF'\n<?php\necho 'm';\nEOF",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl','alt','t'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; [ -f /home/user/project_hard/php_line_total.txt ] || ok=0; val=$(cat /home/user/project_hard/php_line_total.txt 2>/dev/null); [ \"$val\" = \"TOTAL=9\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

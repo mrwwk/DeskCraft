@@ -1,0 +1,86 @@
+{
+  "id": "13584542-872b-42d8-b299-866967b5c3ef",
+  "task_slug": "terminal_size_persist",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "Configure terminal size to be persistent with 140 columns and 46 rows. Also create a backup of ~/.bashrc as ~/.bashrc.osworld.bak before applying changes. The setting must take effect in a newly opened terminal automatically.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cp ~/.bashrc ~/.bashrc.osworld.seed.bak >/dev/null 2>&1 || true",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 1
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; time.sleep(0.5); pyautogui.hotkey('ctrl','alt','t'); time.sleep(0.6); pyautogui.write('stty size'); time.sleep(0.3); pyautogui.press('enter')"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_include_exclude",
+      "exact_match"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_terminal_output"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "ok=1; [ -f ~/.bashrc.osworld.bak ] || ok=0; count=$(grep -c \"stty rows 46 cols 140\" ~/.bashrc 2>/dev/null || true); [ \"$count\" -eq 1 ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": [
+            "46 140"
+          ],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "PASS\n"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

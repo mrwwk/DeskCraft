@@ -1,0 +1,50 @@
+{
+  "id": "971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6",
+  "task_slug": "python_scratch_auto_save",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please configure VS Code for quick Python scratch files: set default language to python, start with a new untitled file on startup, and enable auto save after delay with 1000ms.",
+  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "files.defaultLanguage": "python",
+          "workbench.startupEditor": "newUntitledFile",
+          "files.autoSave": "afterDelay",
+          "files.autoSaveDelay": 1000
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

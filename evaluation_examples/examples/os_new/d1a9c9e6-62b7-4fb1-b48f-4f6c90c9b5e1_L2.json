@@ -1,0 +1,69 @@
+{
+  "id": "d1a9c9e6-62b7-4fb1-b48f-4f6c90c9b5e1",
+  "task_slug": "extract_failing_services",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "Inside ~/Desktop/log_audit, collect all unique service names whose log lines contain level ERROR or CRITICAL and status >=500. Ignore anything under archive/. Save the sorted service names (one per line) to ~/Desktop/log_audit/report/failing_services.txt.",
+  "source": "custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/log_audit && mkdir -p ~/Desktop/log_audit/app1 ~/Desktop/log_audit/app2/sub ~/Desktop/log_audit/archive ~/Desktop/log_audit/report",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cat > ~/Desktop/log_audit/app1/api.log <<'EOF'\n2026-02-01T10:00:00Z service=auth level=INFO status=200 msg=ok\n2026-02-01T10:02:00Z service=auth level=ERROR status=503 msg=upstream_timeout\n2026-02-01T10:03:00Z service=search level=ERROR status=404 msg=not_found\n2026-02-01T10:04:00Z service=billing level=CRITICAL status=500 msg=db_down\nEOF",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cat > ~/Desktop/log_audit/app2/sub/worker.log <<'EOF'\n2026-02-01T11:00:00Z service=cache level=CRITICAL status=502 msg=panic\n2026-02-01T11:01:00Z service=auth level=ERROR status=500 msg=retry_failed\n2026-02-01T11:02:00Z service=payments level=ERROR status=500 msg=gateway_fail\n2026-02-01T11:03:00Z service=analytics level=INFO status=200 msg=ok\nEOF",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cat > ~/Desktop/log_audit/archive/old.log <<'EOF'\n2026-02-01T09:00:00Z service=legacy level=CRITICAL status=503 msg=should_be_ignored\nEOF",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5);"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "[ -f ~/Desktop/log_audit/report/failing_services.txt ] && cat ~/Desktop/log_audit/report/failing_services.txt || echo '__MISSING__'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "auth\nbilling\ncache\npayments\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

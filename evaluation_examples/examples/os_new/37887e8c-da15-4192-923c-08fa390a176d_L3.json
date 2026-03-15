@@ -1,0 +1,54 @@
+{
+  "id": "37887e8c-da15-4192-923c-08fa390a176d",
+  "task_slug": "compress_old_logs",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "In /tmp/test_files_hard, compress only .log and .txt files that were modified at least 30 days ago into .gz files in place. Exclude anything under archive/. Keep newer files unchanged. Then create /tmp/test_files_hard/compress_report.txt listing each compressed file relative path (without .gz), sorted alphabetically.",
+  "source": "OSWorld custom hard task",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf /tmp/test_files_hard; mkdir -p /tmp/test_files_hard/app/a /tmp/test_files_hard/app/b /tmp/test_files_hard/archive/old /tmp/test_files_hard/misc; printf 'oldlog\n' > /tmp/test_files_hard/app/a/error.log; printf 'oldtxt\n' > /tmp/test_files_hard/app/b/report.txt; printf 'newlog\n' > /tmp/test_files_hard/app/b/recent.log; printf 'oldcsv\n' > /tmp/test_files_hard/misc/data.csv; printf 'archived\n' > /tmp/test_files_hard/archive/old/ignore.log; touch -d '45 days ago' /tmp/test_files_hard/app/a/error.log /tmp/test_files_hard/app/b/report.txt /tmp/test_files_hard/misc/data.csv /tmp/test_files_hard/archive/old/ignore.log; touch -d '5 days ago' /tmp/test_files_hard/app/b/recent.log",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl','alt','t'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; [ -f /tmp/test_files_hard/app/a/error.log.gz ] || ok=0; [ -f /tmp/test_files_hard/app/b/report.txt.gz ] || ok=0; [ ! -f /tmp/test_files_hard/app/b/recent.log.gz ] || ok=0; [ -f /tmp/test_files_hard/app/b/recent.log ] || ok=0; [ ! -f /tmp/test_files_hard/misc/data.csv.gz ] || ok=0; [ ! -f /tmp/test_files_hard/archive/old/ignore.log.gz ] || ok=0; expected=$(cat <<'EOF'\napp/a/error.log\napp/b/report.txt\nEOF\n); actual=$(cat /tmp/test_files_hard/compress_report.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

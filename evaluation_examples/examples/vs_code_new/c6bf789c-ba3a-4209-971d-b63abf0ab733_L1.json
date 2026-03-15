@@ -1,0 +1,51 @@
+{
+  "id": "c6bf789c-ba3a-4209-971d-b63abf0ab733",
+  "task_slug": "hide_python_cache_folders",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please update VS Code User Settings to hide Python cache folders in Explorer, including __pycache__, .pytest_cache, and .mypy_cache.",
+  "source": "https://code.visualstudio.com/docs/editor/codebasics#_files-explorer",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "files.exclude": {
+            "**/__pycache__": true,
+            "**/.pytest_cache": true,
+            "**/.mypy_cache": true
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

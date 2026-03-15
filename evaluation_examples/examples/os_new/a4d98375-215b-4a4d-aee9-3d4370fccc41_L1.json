@@ -1,0 +1,48 @@
+{
+  "id": "a4d98375-215b-4a4d-aee9-3d4370fccc41",
+  "task_slug": "screen_lock_config",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Configure auto screen lock for security: enable screen lock, set idle delay to 5 minutes, and set lock delay to 0 (immediate lock after blank). Also save a report to ~/Desktop/lock_policy.txt with exactly three lines: lock-enabled=true, idle-delay=300, lock-delay=0.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.desktop.screensaver lock-enabled false; gsettings set org.gnome.desktop.session idle-delay 0; gsettings set org.gnome.desktop.screensaver lock-delay 60; rm -f ~/Desktop/lock_policy.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; [ \"$(gsettings get org.gnome.desktop.screensaver lock-enabled)\" = \"true\" ] || ok=0; [ \"$(gsettings get org.gnome.desktop.session idle-delay | tr -d '[:space:]')\" = \"uint32300\" ] || ok=0; [ \"$(gsettings get org.gnome.desktop.screensaver lock-delay | tr -d '[:space:]')\" = \"uint320\" ] || ok=0; expected=$(cat <<'EOF'\nlock-enabled=true\nidle-delay=300\nlock-delay=0\nEOF\n); actual=$(cat ~/Desktop/lock_policy.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,62 @@
+{
+  "id": "5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57",
+  "task_slug": "recover_from_trash",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "I accidentally deleted multiple event assets. Recover only poster_party_night.webp and guest_list.txt from Trash into /home/user/Desktop/recovered_party/, and keep old_note.txt in Trash. Also ensure recovered files keep their original content.",
+  "source": "OSWorld custom hard task",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf /home/user/Desktop/recovered_party && mkdir -p /home/user/Desktop/recovered_party",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cat > /home/user/Desktop/poster_party_night.webp <<'EOF'\nFAKE_WEBP_CONTENT_PARTY_NIGHT_V1\nEOF\ncat > /home/user/Desktop/guest_list.txt <<'EOF'\nAlice\nBob\nCharlie\nEOF\ncat > /home/user/Desktop/old_note.txt <<'EOF'\nkeep in trash\nEOF",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gio trash /home/user/Desktop/poster_party_night.webp /home/user/Desktop/guest_list.txt /home/user/Desktop/old_note.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5);"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ok=1; [ -f /home/user/Desktop/recovered_party/poster_party_night.webp ] || ok=0; [ -f /home/user/Desktop/recovered_party/guest_list.txt ] || ok=0; [ ! -f /home/user/Desktop/recovered_party/old_note.txt ] || ok=0; grep -qx 'FAKE_WEBP_CONTENT_PARTY_NIGHT_V1' /home/user/Desktop/recovered_party/poster_party_night.webp || ok=0; diff -u <(printf 'Alice\\nBob\\nCharlie\\n') /home/user/Desktop/recovered_party/guest_list.txt >/dev/null 2>&1 || ok=0; trash_match=$(find /home/user/.local/share/Trash/files -maxdepth 1 -name 'old_note.txt*' | wc -l); [ \"$trash_match\" -ge 1 ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

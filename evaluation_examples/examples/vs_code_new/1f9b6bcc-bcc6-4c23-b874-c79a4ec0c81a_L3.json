@@ -1,0 +1,34 @@
+{
+  "id": "1f9b6bcc-bcc6-4c23-b874-c79a4ec0c81a",
+  "task_slug": "python_productivity_bundle_keybindings_snippets",
+  "difficulty": "L3",
+  "snapshot": "vscode",
+  "instruction": "Please configure a Python productivity bundle in VS Code User settings. Add two custom keybindings: Ctrl+Alt+R should run Python file in terminal when editorTextFocus and editorLangId is python, and Ctrl+Alt+S should save all files when editorTextFocus. Also create a Python user snippet named main_guard with prefix mg, body lines `if __name__ == '__main__':` and `    ${1:main()}`, and description `Python main guard`. Finally set editor.formatOnSave to true and editor.tabCompletion to on in User Settings.",
+  "source": "https://code.visualstudio.com/docs/editor/userdefinedsnippets",
+  "config": [
+    {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/.config/Code/User/snippets"]}},
+    {"type": "launch", "parameters": {"command": ["code"]}},
+    {"type": "activate_window", "parameters": {"window_name": "Visual Studio Code"}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode"],
+  "evaluator": {
+    "func": ["check_json_keybindings", "check_json_keybindings", "compare_config", "check_json_settings"],
+    "result": [
+      {"type": "vm_file", "path": "/home/user/.config/Code/User/keybindings.json", "dest": "keybindings.json"},
+      {"type": "vm_file", "path": "/home/user/.config/Code/User/keybindings.json", "dest": "keybindings.json"},
+      {"type": "vm_file", "path": "/home/user/.config/Code/User/snippets/python.json", "dest": "python.json"},
+      {"type": "vm_file", "path": "/home/user/.config/Code/User/settings.json", "dest": "settings.json"}
+    ],
+    "expected": [
+      {"type": "rule", "rules": {"expected": {"key": "ctrl+alt+r", "command": "python.execInTerminal", "when": "editorTextFocus && editorLangId == python"}}},
+      {"type": "rule", "rules": {"expected": {"key": "ctrl+alt+s", "command": "workbench.action.files.saveAll", "when": "editorTextFocus"}}},
+      {"type": "rule", "rules": {"expected": "{\n  \"main_guard\": {\n    \"prefix\": \"mg\",\n    \"body\": [\n      \"if __name__ == '__main__':\",\n      \"    ${1:main()}\"\n    ],\n    \"description\": \"Python main guard\"\n  }\n}"}},
+      {"type": "rule", "rules": {"expected": {"editor.formatOnSave": true, "editor.tabCompletion": "on"}}}
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

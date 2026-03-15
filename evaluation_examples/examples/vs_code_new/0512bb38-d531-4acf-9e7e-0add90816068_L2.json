@@ -1,0 +1,62 @@
+{
+  "id": "0512bb38-d531-4acf-9e7e-0add90816068",
+  "task_slug": "install_local_vsix_disable_auto_update",
+  "difficulty": "L2",
+  "snapshot": "vscode",
+  "instruction": "Please install the local VSIX extension from /home/user/test.vsix in VS Code, and also disable extension auto-update in User Settings.",
+  "source": "https://code.visualstudio.com/docs/editor/extension-marketplace",
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/vs_code/0512bb38-d531-4acf-9e7e-0add90816068/test.vsix",
+            "path": "/home/user/test.vsix"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "is_extension_installed",
+    "result": {
+      "type": "vm_command_line",
+      "command": [
+        "code",
+        "--list-extensions",
+        "|",
+        "grep",
+        "undefined_publisher.test"
+      ]
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "type": "contain",
+        "expected": "undefined_publisher.test"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -530,6 +530,32 @@ def check_history_deleted(history_data, rule):
         raise TypeError(f"{rule['type']} not support yet!")
 
 
+def check_history_keywords_absent_and_present(history_data, rule):
+    """
+    Check that some keywords are absent from history while others are still present.
+    """
+    if not history_data:
+        return 0.
+
+    if rule['type'] != 'keywords_absent_present':
+        raise TypeError(f"{rule['type']} not support yet!")
+
+    history_urls = [str(item[0]).lower() for item in history_data if item and len(item) > 0 and item[0] is not None]
+
+    absent_keywords = [k.lower() for k in rule.get('absent_keywords', [])]
+    present_keywords = [k.lower() for k in rule.get('present_keywords', [])]
+
+    for keyword in absent_keywords:
+        if any(keyword in url for url in history_urls):
+            return 0.
+
+    for keyword in present_keywords:
+        if not any(keyword in url for url in history_urls):
+            return 0.
+
+    return 1.
+
+
 def check_enabled_experiments(enabled_experiments, rule):
     """
     Check if the enabled experiments are as expected.
