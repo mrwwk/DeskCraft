@@ -1,0 +1,78 @@
+{
+  "id": "370d325c-c7b8-4a59-9899-eb9541e53411",
+  "task_slug": "writer_could_you_help_me_convert_the_comma_sepa",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Could you help me convert the comma-separated text in this document into a properly formatted table?",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/370d325c-c7b8-4a59-9899-eb9541e53411/Data_TextToTable.docx",
+            "path": "/home/user/Desktop/Data_TextToTable.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Data_TextToTable.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/370d325c-c7b8-4a59-9899-eb9541e53411",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Data_TextToTable.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_tables",
+    "expected": {
+      "type": "cache_file",
+      "path": "Data_TextToTable_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Data_TextToTable.docx",
+      "dest": "Data_TextToTable.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

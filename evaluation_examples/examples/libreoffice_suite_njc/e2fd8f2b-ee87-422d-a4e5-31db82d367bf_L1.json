@@ -1,0 +1,86 @@
+{
+  "id": "e2fd8f2b-ee87-422d-a4e5-31db82d367bf",
+  "task_slug": "calc_create_two_tables_in_new_sheet_named",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Create two tables in a new sheet named \"Sheet2\": the first table has headers \"Region\" and \"Total Revenue ($)\" showing total revenue per region (in alphabetical order), and the second table (separated by one blank row) has headers \"Category\" and \"Total Revenue ($)\" showing total revenue per category (in alphabetical order).",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/e2fd8f2b-ee87-422d-a4e5-31db82d367bf/Online_Orders_Summary.xlsx",
+            "path": "/home/user/Online_Orders_Summary.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Online_Orders_Summary.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/e2fd8f2b-ee87-422d-a4e5-31db82d367bf",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Online_Orders_Summary.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Online_Orders_Summary_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Online_Orders_Summary.xlsx",
+      "dest": "Online_Orders_Summary.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNSheet2",
+          "sheet_idx1": "ENSheet2"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

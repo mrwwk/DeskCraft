@@ -1,0 +1,80 @@
+{
+  "id": "b78516f9-ffc3-4c12-8009-97770448d56a",
+  "task_slug": "writer_please_replace_all_occurrences_of_the_wo",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Please replace all occurrences of the word \"manager\" (case-insensitively) with \"supervisor\" throughout the entire document.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/b78516f9-ffc3-4c12-8009-97770448d56a/Dept_Report_Replace.docx",
+            "path": "/home/user/Desktop/Dept_Report_Replace.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Dept_Report_Replace.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/b78516f9-ffc3-4c12-8009-97770448d56a",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Dept_Report_Replace.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Dept_Report_Replace_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Dept_Report_Replace.docx",
+      "dest": "Dept_Report_Replace.docx"
+    },
+    "options": {
+      "ignore_case": false
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

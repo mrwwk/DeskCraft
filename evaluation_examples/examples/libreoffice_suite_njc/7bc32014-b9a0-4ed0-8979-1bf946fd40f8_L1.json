@@ -1,0 +1,78 @@
+{
+  "id": "7bc32014-b9a0-4ed0-8979-1bf946fd40f8",
+  "task_slug": "calc_could_you_help_me_to_export_the_current",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Could you help me to export the current sheet to a CSV file? Export the contents just as they are shown on the screen. Keep the other options untouched. The CSV file should share the same file name as the spreadsheet (without the .xlsx extension).",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/7bc32014-b9a0-4ed0-8979-1bf946fd40f8/Export_to_CSV.xlsx",
+            "path": "/home/user/Export_to_CSV.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Export_to_CSV.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/7bc32014-b9a0-4ed0-8979-1bf946fd40f8",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Export_to_CSV.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_csv",
+    "expected": {
+      "type": "cache_file",
+      "path": "Export_to_CSV.csv"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Export_to_CSV.csv",
+      "dest": "Export_to_CSV.csv"
+    },
+    "options": {}
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,80 @@
+{
+  "id": "79edead5-f5c4-4ddf-9e84-ed74760552b0",
+  "task_slug": "writer_please_change_the_font_of_the_entire_doc",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Please change the font of the entire document to \"Times New Roman\".",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/79edead5-f5c4-4ddf-9e84-ed74760552b0/Article_FontChange_TNR.docx",
+            "path": "/home/user/Desktop/Article_FontChange_TNR.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Article_FontChange_TNR.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/79edead5-f5c4-4ddf-9e84-ed74760552b0",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Article_FontChange_TNR.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_font_names",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "font_name": "Times New Roman"
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Article_FontChange_TNR.docx",
+      "dest": "Article_FontChange_TNR.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

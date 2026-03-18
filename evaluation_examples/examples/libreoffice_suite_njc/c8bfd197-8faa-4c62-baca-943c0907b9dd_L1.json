@@ -1,0 +1,86 @@
+{
+  "id": "c8bfd197-8faa-4c62-baca-943c0907b9dd",
+  "task_slug": "calc_in_new_sheet_named_with_two_column",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "In a new sheet named \"Sheet2\" with two column headers \"Year\" and \"Growth (%)\", calculate the year-over-year revenue growth percentage compared to the previous year for 2019 to 2023. Round to 2 decimal places.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/c8bfd197-8faa-4c62-baca-943c0907b9dd/Annual_Revenue_Growth.xlsx",
+            "path": "/home/user/Annual_Revenue_Growth.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Annual_Revenue_Growth.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/c8bfd197-8faa-4c62-baca-943c0907b9dd",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Annual_Revenue_Growth.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Annual_Revenue_Growth_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Annual_Revenue_Growth.xlsx",
+      "dest": "Annual_Revenue_Growth.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNSheet2",
+          "sheet_idx1": "ENSheet2"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
