@@ -1,0 +1,75 @@
+{
+  "id": "bee51da2-164c-4c0f-a6fb-534ad073e862",
+  "task_slug": "writer_please_add_page_number_to_the_footer",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Please add a page number to the footer of every page.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/bee51da2-164c-4c0f-a6fb-534ad073e862/Proposal_AddPageNum.docx",
+            "path": "/home/user/Desktop/Proposal_AddPageNum.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Proposal_AddPageNum.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/bee51da2-164c-4c0f-a6fb-534ad073e862",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Proposal_AddPageNum.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "has_page_numbers_in_footers",
+    "expected": null,
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Proposal_AddPageNum.docx",
+      "dest": "Proposal_AddPageNum.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

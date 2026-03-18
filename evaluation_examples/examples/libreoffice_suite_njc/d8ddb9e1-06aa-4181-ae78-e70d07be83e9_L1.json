@@ -1,0 +1,113 @@
+{
+  "id": "d8ddb9e1-06aa-4181-ae78-e70d07be83e9",
+  "task_slug": "calc_in_the_column_enable_data_validation_for",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "In the \"Status\" column, enable data validation for cells F2:F16 so that the values can be directly selected from a drop down list with options \"Open\", \"In Progress\", and \"Done\". Finish the work and don't touch irrelevant regions, even if they are blank.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/d8ddb9e1-06aa-4181-ae78-e70d07be83e9/Project_Tasks_Validation.xlsx",
+            "path": "/home/user/Project_Tasks_Validation.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Project_Tasks_Validation.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/d8ddb9e1-06aa-4181-ae78-e70d07be83e9",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Project_Tasks_Validation.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Project_Tasks_Validation_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Project_Tasks_Validation.xlsx",
+      "dest": "Project_Tasks_Validation.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "data_validation",
+          "sheet_idx": 0,
+          "dv_props": [
+            {
+              "ranges": {
+                "method": "spreadsheet_range",
+                "ref": [
+                  "F2:F16",
+                  "F2:F1048576"
+                ]
+              },
+              "type": {
+                "method": "eq",
+                "ref": "list"
+              },
+              "formula1": {
+                "method": "str_set_eq",
+                "ref": [
+                  "Open",
+                  "In Progress",
+                  "Done"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,94 @@
+{
+  "id": "9d33210e-6323-4fdf-ab60-8a4904e41081",
+  "task_slug": "calc_please_highlight_all_the_cells_in_the_co",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Please highlight all the cells in the \"Score\" column that have a value greater than 90 by setting the cell background to green (#00ff00). Finish the work and don't touch irrelevant regions, even if they are blank.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/9d33210e-6323-4fdf-ab60-8a4904e41081/Exam_Score_Highlight.xlsx",
+            "path": "/home/user/Exam_Score_Highlight.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Exam_Score_Highlight.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/9d33210e-6323-4fdf-ab60-8a4904e41081",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Exam_Score_Highlight.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Exam_Score_Highlight_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Exam_Score_Highlight.xlsx",
+      "dest": "Exam_Score_Highlight.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": [
+            "bgcolor"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

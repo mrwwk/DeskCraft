@@ -1,0 +1,86 @@
+{
+  "id": "86a0574a-367d-4611-9c8e-748fc82b412e",
+  "task_slug": "calc_create_column_by_concatenating_and_with",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Create a \"Full Name\" column by concatenating \"First Name\" and \"Last Name\" with a space in between for each employee. Finish the work and don't touch irrelevant regions.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/86a0574a-367d-4611-9c8e-748fc82b412e/Employee_Name_Concat.xlsx",
+            "path": "/home/user/Employee_Name_Concat.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Employee_Name_Concat.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/86a0574a-367d-4611-9c8e-748fc82b412e",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Employee_Name_Concat.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Employee_Name_Concat_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Employee_Name_Concat.xlsx",
+      "dest": "Employee_Name_Concat.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

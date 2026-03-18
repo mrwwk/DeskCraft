@@ -1,0 +1,86 @@
+{
+  "id": "ff761a9f-28ed-4178-b3fc-1e91fe8096db",
+  "task_slug": "calc_fill_all_the_blank_cells_in_the_column",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Fill all the blank cells in the \"Department\" column (B2:B26) with the value in the cell above it. Finish the work and don't touch irrelevant regions, even if they are blank.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/ff761a9f-28ed-4178-b3fc-1e91fe8096db/Employee_Dept_Fill_Blank.xlsx",
+            "path": "/home/user/Employee_Dept_Fill_Blank.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Employee_Dept_Fill_Blank.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/ff761a9f-28ed-4178-b3fc-1e91fe8096db",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Employee_Dept_Fill_Blank.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Employee_Dept_Fill_Blank_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Employee_Dept_Fill_Blank.xlsx",
+      "dest": "Employee_Dept_Fill_Blank.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

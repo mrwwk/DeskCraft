@@ -1,0 +1,86 @@
+{
+  "id": "b8185158-1fda-4729-ad1a-b76a8afa9ecf",
+  "task_slug": "calc_compute_the_sum_of_the_and_columns_and",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Compute the sum of the \"Revenue ($)\" and \"Expenses ($)\" columns and put the results under two column headers named \"Total Revenue ($)\" and \"Total Expenses ($)\" in a new sheet named \"Sheet2\".",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/b8185158-1fda-4729-ad1a-b76a8afa9ecf/Finance_Sheet2_Sum.xlsx",
+            "path": "/home/user/Finance_Sheet2_Sum.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Finance_Sheet2_Sum.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/b8185158-1fda-4729-ad1a-b76a8afa9ecf",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Finance_Sheet2_Sum.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Finance_Sheet2_Sum_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Finance_Sheet2_Sum.xlsx",
+      "dest": "Finance_Sheet2_Sum.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNSheet2",
+          "sheet_idx1": "ENSheet2"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

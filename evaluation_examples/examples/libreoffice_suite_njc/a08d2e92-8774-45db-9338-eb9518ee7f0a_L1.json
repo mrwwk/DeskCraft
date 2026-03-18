@@ -1,0 +1,78 @@
+{
+  "id": "a08d2e92-8774-45db-9338-eb9518ee7f0a",
+  "task_slug": "writer_am_peer_reviewing_this_project_outline",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_writer",
+  "instruction": "I am peer-reviewing this project outline. I think the last paragraph is redundant, so could you add strikethrough formatting to all the text in the last paragraph?",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/a08d2e92-8774-45db-9338-eb9518ee7f0a/Outline_Strikethrough.docx",
+            "path": "/home/user/Desktop/Outline_Strikethrough.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Outline_Strikethrough.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/a08d2e92-8774-45db-9338-eb9518ee7f0a",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Outline_Strikethrough.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "evaluate_strike_through_last_paragraph",
+    "expected": {
+      "type": "cache_file",
+      "path": "Outline_Strikethrough_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Outline_Strikethrough.docx",
+      "dest": "Outline_Strikethrough.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

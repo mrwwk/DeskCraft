@@ -1,0 +1,78 @@
+{
+  "id": "5dda32e9-6da6-4144-ae54-7d7f25fe296f",
+  "task_slug": "writer_am_making_guideline_for_new_employees",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_writer",
+  "instruction": "I am making a guideline for new employees and would like to separate each sentence in the document onto its own line. Please help me do this.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/5dda32e9-6da6-4144-ae54-7d7f25fe296f/Guide_Sentences.docx",
+            "path": "/home/user/Desktop/Guide_Sentences.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Guide_Sentences.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/5dda32e9-6da6-4144-ae54-7d7f25fe296f",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Guide_Sentences.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Guide_Sentences_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Guide_Sentences.docx",
+      "dest": "Guide_Sentences.docx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
