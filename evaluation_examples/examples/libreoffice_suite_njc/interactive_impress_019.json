@@ -1,0 +1,108 @@
+{
+    "id": "interactive_impress_019",
+    "snapshot": "libreoffice_impress",
+    "interactive": true,
+    "scenario_type": "ambiguous_scope",
+    "scenario_description": "用户说在幻灯片里加版权信息但未说加哪张。Agent 询问后只在最后一张加。",
+    "user_persona": {
+        "expertise_level": "intermediate",
+        "communication_style": "casual_chinese"
+    },
+    "config": [
+        {
+            "type": "upload_file",
+            "parameters": {
+                "files": [
+                    {
+                        "local_path": "/cq_1/share_1603164/user/njc/CodeField5/OSWorld/PPTX/Vincent van Gogh_ A Life of Passion and Color.pptx",
+                        "path": "/home/user/Desktop/Vincent van Gogh_ A Life of Passion and Color.pptx"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "launch",
+            "parameters": {
+                "command": [
+                    "libreoffice",
+                    "--norestore",
+                    "--nologo",
+                    "--impress",
+                    "/home/user/Desktop/Vincent van Gogh_ A Life of Passion and Color.pptx"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 12
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我在某张幻灯片加上版权信息",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "只在最后一张幻灯片加上'© Art History Department 2025'，其他页不动，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_impress"
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"from pptx import Presentation; prs = Presentation('/home/user/Desktop/Vincent van Gogh_ A Life of Passion and Color.pptx'); text = ' '.join(run.text for slide in prs.slides for shape in slide.shapes if shape.has_text_frame for para in shape.text_frame.paragraphs for run in para.runs); print(text)\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "Art History Department 2025"
+                ],
+                "exclude": []
+            }
+        }
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}

@@ -1,0 +1,77 @@
+{
+    "id": "interactive_multiapp_c2i_002",
+    "instruction": "帮我把预算执行情况记录一下",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '部门'\nws['B1'] = '年度预算(万元)'\nws['C1'] = 'Q1实际(万元)'\nws['D1'] = 'Q1使用率(%)'\nws['A2'] = '研发部'\nws['B2'] = 800\nws['C2'] = 195\nws['D2'] = 97.5\nws['A3'] = '销售部'\nws['B3'] = 600\nws['C3'] = 138\nws['D3'] = 92.0\nws['A4'] = '市场部'\nws['B4'] = 400\nws['C4'] = 105\nws['D4'] = 105.0\nws['A5'] = '行政部'\nws['B5'] = 200\nws['C5'] = 48\nws['D5'] = 96.0\nwb.save('/home/user/Desktop/dept_budget.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/budget_alert.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把预算执行情况记录一下",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/dept_budget.xlsx中找到Q1使用率超过100%的部门，追加到/home/user/Desktop/budget_alert.txt末尾：'Q1预算超支部门：市场部（使用率105%）'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/budget_alert.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "Q1预算超支部门：市场部（使用率105%）"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

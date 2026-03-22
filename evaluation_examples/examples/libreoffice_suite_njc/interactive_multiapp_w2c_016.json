@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_016",
+    "instruction": "把客户拜访情况记录到台账里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '客户拜访记录\\n拜访日期：2025-03-14\\n客户名称：华北医疗集团\\n联系人：采购总监 方磊\\n拜访人员：业务经理 乔勇\\n拜访目的：推进年度框架合同续签\\n客户态度：积极，有意向续签\\n跟进事项：发送合同草稿，预计3月25日前完成\\n预计合同金额：320万元' > /home/user/Desktop/client_visit.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '日期'; ws['B1'] = '客户'; ws['C1'] = '联系人'; ws['D1'] = '拜访人'; ws['E1'] = '目的'; ws['F1'] = '预计金额(万元)'; ws['G1'] = '跟进事项'; wb.save('/home/user/Desktop/visit_record.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把客户拜访情况记录到台账里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/client_visit.txt里的拜访信息填入/home/user/Desktop/visit_record.xlsx的第2行：A2='2025-03-14'，B2='华北医疗集团'，C2='方磊'，D2='乔勇'，E2='年度框架合同续签'，F2=320，G2='发送合同草稿'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/visit_record.xlsx'); s = df.to_string(); print('PASSED' if '乔勇' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

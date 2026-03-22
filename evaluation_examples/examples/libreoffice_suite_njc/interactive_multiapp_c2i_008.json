@@ -1,0 +1,77 @@
+{
+    "id": "interactive_multiapp_c2i_008",
+    "instruction": "帮我把漏斗数据整理到分析文档里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '阶段'\nws['B1'] = '数量'\nws['C1'] = '转化率(%)'\nws['A2'] = '展示曝光'\nws['B2'] = 100000\nws['C2'] = 100\nws['A3'] = '点击浏览'\nws['B3'] = 12500\nws['C3'] = 12.5\nws['A4'] = '加入购物车'\nws['B4'] = 3200\nws['C4'] = 25.6\nws['A5'] = '提交订单'\nws['B5'] = 1850\nws['C5'] = 57.8\nws['A6'] = '完成支付'\nws['B6'] = 1620\nws['C6'] = 87.6\nwb.save('/home/user/Desktop/funnel_data.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/funnel_summary.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把漏斗数据整理到分析文档里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/funnel_data.xlsx中计算整体支付转化率（1620/100000），追加到/home/user/Desktop/funnel_summary.txt末尾：'整体漏斗转化率：1.62%（10万曝光，1620人支付）'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/funnel_summary.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "整体漏斗转化率：1.62%（10万曝光，1620人支付）"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

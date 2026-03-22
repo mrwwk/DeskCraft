@@ -1,0 +1,78 @@
+{
+    "id": "interactive_multiapp_w2i_007",
+    "instruction": "帮我把课程信息整理到培训简介里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '培训课程大纲\\n课程名称：数字化转型实战\\n课时：12课时（分3天完成）\\n适用对象：中高层管理者\\n培训目标：理解数字化转型战略，掌握推进方法论\\n模块一：数字化转型认知框架（3课时）\\n模块二：企业数字化评估与路径规划（4课时）\\n模块三：数字化转型落地案例（3课时）\\n模块四：行动计划制定（2课时）' > /home/user/Desktop/course_outline.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/training_brief.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把课程信息整理到培训简介里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/course_outline.txt里提取课程名称和课时，追加到/home/user/Desktop/training_brief.txt末尾：'课程：数字化转型实战，共12课时，适用中高层管理者'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/training_brief.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "数字化转型实战，共12课时",
+                    "中高层管理者"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

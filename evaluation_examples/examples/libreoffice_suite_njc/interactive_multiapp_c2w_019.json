@@ -1,0 +1,78 @@
+{
+    "id": "interactive_multiapp_c2w_019",
+    "instruction": "把供应商评估情况汇总一下",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '供应商'\nws['B1'] = '评级'\nws['C1'] = '交货准时率(%)'\nws['D1'] = '价格指数'\nws['A2'] = '优质原料厂'\nws['B2'] = 'A'\nws['C2'] = 98.5\nws['D2'] = 1.05\nws['A3'] = '新兴材料公司'\nws['B3'] = 'B'\nws['C3'] = 92.1\nws['D3'] = 0.95\nws['A4'] = '传统加工厂'\nws['B4'] = 'A'\nws['C4'] = 96.8\nws['D4'] = 1.0\nws['A5'] = '进口代理商'\nws['B5'] = 'C'\nws['C5'] = 85.3\nws['D5'] = 1.2\nwb.save('/home/user/Desktop/supplier_info.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/supplier_note.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把供应商评估情况汇总一下",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/supplier_info.xlsx中找到评级为A且交货准时率最高的供应商，在/home/user/Desktop/supplier_note.txt末尾追加：'首选供应商：优质原料厂（准时率98.5%）'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/supplier_note.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "首选供应商：优质原料厂",
+                    "98.5%"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

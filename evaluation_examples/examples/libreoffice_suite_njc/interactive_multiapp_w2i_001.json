@@ -1,0 +1,77 @@
+{
+    "id": "interactive_multiapp_w2i_001",
+    "instruction": "帮我把团队介绍整理到工作总结里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '团队介绍\\n团队名称：智能产品研发中心\\n团队规模：28人\\n核心成员：产品经理3人、前端工程师6人、后端工程师8人、算法工程师5人、测试工程师4人、设计师2人\\n成立时间：2022年6月\\n主要成果：累计上线产品功能120+项，用户满意度92%' > /home/user/Desktop/team_intro.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/work_summary.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把团队介绍整理到工作总结里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/team_intro.txt里提取团队规模信息，追加到/home/user/Desktop/work_summary.txt末尾：'团队规模：28人，核心成员涵盖产品、研发、设计、测试'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/work_summary.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "团队规模：28人，核心成员涵盖产品、研发、设计、测试"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

@@ -1,0 +1,78 @@
+{
+    "id": "interactive_multiapp_c2w_006",
+    "instruction": "把合同情况记录一下",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '合同编号'\nws['B1'] = '客户'\nws['C1'] = '金额(万元)'\nws['D1'] = '签订日期'\nws['A2'] = 'HT2025001'\nws['B2'] = '星辰科技'\nws['C2'] = 45.0\nws['D2'] = '2025-01-15'\nws['A3'] = 'HT2025002'\nws['B3'] = '明日教育'\nws['C3'] = 28.5\nws['D3'] = '2025-02-08'\nws['A4'] = 'HT2025003'\nws['B4'] = '云帆网络'\nws['C4'] = 92.0\nws['D4'] = '2025-02-20'\nwb.save('/home/user/Desktop/contract_list.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/contract_notes.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把合同情况记录一下",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/contract_list.xlsx中找到金额最大的合同，在/home/user/Desktop/contract_notes.txt末尾追加：'最大合同：HT2025003（92万元，客户：云帆网络）'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/contract_notes.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "HT2025003",
+                    "92万元"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

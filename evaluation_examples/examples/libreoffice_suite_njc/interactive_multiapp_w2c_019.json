@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_019",
+    "instruction": "帮我把设备维修信息录入到台账",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '设备维修记录\\n设备编号：EQP-CNC-005\\n设备名称：五轴数控加工中心\\n故障时间：2025-03-13 09:15\\n故障描述：Z轴丝杆磨损，精度下降\\n维修人员：外协工程师 田浩\\n维修内容：更换Z轴丝杆及轴承\\n配件费用：8600元\\n人工费用：1500元\\n修复时间：2025-03-13 17:30\\n停机时长：8.25小时' > /home/user/Desktop/maintenance_log.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '设备编号'; ws['B1'] = '设备名称'; ws['C1'] = '故障描述'; ws['D1'] = '维修人员'; ws['E1'] = '配件费(元)'; ws['F1'] = '人工费(元)'; ws['G1'] = '停机时长(h)'; wb.save('/home/user/Desktop/maintenance_record.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把设备维修信息录入到台账",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/maintenance_log.txt里的维修信息填入/home/user/Desktop/maintenance_record.xlsx的第2行：A2='EQP-CNC-005'，B2='五轴数控加工中心'，C2='Z轴丝杆磨损'，D2='田浩'，E2=8600，F2=1500，G2=8.25，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/maintenance_record.xlsx'); s = df.to_string(); print('PASSED' if 'EQP-CNC-005' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

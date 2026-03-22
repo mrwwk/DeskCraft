@@ -1,0 +1,77 @@
+{
+    "id": "interactive_multiapp_c2i_007",
+    "instruction": "帮我把团队技能情况整理到报告里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '技能'\nws['B1'] = '精通人数'\nws['C1'] = '熟练人数'\nws['D1'] = '了解人数'\nws['A2'] = 'Python'\nws['B2'] = 8\nws['C2'] = 15\nws['D2'] = 12\nws['A3'] = '数据分析'\nws['B3'] = 6\nws['C3'] = 18\nws['D3'] = 10\nws['A4'] = '机器学习'\nws['B4'] = 4\nws['C4'] = 8\nws['D4'] = 18\nws['A5'] = '云计算'\nws['B5'] = 3\nws['C5'] = 12\nws['D5'] = 20\nwb.save('/home/user/Desktop/skill_matrix.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/skill_report.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把团队技能情况整理到报告里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/skill_matrix.xlsx中找到精通人数最多的技能，追加到/home/user/Desktop/skill_report.txt末尾：'团队最强技能：Python（精通8人，熟练15人）'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/skill_report.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "团队最强技能：Python（精通8人，熟练15人）"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

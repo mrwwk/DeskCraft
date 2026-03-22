@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_011",
+    "instruction": "帮我把报销信息录入到费用台账",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '费用报销单\\n申请人：谢婷\\n部门：市场部\\n申请日期：2025-03-14\\n费用类型：出差费用\\n出差目的地：深圳\\n出差日期：2025-03-10至2025-03-12\\n交通费：1280元\\n住宿费：960元\\n餐饮费：350元\\n合计：2590元' > /home/user/Desktop/expense_claim.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '申请人'; ws['B1'] = '部门'; ws['C1'] = '费用类型'; ws['D1'] = '目的地'; ws['E1'] = '交通(元)'; ws['F1'] = '住宿(元)'; ws['G1'] = '餐饮(元)'; ws['H1'] = '合计(元)'; wb.save('/home/user/Desktop/expense_log.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把报销信息录入到费用台账",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/expense_claim.txt里的报销信息填入/home/user/Desktop/expense_log.xlsx的第2行：A2='谢婷'，B2='市场部'，C2='出差费用'，D2='深圳'，E2=1280，F2=960，G2=350，H2=2590，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/expense_log.xlsx'); s = df.to_string(); print('PASSED' if '谢婷' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

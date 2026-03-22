@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_015",
+    "instruction": "帮我把营销活动信息录入到活动跟踪表",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '营销活动方案\\n活动名称：春季焕新节\\n活动编号：MKT-2025-S03\\n活动周期：2025-03-20至2025-04-05\\n活动渠道：线上+线下\\n活动预算：15万元\\n预期参与人次：50000\\n预期GMV：200万元\\n活动负责人：叶思' > /home/user/Desktop/marketing_event.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '活动编号'; ws['B1'] = '活动名称'; ws['C1'] = '周期'; ws['D1'] = '预算(万元)'; ws['E1'] = '预期GMV(万元)'; ws['F1'] = '负责人'; wb.save('/home/user/Desktop/campaign_tracker.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把营销活动信息录入到活动跟踪表",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/marketing_event.txt里的活动信息填入/home/user/Desktop/campaign_tracker.xlsx的第2行：A2='MKT-2025-S03'，B2='春季焕新节'，C2='2025-03-20至2025-04-05'，D2=15，E2=200，F2='叶思'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/campaign_tracker.xlsx'); s = df.to_string(); print('PASSED' if 'MKT-2025-S03' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}
