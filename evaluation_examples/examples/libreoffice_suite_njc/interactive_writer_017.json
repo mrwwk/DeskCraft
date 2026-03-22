@@ -1,0 +1,107 @@
+{
+    "id": "interactive_writer_017",
+    "snapshot": "libreoffice_writer",
+    "interactive": true,
+    "scenario_type": "requirement_change",
+    "scenario_description": "用户先让Agent加上项目负责人张明，然后改口说名字写错了要改成张强。",
+    "user_persona": {
+        "expertise_level": "beginner",
+        "communication_style": "casual_chinese"
+    },
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '2025年度工作报告\n\n一、概述\n本年度，公司各项业务保持稳定增长，整体经营状况良好。\n\n二、财务数据\n全年营业收入：3.2亿元，同比增长22%%。\n净利润：4800万元，同比增长18%%。\n\n三、业务亮点\n1. 数字化转型项目成功上线。\n2. 开拓海外市场，新签5个海外合作订单。\n\n四、总结\n展望未来，公司将继续坚持创新驱动。\n' > /home/user/Desktop/annual_report.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "launch",
+            "parameters": {
+                "command": [
+                    "libreoffice",
+                    "--norestore",
+                    "--nologo",
+                    "--writer",
+                    "/home/user/Desktop/annual_report.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 12
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我在报告末尾加上\"项目负责人：张明\"",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "在文档的最末尾另起一行，加上\"项目负责人：张强\"，然后保存文件",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_writer"
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/annual_report.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "项目负责人：张强"
+                ],
+                "exclude": []
+            }
+        }
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}

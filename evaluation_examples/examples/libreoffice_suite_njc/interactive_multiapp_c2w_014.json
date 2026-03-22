@@ -1,0 +1,77 @@
+{
+    "id": "interactive_multiapp_c2w_014",
+    "instruction": "把项目任务情况汇总一下",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '任务名'\nws['B1'] = '负责人'\nws['C1'] = '优先级'\nws['D1'] = '完成状态'\nws['A2'] = '需求评审'\nws['B2'] = '李明'\nws['C2'] = '高'\nws['D2'] = '已完成'\nws['A3'] = 'UI设计'\nws['B3'] = '王芳'\nws['C3'] = '高'\nws['D3'] = '进行中'\nws['A4'] = '后端开发'\nws['B4'] = '张强'\nws['C4'] = '高'\nws['D4'] = '进行中'\nws['A5'] = '测试'\nws['B5'] = '陈明'\nws['C5'] = '中'\nws['D5'] = '未开始'\nws['A6'] = '上线部署'\nws['B6'] = '刘明'\nws['C6'] = '低'\nws['D6'] = '未开始'\nwb.save('/home/user/Desktop/team_tasks.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/task_overview.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把项目任务情况汇总一下",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/team_tasks.xlsx中统计高优先级且未完成的任务数量，在/home/user/Desktop/task_overview.txt末尾追加：'高优先级未完成任务：2项'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/task_overview.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "高优先级未完成任务：2项"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

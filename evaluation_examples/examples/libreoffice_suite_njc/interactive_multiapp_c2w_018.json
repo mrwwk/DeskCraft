@@ -1,0 +1,78 @@
+{
+    "id": "interactive_multiapp_c2w_018",
+    "instruction": "把会议跟进事项记录一下",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = '事项'\nws['B1'] = '负责人'\nws['C1'] = '截止日期'\nws['D1'] = '状态'\nws['A2'] = '更新产品文档'\nws['B2'] = '赵雷'\nws['C2'] = '2025-03-15'\nws['D2'] = '完成'\nws['A3'] = '安排客户演示'\nws['B3'] = '孙梅'\nws['C3'] = '2025-03-20'\nws['D3'] = '进行中'\nws['A4'] = '提交预算申请'\nws['B4'] = '周斌'\nws['C4'] = '2025-03-18'\nws['D4'] = '逾期'\nws['A5'] = '组织团建活动'\nws['B5'] = '钱琳'\nws['C5'] = '2025-04-01'\nws['D5'] = '未开始'\nwb.save('/home/user/Desktop/meeting_followup.xlsx')\n\""
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/action_items.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把会议跟进事项记录一下",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/meeting_followup.xlsx中找到状态为'逾期'的事项，在/home/user/Desktop/action_items.txt末尾追加：'逾期事项：提交预算申请（负责人：周斌）'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/action_items.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "逾期事项：提交预算申请",
+                    "周斌"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

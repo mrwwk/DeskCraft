@@ -1,0 +1,78 @@
+{
+    "id": "interactive_multiapp_w2i_008",
+    "instruction": "帮我把销售复盘信息记录到台账里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '销售复盘分析\\n分析周期：2025年Q1\\n分析人：销售总监 彭磊\\n达成情况：目标1500万，实际1620万，完成率108%\\n增长驱动：大客户续费（+320万），新客户开拓（+180万）\\n未达目标区域：西北区（完成率82%）\\nQ2策略：重点加强西北区客户开拓，增加1名区域经理' > /home/user/Desktop/sales_analysis.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/sales_record.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把销售复盘信息记录到台账里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/sales_analysis.txt里提取Q1达成情况，追加到/home/user/Desktop/sales_record.txt末尾：'Q1销售：目标1500万，实际1620万，完成率108%，分析人：彭磊'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/sales_record.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "实际1620万，完成率108%",
+                    "彭磊"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

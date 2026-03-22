@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_013",
+    "instruction": "帮我把新品信息录入到产品档案",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '新品上市信息\\n产品名称：智能温控杯 Pro\\n产品型号：TC-P2025\\n上市日期：2025-05-01\\n建议零售价：299元\\n成本价：95元\\n毛利率：68.2%\\n目标销量：首月3000件\\n销售渠道：官网、天猫、京东、线下旗舰店\\n产品经理：庄宇' > /home/user/Desktop/product_launch.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '产品名称'; ws['B1'] = '型号'; ws['C1'] = '上市日期'; ws['D1'] = '零售价(元)'; ws['E1'] = '毛利率(%)'; ws['F1'] = '目标销量'; ws['G1'] = '产品经理'; wb.save('/home/user/Desktop/product_pipeline.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把新品信息录入到产品档案",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/product_launch.txt里的产品信息填入/home/user/Desktop/product_pipeline.xlsx的第2行：A2='智能温控杯 Pro'，B2='TC-P2025'，C2='2025-05-01'，D2=299，E2=68.2，F2=3000，G2='庄宇'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/product_pipeline.xlsx'); s = df.to_string(); print('PASSED' if 'TC-P2025' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_003",
+    "instruction": "把电话销售数据填到统计表里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '2025年3月电话销售记录\\n业务员：陈静\\n拨打总量：128次\\n接通次数：89次\\n接通率：69.5%\\n意向客户：23个\\n签约客户：8个\\n签约金额：42.5万元' > /home/user/Desktop/sales_calls.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '业务员'; ws['B1'] = '拨打量'; ws['C1'] = '接通量'; ws['D1'] = '接通率(%)'; ws['E1'] = '签约量'; ws['F1'] = '签约额(万元)'; wb.save('/home/user/Desktop/call_stats.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把电话销售数据填到统计表里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/sales_calls.txt里的数据填入/home/user/Desktop/call_stats.xlsx的第2行：A2='陈静'，B2=128，C2=89，D2=69.5，E2=8，F2=42.5，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/call_stats.xlsx'); s = df.to_string(); print('PASSED' if '陈静' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

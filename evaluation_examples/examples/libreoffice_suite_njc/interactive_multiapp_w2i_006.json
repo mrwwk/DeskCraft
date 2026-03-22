@@ -1,0 +1,78 @@
+{
+    "id": "interactive_multiapp_w2i_006",
+    "instruction": "帮我把年度目标整理到战略简报里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '2025年度经营目标\\n战略主题：深耕主业，创新驱动\\n收入目标：15亿元（同比增长20%）\\n利润目标：净利润2.1亿元\\n市场目标：华南市场份额提升至25%\\n产品目标：发布2款旗舰新品\\n人才目标：引进高端人才50名，员工满意度≥88%' > /home/user/Desktop/annual_goals.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '' > /home/user/Desktop/strategy_brief.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把年度目标整理到战略简报里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "从/home/user/Desktop/annual_goals.txt里提取战略主题和收入目标，追加到/home/user/Desktop/strategy_brief.txt末尾：'2025战略：深耕主业，创新驱动；收入目标：15亿元'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/strategy_brief.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "深耕主业，创新驱动",
+                    "收入目标：15亿元"
+                ],
+                "exclude": []
+            }
+        }
+    }
+}

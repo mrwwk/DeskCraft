@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_008",
+    "instruction": "把培训计划信息录入到培训台账",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '培训计划\\n培训名称：新员工入职培训\\n培训日期：2025-04-07 至 2025-04-11\\n培训地点：3楼培训室\\n讲师：人力资源部 廖燕\\n参与人数：12人\\n培训费用：8500元\\n培训目标：了解公司文化、制度和基本业务流程' > /home/user/Desktop/training_plan.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '培训名称'; ws['B1'] = '日期'; ws['C1'] = '地点'; ws['D1'] = '讲师'; ws['E1'] = '人数'; ws['F1'] = '费用(元)'; wb.save('/home/user/Desktop/training_record.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "把培训计划信息录入到培训台账",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/training_plan.txt里的培训信息填入/home/user/Desktop/training_record.xlsx的第2行：A2='新员工入职培训'，B2='2025-04-07至2025-04-11'，C2='3楼培训室'，D2='廖燕'，E2=12，F2=8500，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/training_record.xlsx'); s = df.to_string(); print('PASSED' if '廖燕' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

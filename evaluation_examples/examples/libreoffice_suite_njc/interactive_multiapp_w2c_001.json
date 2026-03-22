@@ -1,0 +1,79 @@
+{
+    "id": "interactive_multiapp_w2c_001",
+    "instruction": "帮我把会议纪要里的Q2目标填到表格里",
+    "source": "interactive",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '会议纪要：2025年Q1复盘会议\\n参会人员：张伟、李娜、王强、赵敏\\n会议时间：2025年3月15日\\n讨论事项：\\n  1. Q1销售完成情况：全年目标完成率105%\\n  2. Q2目标设定：较Q1增长15%\\n  3. 重点客户跟进：优先维护前10大客户\\n决议：Q2目标定为1150万元，由张伟牵头执行' > /home/user/Desktop/meeting_record.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = '项目'; ws['B1'] = '负责人'; ws['C1'] = '目标值'; ws['D1'] = '备注'; wb.save('/home/user/Desktop/q2_targets.xlsx')\""
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "interactive": true,
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把会议纪要里的Q2目标填到表格里",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "把/home/user/Desktop/meeting_record.txt里的Q2目标信息填入/home/user/Desktop/q2_targets.xlsx的第2行：A2填'Q2销售目标'，B2填'张伟'，C2填1150，D2填'较Q1增长15%'，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/q2_targets.xlsx'); s = df.to_string(); print('PASSED' if '张伟' in s else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,107 @@
+{
+    "id": "interactive_writer_006",
+    "snapshot": "libreoffice_writer",
+    "interactive": true,
+    "scenario_type": "ambiguous_detail",
+    "scenario_description": "用户说要更新完成率，但没说改成多少。Agent 询问后修改。",
+    "user_persona": {
+        "expertise_level": "beginner",
+        "communication_style": "casual_chinese"
+    },
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "printf '周报\n\n汇报人：赵磊\n汇报周期：2025年第24周（6月9日—6月13日）\n\n一、本周完成工作\n1. 完成用户界面改版设计方案\n2. 参与新功能需求评审会议\n3. 对接第三方支付接口调试\n\n二、工作进展指标\n完成率：60%%\nBug修复数：12个\n代码提交次数：15次\n\n三、下周计划\n完成前端开发并提交测试。\n' > /home/user/Desktop/weekly_report.txt"
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "launch",
+            "parameters": {
+                "command": [
+                    "libreoffice",
+                    "--norestore",
+                    "--nologo",
+                    "--writer",
+                    "/home/user/Desktop/weekly_report.txt"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 12
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我更新一下完成率",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "在文档的最末尾另起一行，加上\"完成率（更新）：85%\"，然后保存文件",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_writer"
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "cat /home/user/Desktop/weekly_report.txt"
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "完成率（更新）：85%"
+                ],
+                "exclude": []
+            }
+        }
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}
