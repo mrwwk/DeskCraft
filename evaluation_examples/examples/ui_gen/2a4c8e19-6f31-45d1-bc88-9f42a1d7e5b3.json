@@ -1,0 +1,139 @@
+{
+  "id": "2a4c8e19-6f31-45d1-bc88-9f42a1d7e5b3",
+  "snapshot": "vscode",
+  "instruction": "Create a small profile card page in VS Code at /home/user/Desktop/profile_card_grid. Create index.html and styles.css. The page should show the title \"Team Members\" and exactly three profile cards inside a container with id=\"card-grid\". Each profile card must use class=\"card\" and include three elements with classes name, role, and bio. Use simple CSS in styles.css so the cards are visually separated. Include CSS rules for body, #card-grid, and .card. Save both files.",
+  "source": "",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/profile_card_grid"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/profile_card_grid"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/profile_card_grid && zip -qr /home/user/Desktop/profile_card_grid_bundle.zip index.html styles.css"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_html_checks"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "styles.css": [
+              "body",
+              "#card-grid",
+              ".card",
+              "border",
+              "gap"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "text_present", "text": "Team Members" },
+              { "type": "selector_exists", "selector": "#card-grid" },
+              { "type": "selector_count", "selector": ".card", "count": 3 },
+              { "type": "selector_count", "selector": ".card .name", "count": 3 },
+              { "type": "selector_count", "selector": ".card .role", "count": 3 },
+              { "type": "selector_count", "selector": ".card .bio", "count": 3 }
+            ]
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/profile_card_grid_bundle.zip",
+        "dest": "profile_card_grid_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/profile_card_grid_bundle.zip",
+        "dest": "profile_card_grid_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/profile_card_grid_bundle.zip",
+        "dest": "profile_card_grid_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

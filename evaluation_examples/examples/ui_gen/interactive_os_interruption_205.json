@@ -1,0 +1,68 @@
+{
+  "id": "interactive_os_interruption_205",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户起初想把整批 UI 截图都汇总出来，但操作中途突然收紧规则，只允许公开 JPG 进入 press pack，并要求生成 sha256 清单。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; import shutil; src=Path('/home/user/Desktop/ui_press_source_205'); out=Path('/home/user/Desktop/ui_press_pack_205'); shutil.rmtree(src, ignore_errors=True); shutil.rmtree(out, ignore_errors=True); (src/'screens').mkdir(parents=True, exist_ok=True); (src/'screens'/'private').mkdir(parents=True, exist_ok=True); (src/'screens'/'flow').mkdir(parents=True, exist_ok=True); (src/'screens'/'landing.jpg').write_text('landing', encoding='utf-8'); (src/'screens'/'notes.txt').write_text('notes', encoding='utf-8'); (src/'screens'/'private'/'vip.jpg').write_text('vip', encoding='utf-8'); (src/'screens'/'flow'/'checkout.jpg').write_text('checkout', encoding='utf-8'); (src/'screens'/'flow'/'checkout_raw.jpg').write_text('raw', encoding='utf-8')"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 ui_press_source_205 里能找到的截图都整理到 ~/Desktop/ui_press_pack_205，目录层级尽量保留。",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等等，规则改了：private 目录下的不要，文件名里带 _raw 的 JPG 也不要。最后只保留可以公开发的 JPG。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再在 ~/Desktop/ui_press_pack_205/manifest.txt 里写每个复制出的 JPG 的 sha256 和相对路径，格式是 <sha256> 两个空格 <relative_path>，按相对路径排序。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; import hashlib; out=Path('/home/user/Desktop/ui_press_pack_205'); files=sorted(p for p in out.rglob('*.jpg')); allowed=['screens/flow/checkout.jpg','screens/landing.jpg']; rel=[str(p.relative_to(out)) for p in files]; lines=[]; ok=rel==allowed;\nfor relp in allowed:\n p=out/relp;\n ok=ok and p.exists();\n lines.append(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {relp}');\nactual=(out/'manifest.txt').read_text(encoding='utf-8').strip() if (out/'manifest.txt').exists() else ''; bad=(out/'screens/private/vip.jpg').exists() or (out/'screens/flow/checkout_raw.jpg').exists(); print('PASS' if ok and not bad and actual=='\\n'.join(lines) else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

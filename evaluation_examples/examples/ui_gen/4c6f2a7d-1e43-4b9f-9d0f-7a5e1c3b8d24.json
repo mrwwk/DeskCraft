@@ -1,0 +1,146 @@
+{
+  "id": "4c6f2a7d-1e43-4b9f-9d0f-7a5e1c3b8d24",
+  "snapshot": "vscode",
+  "instruction": "Open the folder /home/user/Desktop/product_feature_list in VS Code. A file named data.json is already provided in the folder. Create index.html and script.js. Build a page titled \"Product Features\". In script.js, read data.json using JavaScript and render all items into the page inside a container with id=\"feature-list\". Each rendered feature should use class=\"feature-item\" and show name, category, and summary. Save all files.",
+  "source": "",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import json, os; os.makedirs('/home/user/Desktop/product_feature_list', exist_ok=True); data=[{'name':'Smart Search','category':'Discovery','summary':'Find results quickly with better relevance.'},{'name':'Quick Share','category':'Collaboration','summary':'Send pages and snippets to teammates.'},{'name':'Auto Save','category':'Productivity','summary':'Keep changes without manual saving.'}]; json.dump(data, open('/home/user/Desktop/product_feature_list/data.json', 'w'), indent=2)"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/product_feature_list"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/product_feature_list && zip -qr /home/user/Desktop/product_feature_list_bundle.zip index.html script.js data.json"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_html_checks"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "script.js",
+            "data.json"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "script.js": [
+              "fetch",
+              "data.json",
+              "feature-list",
+              "feature-item",
+              "name",
+              "category",
+              "summary"
+            ],
+            "data.json": [
+              "Smart Search",
+              "Discovery",
+              "Quick Share",
+              "Collaboration",
+              "Auto Save",
+              "Productivity"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "text_present", "text": "Product Features" },
+              { "type": "selector_exists", "selector": "#feature-list" }
+            ]
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/product_feature_list_bundle.zip",
+        "dest": "product_feature_list_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/product_feature_list_bundle.zip",
+        "dest": "product_feature_list_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/product_feature_list_bundle.zip",
+        "dest": "product_feature_list_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

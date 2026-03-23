@@ -1,0 +1,67 @@
+{
+  "id": "interactive_os_ambiguous_201",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户只笼统地说要整理一批做界面时会用到的素材，期望 Agent 先询问怎么分组，再按资源类型完成归档。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/ui_asset_drop_201 && mkdir -p /home/user/Desktop/ui_asset_drop_201 && touch /home/user/Desktop/ui_asset_drop_201/hero_bg.png /home/user/Desktop/ui_asset_drop_201/logo_mark.svg /home/user/Desktop/ui_asset_drop_201/icon_user.png /home/user/Desktop/ui_asset_drop_201/palette_notes.md /home/user/Desktop/ui_asset_drop_201/README.txt && mkdir -p /home/user/Desktop/ui_asset_drop_201_bundle/assets/images /home/user/Desktop/ui_asset_drop_201_bundle/assets/icons /home/user/Desktop/ui_asset_drop_201_bundle/docs"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我把这批做界面要用的东西整理一下。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "把 hero_bg.png 放到 ui_asset_drop_201_bundle/assets/images，把 logo_mark.svg 和 icon_user.png 放到 ui_asset_drop_201_bundle/assets/icons。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再把 palette_notes.md 和 README.txt 放到 ui_asset_drop_201_bundle/docs，原始投递目录里不要再留这些文件。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; src=Path('/home/user/Desktop/ui_asset_drop_201'); base=Path('/home/user/Desktop/ui_asset_drop_201_bundle'); ok=(base/'assets/images/hero_bg.png').exists() and (base/'assets/icons/logo_mark.svg').exists() and (base/'assets/icons/icon_user.png').exists() and (base/'docs/palette_notes.md').exists() and (base/'docs/README.txt').exists() and not any((src/name).exists() for name in ['hero_bg.png','logo_mark.svg','icon_user.png','palette_notes.md','README.txt']); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

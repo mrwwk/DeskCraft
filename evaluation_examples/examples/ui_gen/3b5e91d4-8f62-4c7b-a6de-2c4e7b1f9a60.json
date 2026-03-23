@@ -1,0 +1,145 @@
+{
+  "id": "3b5e91d4-8f62-4c7b-a6de-2c4e7b1f9a60",
+  "snapshot": "vscode",
+  "instruction": "Create a simple FAQ page in VS Code at /home/user/Desktop/faq_accordion_basic. Create three files: index.html, styles.css, and script.js. The page should contain the title \"FAQ\" and exactly three FAQ items. Each FAQ item must use class=\"faq-item\" and contain a clickable question element with class=\"question\" and a hidden answer section with class=\"answer\". Reference styles.css and script.js from index.html. In script.js, add a click handler so clicking each question toggles its answer visibility. Keep the implementation simple and save all files.",
+  "source": "",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/faq_accordion_basic"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/faq_accordion_basic"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/faq_accordion_basic && zip -qr /home/user/Desktop/faq_accordion_basic_bundle.zip index.html styles.css script.js"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_html_checks"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css",
+            "script.js"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "index.html": [
+              "styles.css",
+              "script.js"
+            ],
+            "styles.css": [
+              ".faq-item",
+              ".question",
+              ".answer"
+            ],
+            "script.js": [
+              "addEventListener",
+              "click",
+              "classList.toggle"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_text_contains", "selector": "h1", "text": "FAQ" },
+              { "type": "selector_count", "selector": ".faq-item", "count": 3 },
+              { "type": "selector_count", "selector": ".question", "count": 3 },
+              { "type": "selector_count", "selector": ".answer", "count": 3 }
+            ]
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/faq_accordion_basic_bundle.zip",
+        "dest": "faq_accordion_basic_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/faq_accordion_basic_bundle.zip",
+        "dest": "faq_accordion_basic_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/faq_accordion_basic_bundle.zip",
+        "dest": "faq_accordion_basic_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

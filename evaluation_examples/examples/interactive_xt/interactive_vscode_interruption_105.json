@@ -1,0 +1,69 @@
+{
+  "id": "interactive_vscode_interruption_105",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户先让 Agent 调整几个编辑器显示选项，但在执行过程中突然改变主意，要求保留部分设置并改动其他项。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把 minimap 打开，再把自动换行打开。",
+      "trigger": {
+        "type": "step_count",
+        "value": 1
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等等，我改主意了：minimap 不要开，改成关闭 minimap，并把行号显示设成 off，自动换行还是保留开启。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "editor.minimap.enabled": false,
+          "editor.wordWrap": "on",
+          "editor.lineNumbers": "off"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

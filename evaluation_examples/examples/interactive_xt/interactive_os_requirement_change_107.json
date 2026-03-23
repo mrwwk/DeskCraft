@@ -1,0 +1,67 @@
+{
+  "id": "interactive_os_requirement_change_107",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先让 Agent 把投标素材都归进同一个项目文件夹，随后改变主意，要求重命名项目目录并把部分素材拆到品牌素材和归档目录。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -f /home/user/Desktop/client_brief.docx /home/user/Desktop/quote.xlsx /home/user/Desktop/logo.png && touch /home/user/Desktop/client_brief.docx /home/user/Desktop/quote.xlsx /home/user/Desktop/logo.png && mkdir -p /home/user/Desktop/Projects/AprilPitch /home/user/Desktop/Projects/Archive /home/user/Pictures/BrandAssets"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 client_brief.docx、quote.xlsx 和 logo.png 都放进桌面的 Projects/AprilPitch 文件夹里。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等一下，logo.png 不用放在项目里了。把 Projects/AprilPitch 改名成 Projects/AprilPitch_Final，并把 logo.png 挪到 Pictures/BrandAssets。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后把 quote.xlsx 从 AprilPitch_Final 挪到 Projects/Archive，client_brief.docx 还是留在 AprilPitch_Final。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; final=Path('/home/user/Desktop/Projects/AprilPitch_Final'); archive=Path('/home/user/Desktop/Projects/Archive'); brand=Path('/home/user/Pictures/BrandAssets'); desk=Path('/home/user/Desktop'); ok=final.exists() and (final/'client_brief.docx').exists() and not (final/'quote.xlsx').exists() and archive.exists() and (archive/'quote.xlsx').exists() and brand.exists() and (brand/'logo.png').exists() and not any((desk/name).exists() for name in ['client_brief.docx','quote.xlsx','logo.png']) and not Path('/home/user/Desktop/Projects/AprilPitch').exists(); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

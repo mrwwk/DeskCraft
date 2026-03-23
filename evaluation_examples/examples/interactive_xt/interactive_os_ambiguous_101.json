@@ -1,0 +1,78 @@
+{
+  "id": "interactive_os_ambiguous_101",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户只模糊地让 Agent 帮忙整理桌面，期望 Agent 先询问整理规则，再按文件类型完成归类。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -f /home/user/Desktop/photo_sun.png /home/user/Desktop/budget.pdf /home/user/Desktop/ideas.txt && touch /home/user/Desktop/photo_sun.png /home/user/Desktop/budget.pdf /home/user/Desktop/ideas.txt && mkdir -p /home/user/Pictures /home/user/Documents"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "我桌面有点乱，帮我整理一下吧。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "把图片移到 Pictures，pdf 和 txt 文件都移到 Documents。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "整理完后，桌面上不要再留这三个文件。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+        "command": "DESK=$(find /home/user/Desktop -maxdepth 1 -type f \\( -name 'photo_sun.png' -o -name 'budget.pdf' -o -name 'ideas.txt' \\) -printf '%f ' | sort); PIC=$(ls /home/user/Pictures 2>/dev/null | sort | tr '\\n' ' '); DOC=$(ls /home/user/Documents 2>/dev/null | sort | tr '\\n' ' '); echo DESK:$DESK PIC:$PIC DOC:$DOC",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PIC:photo_sun.png",
+          "DOC:budget.pdf ideas.txt"
+        ],
+        "exclude": [
+          "DESK:photo_sun.png",
+          "DESK:budget.pdf",
+          "DESK:ideas.txt",
+          "PIC:budget.pdf",
+          "PIC:ideas.txt",
+          "DOC:photo_sun.png"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
