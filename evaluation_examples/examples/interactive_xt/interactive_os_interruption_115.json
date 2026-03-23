@@ -1,0 +1,68 @@
+{
+  "id": "interactive_os_interruption_115",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户原本想把活动照片整体收集出来，但在执行过程中改变了筛选规则，要求 Agent 只保留可公开的 JPG 并生成校验清单。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; import shutil; base=Path('/home/user/Desktop/photos_dispatch'); out=Path('/home/user/Desktop/press_pick'); shutil.rmtree(base, ignore_errors=True); shutil.rmtree(out, ignore_errors=True); (base/'event').mkdir(parents=True, exist_ok=True); (base/'event'/'private').mkdir(parents=True, exist_ok=True); (base/'event'/'stage').mkdir(parents=True, exist_ok=True); (base/'event'/'a.jpg').write_text('A', encoding='utf-8'); (base/'event'/'notes.txt').write_text('notes', encoding='utf-8'); (base/'event'/'private'/'vip.jpg').write_text('VIP', encoding='utf-8'); (base/'event'/'stage'/'speaker.jpg').write_text('SPEAKER', encoding='utf-8'); (base/'event'/'stage'/'speaker_raw.jpg').write_text('RAW', encoding='utf-8')"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 ~/Desktop/photos_dispatch 里的 JPG 图片都整理到 ~/Desktop/press_pick 里，目录结构尽量保留。",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等等，筛选规则改了：private 目录下面的一律不要，文件名里带 _raw 的 JPG 也不要。只保留能公开发出的 JPG。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后在 ~/Desktop/press_pick/manifest.txt 里写入每个复制出来的 JPG 的 sha256 和相对路径，格式是 <sha256> 两个空格 <相对路径>，按相对路径排序。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; import hashlib; out=Path('/home/user/Desktop/press_pick'); files=sorted(p for p in out.rglob('*.jpg')); allowed=['event/a.jpg','event/stage/speaker.jpg']; rel=[str(p.relative_to(out)) for p in files]; manifest=out/'manifest.txt'; lines=[];\nfor relp in allowed:\n p=out/relp;\n if not p.exists():\n  print('FAIL'); raise SystemExit\n h=hashlib.sha256(p.read_bytes()).hexdigest(); lines.append(f'{h}  {relp}');\nexpected='\\n'.join(lines); actual=manifest.read_text(encoding='utf-8').strip() if manifest.exists() else ''; bad=(out/'event/private/vip.jpg').exists() or (out/'event/stage/speaker_raw.jpg').exists(); print('PASS' if rel==allowed and not bad and actual==expected else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

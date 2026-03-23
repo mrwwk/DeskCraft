@@ -1,0 +1,68 @@
+{
+  "id": "interactive_vscode_progressive_116",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户先让 Agent 打开一个基础编辑器设置，随后再补充两个非常常见的 VS Code 设置项。这个任务用于快速排查是任务设计问题还是模型能力问题。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把 VS Code 的自动保存打开，模式设成 afterDelay。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "然后再把自动保存延迟改成 500 毫秒。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "files.autoSave": "afterDelay",
+          "files.autoSaveDelay": 500,
+          "editor.wordWrap": "on"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

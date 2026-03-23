@@ -1,0 +1,74 @@
+{
+  "id": "interactive_os_ambiguous_111",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户只笼统地说想把值班用电脑准备得更顺手，期望 Agent 先问清需要改哪些系统项，再同时调整常用收藏和电量显示并留下备忘记录。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.shell favorite-apps \"['vim.desktop', 'org.gnome.Nautilus.desktop']\"; gsettings set org.gnome.desktop.interface show-battery-percentage false; rm -f /home/user/Desktop/station_prep.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我把这台值班电脑准备得顺手一点。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "把收藏栏改成 thunderbird.desktop、google-chrome.desktop、org.gnome.Terminal.desktop 这三个，顺序就按我说的来。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再把顶栏电量百分比打开，并在桌面新建 station_prep.txt，前 3 行按顺序写这 3 个 desktop 文件名，第 4 行写 battery-percentage=true。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "fav=$(gsettings get org.gnome.shell favorite-apps 2>/dev/null | tr -d '[:space:]'); batt=$(gsettings get org.gnome.desktop.interface show-battery-percentage 2>/dev/null | tr -d '[:space:]'); expected=$(printf 'thunderbird.desktop\ngoogle-chrome.desktop\norg.gnome.Terminal.desktop\nbattery-percentage=true'); actual=$(cat /home/user/Desktop/station_prep.txt 2>/dev/null); if [ \"$fav\" = \"['thunderbird.desktop','google-chrome.desktop','org.gnome.Terminal.desktop']\" ] && [ \"$batt\" = \"true\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

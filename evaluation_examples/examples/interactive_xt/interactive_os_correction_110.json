@@ -1,0 +1,67 @@
+{
+  "id": "interactive_os_correction_110",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "correction",
+  "scenario_description": "用户先让 Agent 把几份 HR 材料都收进 Documents，但随后纠正图片文件应该归入 Pictures，并要求把合同扫描件重命名。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -f /home/user/Desktop/contract_scan.pdf /home/user/Desktop/id_scan.png /home/user/Desktop/headshot.jpg && touch /home/user/Desktop/contract_scan.pdf /home/user/Desktop/id_scan.png /home/user/Desktop/headshot.jpg && mkdir -p /home/user/Documents/HR /home/user/Pictures/HR"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 contract_scan.pdf、id_scan.png 和 headshot.jpg 都收进 Documents/HR。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我说得不准确，id_scan.png 和 headshot.jpg 其实都应该放 Pictures/HR，pdf 还是留在 Documents/HR。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "另外把 contract_scan.pdf 重命名成 employment_contract.pdf。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; docs=Path('/home/user/Documents/HR'); pics=Path('/home/user/Pictures/HR'); desk=Path('/home/user/Desktop'); ok=(docs/'employment_contract.pdf').exists() and not (docs/'contract_scan.pdf').exists() and all((pics/name).exists() for name in ['id_scan.png','headshot.jpg']) and not any((desk/name).exists() for name in ['contract_scan.pdf','id_scan.png','headshot.jpg']); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

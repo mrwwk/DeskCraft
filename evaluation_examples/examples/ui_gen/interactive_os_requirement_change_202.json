@@ -1,0 +1,67 @@
+{
+  "id": "interactive_os_requirement_change_202",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先让 Agent 把一整批 UI 发布文件都放进同一个目录，随后改变打包规范，要求排除草稿图并把配置拆到单独目录。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; src=Path('/home/user/Desktop/ui_release_source_202'); out=Path('/home/user/Desktop/ui_release_202'); import shutil; shutil.rmtree(src, ignore_errors=True); shutil.rmtree(out, ignore_errors=True); src.mkdir(parents=True, exist_ok=True); (src/'card.png').write_text('card', encoding='utf-8'); (src/'chart.png').write_text('chart', encoding='utf-8'); (src/'draft_old.png').write_text('draft', encoding='utf-8'); (src/'tokens.json').write_text('{\"theme\":\"mint\"}\n', encoding='utf-8'); (out/'package').mkdir(parents=True, exist_ok=True); (out/'config').mkdir(parents=True, exist_ok=True)"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 ui_release_source_202 里的 card.png、chart.png、draft_old.png 和 tokens.json 都整理到 ui_release_202/package 里。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我改一下发布规则：draft_old.png 不能进正式包，tokens.json 也不要放 package 里，改放到 ui_release_202/config。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后把 ui_release_202/package 和 ui_release_202/config 打成 /home/user/Desktop/ui_release_202/final_bundle.zip。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; import zipfile; base=Path('/home/user/Desktop/ui_release_202'); z=base/'final_bundle.zip'; ok=(base/'package/card.png').exists() and (base/'package/chart.png').exists() and not (base/'package/draft_old.png').exists() and (base/'config/tokens.json').exists() and z.exists(); names=set();\nif ok:\n names=set(zipfile.ZipFile(z).namelist());\n req={'package/card.png','package/chart.png','config/tokens.json'}; bad=any(name.endswith('draft_old.png') for name in names); ok=ok and req.issubset(names) and not bad;\nprint('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

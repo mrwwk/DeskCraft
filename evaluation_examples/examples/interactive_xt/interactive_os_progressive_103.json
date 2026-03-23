@@ -1,0 +1,67 @@
+{
+  "id": "interactive_os_progressive_103",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户先要求把系统调得更易读，随后逐步补充更具体的无障碍要求。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把系统文字调大一点，更容易看清。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "再把鼠标光标也调大，至少调到 48。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后打开放大镜，并把倍率调到 1.75 或更高。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "TEXT_SCALE=$(gsettings get org.gnome.desktop.interface text-scaling-factor 2>/dev/null | grep -oE '[0-9]+(\\.[0-9]+)?' | head -1); CURSOR_SIZE=$(gsettings get org.gnome.desktop.interface cursor-size 2>/dev/null | grep -oE '[0-9]+' | head -1); MAG_ENABLED=$(gsettings get org.gnome.desktop.a11y.applications screen-magnifier-enabled 2>/dev/null); MAG_FACTOR=$(gsettings get org.gnome.desktop.a11y.magnifier mag-factor 2>/dev/null | grep -oE '[0-9]+(\\.[0-9]+)?' | head -1); if [ -n \"$TEXT_SCALE\" ] && [ -n \"$CURSOR_SIZE\" ] && [ \"$MAG_ENABLED\" = \"true\" ] && [ -n \"$MAG_FACTOR\" ] && [ \"$(echo \"$TEXT_SCALE >= 1.2\" | bc -l 2>/dev/null || echo 0)\" = \"1\" ] && [ \"$CURSOR_SIZE\" -ge 48 ] && [ \"$(echo \"$MAG_FACTOR >= 1.75\" | bc -l 2>/dev/null || echo 0)\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,78 @@
+{
+  "id": "interactive_vscode_requirement_change_102",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先要求把 VS Code 调成更大的阅读模式，随后又改变主意，希望字体回调并补充别的显示偏好。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把编辑器字体调到 16，然后把 minimap 关掉。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等一下，字体先别那么大，改成 14；另外把行号改成相对行号。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后再加一条 80 列的竖线方便我看排版。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "editor.fontSize": 14,
+          "editor.minimap.enabled": false,
+          "editor.lineNumbers": "relative",
+          "editor.rulers": [
+            80
+          ]
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

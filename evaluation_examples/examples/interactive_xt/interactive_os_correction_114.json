@@ -1,0 +1,74 @@
+{
+  "id": "interactive_os_correction_114",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "correction",
+  "scenario_description": "用户想整理 GNOME 收藏栏，但中途纠正了应用和顺序，并要求留下交接记录，检验 Agent 是否会按最终要求修正而不是沿用最初设定。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.shell favorite-apps \"['org.gnome.Nautilus.desktop','google-chrome.desktop']\"; rm -f /home/user/Desktop/favorites_handoff.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把收藏栏整理成 google-chrome.desktop、org.gnome.Terminal.desktop、org.gnome.Nautilus.desktop 这三个。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "不对，我真正想要的是 thunderbird.desktop、google-chrome.desktop、org.gnome.Terminal.desktop，顺序也按这个来，不要 Files。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后在桌面写一个 favorites_handoff.txt，把最终这 3 个 desktop 文件名按顺序一行一个写进去。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "fav=$(gsettings get org.gnome.shell favorite-apps 2>/dev/null | tr -d '[:space:]'); expected=$(printf 'thunderbird.desktop\ngoogle-chrome.desktop\norg.gnome.Terminal.desktop'); actual=$(cat /home/user/Desktop/favorites_handoff.txt 2>/dev/null); if [ \"$fav\" = \"['thunderbird.desktop','google-chrome.desktop','org.gnome.Terminal.desktop']\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

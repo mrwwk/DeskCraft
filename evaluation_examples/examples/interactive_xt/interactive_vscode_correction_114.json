@@ -1,0 +1,71 @@
+{
+  "id": "interactive_vscode_correction_114",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "correction",
+  "scenario_description": "用户想同时整理终端导航和资源管理器查找快捷键，但在设置过程中纠正了具体按键组合和目标命令。任务强调按纠正后的最终快捷键配置收敛。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先配两个终端导航快捷键：Ctrl+J 在终端聚焦时切回编辑器，Ctrl+Shift+J 在编辑器聚焦时切到终端。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我说错了，从终端切回编辑器的那个不要 Ctrl+J，改成 Ctrl+Alt+J。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再顺手把资源管理器里的查找冲突也处理掉：去掉 list.find 的 Ctrl+F 绑定，并给同一个命令加上 Ctrl+Alt+F，条件还是 listFocus && !inputFocus。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"import json; from pathlib import Path; p=Path('/home/user/.config/Code/User/keybindings.json'); data=json.loads(p.read_text(encoding='utf-8')) if p.exists() else []; has=lambda pred:any(pred(item) for item in data); ok=has(lambda x:x.get('key')=='ctrl+alt+j' and x.get('command')=='workbench.action.focusActiveEditorGroup' and x.get('when')=='terminalFocus') and has(lambda x:x.get('key')=='ctrl+shift+j' and x.get('command')=='workbench.action.terminal.focus' and x.get('when')=='editorTextFocus') and has(lambda x:x.get('key')=='ctrl+f' and x.get('command')=='-list.find' and x.get('when')=='listFocus && !inputFocus') and has(lambda x:x.get('key')=='ctrl+alt+f' and x.get('command')=='list.find' and x.get('when')=='listFocus && !inputFocus') and not has(lambda x:x.get('key')=='ctrl+j' and x.get('command')=='workbench.action.focusActiveEditorGroup' and x.get('when')=='terminalFocus'); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

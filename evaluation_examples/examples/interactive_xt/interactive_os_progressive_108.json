@@ -1,0 +1,81 @@
+{
+  "id": "interactive_os_progressive_108",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户准备长时间夜间办公，先后补充了电量显示、Night Light 和确认记录文件的需求，要求 Agent 跨系统设置与桌面文件连续完成。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.desktop.interface show-battery-percentage false; gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false; gsettings set org.gnome.settings-daemon.plugins.color night-light-temperature uint32 4000; rm -f /home/user/Desktop/late_shift_setup.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "我要今晚一直盯着电脑，先把顶栏电量百分比显示出来。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "再把 Night Light 打开。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "把 Night Light 色温调到 3700。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 4,
+      "instruction": "最后在桌面上新建一个 late_shift_setup.txt，按顺序写三行：battery_percentage=on、night_light=on、temperature=3700。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "enabled=$(gsettings get org.gnome.desktop.interface show-battery-percentage 2>/dev/null | tr -d ' '); nl=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d ' '); temp=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | tr -d ' '); expected=$(printf 'battery_percentage=on\nnight_light=on\ntemperature=3700'); actual=$(cat /home/user/Desktop/late_shift_setup.txt 2>/dev/null); if [ \"$enabled\" = \"true\" ] && [ \"$nl\" = \"true\" ] && { [ \"$temp\" = \"3700\" ] || [ \"$temp\" = \"uint323700\" ]; } && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

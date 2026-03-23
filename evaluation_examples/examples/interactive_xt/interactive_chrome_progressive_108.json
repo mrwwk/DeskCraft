@@ -1,0 +1,136 @@
+{
+  "id": "interactive_chrome_progressive_108",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户在一个本地运维知识库里逐步补充需要保留的参考资料，最终要求只保留 3 个文档标签页、全部加入书签栏，并停留在最后一个文档。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/chrome_it_ops_hub_108'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>IT Ops Hub</h1><ul><li><a href=\"oncall_runbook.html\">On-call Runbook</a></li><li><a href=\"vpn_setup.html\">VPN Setup</a></li><li><a href=\"release_checklist.html\">Release Checklist</a></li></ul></body></html>', encoding='utf-8'); (d/'oncall_runbook.html').write_text('<html><body><h1>On-call Runbook</h1><p>Escalate after 15 minutes.</p></body></html>', encoding='utf-8'); (d/'vpn_setup.html').write_text('<html><body><h1>VPN Setup</h1><p>Install the corp profile before login.</p></body></html>', encoding='utf-8'); (d/'release_checklist.html').write_text('<html><body><h1>Release Checklist</h1><p>Confirm feature flag state before rollout.</p></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/chrome_it_ops_hub_108/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 On-call Runbook 打开到一个单独标签页里。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "再把 VPN Setup 也打开到单独标签页里。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后把 Release Checklist 也打开成单独标签页，把这三页都加入书签栏，只保留这三个文档标签，不要留首页标签，并停留在 Release Checklist 页面。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_tabs",
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "open_tabs_info"
+      },
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/chrome_it_ops_hub_108/oncall_runbook.html",
+            "file:///home/user/Desktop/chrome_it_ops_hub_108/vpn_setup.html",
+            "file:///home/user/Desktop/chrome_it_ops_hub_108/release_checklist.html"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/chrome_it_ops_hub_108/release_checklist.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/chrome_it_ops_hub_108/oncall_runbook.html",
+            "file:///home/user/Desktop/chrome_it_ops_hub_108/vpn_setup.html",
+            "file:///home/user/Desktop/chrome_it_ops_hub_108/release_checklist.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,158 @@
+{
+  "id": "9d45fa07-7e64-4cad-d4e2-b05c6f7eac73",
+  "snapshot": "vscode",
+  "instruction": "Open /home/user/Desktop/fix_image_refs in VS Code. The project contains index.html and an assets folder with the correct image files. Some image paths in index.html are incorrect. Update the HTML so that all existing image elements point to the correct local files in the assets folder. The hero image must use src=\"assets/hero.png\". The first feature card image must use src=\"assets/card1.png\". The second feature card image must use src=\"assets/card2.png\". Do not change the visible text content of the page. Save the file.",
+  "source": "https://huggingface.co/datasets/YuanDaozeiii/Test",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/fix_image_refs/assets"
+        ]
+      }
+    },
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/YuanDaozeiii/Test/blob/main/vscode_ui_gen/9d45fa07-7e64-4cad-d4e2-b05c6f7eac73/index.html",
+            "path": "/home/user/Desktop/fix_image_refs/index.html"
+          },
+          {
+            "url": "https://huggingface.co/datasets/YuanDaozeiii/Test/blob/main/vscode_ui_gen/9d45fa07-7e64-4cad-d4e2-b05c6f7eac73/assets/hero.png",
+            "path": "/home/user/Desktop/fix_image_refs/assets/hero.png"
+          },
+          {
+            "url": "https://huggingface.co/datasets/YuanDaozeiii/Test/blob/main/vscode_ui_gen/9d45fa07-7e64-4cad-d4e2-b05c6f7eac73/assets/card1.png",
+            "path": "/home/user/Desktop/fix_image_refs/assets/card1.png"
+          },
+          {
+            "url": "https://huggingface.co/datasets/YuanDaozeiii/Test/blob/main/vscode_ui_gen/9d45fa07-7e64-4cad-d4e2-b05c6f7eac73/assets/card2.png",
+            "path": "/home/user/Desktop/fix_image_refs/assets/card2.png"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/fix_image_refs"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/fix_image_refs && zip -qr /home/user/Desktop/fix_image_refs_bundle.zip index.html assets"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_html_checks",
+      "check_ui_bundle_no_remote_image_urls"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "assets/hero.png",
+            "assets/card1.png",
+            "assets/card2.png"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_attribute_equals", "selector": ".hero-image img", "attribute": "src", "value": "assets/hero.png" },
+              { "type": "selector_attribute_equals", "selector": ".card-grid .card:nth-of-type(1) img", "attribute": "src", "value": "assets/card1.png" },
+              { "type": "selector_attribute_equals", "selector": ".card-grid .card:nth-of-type(2) img", "attribute": "src", "value": "assets/card2.png" },
+              { "type": "text_present", "text": "Build pages your team can trust" },
+              { "type": "text_present", "text": "Featured blocks" },
+              { "type": "text_present", "text": "Analytics Overview" },
+              { "type": "text_present", "text": "Team Collaboration" },
+              { "type": "text_present", "text": "© 2026 Northstar Studio. All rights reserved." }
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "forbid_remote_image_urls": true
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/fix_image_refs_bundle.zip",
+        "dest": "fix_image_refs_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/fix_image_refs_bundle.zip",
+        "dest": "fix_image_refs_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/fix_image_refs_bundle.zip",
+        "dest": "fix_image_refs_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

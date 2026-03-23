@@ -1,0 +1,51 @@
+{
+  "id": "0ed39f63-6049-43d4-ba4d-5fa2fe04a951",
+  "task_slug": "auto_save_trim_newline_word_wrap",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please update VS Code User Settings with all of the following at once: enable Auto Save after delay with a 700ms delay, trim trailing whitespace on save, insert a final newline on save, and enable editor word wrap.",
+  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "files.autoSave": "afterDelay",
+          "files.autoSaveDelay": 700,
+          "files.trimTrailingWhitespace": true,
+          "files.insertFinalNewline": true,
+          "editor.wordWrap": "on"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
