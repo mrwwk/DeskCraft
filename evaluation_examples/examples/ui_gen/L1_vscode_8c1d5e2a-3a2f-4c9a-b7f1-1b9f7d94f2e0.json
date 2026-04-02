@@ -1,0 +1,139 @@
+{
+  "id": "8c1d5e2a-3a2f-4c9a-b7f1-1b9f7d94f2e0",
+  "snapshot": "vscode",
+  "instruction": "Create a very simple Generative UI check project in VS Code. Create folder /home/user/Desktop/generative_ui_quick with two files: index.html and manifest.json. In index.html, include a main container with id=\"app\", a hero section with id=\"hero\", and a button with id=\"cta\" whose text is exactly \"Start\". Also include the page title text \"Generative UI Quick Check\" somewhere in the HTML body. In manifest.json, set project to \"generative-ui-quick\", theme to \"mint\", and version to \"1.0\". Save both files and make a zip file /home/user/Desktop/generative_ui_quick_bundle.zip containing index.html and manifest.json.",
+  "source": "authors | sanity bundle for UI generation smoke validation",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/generative_ui_quick"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/generative_ui_quick"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/generative_ui_quick && zip -qr /home/user/Desktop/generative_ui_quick_bundle.zip index.html manifest.json"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_manifest_subset"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "manifest.json"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "index.html": [
+              "id=\"app\"",
+              "id=\"hero\"",
+              "id=\"cta\"",
+              ">Start<",
+              "Generative UI Quick Check"
+            ],
+            "manifest.json": [
+              "generative-ui-quick",
+              "mint",
+              "1.0"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_manifest": {
+            "project": "generative-ui-quick",
+            "theme": "mint",
+            "version": "1.0"
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_quick_bundle.zip",
+        "dest": "generative_ui_quick_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_quick_bundle.zip",
+        "dest": "generative_ui_quick_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_quick_bundle.zip",
+        "dest": "generative_ui_quick_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

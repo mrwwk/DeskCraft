@@ -248,7 +248,6 @@ evaluation_examples/examples/libreoffice_writer/
 evaluation_examples/examples/multi_apps/
 evaluation_examples/examples/os/
 evaluation_examples/examples/thunderbird/
-evaluation_examples/examples/ui_gen/
 evaluation_examples/examples/vlc/
 evaluation_examples/examples/vs_code/
 run_human_examine.sh

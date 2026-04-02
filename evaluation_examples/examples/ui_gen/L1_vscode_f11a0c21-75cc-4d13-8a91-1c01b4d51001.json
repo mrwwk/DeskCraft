@@ -1,0 +1,159 @@
+{
+  "id": "f11a0c21-75cc-4d13-8a91-1c01b4d51001",
+  "task_slug": "tabs_switcher_basic",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Create a small tabs demo in VS Code at /home/user/Desktop/tabs_switcher_basic. Create index.html, styles.css, app.js, and manifest.json. Build a page with main#app, section#hero, nav#tab-nav containing exactly 3 button.tab-trigger elements with data-tab values overview, timeline, and assets, and section#tab-panels containing exactly 3 article.tab-panel elements matching those ids. One tab and one panel should start with the class is-active. In app.js, wire click handlers so clicking a tab updates the active trigger and panel. In manifest.json, set project to tabs-switcher-basic, theme to clay, and version to 1.0. Save all files.",
+  "source": "https://www.frontendmentor.io/challenges | authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/tabs_switcher_basic"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/tabs_switcher_basic"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/tabs_switcher_basic && zip -qr /home/user/Desktop/tabs_switcher_basic_bundle.zip index.html styles.css app.js manifest.json"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_patterns",
+      "check_ui_bundle_html_checks",
+      "check_ui_bundle_manifest_subset"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css",
+            "app.js",
+            "manifest.json"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_patterns": {
+            "app.js": [
+              "querySelectorAll\\(['\"]\\.tab-trigger['\"]\\)",
+              "addEventListener\\(['\"]click['\"]",
+              "dataset\\.tab",
+              "classList\\.(add|remove|toggle)"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "main#app" },
+              { "type": "selector_exists", "selector": "section#hero" },
+              { "type": "selector_exists", "selector": "nav#tab-nav" },
+              { "type": "selector_count", "selector": "button.tab-trigger", "count": 3 },
+              { "type": "selector_count", "selector": "article.tab-panel", "count": 3 },
+              { "type": "selector_exists", "selector": "button.tab-trigger.is-active" },
+              { "type": "selector_exists", "selector": "article.tab-panel.is-active" }
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_manifest": {
+            "project": "tabs-switcher-basic",
+            "theme": "clay",
+            "version": "1.0"
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/tabs_switcher_basic_bundle.zip",
+        "dest": "tabs_switcher_basic_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/tabs_switcher_basic_bundle.zip",
+        "dest": "tabs_switcher_basic_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/tabs_switcher_basic_bundle.zip",
+        "dest": "tabs_switcher_basic_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/tabs_switcher_basic_bundle.zip",
+        "dest": "tabs_switcher_basic_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
