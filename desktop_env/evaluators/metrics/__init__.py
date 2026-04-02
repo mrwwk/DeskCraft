@@ -3,7 +3,47 @@ from .basic_os import (
     is_utc_0,
     check_text_enlarged,
     check_moved_jpgs,
-    is_in_vm_clickboard
+    is_in_vm_clickboard,
+    # New OS evaluators
+    check_os_timezone_utc,
+    check_os_gnome_favorites,
+    check_os_accessibility,
+    check_os_screen_lock,
+    check_os_night_light,
+    check_os_notifications,
+    check_os_power_settings,
+    check_os_battery_config,
+    check_os_audio_config,
+    check_os_file_manifest,
+    check_os_file_operations,
+    check_os_file_permissions,
+    check_os_copy_filter,
+    check_os_dir_hierarchy,
+    check_os_compress_logs,
+    check_os_deploy_files,
+    check_os_trash_recovery,
+    check_os_rename_dirs,
+    check_os_terminal_size,
+    check_os_python_alias,
+    check_os_php_line_count,
+    check_os_text_transform,
+    check_os_meeting_template,
+    check_os_bluetooth_service,
+    check_os_install_local_app,
+    check_os_switch_user,
+    check_os_sftp_user,
+    check_os_extract_services,
+    check_os_recent_manifest,
+    # New OS evaluators – batch 2
+    check_os_cron_job,
+    check_os_disk_cleanup,
+    check_os_batch_extract,
+    check_os_hosts_block,
+    check_os_systemd_timer_basic,
+    check_os_quota_dirs,
+    check_os_log_rotate_pipeline,
+    check_os_systemd_custom_service,
+    check_os_firewall_rules,
 )
 from .chrome import (
     is_expected_tabs,
@@ -291,6 +331,9 @@ from .kdenlive import (
     check_kdenlive_render_audio_mix,
     check_kdenlive_render_color_grading,
 )
+
+from .mutil_apps_new import check_bookmark_contains_url
+
 from .vscode import (
     compare_text_file,
     compare_config,
@@ -305,6 +348,7 @@ from .vscode import (
     compare_zip_files
 )
 from .interactive import check_interactive_final_result
+
 from .inkscape import (
     check_inkscape_fill_color,
     check_inkscape_stroke,
@@ -443,7 +487,20 @@ from .blender import (
     check_blender_modifier_bevel,
     check_blender_pbr_setup,
 )
-
+from .UI_Gen import (
+    check_ui_bundle_required_files,
+    check_ui_bundle_min_file_sizes,
+    check_ui_bundle_required_keywords,
+    check_ui_bundle_required_patterns,
+    check_ui_bundle_manifest_subset,
+    check_ui_bundle_html_checks,
+    check_ui_bundle_section_order,
+    check_ui_bundle_css_declarations,
+    check_ui_bundle_local_asset_links,
+    check_ui_bundle_no_remote_image_urls,
+    check_generative_ui_bundle,
+    check_ui_previewable_generative_bundle,
+)
 
 def infeasible():
     pass
