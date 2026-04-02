@@ -1,0 +1,77 @@
+{
+  "id": "409f8738-31ec-406f-898f-01ed419b74b4",
+  "task_slug": "writer_open_meetingl303docx_and_do_all_1_center_the",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Meeting_L3_03.docx\" and do ALL: (1) Center the title and set to 20pt. (2) Replace \"Q1\" with \"First Quarter\" and \"Q2\" with \"Second Quarter\" everywhere. (3) Bold the attendees list paragraph. (4) Italic all action item paragraphs (lines starting with names followed by colon). (5) Change all section headings to dark blue (#003366). (6) Add \"--- End of Meeting Minutes ---\" at the end.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/409f8738-31ec-406f-898f-01ed419b74b4/Meeting_L3_03.docx",
+            "path": "/home/user/Desktop/Meeting_L3_03.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Meeting_L3_03.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/409f8738-31ec-406f-898f-01ed419b74b4",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Meeting_L3_03.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Meeting_L3_03_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Meeting_L3_03.docx",
+      "dest": "Meeting_L3_03.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_015",
+  "instruction": "Help me enter the marketing campaign into the campaign tracker",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Marketing Campaign Plan\\nCampaign Name: Spring Renewal Festival\\nCampaign ID: MKT-2025-S03\\nCampaign Period: 2025-03-20 to 2025-04-05\\nChannels: Online + Offline\\nBudget: 150K CNY\\nExpected Participants: 50000\\nExpected GMV: 2M CNY\\nCampaign Lead: Ye Si' > /home/user/Desktop/marketing_event.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Campaign ID'; ws['B1'] = 'Campaign Name'; ws['C1'] = 'Period'; ws['D1'] = 'Budget(10K CNY)'; ws['E1'] = 'Expected GMV(10K CNY)'; ws['F1'] = 'Lead'; wb.save('/home/user/Desktop/campaign_tracker.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me enter the marketing campaign into the campaign tracker",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the campaign information from /home/user/Desktop/marketing_event.txt into /home/user/Desktop/campaign_tracker.xlsx row 2: A2='MKT-2025-S03', B2='Spring Renewal Festival', C2='2025-03-20 to 2025-04-05', D2=15, E2=200, F2='Ye Si', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/campaign_tracker.xlsx'); s = df.to_string(); print('PASSED' if 'MKT-2025-S03' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

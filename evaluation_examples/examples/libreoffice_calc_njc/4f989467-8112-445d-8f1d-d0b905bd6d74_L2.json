@@ -1,0 +1,94 @@
+{
+  "id": "4f989467-8112-445d-8f1d-d0b905bd6d74",
+  "task_slug": "calc_open_empstatsl207xlsx_create_a_new_sheet_stats_with",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"EmpStats_L2_07.xlsx\". Create a new sheet \"Stats\" with headers \"Metric\" and \"Value\". Calculate these salary statistics from the Employees sheet: Count (number of employees), Average (rounded to 2 decimal places), Min, Max, and Total. List them in separate rows.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/4f989467-8112-445d-8f1d-d0b905bd6d74/EmpStats_L2_07.xlsx",
+            "path": "/home/user/Desktop/EmpStats_L2_07.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/EmpStats_L2_07.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/4f989467-8112-445d-8f1d-d0b905bd6d74",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "EmpStats_L2_07.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "EmpStats_L2_07_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/EmpStats_L2_07.xlsx",
+      "dest": "EmpStats_L2_07.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_name"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNEmployees",
+          "sheet_idx1": "ENEmployees"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNStats",
+          "sheet_idx1": "ENStats"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

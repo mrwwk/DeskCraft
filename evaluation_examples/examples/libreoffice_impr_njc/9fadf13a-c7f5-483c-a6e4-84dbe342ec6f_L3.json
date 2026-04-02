@@ -1,0 +1,80 @@
+{
+  "id": "9fadf13a-c7f5-483c-a6e4-84dbe342ec6f",
+  "task_slug": "impress_open_bitcoin_the_digital_revolutionpptx_and_perform_the",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open \"Bitcoin_ The Digital Revolution.pptx\" and perform the following changes: (1) On slide 1, set the background to navy blue (#003366) and make all text white (#FFFFFF), bold, and 36pt. (2) On slide 2, make the title text orange (#FF7F00) and bold. (3) On slide 3, make all body/content text (not the title) italic and dark blue (#00008B). (4) On slide 5, set the background color to light gray (#D3D3D3). (5) On slide 6, add this speaker note: \"Summary: Bitcoin has fundamentally changed how we think about money, trust, and decentralized systems.\" (6) Delete the last 3 slides from the presentation. Save the file.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/9fadf13a-c7f5-483c-a6e4-84dbe342ec6f/Bitcoin_ The Digital Revolution.pptx",
+            "path": "/home/user/Desktop/Bitcoin_ The Digital Revolution.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Bitcoin_ The Digital Revolution.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/9fadf13a-c7f5-483c-a6e4-84dbe342ec6f",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Bitcoin_ The Digital Revolution.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Bitcoin_L3.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Bitcoin_ The Digital Revolution.pptx",
+      "dest": "Bitcoin_ The Digital Revolution.pptx"
+    },
+    "options": {
+      "examine_shape": false
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

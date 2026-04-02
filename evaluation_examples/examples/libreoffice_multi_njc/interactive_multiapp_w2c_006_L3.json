@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_006",
+  "instruction": "Register the risk information in the risk ledger",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Risk Assessment Report\\nRisk ID: RSK-2025-015\\nRisk Name: Key Supplier Disruption Risk\\nRisk Category: Supply Chain\\nProbability: Medium (40%)\\nImpact Level: High\\nRisk Level: High\\nMitigation: Develop alternative suppliers, establish safety stock\\nOwner: Procurement Dept, Qian Zhiyuan' > /home/user/Desktop/risk_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Risk ID'; ws['B1'] = 'Risk Name'; ws['C1'] = 'Category'; ws['D1'] = 'Level'; ws['E1'] = 'Owner'; ws['F1'] = 'Mitigation'; wb.save('/home/user/Desktop/risk_register.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Register the risk information in the risk ledger",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the risk information from /home/user/Desktop/risk_report.txt into /home/user/Desktop/risk_register.xlsx row 2: A2='RSK-2025-015', B2='Key Supplier Disruption Risk', C2='Supply Chain', D2='High', E2='Qian Zhiyuan', F2='Develop alternative suppliers, establish safety stock', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/risk_register.xlsx'); s = df.to_string(); print('PASSED' if 'RSK-2025-015' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

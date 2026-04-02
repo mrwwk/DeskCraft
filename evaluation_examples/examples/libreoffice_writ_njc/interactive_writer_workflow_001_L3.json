@@ -1,0 +1,123 @@
+{
+  "id": "interactive_writer_workflow_001",
+  "snapshot": "libreoffice_writer",
+  "interactive": true,
+  "scenario_type": "multi_step_workflow",
+  "scenario_description": "Sequential 4-step workflow: create document structure, add content, format headers, add footer.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Quarterly Business Report\\n\\nQ1 Performance Summary\\n\\nRevenue reached 3.2 million, exceeding target by 8%%.\\nCustomer satisfaction improved to 92%%.\\nThree new partnerships were established.\\n\\nQ2 Outlook\\n\\nFocus areas include digital transformation and team expansion.\\nExpected revenue growth of 15%% over Q1.\\n' > /home/user/Desktop/quarterly_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--writer",
+          "/home/user/Desktop/quarterly_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Add the author name 'Prepared by: Marketing Department' at the very top of the document, before the title.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Now add a new section at the end titled 'Key Risks' with the text: 'Supply chain disruptions remain the primary concern.'",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Add the date 'Date: March 2025' right after the author line you added earlier.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 4,
+      "instruction": "Finally, add 'CONFIDENTIAL' at the very end of the document. Save the file.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/quarterly_report.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Prepared by: Marketing Department",
+          "Key Risks",
+          "CONFIDENTIAL"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

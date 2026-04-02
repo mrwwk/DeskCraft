@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_004",
+  "instruction": "Register the complaint information in the spreadsheet",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Complaint ID: CP-20250315-001\\nClient: Beijing StarTech Co., Ltd.\\nComplaint Time: 2025-03-15 10:23\\nComplaint Type: Product Quality\\nDescription: Batch B2025003 products have widespread defects\\nSeverity: High\\nHandler: Quality Dept, Wang Lin\\nExpected Resolution: 2025-03-20' > /home/user/Desktop/customer_complaint.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Complaint ID'; ws['B1'] = 'Client'; ws['C1'] = 'Complaint Type'; ws['D1'] = 'Severity'; ws['E1'] = 'Handler'; ws['F1'] = 'Expected Resolution'; wb.save('/home/user/Desktop/complaint_log.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Register the complaint information in the spreadsheet",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the complaint information from /home/user/Desktop/customer_complaint.txt into /home/user/Desktop/complaint_log.xlsx row 2: A2='CP-20250315-001', B2='Beijing StarTech Co., Ltd.', C2='Product Quality', D2='High', E2='Wang Lin', F2='2025-03-20', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/complaint_log.xlsx'); s = df.to_string(); print('PASSED' if 'CP-20250315-001' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

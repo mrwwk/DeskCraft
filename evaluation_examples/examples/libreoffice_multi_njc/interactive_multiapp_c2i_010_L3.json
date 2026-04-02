@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2i_010",
+  "instruction": "Help me organize the tech roadmap information into the document",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Feature'\nws['B1'] = 'Priority'\nws['C1'] = 'Planned Version'\nws['D1'] = 'Est. Effort(days)'\nws['A2'] = 'AI Smart Recommendation'\nws['B2'] = 'P0'\nws['C2'] = 'v4.0'\nws['D2'] = 45\nws['A3'] = 'Multi-language Support'\nws['B3'] = 'P1'\nws['C3'] = 'v4.1'\nws['D3'] = 30\nws['A4'] = 'Offline Mode'\nws['B4'] = 'P1'\nws['C4'] = 'v4.1'\nws['D4'] = 25\nws['A5'] = 'Custom Dashboard'\nws['B5'] = 'P2'\nws['C5'] = 'v4.2'\nws['D5'] = 20\nws['A6'] = 'API Extension Interface'\nws['B6'] = 'P0'\nws['C6'] = 'v4.0'\nws['D6'] = 35\nwb.save('/home/user/Desktop/tech_roadmap.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/roadmap_note.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the tech roadmap information into the document",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Count the number of P0 features for v4.0 and their total effort (45+35) from /home/user/Desktop/tech_roadmap.xlsx, append to /home/user/Desktop/roadmap_note.txt: 'v4.0 Core Features: 2 P0 items, total effort 80 days', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/roadmap_note.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "v4.0 Core Features: 2 P0 items, total effort 80 days"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L3"
+}

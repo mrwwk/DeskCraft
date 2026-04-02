@@ -1,0 +1,118 @@
+{
+  "id": "interactive_impress_error_correction_002",
+  "snapshot": "libreoffice_impress",
+  "interactive": true,
+  "scenario_type": "error_correction",
+  "scenario_description": "User asks agent to add a slide. Agent adds it but with wrong content. User provides the correct text.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/pptx_shared/The Golden Age of Arcade Games.pptx",
+            "path": "/home/user/Desktop/The Golden Age of Arcade Games.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--impress",
+          "/home/user/Desktop/The Golden Age of Arcade Games.pptx"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Add a new slide at the end with some conclusion text",
+      "trigger": {
+        "type": "step_count",
+        "value": 5
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "That conclusion doesn't capture what I want. Please replace it with: Title: 'Legacy of Arcade Gaming', Content: 'The arcade era established the foundation for the modern gaming industry worth over $200 billion today.'",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Good. Now also add 'Sources: ESA Annual Report 2024' at the bottom of that slide. Save.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"from pptx import Presentation; p=Presentation('/home/user/Desktop/The Golden Age of Arcade Games.pptx'); t=' '.join(r.text for s in p.slides for sh in s.shapes if sh.has_text_frame for pa in sh.text_frame.paragraphs for r in pa.runs); print('PASSED' if 'Legacy of Arcade Gaming' in t and 'ESA Annual Report' in t else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}
