@@ -12,7 +12,7 @@
     {
       "type": "execute",
       "parameters": {
-        "command": "gsettings set org.gnome.shell favorite-apps \"['org.gnome.Nautilus.desktop','google-chrome.desktop']\"; rm -f /home/user/Desktop/favorites_handoff.txt",
+        "command": "export DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'; gsettings set org.gnome.shell favorite-apps \"['org.gnome.Nautilus.desktop','google-chrome.desktop']\"; rm -f /home/user/Desktop/favorites_handoff.txt",
         "shell": true
       }
     },
@@ -58,7 +58,7 @@
     "func": "exact_match",
     "result": {
       "type": "vm_command_line",
-      "command": "fav=$(gsettings get org.gnome.shell favorite-apps 2>/dev/null | tr -d '[:space:]'); expected=$(printf 'thunderbird.desktop\ngoogle-chrome.desktop\norg.gnome.Terminal.desktop'); actual=$(cat /home/user/Desktop/favorites_handoff.txt 2>/dev/null); if [ \"$fav\" = \"['thunderbird.desktop','google-chrome.desktop','org.gnome.Terminal.desktop']\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "export DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'; fav=$(gsettings get org.gnome.shell favorite-apps 2>/dev/null | tr -d '[:space:]'); expected=$(printf 'thunderbird.desktop\ngoogle-chrome.desktop\norg.gnome.Terminal.desktop'); actual=$(cat /home/user/Desktop/favorites_handoff.txt 2>/dev/null); if [ \"$fav\" = \"['thunderbird.desktop','google-chrome.desktop','org.gnome.Terminal.desktop']\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
       "shell": true
     },
     "expected": {

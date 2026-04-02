@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please open /home/user/analytics-app in VS Code and set up the project for data work. Create .vscode/extensions.json recommending ms-python.python and ms-toolsai.jupyter. Also create .vscode/settings.json so editor.tabSize is 4, files.trimTrailingWhitespace is true, and files.exclude hides data/raw and .venv.",
-  "source": "https://code.visualstudio.com/docs/editor/extension-marketplace",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：数据分析项目初始化时常见的“推荐 Python/Jupyter 扩展 + 收敛项目级编辑设置与目录隐藏规则”脚手架需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/analytics-app/data/raw", "/home/user/analytics-app/.venv"]}},
     {"type": "launch", "parameters": {"command": ["code", "/home/user/analytics-app"]}},

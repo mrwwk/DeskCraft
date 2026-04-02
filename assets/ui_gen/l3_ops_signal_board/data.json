@@ -1,0 +1,17 @@
+{
+  "hero": {
+    "headline": "Watch release signals before they turn into blockers.",
+    "subcopy": "A live ops board for launch, QA, and design review handoff."
+  },
+  "kpis": [
+    {"label": "Active launches", "value": 6, "category": "Active"},
+    {"label": "At-risk workstreams", "value": 2, "category": "Risk"},
+    {"label": "Resolved today", "value": 11, "category": "All"}
+  ],
+  "incidents": [
+    {"title": "Checkout banner regression", "status": "Risk", "time": "08:20", "owner": "UI QA"},
+    {"title": "Billing copy sign-off", "status": "Active", "time": "09:10", "owner": "Marketing"},
+    {"title": "Analytics patch verified", "status": "All", "time": "10:45", "owner": "Data Ops"}
+  ],
+  "series": [34, 48, 41, 57, 62]
+}

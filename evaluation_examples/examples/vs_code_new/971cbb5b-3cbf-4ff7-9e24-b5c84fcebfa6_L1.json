@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please configure VS Code for quick Python scratch files: set default language to python, start with a new untitled file on startup, and enable auto save after delay with 1000ms.",
-  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/python/settings-reference",
+    "现实场景构造来源：开发者临时编写 Python 草稿或验证脚本时常见的“新建即 Python + 启动空白文件 + 延迟自动保存”个人工作流需求"
+  ],
   "config": [
     {
       "type": "launch",

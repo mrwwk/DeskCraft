@@ -4,7 +4,12 @@
   "difficulty": "L3",
   "snapshot": "vscode",
   "instruction": "Please open /home/user/ops-toolkit in VS Code, add /home/user/runbooks and /home/user/scripts into the same workspace, and save it as /home/user/ops-toolkit.code-workspace. In that workspace configure files.exclude so .terraform and .cache are hidden, and add extension recommendations for redhat.vscode-yaml and ms-python.python. Also create .vscode/tasks.json inside /home/user/ops-toolkit with two shell tasks named Validate JSON running `python -m json.tool config.json` and Search TODO running `grep -R TODO .`.",
-  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "https://code.visualstudio.com/docs/debugtest/tasks",
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "现实场景构造来源：运维交接仓库常见的“多目录工作区 + 推荐 YAML/Python 扩展 + 内置巡检任务”工作区脚手架需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/ops-toolkit/.terraform", "/home/user/ops-toolkit/.cache", "/home/user/runbooks", "/home/user/scripts"]}},
     {"type": "execute", "parameters": {"command": ["/bin/bash", "-c", "echo '{\"ok\": true}' > /home/user/ops-toolkit/config.json"]}},

@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Perform a code quality setup for the Python project at /tmp/pyproject/. Step 1 — Audit: use the terminal to count the total lines across all .py files recursively (all files combined have 80 lines). Write ~/Desktop/audit_report.txt with exactly these two lines: 'total_py_lines=80' and 'style=PEP-8'. Step 2 — Configure: because requirements.txt confirms this is a Python project, apply the PEP-8 standard settings to VS Code User Settings — editor.tabSize=4, editor.rulers=[79], files.insertFinalNewline=true, files.trimTrailingWhitespace=true. Step 3 — Reference: open the official Python style guide at https://peps.python.org/pep-0008/ in Chrome so you have the reference at hand.",
-  "source": "authors",
+  "source": [
+    "https://peps.python.org/pep-0008/",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：接手 Python 仓库时，先做代码规模审计，再按 PEP 8 统一编辑器表现并打开规范原文的常见整备流程"
+  ],
   "config": [
     {
       "type": "execute",

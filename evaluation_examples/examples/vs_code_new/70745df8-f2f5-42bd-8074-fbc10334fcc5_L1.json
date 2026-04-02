@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please configure VS Code Auto Save behavior in User Settings: enable afterDelay mode with an 800ms delay, and also enable trim trailing whitespace and insert final newline on save.",
-  "source": "https://code.visualstudio.com/docs/editor/codebasics#_save-auto-save",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/editing/codebasics"
+  ],
   "config": [
     {
       "type": "launch",

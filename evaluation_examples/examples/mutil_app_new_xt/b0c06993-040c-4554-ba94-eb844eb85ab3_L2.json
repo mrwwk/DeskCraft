@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "multi_apps",
   "instruction": "A code-style spec is stored in ~/Desktop/audit_spec.json, and the project it describes is under /tmp/audit_target/. Use the terminal to inspect that project and write ~/Desktop/audit_summary.txt with exactly two lines: `py_files=<count>` and `total_lines=<count>`. Then apply the VS Code settings described in the spec: set editor.tabSize and editor.rulers exactly as requested. Finally, open the docsUrl from the spec in Chrome so the style reference is available while you work.",
-  "source": "authors",
+  "source": [
+    "https://peps.python.org/pep-0008/",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：技术负责人通过 audit spec 下发代码风格和统计口径，执行人据此完成仓库审计与编辑器同步的常见治理流程"
+  ],
   "config": [
     {
       "type": "execute",

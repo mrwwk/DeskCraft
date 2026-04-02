@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", sans-serif;
+  background: #f5f0ea;
+  color: #201d23;
+}
+
+#app {
+  width: min(900px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.hero {
+  background: #fff9f2;
+  border: 1px solid #decdbb;
+  border-radius: 24px;
+  padding: 28px;
+}
+
+#openDialog {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: #8b4d34;
+  color: #fff;
+}
+
+.modal-shell {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px dashed #c7b09a;
+}

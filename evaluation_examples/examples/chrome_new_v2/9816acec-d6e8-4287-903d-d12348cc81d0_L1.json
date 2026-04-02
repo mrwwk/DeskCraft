@@ -1,0 +1,94 @@
+{
+  "id": "9816acec-d6e8-4287-903d-d12348cc81d0",
+  "task_slug": "delete_specific_site_cookies",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "I've been browsing Amazon and eBay and I want to clear my tracks. Please delete all cookies for amazon.com and ebay.com, but keep cookies for other websites untouched.",
+  "source": "https://support.google.com/chrome/answer/95647",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://www.amazon.com",
+          "https://www.ebay.com",
+          "https://www.wikipedia.org"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "pkill",
+            "chrome"
+          ]
+        }
+      },
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "google-chrome",
+            "--remote-debugging-port=1337"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": "is_cookie_deleted",
+    "result": {
+      "type": "cookie_data"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "type": "domains",
+        "domains": [
+          ".amazon.com",
+          ".ebay.com"
+        ]
+      }
+    }
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

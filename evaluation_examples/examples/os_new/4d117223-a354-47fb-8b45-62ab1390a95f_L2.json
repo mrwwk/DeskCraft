@@ -4,7 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "In ~/Desktop/perm_lab, recursively set permission 640 for all regular .log files, but do not change anything under archive/ and do not modify non-.log files. Keep directory permissions unchanged.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu manpage - chmod(1) (https://manpages.ubuntu.com/manpages/jammy/en/man1/chmod.1.html)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -43,16 +43,23 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_file_permissions",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ \"$(stat -c '%a' ~/Desktop/perm_lab/serviceA/app.log)\" = \"640\" ] || ok=0; [ \"$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/error.log)\" = \"640\" ] || ok=0; [ \"$(stat -c '%a' ~/Desktop/perm_lab/serviceB/.hidden/hidden.log)\" = \"640\" ] || ok=0; [ \"$(stat -c '%a' ~/Desktop/perm_lab/archive/old.log)\" = \"755\" ] || ok=0; [ \"$(stat -c '%a' ~/Desktop/perm_lab/serviceA/readme.txt)\" = \"666\" ] || ok=0; [ \"$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/run.sh)\" = \"700\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "echo \"perm_serviceA_app=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/app.log 2>/dev/null)\"; echo \"perm_serviceB_error=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/error.log 2>/dev/null)\"; echo \"perm_hidden=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/.hidden/hidden.log 2>/dev/null)\"; echo \"perm_archive_old=$(stat -c '%a' ~/Desktop/perm_lab/archive/old.log 2>/dev/null)\"; echo \"perm_readme=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/readme.txt 2>/dev/null)\"; echo \"perm_run=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/run.sh 2>/dev/null)\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "permissions": {
+          "serviceA_app": "640",
+          "serviceB_error": "640",
+          "hidden": "640",
+          "archive_old": "755",
+          "readme": "666",
+          "run": "700"
+        }
       }
     }
   },

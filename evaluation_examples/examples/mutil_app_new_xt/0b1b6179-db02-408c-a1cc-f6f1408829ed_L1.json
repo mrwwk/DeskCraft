@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Your team stores shared editor preferences in ~/.team_editor_spec. Read this file to find the three settings listed there (tabSize, fontSize, lineHeight). Apply all three to VS Code User Settings using the key names editor.tabSize, editor.fontSize, and editor.lineHeight. Also copy the entire contents of the spec file to ~/Desktop/applied_editor_spec.txt so there is a record of what was applied.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/editor/codebasics",
+    "现实场景构造来源：团队成员按共享 editor spec 同步字号、行高与缩进，并留存应用结果供交接核对的常见入项流程"
+  ],
   "config": [
     {
       "type": "execute",

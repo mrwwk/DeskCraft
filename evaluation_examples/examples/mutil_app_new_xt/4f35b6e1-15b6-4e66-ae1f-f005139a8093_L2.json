@@ -1,11 +1,22 @@
 {
   "id": "4f35b6e1-15b6-4e66-ae1f-f005139a8093",
-  "task_slug": "chrome_vscode_docs_save_url_autosave",
+  "task_slug": "editing_handoff_url_and_vscode_settings",
   "difficulty": "L2",
   "snapshot": "os",
-  "instruction": "Open the VS Code keybindings documentation page (https://code.visualstudio.com/docs/getstarted/keybindings) in a new Chrome tab. Save the full URL to ~/Desktop/docs_url.txt. Then in VS Code User Settings, set files.autoSave to 'onWindowChange' and enable editor.linkedEditing.",
-  "source": "authors",
+  "instruction": "The docs team's editing handoff is saved at ~/Desktop/editing_handoff.html. Open that file in Chrome using the file:// URL, copy the support URL shown on the page into ~/Desktop/docs_url.txt, then apply the recommended VS Code User Settings from the same page: set files.autoSave to 'onWindowChange' and enable editor.linkedEditing. Leave the handoff page open in Chrome when you are done.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/keybindings",
+    "https://code.visualstudio.com/docs/editing/codebasics#_save-auto-save",
+    "现实场景构造来源：文档团队通过 handoff 页面分发支持文档链接和编辑偏好，要求执行人同步保存策略并留存 URL 的常见协作流程"
+  ],
   "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nPath('/home/user/Desktop/editing_handoff.html').write_text('<!DOCTYPE html><html><body><h1>Editing Handoff</h1><p>Support URL: https://code.visualstudio.com/docs/getstarted/keybindings</p><p>Recommended settings: files.autoSave=onWindowChange, editor.linkedEditing=true</p></body></html>')\nPY",
+        "shell": true
+      }
+    },
     {
       "type": "launch",
       "parameters": {
@@ -17,13 +28,22 @@
       "parameters": {
         "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
       }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
     }
   ],
   "trajectory": "trajectories/",
   "related_apps": ["chrome", "vscode", "os"],
   "evaluator": {
-    "func": ["check_include_exclude", "check_json_settings"],
+    "func": ["is_expected_active_tab_approximate", "check_include_exclude", "check_json_settings"],
     "result": [
+      {
+        "type": "active_tab_info"
+      },
       {
         "type": "vm_command_line",
         "command": "cat /home/user/Desktop/docs_url.txt",
@@ -36,6 +56,13 @@
       }
     ],
     "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/editing_handoff.html"
+        }
+      },
       {
         "type": "rule",
         "rules": {
@@ -55,7 +82,7 @@
     ],
     "conj": "and"
   },
-  "proxy": true,
+  "proxy": false,
   "fixed_ip": false,
   "possibility_of_env_change": "low"
 }

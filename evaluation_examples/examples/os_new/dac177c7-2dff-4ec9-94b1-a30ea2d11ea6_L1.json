@@ -4,7 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Create a user document template at ~/Templates/meeting_minutes.txt containing exactly these three lines: Meeting Title:, Attendees:, Action Items:. Also create ~/Desktop/template_status.txt containing exactly template=meeting_minutes.txt.",
-  "source": "OSWorld custom task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Create a document template (https://help.ubuntu.com/lts/ubuntu-help/files-templates.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -19,17 +19,15 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_meeting_template",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; expected_tpl=$(cat <<'EOF'\nMeeting Title:\nAttendees:\nAction Items:\nEOF\n); actual_tpl=$(cat ~/Templates/meeting_minutes.txt 2>/dev/null); [ \"$actual_tpl\" = \"$expected_tpl\" ] || ok=0; status=$(cat ~/Desktop/template_status.txt 2>/dev/null); [ \"$status\" = \"template=meeting_minutes.txt\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "expected_tpl=$(printf 'Meeting Title:\\nAttendees:\\nAction Items:\\n'); actual_tpl=$(cat ~/Templates/meeting_minutes.txt 2>/dev/null); template_ok='false'; [ \"$actual_tpl\" = \"$expected_tpl\" ] && template_ok='true'; status=$(cat ~/Desktop/template_status.txt 2>/dev/null); status_ok='false'; [ \"$status\" = 'template=meeting_minutes.txt' ] && status_ok='true'; echo \"template_ok=$template_ok\"; echo \"status_ok=$status_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
-      "rules": {
-        "expected": "PASS\n"
-      }
+      "rules": {}
     }
   },
   "proxy": false,

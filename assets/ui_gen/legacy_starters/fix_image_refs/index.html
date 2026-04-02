@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Northstar Studio</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f7f8fc; color: #172033; }
+    .hero, .card-grid, footer { padding: 28px 32px; }
+    .hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: center; background: #e8eefc; }
+    .hero-image img, .card img { width: 100%; display: block; border-radius: 18px; }
+    .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .card { background: #fff; border-radius: 22px; padding: 16px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div>
+        <h1>Build pages your team can trust</h1>
+        <p>Northstar Studio starter with local assets waiting to be wired correctly.</p>
+      </div>
+      <div class="hero-image">
+        <img src="https://cdn.example.com/hero.png" alt="Dashboard preview">
+      </div>
+    </section>
+    <section>
+      <h2>Featured blocks</h2>
+      <div class="card-grid">
+        <article class="card">
+          <img src="images/feature-card-a.png" alt="Analytics Overview">
+          <h3>Analytics Overview</h3>
+          <p>Track rollout metrics and momentum.</p>
+        </article>
+        <article class="card">
+          <img src="./broken/card-b.png" alt="Team Collaboration">
+          <h3>Team Collaboration</h3>
+          <p>Keep product and design aligned.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>© 2026 Northstar Studio. All rights reserved.</p>
+  </footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
   "snapshot": "chrome",
   "interactive": true,
   "scenario_type": "interruption",
-  "scenario_description": "用户一开始想保留活动场地信息，但浏览过程中被打断，临时改成更关注停车信息，并要求移除原本的书签选择。",
+  "scenario_description": "用户一开始想保留活动场地信息，但浏览过程中被打断，临时改成更关注停车信息，并要求移除原本的书签选择，最终只保留停车与议程两个文档标签。",
   "user_persona": {
     "expertise_level": "intermediate",
     "communication_style": "casual_chinese"
@@ -71,7 +71,7 @@
     },
     {
       "phase_id": 3,
-      "instruction": "再把 Agenda 打开看一眼，但最后回到 Parking Information 页面。",
+      "instruction": "再把 Agenda 打开看一眼，但最后回到 Parking Information 页面，并且只保留 Parking Information 和 Agenda 这两个文档标签。",
       "trigger": {
         "type": "agent_done"
       }
@@ -83,11 +83,15 @@
   ],
   "evaluator": {
     "func": [
+      "is_expected_tabs",
       "is_expected_active_tab",
       "is_expected_bookmarks"
     ],
     "conj": "and",
     "result": [
+      {
+        "type": "open_tabs_info"
+      },
       {
         "type": "active_url_from_accessTree"
       },
@@ -96,6 +100,16 @@
       }
     ],
     "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/chrome_event_planner_109/parking.html",
+            "file:///home/user/Desktop/chrome_event_planner_109/agenda.html"
+          ]
+        }
+      },
       {
         "type": "rule",
         "rules": {

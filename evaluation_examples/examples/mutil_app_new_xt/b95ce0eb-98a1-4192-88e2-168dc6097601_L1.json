@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "multi_apps",
   "instruction": "The site metadata in ~/Desktop/project_site/site.json needs to be updated before release. Read HANDOFF.txt in the same folder, create a backup named site.json.bak, and then update site.json so the title, owner, and contactEmail match the handoff. After that, create RELEASE_NOTE.txt in the folder containing exactly `metadata updated`.",
-  "source": "authors",
+  "source": [
+    "https://docs.github.com/en/pages",
+    "现实场景构造来源：站点发布前根据 handoff note 修正 JSON 元数据、补备份并留下 release note 的常见内容上线流程"
+  ],
   "config": [
     {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/project_site')\nbase.mkdir(parents=True, exist_ok=True)\n(base / 'HANDOFF.txt').write_text('title=Vision Console\\nowner=Nina Zhou\\ncontactEmail=nina.zhou@example.com\\n')\njson.dump({'title': 'Old Site', 'owner': 'Old Owner', 'contactEmail': 'old@example.com'}, open(base / 'site.json', 'w'), indent=2)\nPY", "shell": true}},
     {"type": "launch", "parameters": {"command": ["code", "/home/user/Desktop/project_site"]}}

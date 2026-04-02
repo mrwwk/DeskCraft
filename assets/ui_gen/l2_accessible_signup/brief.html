@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Accessible Signup Brief</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 920px; margin: 36px auto; line-height: 1.65; color: #1b2228; }
+    h1, h2 { color: #255364; }
+    code { background: #edf6f8; padding: 2px 6px; }
+    .source { background: #f2fbfd; border-left: 4px solid #4d9db3; padding: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Accessible Signup Refinement</h1>
+  <p>Upgrade the starter signup page in VS Code and verify the result from a local Chrome preview served on <code>http://127.0.0.1:8124/index.html</code>.</p>
+  <h2>Required changes</h2>
+  <ol>
+    <li>Keep the form wrapper and illustration, but refine the UI into an accessible signup experience.</li>
+    <li>Add <code>span.error-text</code> blocks with <code>aria-live="polite"</code> for the name, email, and password fields.</li>
+    <li>Add a checkbox <code>input#terms</code> with a visible agreement label.</li>
+    <li>Add <code>section#success-panel</code> below the form with a heading that includes <code>Ready to launch</code>.</li>
+    <li>In <code>app.js</code>, validate the form using browser validity APIs and custom messages. Use <code>setCustomValidity</code> and <code>reportValidity</code>.</li>
+    <li>Update <code>manifest.json</code> so <code>project</code> is <code>accessible-signup-refine</code>, <code>theme</code> is <code>harbor</code>, <code>validationMode</code> is <code>inline-live</code>, and <code>previewPort</code> is <code>8124</code>.</li>
+    <li>Finish on the local Chrome preview tab, not on the file:// brief tab.</li>
+  </ol>
+  <div class="source">
+    <p><strong>Source grounding</strong></p>
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation">MDN: Client-side form validation</a></li>
+      <li><a href="https://www.w3.org/WAI/tutorials/forms/validation/">W3C WAI: Validating Input</a></li>
+      <li><a href="https://www.frontendmentor.io/challenges/contact-form--G-hYlqKJj">Frontend Mentor: Contact Form</a></li>
+    </ul>
+  </div>
+</body>
+</html>

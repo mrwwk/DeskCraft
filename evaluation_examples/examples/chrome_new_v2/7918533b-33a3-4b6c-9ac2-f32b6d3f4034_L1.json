@@ -1,0 +1,74 @@
+{
+  "id": "7918533b-33a3-4b6c-9ac2-f32b6d3f4034",
+  "task_slug": "change_chrome_language_to_french",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "Change Chrome's display language to French (Français). After changing the language, leave Chrome on the Languages settings page.",
+  "source": "https://support.google.com/chrome/answer/173424",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "pkill",
+            "chrome"
+          ]
+        }
+      },
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "google-chrome",
+            "--remote-debugging-port=1337"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": "exact_match",
+    "result": {
+      "type": "chrome_language"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "fr"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "multi_apps",
   "instruction": "A workspace manifest is available at ~/Desktop/workspace_manifest.json. Read it to determine the project name, the notes file path, and the editor settings your team expects. Then use the terminal to create the project directory and the requested notes file, writing the project name into that notes file. Finally, apply the tabSize and insertFinalNewline settings from the manifest to VS Code User Settings.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：小团队用 workspace manifest 一次性生成项目目录、注释文件和基础编辑器规则的常见项目起步流程"
+  ],
   "config": [
     {
       "type": "execute",

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Launch Story Lab Brief</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 980px; margin: 36px auto; line-height: 1.68; color: #1b1621; }
+    h1, h2 { color: #713c6f; }
+    code { background: #f7eef7; padding: 2px 6px; }
+    .source { background: #fbf4fb; border-left: 4px solid #b05aa9; padding: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Launch Story Lab</h1>
+  <p>Build a richer generative UI page from local structured content, then verify it in Chrome at <code>http://127.0.0.1:8126/index.html</code>.</p>
+  <h2>Required experience</h2>
+  <ol>
+    <li>Create a storytelling page with <code>main#story-app</code>, <code>section#hero</code>, <code>section#insight-grid</code>, <code>section#milestones</code>, <code>canvas#sentimentChart</code>, and <code>dialog#noteDialog</code>.</li>
+    <li>Load <code>story.json</code> and use it to render 4 insight cards and 3 milestone items.</li>
+    <li>Use the local asset <code>assets/launch-mark.svg</code> in the hero or header area.</li>
+    <li>Implement an interaction that opens the dialog or toggles a detail panel when a milestone button is clicked.</li>
+    <li>Draw a bar or column chart for the sentiment series on the canvas.</li>
+    <li>Manifest must set <code>project=launch-story-lab</code>, <code>theme=orchid-night</code>, <code>chartType=bar</code>, <code>dataSource=story.json</code>, and <code>previewPort=8126</code>.</li>
+  </ol>
+  <div class="source">
+    <p><strong>Source grounding</strong></p>
+    <ul>
+      <li><a href="https://www.frontendmentor.io/challenges/bento-grid-RMydElrlOj">Frontend Mentor: Bento Grid</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial">MDN: Canvas tutorial</a></li>
+      <li>Professional scenario derived from real launch-report and AI result summary pages, aligned with the Generative UI definition in the internal report PDF.</li>
+    </ul>
+  </div>
+</body>
+</html>

@@ -4,7 +4,10 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please resolve Explorer shortcut conflicts in VS Code by removing Ctrl+F for list.find and adding Ctrl+Alt+F for the same Tree View Find command with the same condition.",
-  "source": "https://code.visualstudio.com/docs/getstarted/keybindings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/keybindings",
+    "https://code.visualstudio.com/docs/getstarted/userinterface"
+  ],
   "config": [
     {
       "type": "launch",
@@ -30,11 +33,20 @@
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": {
-          "key": "ctrl+alt+f",
-          "command": "list.find",
-          "when": "listFocus && listSupportsFind"
-        }
+        "all_of": [
+          {
+            "key": "ctrl+alt+f",
+            "command": "list.find",
+            "when": "listFocus && listSupportsFind"
+          }
+        ],
+        "none_of": [
+          {
+            "key": "ctrl+f",
+            "command": "list.find",
+            "when": "listFocus && listSupportsFind"
+          }
+        ]
       }
     },
     "result": {

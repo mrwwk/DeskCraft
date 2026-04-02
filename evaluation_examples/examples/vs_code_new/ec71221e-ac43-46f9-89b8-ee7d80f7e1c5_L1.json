@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please create a VS Code keybinding so that Ctrl+Alt+] indents selected lines, and it should only work when the editor has focus and the editor is not read-only.",
-  "source": "https://code.visualstudio.com/docs/getstarted/keybindings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/keybindings",
+    "https://code.visualstudio.com/docs/editing/codebasics"
+  ],
   "config": [
     {
       "type": "launch",

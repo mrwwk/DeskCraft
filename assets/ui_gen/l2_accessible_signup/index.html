@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signup Starter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <section class="signup-shell">
+      <img class="illustration" src="assets/form-scene.svg" alt="Abstract signup illustration">
+      <form id="signup-form" novalidate>
+        <h1>Create your release account</h1>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required>
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" minlength="10" required>
+
+        <button id="signup-button" type="submit">Create account</button>
+      </form>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

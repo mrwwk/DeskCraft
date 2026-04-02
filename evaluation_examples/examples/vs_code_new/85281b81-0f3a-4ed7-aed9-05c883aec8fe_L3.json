@@ -4,7 +4,13 @@
   "difficulty": "L3",
   "snapshot": "vscode",
   "instruction": "Please open /home/user/data-pipeline in VS Code and prepare it for running and debugging. Create .vscode/tasks.json with a shell task named Install Requirements that runs `pip install -r requirements.txt` and another task named Run Current File that runs `python ${file}`. Then create .vscode/launch.json with a Python launch configuration named Debug Current File that launches ${file} in the integrated terminal and uses Install Requirements as its preLaunchTask. Also create .vscode/settings.json so python.analysis.typeCheckingMode is basic.",
-  "source": "https://code.visualstudio.com/docs/python/debugging",
+  "source": [
+    "https://code.visualstudio.com/docs/debugtest/tasks",
+    "https://code.visualstudio.com/docs/debugtest/debugging-configuration",
+    "https://code.visualstudio.com/docs/python/debugging",
+    "https://code.visualstudio.com/docs/python/settings-reference",
+    "现实场景构造来源：数据管线项目初始化时常见的“安装依赖任务 + 运行当前文件任务 + preLaunchTask 调试入口 + 基础类型检查”联动配置需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/data-pipeline"]}},
     {"type": "execute", "parameters": {"command": ["/bin/bash", "-c", "echo 'pandas==2.2.0' > /home/user/data-pipeline/requirements.txt"]}},

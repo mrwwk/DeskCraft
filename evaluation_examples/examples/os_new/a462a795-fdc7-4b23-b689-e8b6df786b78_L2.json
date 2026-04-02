@@ -3,8 +3,8 @@
   "task_slug": "switch_user_session",
   "difficulty": "L2",
   "snapshot": "os",
-  "instruction": "Switch to user charles (password Ex@mpleP@55w0rd!) without logging out, and as charles create /tmp/charles_session_ok.txt containing exactly: whoami=charles and home=/home/charles on separate lines. Then return to your original user session.",
-  "source": "OSWorld custom hard task",
+  "instruction": "Switch to user charles (password Ex@mpleP@55w0rd!) without logging out, and as charles create /tmp/charles_session_ok.txt containing exactly: whoami=charles and home=/home/charles on separate lines.",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Log out, power off or switch users (https://help.ubuntu.com/lts/ubuntu-help/shell-exit.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -29,17 +29,15 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_switch_user",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -f /tmp/charles_session_ok.txt ] || ok=0; expected=$(cat <<'EOF'\nwhoami=charles\nhome=/home/charles\nEOF\n); actual=$(cat /tmp/charles_session_ok.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; [ \"$(stat -c '%U' /tmp/charles_session_ok.txt 2>/dev/null)\" = \"charles\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "file_exists='false'; [ -f /tmp/charles_session_ok.txt ] && file_exists='true'; expected=$(printf 'whoami=charles\\nhome=/home/charles\\n'); actual=$(cat /tmp/charles_session_ok.txt 2>/dev/null); content_ok='false'; [ \"$actual\" = \"$expected\" ] && content_ok='true'; owner_ok='false'; [ \"$(stat -c '%U' /tmp/charles_session_ok.txt 2>/dev/null)\" = 'charles' ] && owner_ok='true'; echo \"file_exists=$file_exists\"; echo \"content_ok=$content_ok\"; echo \"owner_ok=$owner_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
-      "rules": {
-        "expected": "PASS\n"
-      }
+      "rules": {}
     }
   },
   "proxy": false,

@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please install the local VSIX extension from /home/user/test.vsix in VS Code, and also disable extension auto-update in User Settings.",
-  "source": "https://code.visualstudio.com/docs/editor/extension-marketplace",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：团队内部分发固定版本扩展包时常见的“离线安装 VSIX + 关闭自动更新以避免版本漂移”配置需求"
+  ],
   "config": [
     {
       "type": "download",
@@ -37,24 +41,42 @@
     "vscode"
   ],
   "evaluator": {
-    "func": "is_extension_installed",
-    "result": {
-      "type": "vm_command_line",
-      "command": [
-        "code",
-        "--list-extensions",
-        "|",
-        "grep",
-        "undefined_publisher.test"
-      ]
-    },
-    "expected": {
-      "type": "rule",
-      "rules": {
-        "type": "contain",
-        "expected": "undefined_publisher.test"
+    "func": ["is_extension_installed", "check_json_settings"],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": [
+          "code",
+          "--list-extensions",
+          "|",
+          "grep",
+          "undefined_publisher.test"
+        ]
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
       }
-    }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "contain",
+          "expected": "undefined_publisher.test"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "extensions.autoUpdate": false
+          }
+        }
+      }
+    ],
+    "conj": "and"
   },
   "proxy": false,
   "fixed_ip": false,

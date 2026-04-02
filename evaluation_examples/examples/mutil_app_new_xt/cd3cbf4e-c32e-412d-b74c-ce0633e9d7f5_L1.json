@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Configure VS Code to automatically save files in 'afterDelay' mode with a 1000ms delay in User Settings. Also, add the line `alias gs='git status'` to your ~/.bashrc file so the shortcut is available in future terminal sessions.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/editing/codebasics#_save-auto-save",
+    "现实场景构造来源：开发者在整理个人环境时常见的“启用延迟自动保存 + 添加 git status shell alias”效率配置需求"
+  ],
   "config": [
     {
       "type": "launch",

@@ -1,0 +1,18 @@
+{
+  "hero": {
+    "title": "Launch Story Lab",
+    "subtitle": "Shape a product narrative from live release signals and structured notes."
+  },
+  "insights": [
+    {"title": "Launch readiness", "value": "84%", "tone": "strong"},
+    {"title": "Open issues", "value": "7", "tone": "alert"},
+    {"title": "Review velocity", "value": "2.4x", "tone": "steady"},
+    {"title": "Audience confidence", "value": "High", "tone": "warm"}
+  ],
+  "milestones": [
+    {"label": "Spec lock", "detail": "Narrative, CTA stack, and metrics approved."},
+    {"label": "Preview QA", "detail": "Hero, modal state, and chart pass live review."},
+    {"label": "Launch day", "detail": "All channels receive the final story page bundle."}
+  ],
+  "sentiment": [22, 31, 45, 54, 63]
+}

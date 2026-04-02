@@ -4,7 +4,10 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Bootstrap a new project using the team configuration at ~/Desktop/team_config.json. This file defines the project name, editor tab size, directories to exclude in VS Code, and a documentation URL. Your tasks: (1) Open the config file in Chrome via its file:// URL so you can review it. (2) Create the project directory ~/Desktop/<projectName>/ (use the name from the config: 'DataPipeline') and create a README.md inside it containing the single line '# DataPipeline'. (3) Configure VS Code User Settings: set editor.tabSize to the value from the config, and add all three directories from excludeDirs to files.exclude (each mapped to true). (4) Open the repoDocsUrl from the config in a new Chrome tab.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "现实场景构造来源：团队 handoff JSON 驱动新项目目录、README 和 files.exclude 规则落地，并顺手打开协作文档的常见入场流程"
+  ],
   "config": [
     {
       "type": "execute",

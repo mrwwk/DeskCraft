@@ -1,0 +1,20 @@
+[
+  {
+    "version": "3.2",
+    "title": "Faster dashboard loading",
+    "summary": "Charts now warm up before rendering so the first panel appears quicker.",
+    "tag": "Performance"
+  },
+  {
+    "version": "3.1",
+    "title": "Comment handoff mode",
+    "summary": "Reviewers can now leave inline launch notes for each card block.",
+    "tag": "Collaboration"
+  },
+  {
+    "version": "3.0",
+    "title": "Launch checklist",
+    "summary": "Teams can track release blockers from a single prep feed.",
+    "tag": "Workflow"
+  }
+]

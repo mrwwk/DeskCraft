@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "multi_apps",
   "instruction": "The repository audit spec at ~/Desktop/scan_spec.json tells you how the knowledge base under /tmp/knowledge_base/ should be summarized. Use the terminal to inspect that folder and update ~/Desktop/repo_audit/project_meta.json with the actual counts for pythonFiles and markdownFiles, and set status to audited. Then apply the tabSize and ruler values from the spec to VS Code User Settings. Finally, open the docsUrl from the spec in Chrome.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/codebasics",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：知识库仓库审计时常见的“依据 scan spec 更新 project_meta.json 并同步 VS Code 检查设置”元数据治理流程"
+  ],
   "config": [
     {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/tmp/knowledge_base')\n(base / 'notes').mkdir(parents=True, exist_ok=True)\n(base / 'src').mkdir(parents=True, exist_ok=True)\n(base / 'src' / 'a.py').write_text('print(1)\\n')\n(base / 'src' / 'b.py').write_text('print(2)\\n')\n(base / 'src' / 'c.py').write_text('print(3)\\n')\n(base / 'README.md').write_text('# kb\\n')\n(base / 'notes' / 'plan.md').write_text('todo\\n')\nPath('/home/user/Desktop/repo_audit').mkdir(parents=True, exist_ok=True)\njson.dump({'pythonFiles': 0, 'markdownFiles': 0, 'status': 'pending'}, open('/home/user/Desktop/repo_audit/project_meta.json', 'w'), indent=2)\njson.dump({'tabSize': 4, 'ruler': 90, 'docsUrl': 'https://code.visualstudio.com/docs/editor/codebasics'}, open('/home/user/Desktop/scan_spec.json', 'w'), indent=2)\nPY", "shell": true}},
     {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},

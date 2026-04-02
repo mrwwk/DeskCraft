@@ -23,7 +23,7 @@
   "phases": [
     {
       "phase_id": 1,
-      "instruction": "帮我把 ~/Desktop/log_audit 里出问题的 service 先汇总一下。",
+      "instruction": "先帮我把 ~/Desktop/log_audit/current 里出现过的 service 名称粗略汇总一下，暂时不用区分严重程度。",
       "trigger": {
         "type": "agent_done"
       }

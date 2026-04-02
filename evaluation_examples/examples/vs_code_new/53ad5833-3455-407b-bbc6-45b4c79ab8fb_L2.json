@@ -4,7 +4,9 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please open the folder /home/user/project in VS Code, add /home/user/data1 and /home/user/data2 into the same workspace, then save the workspace file as /home/user/project.code-workspace.",
-  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces"
+  ],
   "config": [
     {
       "type": "command",

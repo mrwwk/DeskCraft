@@ -4,7 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "In ~/Downloads/mock_downloads, copy only the top-level .png files into ~/Desktop/selected_pngs. Do not copy non-png files or anything inside subdirectories. Then create ~/Desktop/selected_pngs/selected_count.txt containing exactly count=2.",
-  "source": "OSWorld custom task",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -19,16 +19,26 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_copy_filter",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -f ~/Desktop/selected_pngs/chart.png ] || ok=0; [ -f ~/Desktop/selected_pngs/logo.png ] || ok=0; [ ! -f ~/Desktop/selected_pngs/photo.jpg ] || ok=0; [ ! -f ~/Desktop/selected_pngs/deep.png ] || ok=0; status=$(cat ~/Desktop/selected_pngs/selected_count.txt 2>/dev/null); [ \"$status\" = \"count=2\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "present_chart='false'; [ -f ~/Desktop/selected_pngs/chart.png ] && present_chart='true'; present_logo='false'; [ -f ~/Desktop/selected_pngs/logo.png ] && present_logo='true'; absent_photo='false'; [ ! -f ~/Desktop/selected_pngs/photo.jpg ] && absent_photo='true'; absent_deep='false'; [ ! -f ~/Desktop/selected_pngs/deep.png ] && absent_deep='true'; count_ok='false'; status=$(cat ~/Desktop/selected_pngs/selected_count.txt 2>/dev/null); [ \"$status\" = 'count=2' ] && count_ok='true'; echo \"present_chart.png=$present_chart\"; echo \"present_logo.png=$present_logo\"; echo \"absent_photo.jpg=$absent_photo\"; echo \"absent_deep.png=$absent_deep\"; echo \"count_ok=$count_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "present": [
+          "chart.png",
+          "logo.png"
+        ],
+        "absent": [
+          "photo.jpg",
+          "deep.png"
+        ],
+        "extra_checks": {
+          "count_ok": "true"
+        }
       }
     }
   },

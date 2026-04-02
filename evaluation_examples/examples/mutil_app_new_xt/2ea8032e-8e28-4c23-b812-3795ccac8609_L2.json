@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "multi_apps",
   "instruction": "The local academic site in ~/Desktop/academic_site/ needs to be handed over to a new owner. Review the public site structure at https://academicpages.github.io/ in Chrome, then read HANDOFF.txt in the project folder and update _config.yml in VS Code so the site reflects the new owner information. Before editing, create a backup named _config.yml.bak in the same folder.",
-  "source": "authors",
+  "source": [
+    "https://academicpages.github.io/",
+    "https://docs.github.com/en/pages",
+    "现实场景构造来源：学术主页换人维护时，常见的“参考线上示例站结构 + 读取 handoff + 更新本地 _config.yml 并备份”迁移流程"
+  ],
   "config": [
     {
       "type": "execute",

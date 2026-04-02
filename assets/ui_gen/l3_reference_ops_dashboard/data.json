@@ -1,0 +1,5 @@
+[
+  {"label": "Launch risk", "value": 18, "state": "Active"},
+  {"label": "Copy backlog", "value": 9, "state": "Watch"},
+  {"label": "QA blockers", "value": 4, "state": "Risk"}
+]

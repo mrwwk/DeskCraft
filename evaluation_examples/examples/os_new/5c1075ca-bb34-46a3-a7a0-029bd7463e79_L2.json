@@ -4,7 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "In ~/Desktop/test_environment_hard, copy all files matching *failed.ipynb into ./fails while preserving directory hierarchy, but exclude any files under a tmp directory and any file whose basename starts with draft_. Then create ./fails/fails_manifest.txt containing sha256 and relative path (format: <sha256>  <relative_path_from_fails>) for copied .ipynb files only, sorted by relative path.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -52,21 +52,23 @@
     "os"
   ],
   "evaluator": {
-    "func": "check_include_exclude",
+    "func": "check_os_file_operations",
     "result": {
       "type": "vm_command_line",
-      "command": "cd ~/Desktop/test_environment_hard; ok=1; [ -f fails/projectA/run1/model_failed.ipynb ] || ok=0; [ -f fails/projectB/deep/eval_failed.ipynb ] || ok=0; [ ! -f fails/projectA/tmp/cache_failed.ipynb ] || ok=0; [ ! -f fails/projectB/tmp/deeper/secret_failed.ipynb ] || ok=0; [ ! -f fails/projectB/deep/draft_experiment_failed.ipynb ] || ok=0; [ -f fails/fails_manifest.txt ] || ok=0; expected=$(printf '%s\n' \"$(sha256sum fails/projectA/run1/model_failed.ipynb | awk '{print $1}')  projectA/run1/model_failed.ipynb\" \"$(sha256sum fails/projectB/deep/eval_failed.ipynb | awk '{print $1}')  projectB/deep/eval_failed.ipynb\" | sort); actual=$(cat fails/fails_manifest.txt 2>/dev/null); if [ \"$actual\" != \"$expected\" ]; then ok=0; fi; if [ \"$ok\" = \"1\" ]; then echo SUCCESS: hard copy task passed.; else echo FAIL: hard copy task failed.; fi",
+      "command": "cd ~/Desktop/test_environment_hard; model_ok='false'; [ -f fails/projectA/run1/model_failed.ipynb ] && model_ok='true'; eval_ok='false'; [ -f fails/projectB/deep/eval_failed.ipynb ] && eval_ok='true'; no_cache='false'; [ ! -f fails/projectA/tmp/cache_failed.ipynb ] && no_cache='true'; no_secret='false'; [ ! -f fails/projectB/tmp/deeper/secret_failed.ipynb ] && no_secret='true'; no_draft='false'; [ ! -f fails/projectB/deep/draft_experiment_failed.ipynb ] && no_draft='true'; manifest_ok='false'; [ -f fails/fails_manifest.txt ] && { expected=$(printf '%s\\n' \"$(sha256sum fails/projectA/run1/model_failed.ipynb | awk '{print $1}')  projectA/run1/model_failed.ipynb\" \"$(sha256sum fails/projectB/deep/eval_failed.ipynb | awk '{print $1}')  projectB/deep/eval_failed.ipynb\" | sort); actual=$(cat fails/fails_manifest.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] && manifest_ok='true'; }; echo \"model_ok=$model_ok\"; echo \"eval_ok=$eval_ok\"; echo \"no_cache=$no_cache\"; echo \"no_secret=$no_secret\"; echo \"no_draft=$no_draft\"; echo \"manifest_ok=$manifest_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "include": [
-          "SUCCESS: hard copy task passed."
-        ],
-        "exclude": [
-          "FAIL: hard copy task failed."
-        ]
+        "checks": {
+          "model_ok": "true",
+          "eval_ok": "true",
+          "no_cache": "true",
+          "no_secret": "true",
+          "no_draft": "true",
+          "manifest_ok": "true"
+        }
       }
     }
   },

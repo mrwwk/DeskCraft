@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ops Signal Board Brief</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 960px; margin: 36px auto; line-height: 1.65; color: #151a22; }
+    h1, h2 { color: #27456b; }
+    code { background: #edf3fa; padding: 2px 6px; }
+    .source { background: #f3f7fd; border-left: 4px solid #4e7fb2; padding: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Ops Signal Board</h1>
+  <p>Build a real, previewable dashboard from local JSON data. The app must be served locally and verified in Chrome at <code>http://127.0.0.1:8125/index.html</code>.</p>
+  <h2>Required UI system</h2>
+  <ol>
+    <li>Create <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>, and <code>manifest.json</code> inside the project folder.</li>
+    <li>Load <code>data.json</code> with <code>fetch()</code> and render a KPI grid into <code>#kpi-grid</code>.</li>
+    <li>Create a filter bar <code>#filter-bar</code> with buttons for <code>All</code>, <code>Active</code>, and <code>Risk</code>.</li>
+    <li>Render a timeline into <code>#incident-timeline</code>, a canvas chart into <code>canvas#chartCanvas</code>, and a side drawer as <code>aside#detail-drawer</code>.</li>
+    <li>Use the local asset <code>assets/ops-badge.svg</code> in the header or hero area.</li>
+    <li>Manifest must set <code>project=ops-signal-board</code>, <code>theme=midnight-signal</code>, <code>chartType=bar</code>, <code>dataSource=data.json</code>, and <code>previewPort=8125</code>.</li>
+    <li>Finish with the live preview open in Chrome.</li>
+  </ol>
+  <div class="source">
+    <p><strong>Source grounding</strong></p>
+    <ul>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">MDN: Using the Fetch API</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial">MDN: Canvas tutorial</a></li>
+      <li><a href="https://www.frontendmentor.io/challenges/time-tracking-dashboard-UIQ7167Jw">Frontend Mentor: Time Tracking Dashboard</a></li>
+    </ul>
+  </div>
+</body>
+</html>
