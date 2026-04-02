@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please update VS Code User Settings for creating Python files faster: set default language for new untitled files to python, enable auto save on focus change, and enable rendering of whitespace for all characters.",
-  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/python/settings-reference"
+  ],
   "config": [
     {
       "type": "launch",

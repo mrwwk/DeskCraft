@@ -3,7 +3,7 @@
   "snapshot": "vscode",
   "interactive": true,
   "scenario_type": "interruption",
-  "scenario_description": "用户先让 Agent 调整几个编辑器显示选项，但在执行过程中突然改变主意，要求保留部分设置并改动其他项。",
+  "scenario_description": "用户原本想配一个偏阅读的显示模式，但在执行过程中突然切换成审稿模式，要求 Agent 中断原计划并按新的显示偏好收敛。",
   "user_persona": {
     "expertise_level": "intermediate",
     "communication_style": "casual_chinese"
@@ -27,15 +27,15 @@
   "phases": [
     {
       "phase_id": 1,
-      "instruction": "先帮我把 minimap 打开，再把自动换行打开。",
+      "instruction": "先帮我把 minimap 打开，再把行号改成 relative，并加一条 80 列的 ruler。",
       "trigger": {
         "type": "step_count",
-        "value": 1
+        "value": 2
       }
     },
     {
       "phase_id": 2,
-      "instruction": "等等，我改主意了：minimap 不要开，改成关闭 minimap，并把行号显示设成 off，自动换行还是保留开启。",
+      "instruction": "等等，改成审稿用的配置：minimap 不要开，改成关闭 minimap，行号显示设成 off，ruler 改成 100，同时把自动换行打开，并把 render whitespace 设成 boundary。",
       "trigger": {
         "type": "agent_done"
       }
@@ -53,7 +53,11 @@
         "expected": {
           "editor.minimap.enabled": false,
           "editor.wordWrap": "on",
-          "editor.lineNumbers": "off"
+          "editor.lineNumbers": "off",
+          "editor.rulers": [
+            100
+          ],
+          "editor.renderWhitespace": "boundary"
         }
       }
     },

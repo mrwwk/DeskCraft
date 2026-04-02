@@ -4,7 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "I accidentally deleted multiple event assets. Recover only poster_party_night.webp and guest_list.txt from Trash into /home/user/Desktop/recovered_party/, and keep old_note.txt in Trash. Also ensure recovered files keep their original content.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Recover a file from the Trash (https://help.ubuntu.com/lts/ubuntu-help/files-recover.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -43,16 +43,23 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_trash_recovery",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -f /home/user/Desktop/recovered_party/poster_party_night.webp ] || ok=0; [ -f /home/user/Desktop/recovered_party/guest_list.txt ] || ok=0; [ ! -f /home/user/Desktop/recovered_party/old_note.txt ] || ok=0; grep -qx 'FAKE_WEBP_CONTENT_PARTY_NIGHT_V1' /home/user/Desktop/recovered_party/poster_party_night.webp || ok=0; diff -u <(printf 'Alice\\nBob\\nCharlie\\n') /home/user/Desktop/recovered_party/guest_list.txt >/dev/null 2>&1 || ok=0; trash_match=$(find /home/user/.local/share/Trash/files -maxdepth 1 -name 'old_note.txt*' | wc -l); [ \"$trash_match\" -ge 1 ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "poster_ok='false'; [ -f /home/user/Desktop/recovered_party/poster_party_night.webp ] && poster_ok='true'; guest_ok='false'; [ -f /home/user/Desktop/recovered_party/guest_list.txt ] && guest_ok='true'; no_old='false'; [ ! -f /home/user/Desktop/recovered_party/old_note.txt ] && no_old='true'; content1_ok='false'; grep -qx 'FAKE_WEBP_CONTENT_PARTY_NIGHT_V1' /home/user/Desktop/recovered_party/poster_party_night.webp 2>/dev/null && content1_ok='true'; content2_ok='false'; diff -u <(printf 'Alice\\nBob\\nCharlie\\n') /home/user/Desktop/recovered_party/guest_list.txt >/dev/null 2>&1 && content2_ok='true'; trash_ok='false'; trash_match=$(find /home/user/.local/share/Trash/files -maxdepth 1 -name 'old_note.txt*' 2>/dev/null | wc -l); [ \"$trash_match\" -ge 1 ] && trash_ok='true'; echo \"poster_ok=$poster_ok\"; echo \"guest_ok=$guest_ok\"; echo \"no_old=$no_old\"; echo \"content1_ok=$content1_ok\"; echo \"content2_ok=$content2_ok\"; echo \"trash_ok=$trash_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "checks": {
+          "poster_ok": "true",
+          "guest_ok": "true",
+          "no_old": "true",
+          "content1_ok": "true",
+          "content2_ok": "true",
+          "trash_ok": "true"
+        }
       }
     }
   },

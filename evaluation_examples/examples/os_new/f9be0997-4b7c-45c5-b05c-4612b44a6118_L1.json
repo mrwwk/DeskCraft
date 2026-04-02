@@ -4,21 +4,44 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Enable a strict quiet mode: disable notification banners and disable lock-screen notifications. Then create ~/Desktop/dnd_status.txt with two lines exactly: show-banners=false and show-in-lock-screen=false.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Turn off or adjust notifications (https://help.ubuntu.com/lts/ubuntu-help/shell-notifications.html.en)",
   "trajectory": "trajectories/",
   "config": [
-    {"type": "execute", "parameters": {"command": "gsettings set org.gnome.desktop.notifications show-banners true; gsettings set org.gnome.desktop.notifications show-in-lock-screen true; rm -f ~/Desktop/dnd_status.txt", "shell": true}},
-    {"type": "execute", "parameters": {"command": ["python", "-c", "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"]}}
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.desktop.notifications show-banners true; gsettings set org.gnome.desktop.notifications show-in-lock-screen true; rm -f ~/Desktop/dnd_status.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
   ],
-  "related_apps": ["os"],
+  "related_apps": [
+    "os"
+  ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_notifications",
     "result": {
       "type": "vm_command_line",
-      "command": "b=$(gsettings get org.gnome.desktop.notifications show-banners 2>/dev/null); l=$(gsettings get org.gnome.desktop.notifications show-in-lock-screen 2>/dev/null); ok=1; [ \"$b\" = \"false\" ] || ok=0; [ \"$l\" = \"false\" ] || ok=0; expected=$(cat <<'EOF'\nshow-banners=false\nshow-in-lock-screen=false\nEOF\n); actual=$(cat ~/Desktop/dnd_status.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "b=$(gsettings get org.gnome.desktop.notifications show-banners 2>/dev/null); l=$(gsettings get org.gnome.desktop.notifications show-in-lock-screen 2>/dev/null); expected=$(printf 'show-banners=false\\nshow-in-lock-screen=false\\n'); actual=$(cat ~/Desktop/dnd_status.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"show_banners=$b\"; echo \"show_in_lock_screen=$l\"; echo \"file_ok=$file_ok\"",
       "shell": true
     },
-    "expected": {"type": "rule", "rules": {"expected": "PASS\n"}}
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "show_banners": "false",
+        "show_in_lock_screen": "false"
+      }
+    }
   },
   "proxy": false,
   "fixed_ip": false,

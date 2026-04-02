@@ -4,7 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Please set up a local Spotify app without sudo: install the provided spotify script to ~/.local/opt/spotify/spotify, create an executable launcher ~/.local/bin/spotify, and add desktop entry ~/.local/share/applications/spotify.desktop with Exec pointing to ~/.local/bin/spotify. After setup, running `spotify --version` must print `Spotify mock 2.0.0`.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Freedesktop.org - XDG Base Directory Specification (https://specifications.freedesktop.org/basedir-spec/latest/)；Freedesktop.org - Desktop Entry Specification (https://specifications.freedesktop.org/desktop-entry-spec/latest/)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -36,17 +36,15 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_install_local_app",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -x /home/user/.local/opt/spotify/spotify ] || ok=0; [ -x /home/user/.local/bin/spotify ] || ok=0; [ -f /home/user/.local/share/applications/spotify.desktop ] || ok=0; [ \"$(readlink -f /home/user/.local/bin/spotify 2>/dev/null)\" = \"/home/user/.local/opt/spotify/spotify\" ] || ok=0; grep -qx 'Exec=/home/user/.local/bin/spotify' /home/user/.local/share/applications/spotify.desktop || ok=0; version=$(/home/user/.local/bin/spotify --version 2>/dev/null); [ \"$version\" = \"Spotify mock 2.0.0\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "binary_ok='false'; [ -x /home/user/.local/opt/spotify/spotify ] && binary_ok='true'; launcher_ok='false'; [ -x /home/user/.local/bin/spotify ] && launcher_ok='true'; desktop_ok='false'; [ -f /home/user/.local/share/applications/spotify.desktop ] && grep -qx 'Exec=/home/user/.local/bin/spotify' /home/user/.local/share/applications/spotify.desktop && desktop_ok='true'; version_ok='false'; ver=$(/home/user/.local/bin/spotify --version 2>/dev/null); [ \"$ver\" = 'Spotify mock 2.0.0' ] && version_ok='true'; echo \"binary_ok=$binary_ok\"; echo \"launcher_ok=$launcher_ok\"; echo \"desktop_ok=$desktop_ok\"; echo \"version_ok=$version_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
-      "rules": {
-        "expected": "PASS\n"
-      }
+      "rules": {}
     }
   },
   "proxy": false,

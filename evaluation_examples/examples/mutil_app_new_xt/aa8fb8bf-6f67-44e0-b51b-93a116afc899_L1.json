@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "multi_apps",
   "instruction": "The personal site config in ~/Desktop/site_profile/_config.yml is outdated. Open the local brief file PROFILE_BRIEF.txt in Chrome so you can read the new profile details, then use VS Code to update _config.yml with the new name, email, and role from the brief. Before editing, create a backup named _config.yml.bak in the same folder.",
-  "source": "authors",
+  "source": [
+    "https://docs.github.com/en/pages",
+    "现实场景构造来源：个人站点换人维护时，根据本地 profile brief 更新 Jekyll/YAML 资料并保留备份的常见 handoff 流程"
+  ],
   "config": [
     {
       "type": "execute",

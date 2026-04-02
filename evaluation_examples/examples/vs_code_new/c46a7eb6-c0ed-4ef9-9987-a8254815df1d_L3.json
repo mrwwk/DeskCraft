@@ -4,7 +4,12 @@
   "difficulty": "L3",
   "snapshot": "vscode",
   "instruction": "Please open /home/user/frontend-app in VS Code and scaffold the project workspace. Create .vscode/extensions.json recommending dbaeumer.vscode-eslint and esbenp.prettier-vscode. Create .vscode/tasks.json with two shell tasks named npm: build running `npm run build` and npm: test running `npm test`. Also create .vscode/settings.json so editor.formatOnSave is true, editor.defaultFormatter is esbenp.prettier-vscode, and files.associations maps *.css to tailwindcss.",
-  "source": "https://code.visualstudio.com/docs/editor/tasks",
+  "source": [
+    "https://code.visualstudio.com/docs/debugtest/tasks",
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：前端项目开工时常见的“推荐 ESLint/Prettier + 预置 build/test 任务 + 默认格式器与文件关联”脚手架需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/frontend-app"]}},
     {"type": "launch", "parameters": {"command": ["code", "/home/user/frontend-app"]}},

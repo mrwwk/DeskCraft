@@ -3,7 +3,7 @@
   "snapshot": "chrome",
   "interactive": true,
   "scenario_type": "correction",
-  "scenario_description": "用户一开始让 Agent 打开并收藏一个总览页，随后纠正说真正需要的是认证文档页。",
+  "scenario_description": "用户一开始让 Agent 打开并收藏一个总览页，随后纠正说真正需要的是认证文档页，并要求最终只保留修正后的目标页。",
   "user_persona": {
     "expertise_level": "intermediate",
     "communication_style": "casual_chinese"
@@ -63,7 +63,14 @@
     },
     {
       "phase_id": 2,
-      "instruction": "不对，我真正要的是 API Authentication 这一页；把书签改成它，最后也停留在那一页。",
+      "instruction": "不对，我真正要的是 API Authentication 这一页；把 API Overview 的书签撤掉，改成它。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后浏览器里只保留 API Authentication 这一个文档标签，并停留在那一页。",
       "trigger": {
         "type": "agent_done"
       }
@@ -75,11 +82,15 @@
   ],
   "evaluator": {
     "func": [
+      "is_expected_tabs",
       "is_expected_active_tab",
       "is_expected_bookmarks"
     ],
     "conj": "and",
     "result": [
+      {
+        "type": "open_tabs_info"
+      },
       {
         "type": "active_url_from_accessTree"
       },
@@ -88,6 +99,15 @@
       }
     ],
     "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/chrome_api_docs_105/api_authentication.html"
+          ]
+        }
+      },
       {
         "type": "rule",
         "rules": {

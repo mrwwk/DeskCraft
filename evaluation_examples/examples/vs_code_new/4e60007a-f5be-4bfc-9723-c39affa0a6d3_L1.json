@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please update VS Code User Settings to improve Python editing workflow: turn on format-on-save, organize imports on save explicitly, set Python as the default formatter, and set editor tab size to 2.",
-  "source": "https://code.visualstudio.com/docs/python/formatting",
+  "source": [
+    "https://code.visualstudio.com/docs/python/formatting",
+    "https://code.visualstudio.com/docs/python/settings-reference",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
   "config": [
     {
       "type": "launch",

@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "multi_apps",
   "instruction": "The workspace handoff file at ~/Desktop/editor_handoff.json describes how the new project should be initialized. Read that file, create the workspace folder ~/Desktop/ml-dashboard/.vscode/, and add an extensions.json file containing the recommended extensions from the handoff. Also create a workspace settings.json file in the same .vscode folder and apply the tabSize and trimTrailingWhitespace values from the handoff.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "现实场景构造来源：项目交接时常见的“根据 handoff JSON 生成 .vscode 推荐扩展和工作区设置”初始化需求"
+  ],
   "config": [
     {
       "type": "execute",

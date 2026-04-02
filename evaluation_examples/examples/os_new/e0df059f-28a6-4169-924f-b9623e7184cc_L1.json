@@ -4,21 +4,50 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "In ~/Desktop/tasks_board, rename directories by replacing prefix todo_list_ with done_list_ for only Jan_1 and Jan_2. Do not rename backlog_list_Jan_3. Create ~/Desktop/tasks_board/rename_log.txt listing renamed pairs as old->new in alphabetical order.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Rename a file or folder (https://help.ubuntu.com/lts/ubuntu-help/files-rename.html.en)",
   "trajectory": "trajectories/",
   "config": [
-    {"type": "execute", "parameters": {"command": "rm -rf ~/Desktop/tasks_board; mkdir -p ~/Desktop/tasks_board/todo_list_Jan_1 ~/Desktop/tasks_board/todo_list_Jan_2 ~/Desktop/tasks_board/backlog_list_Jan_3", "shell": true}},
-    {"type": "execute", "parameters": {"command": ["python", "-c", "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"]}}
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/tasks_board; mkdir -p ~/Desktop/tasks_board/todo_list_Jan_1 ~/Desktop/tasks_board/todo_list_Jan_2 ~/Desktop/tasks_board/backlog_list_Jan_3",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
   ],
-  "related_apps": ["os"],
+  "related_apps": [
+    "os"
+  ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_rename_dirs",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -d ~/Desktop/tasks_board/done_list_Jan_1 ] || ok=0; [ -d ~/Desktop/tasks_board/done_list_Jan_2 ] || ok=0; [ -d ~/Desktop/tasks_board/backlog_list_Jan_3 ] || ok=0; [ ! -d ~/Desktop/tasks_board/todo_list_Jan_1 ] || ok=0; [ ! -d ~/Desktop/tasks_board/todo_list_Jan_2 ] || ok=0; expected=$(cat <<'EOF'\ntodo_list_Jan_1->done_list_Jan_1\ntodo_list_Jan_2->done_list_Jan_2\nEOF\n); actual=$(cat ~/Desktop/tasks_board/rename_log.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "done1_ok='false'; [ -d ~/Desktop/tasks_board/done_list_Jan_1 ] && done1_ok='true'; done2_ok='false'; [ -d ~/Desktop/tasks_board/done_list_Jan_2 ] && done2_ok='true'; backlog_ok='false'; [ -d ~/Desktop/tasks_board/backlog_list_Jan_3 ] && backlog_ok='true'; no_todo1='false'; [ ! -d ~/Desktop/tasks_board/todo_list_Jan_1 ] && no_todo1='true'; no_todo2='false'; [ ! -d ~/Desktop/tasks_board/todo_list_Jan_2 ] && no_todo2='true'; expected=$(printf 'todo_list_Jan_1->done_list_Jan_1\\ntodo_list_Jan_2->done_list_Jan_2\\n'); actual=$(cat ~/Desktop/tasks_board/rename_log.txt 2>/dev/null); log_ok='false'; [ \"$actual\" = \"$expected\" ] && log_ok='true'; echo \"done1_ok=$done1_ok\"; echo \"done2_ok=$done2_ok\"; echo \"backlog_ok=$backlog_ok\"; echo \"no_todo1=$no_todo1\"; echo \"no_todo2=$no_todo2\"; echo \"log_ok=$log_ok\"",
       "shell": true
     },
-    "expected": {"type": "rule", "rules": {"expected": "PASS\n"}}
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "done1_ok": "true",
+          "done2_ok": "true",
+          "backlog_ok": "true",
+          "no_todo1": "true",
+          "no_todo2": "true",
+          "log_ok": "true"
+        }
+      }
+    }
   },
   "proxy": false,
   "fixed_ip": false,

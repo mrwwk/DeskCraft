@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please tune VS Code tab behavior in User Settings by enabling wrapped tabs, disabling tab pinning, and setting tab close button visibility to left.",
-  "source": "https://code.visualstudio.com/docs/getstarted/userinterface",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/userinterface",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
   "config": [
     {
       "type": "launch",

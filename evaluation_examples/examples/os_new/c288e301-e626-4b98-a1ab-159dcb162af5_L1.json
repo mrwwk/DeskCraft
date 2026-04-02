@@ -4,21 +4,41 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Set python and pip defaults for this user so that `python` runs Python 3 and `pip` points to pip3, without removing system binaries. Then create ~/Desktop/python_default_report.txt with two lines: python=python3 and pip=pip3.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "trajectory": "trajectories/",
   "config": [
-    {"type": "execute", "parameters": {"command": "rm -f ~/.local/bin/python ~/.local/bin/pip ~/Desktop/python_default_report.txt; mkdir -p ~/.local/bin", "shell": true}},
-    {"type": "execute", "parameters": {"command": ["python", "-c", "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"]}}
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -f ~/.local/bin/python ~/.local/bin/pip ~/Desktop/python_default_report.txt; mkdir -p ~/.local/bin",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
   ],
-  "related_apps": ["os"],
+  "related_apps": [
+    "os"
+  ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_python_alias",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; pyv=$(python --version 2>&1); pipv=$(pip --version 2>&1); echo \"$pyv\" | grep -q '^Python 3\\.' || ok=0; echo \"$pipv\" | grep -q 'python 3' || ok=0; expected=$(cat <<'EOF'\npython=python3\npip=pip3\nEOF\n); actual=$(cat ~/Desktop/python_default_report.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "pyv=$(python --version 2>&1); python_ok='false'; echo \"$pyv\" | grep -q '^Python 3\\.' && python_ok='true'; pipv=$(pip --version 2>&1); pip_ok='false'; echo \"$pipv\" | grep -q 'python 3' && pip_ok='true'; expected=$(printf 'python=python3\\npip=pip3\\n'); actual=$(cat ~/Desktop/python_default_report.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"python_ok=$python_ok\"; echo \"pip_ok=$pip_ok\"; echo \"file_ok=$file_ok\"",
       "shell": true
     },
-    "expected": {"type": "rule", "rules": {"expected": "PASS\n"}}
+    "expected": {
+      "type": "rule",
+      "rules": {}
+    }
   },
   "proxy": false,
   "fixed_ip": false,

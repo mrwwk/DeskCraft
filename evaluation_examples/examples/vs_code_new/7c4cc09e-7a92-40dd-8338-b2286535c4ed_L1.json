@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please configure VS Code User Settings for multilingual coding by setting Unicode highlight to include ambiguous and invisible characters, while allowing comments and strings.",
-  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：多语言开发与内容安全审查场景下常见的“高亮歧义字符与不可见字符，同时保留注释和字符串可读性”编辑器防误判需求"
+  ],
   "config": [
     {
       "type": "launch",

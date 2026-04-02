@@ -3,8 +3,8 @@
   "task_slug": "php_line_count",
   "difficulty": "L2",
   "snapshot": "os",
-  "instruction": "In /home/user/project_hard, count total lines from all .php files recursively, excluding any path under vendor/ and any file ending with .test.php. Save the exact result as TOTAL=<number> into /home/user/project_hard/php_line_total.txt, and also print the same line in terminal.",
-  "source": "OSWorld custom hard task",
+  "instruction": "In /home/user/project_hard, count total lines from all .php files recursively, excluding any path under vendor/ and any file ending with .test.php. Save the exact result as TOTAL=<number> into /home/user/project_hard/php_line_total.txt.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "config": [
     {
       "type": "execute",
@@ -35,16 +35,16 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_php_line_count",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -f /home/user/project_hard/php_line_total.txt ] || ok=0; val=$(cat /home/user/project_hard/php_line_total.txt 2>/dev/null); [ \"$val\" = \"TOTAL=9\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "file_exists='false'; [ -f /home/user/project_hard/php_line_total.txt ] && file_exists='true'; val=$(cat /home/user/project_hard/php_line_total.txt 2>/dev/null); content_ok='false'; [ \"$val\" = 'TOTAL=9' ] && content_ok='true'; echo \"file_exists=$file_exists\"; echo \"content_ok=$content_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "expected_total": "TOTAL=9"
       }
     }
   },

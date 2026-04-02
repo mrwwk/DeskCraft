@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please configure VS Code wrapping behavior in User Settings: set line wrap column to 72, enable wrapping by column mode, and keep normal editor word wrap behavior enabled.",
-  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/editing/codebasics"
+  ],
   "config": [
     {
       "type": "launch",

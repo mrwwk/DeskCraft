@@ -15,7 +15,7 @@
         "command": [
           "python",
           "-c",
-          "from pathlib import Path; import shutil; base=Path('/home/user/Desktop/photos_dispatch'); out=Path('/home/user/Desktop/press_pick'); shutil.rmtree(base, ignore_errors=True); shutil.rmtree(out, ignore_errors=True); (base/'event').mkdir(parents=True, exist_ok=True); (base/'event'/'private').mkdir(parents=True, exist_ok=True); (base/'event'/'stage').mkdir(parents=True, exist_ok=True); (base/'event'/'a.jpg').write_text('A', encoding='utf-8'); (base/'event'/'notes.txt').write_text('notes', encoding='utf-8'); (base/'event'/'private'/'vip.jpg').write_text('VIP', encoding='utf-8'); (base/'event'/'stage'/'speaker.jpg').write_text('SPEAKER', encoding='utf-8'); (base/'event'/'stage'/'speaker_raw.jpg').write_text('RAW', encoding='utf-8')"
+          "from pathlib import Path; import shutil; base=Path('/home/user/Desktop/photos_dispatch'); out=Path('/home/user/Desktop/press_pick'); shutil.rmtree(base, ignore_errors=True); shutil.rmtree(out, ignore_errors=True); (base/'event').mkdir(parents=True, exist_ok=True); (base/'event'/'private').mkdir(parents=True, exist_ok=True); (base/'event'/'stage').mkdir(parents=True, exist_ok=True); jpg=b'\\xff\\xd8\\xff\\xe0\\x00\\x10JFIF\\x00\\x01\\x01\\x00\\x00\\x01\\x00\\x01\\x00\\x00'; tail=b'\\xff\\xd9'; (base/'event'/'a.jpg').write_bytes(jpg + b'A' + tail); (base/'event'/'notes.txt').write_text('notes', encoding='utf-8'); (base/'event'/'private'/'vip.jpg').write_bytes(jpg + b'VIP' + tail); (base/'event'/'stage'/'speaker.jpg').write_bytes(jpg + b'SPEAKER' + tail); (base/'event'/'stage'/'speaker_raw.jpg').write_bytes(jpg + b'RAW' + tail)"
         ]
       }
     }

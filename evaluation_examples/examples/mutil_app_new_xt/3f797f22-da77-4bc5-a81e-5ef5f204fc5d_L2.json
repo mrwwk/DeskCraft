@@ -4,7 +4,10 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Open a terminal and run 'uname -a', saving the full output to ~/Desktop/sysinfo.txt. Then configure VS Code User Settings with editor.lineNumbers set to 'relative' and files.insertFinalNewline set to true. Finally, open ~/Desktop/sysinfo.txt in a Chrome tab using the file:// protocol so you can preview it in the browser.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：排障或远程协作前，先抓取系统信息、收敛编辑器设置，再用浏览器快速预览产物的常见运维辅助流程"
+  ],
   "config": [
     {
       "type": "launch",

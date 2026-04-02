@@ -4,13 +4,13 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Enable Night Light, set the color temperature to 3700, and create ~/Desktop/night_light_status.txt with exactly two lines: enabled=true and temperature=3700.",
-  "source": "OSWorld custom task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Adjust the Night Light color temperature (https://help.ubuntu.com/lts/ubuntu-help/display-night-light.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
       "type": "execute",
       "parameters": {
-        "command": "rm -f ~/Desktop/night_light_status.txt",
+        "command": "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false; gsettings set org.gnome.settings-daemon.plugins.color night-light-temperature uint32 4000; rm -f ~/Desktop/night_light_status.txt",
         "shell": true
       }
     },
@@ -29,16 +29,17 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_night_light",
     "result": {
       "type": "vm_command_line",
-      "command": "enabled=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d ' '); temp=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | tr -d ' '); ok=1; [ \"$enabled\" = \"true\" ] || ok=0; [ \"$temp\" = \"uint323700\" ] || [ \"$temp\" = \"3700\" ] || ok=0; expected=$(cat <<'EOF'\nenabled=true\ntemperature=3700\nEOF\n); actual=$(cat ~/Desktop/night_light_status.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "en=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d ' '); tp_raw=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | tr -d ' '); tp=$(echo \"$tp_raw\" | grep -oE '[0-9]+'); expected=$(printf 'enabled=true\\ntemperature=3700\\n'); actual=$(cat ~/Desktop/night_light_status.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"enabled=$en\"; echo \"temperature=$tp\"; echo \"file_ok=$file_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "enabled": "true",
+        "temperature": "3700"
       }
     }
   },

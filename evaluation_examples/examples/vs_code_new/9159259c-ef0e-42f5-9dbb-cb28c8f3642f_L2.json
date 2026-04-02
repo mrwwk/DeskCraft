@@ -4,7 +4,12 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please open /home/user/service-app in VS Code and set up test tooling for the project. Create .vscode/tasks.json with two shell tasks named Run Tests using `pytest` and Lint using `ruff check .`. Also create .vscode/settings.json so python.testing.pytestEnabled is true, python.testing.unittestEnabled is false, and python.testing.pytestArgs is [\"tests\"].",
-  "source": "https://code.visualstudio.com/docs/editor/tasks",
+  "source": [
+    "https://code.visualstudio.com/docs/debugtest/tasks",
+    "https://code.visualstudio.com/docs/python/testing",
+    "https://code.visualstudio.com/docs/python/settings-reference",
+    "现实场景构造来源：Python 服务项目接手时常见的“补齐测试任务 + 统一 pytest 发现配置 + 保留 lint 入口”工程化配置需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/service-app/tests"]}},
     {"type": "launch", "parameters": {"command": ["code", "/home/user/service-app"]}},

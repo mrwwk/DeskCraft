@@ -1,0 +1,23 @@
+[
+  {
+    "team": "North Star",
+    "status": "Healthy",
+    "velocity": 94,
+    "focus": "Homepage refresh",
+    "note": "Ready for content QA."
+  },
+  {
+    "team": "Orbit",
+    "status": "Watch",
+    "velocity": 78,
+    "focus": "Checkout guardrails",
+    "note": "Waiting on payment copy review."
+  },
+  {
+    "team": "Harbor",
+    "status": "Risk",
+    "velocity": 63,
+    "focus": "Launch story page",
+    "note": "Image approvals still blocked."
+  }
+]

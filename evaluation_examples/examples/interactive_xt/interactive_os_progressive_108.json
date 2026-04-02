@@ -65,7 +65,7 @@
     "func": "exact_match",
     "result": {
       "type": "vm_command_line",
-      "command": "enabled=$(gsettings get org.gnome.desktop.interface show-battery-percentage 2>/dev/null | tr -d ' '); nl=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d ' '); temp=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | tr -d ' '); expected=$(printf 'battery_percentage=on\nnight_light=on\ntemperature=3700'); actual=$(cat /home/user/Desktop/late_shift_setup.txt 2>/dev/null); if [ \"$enabled\" = \"true\" ] && [ \"$nl\" = \"true\" ] && { [ \"$temp\" = \"3700\" ] || [ \"$temp\" = \"uint323700\" ]; } && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "enabled=$(gsettings get org.gnome.desktop.interface show-battery-percentage 2>/dev/null | tr -d '[:space:]'); nl=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d '[:space:]'); temp=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | grep -oE '[0-9]+' | head -1); expected=$(printf 'battery_percentage=on\nnight_light=on\ntemperature=3700'); actual=$(cat /home/user/Desktop/late_shift_setup.txt 2>/dev/null); if [ \"$enabled\" = \"true\" ] && [ \"$nl\" = \"true\" ] && [ \"$temp\" = \"3700\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
       "shell": true
     },
     "expected": {

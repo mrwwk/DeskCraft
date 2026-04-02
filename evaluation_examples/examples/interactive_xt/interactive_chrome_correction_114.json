@@ -3,7 +3,7 @@
   "snapshot": "chrome",
   "interactive": true,
   "scenario_type": "correction",
-  "scenario_description": "用户最初让 Agent 加载了错误的本地扩展，随后纠正成另一个扩展，并追加隐私设置要求，检验 Agent 对纠正信息的跟进能力。",
+  "scenario_description": "用户最初让 Agent 加载了一个并非最终要调试的本地扩展，随后纠正成另一个扩展，并追加隐私设置要求，检验 Agent 是否能根据更正信息完成最终目标。",
   "user_persona": {
     "expertise_level": "intermediate",
     "communication_style": "casual_chinese"
@@ -55,7 +55,7 @@
     },
     {
       "phase_id": 2,
-      "instruction": "我说错扩展了，我真正要调的是 /home/user/Desktop/noteHighlighterExt。请把这个也加载进来，并以它为准。",
+      "instruction": "我说错扩展了，我真正要调的是 /home/user/Desktop/noteHighlighterExt。请把这个也加载进来，接下来以它为准。",
       "trigger": {
         "type": "agent_done"
       }

@@ -1,0 +1,57 @@
+:root {
+  --bg: #fff8f4;
+  --panel: #ffffff;
+  --text: #201612;
+  --muted: #735a51;
+  --accent: #c86d4c;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.site-header,
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 28px;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 18px;
+}
+
+.hero {
+  padding: 56px 28px 28px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.lede {
+  max-width: 54ch;
+  color: var(--muted);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 0 28px 40px;
+}
+
+.feature-card {
+  background: var(--panel);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(32, 22, 18, 0.08);
+}

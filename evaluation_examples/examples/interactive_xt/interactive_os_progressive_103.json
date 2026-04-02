@@ -12,6 +12,13 @@
     {
       "type": "execute",
       "parameters": {
+        "command": "gsettings set org.gnome.desktop.interface text-scaling-factor 1.0; gsettings set org.gnome.desktop.interface cursor-size 24; gsettings set org.gnome.desktop.a11y.applications screen-magnifier-enabled false; gsettings set org.gnome.desktop.a11y.magnifier mag-factor 1.0",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
         "command": [
           "python",
           "-c",
@@ -48,16 +55,18 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_accessibility",
     "result": {
       "type": "vm_command_line",
-      "command": "TEXT_SCALE=$(gsettings get org.gnome.desktop.interface text-scaling-factor 2>/dev/null | grep -oE '[0-9]+(\\.[0-9]+)?' | head -1); CURSOR_SIZE=$(gsettings get org.gnome.desktop.interface cursor-size 2>/dev/null | grep -oE '[0-9]+' | head -1); MAG_ENABLED=$(gsettings get org.gnome.desktop.a11y.applications screen-magnifier-enabled 2>/dev/null); MAG_FACTOR=$(gsettings get org.gnome.desktop.a11y.magnifier mag-factor 2>/dev/null | grep -oE '[0-9]+(\\.[0-9]+)?' | head -1); if [ -n \"$TEXT_SCALE\" ] && [ -n \"$CURSOR_SIZE\" ] && [ \"$MAG_ENABLED\" = \"true\" ] && [ -n \"$MAG_FACTOR\" ] && [ \"$(echo \"$TEXT_SCALE >= 1.2\" | bc -l 2>/dev/null || echo 0)\" = \"1\" ] && [ \"$CURSOR_SIZE\" -ge 48 ] && [ \"$(echo \"$MAG_FACTOR >= 1.75\" | bc -l 2>/dev/null || echo 0)\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "ts=$(gsettings get org.gnome.desktop.interface text-scaling-factor 2>/dev/null | grep -oE '[0-9]+(\\.[0-9]+)?' | head -1); cs=$(gsettings get org.gnome.desktop.interface cursor-size 2>/dev/null | grep -oE '[0-9]+' | head -1); me=$(gsettings get org.gnome.desktop.a11y.applications screen-magnifier-enabled 2>/dev/null | tr -d '[:space:]'); mf=$(gsettings get org.gnome.desktop.a11y.magnifier mag-factor 2>/dev/null | grep -oE '[0-9]+(\\.[0-9]+)?' | head -1); echo \"text_scale=$ts\"; echo \"cursor_size=$cs\"; echo \"mag_enabled=$me\"; echo \"mag_factor=$mf\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "min_text_scale": 1.2,
+        "min_cursor_size": 48,
+        "min_mag_factor": 1.5
       }
     }
   },

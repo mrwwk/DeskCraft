@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accessible Form Upgrade</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <section class="form-shell">
+        <h1>Request launch review</h1>
+        <form id="request-form" novalidate>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" />
+          <p id="email-hint">Use your work email for the preview.</p>
+          <p id="error-message">Please enter an email address.</p>
+          <button id="submit-button" type="submit">Request review</button>
+        </form>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

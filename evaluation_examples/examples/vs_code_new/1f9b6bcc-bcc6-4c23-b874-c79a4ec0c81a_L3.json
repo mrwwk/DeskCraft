@@ -4,7 +4,12 @@
   "difficulty": "L3",
   "snapshot": "vscode",
   "instruction": "Please configure a Python productivity bundle in VS Code User settings. Add two custom keybindings: Ctrl+Alt+R should run Python file in terminal when editorTextFocus and editorLangId is python, and Ctrl+Alt+S should save all files when editorTextFocus. Also create a Python user snippet named main_guard with prefix mg, body lines `if __name__ == '__main__':` and `    ${1:main()}`, and description `Python main guard`. Finally set editor.formatOnSave to true and editor.tabCompletion to on in User Settings.",
-  "source": "https://code.visualstudio.com/docs/editor/userdefinedsnippets",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/keybindings",
+    "https://code.visualstudio.com/docs/editor/userdefinedsnippets",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：个人 Python 开发环境整理时常见的“运行快捷键 + 保存快捷键 + main_guard snippet + 保存格式化”效率套装需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/.config/Code/User/snippets"]}},
     {"type": "launch", "parameters": {"command": ["code"]}},

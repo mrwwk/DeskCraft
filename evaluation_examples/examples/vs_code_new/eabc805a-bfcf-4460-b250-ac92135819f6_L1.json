@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please create a custom VS Code keybinding so that pressing Ctrl+Alt+R runs Python file in terminal, and make it active only when the editor is focused and the current language is Python.",
-  "source": "https://code.visualstudio.com/docs/getstarted/keybindings",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/keybindings",
+    "https://code.visualstudio.com/docs/python/settings-reference"
+  ],
   "config": [
     {
       "type": "launch",

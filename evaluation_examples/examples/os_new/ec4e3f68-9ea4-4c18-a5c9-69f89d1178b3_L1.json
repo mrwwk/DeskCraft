@@ -4,21 +4,47 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Set GNOME favorites to exactly three apps in this order: thunderbird.desktop, google-chrome.desktop, org.gnome.Terminal.desktop. Ensure vim.desktop is removed. Then write the same ordered list (one item per line) to ~/Desktop/favorites_audit.txt.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Add apps to the favorites bar (https://help.ubuntu.com/lts/ubuntu-help/shell-apps-favorites.html.en)",
   "trajectory": "trajectories/",
   "config": [
-    {"type": "execute", "parameters": {"command": "export DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'; gsettings set org.gnome.shell favorite-apps \"['thunderbird.desktop','vim.desktop','google-chrome.desktop']\"; rm -f ~/Desktop/favorites_audit.txt", "shell": true}},
-    {"type": "execute", "parameters": {"command": ["python", "-c", "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"]}}
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "export DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'; gsettings set org.gnome.shell favorite-apps \"['thunderbird.desktop','vim.desktop','google-chrome.desktop']\"; rm -f ~/Desktop/favorites_audit.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
   ],
-  "related_apps": ["os"],
+  "related_apps": [
+    "os"
+  ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_gnome_favorites",
     "result": {
       "type": "vm_command_line",
-      "command": "val=$(export DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'; gsettings get org.gnome.shell favorite-apps); pyok=$(python - <<'PY'\nimport ast\ns=\"\"\"$val\"\"\"\ntry:\n    apps=ast.literal_eval(s.strip())\nexcept Exception:\n    print('FAIL'); raise SystemExit\nexp=['thunderbird.desktop','google-chrome.desktop','org.gnome.Terminal.desktop']\nprint('PASS' if apps==exp else 'FAIL')\nPY\n); ok=1; [ \"$pyok\" = \"PASS\" ] || ok=0; expected=$(cat <<'EOF'\nthunderbird.desktop\ngoogle-chrome.desktop\norg.gnome.Terminal.desktop\nEOF\n); actual=$(cat ~/Desktop/favorites_audit.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "export DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus'; fav=$(gsettings get org.gnome.shell favorite-apps); expected=$(printf 'thunderbird.desktop\\ngoogle-chrome.desktop\\norg.gnome.Terminal.desktop\\n'); actual=$(cat ~/Desktop/favorites_audit.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"favorites=$fav\"; echo \"file_ok=$file_ok\"",
       "shell": true
     },
-    "expected": {"type": "rule", "rules": {"expected": "PASS\n"}}
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_apps": [
+          "thunderbird.desktop",
+          "google-chrome.desktop",
+          "org.gnome.Terminal.desktop"
+        ]
+      }
+    }
   },
   "proxy": false,
   "fixed_ip": false,

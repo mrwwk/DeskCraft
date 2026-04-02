@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "You are configuring a new development machine. First, open the ESLint VS Code extension page at https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint in Chrome and bookmark it to your bookmarks bar so you can install it later. Then configure VS Code User Settings for the project: disable the editor minimap (editor.minimap.enabled = false) and enable bracket pair colorization (editor.bracketPairColorization.enabled = true). Finally, record what you have done by creating ~/Desktop/setup_notes.txt with the line 'ESLint bookmarked, VS Code configured'.",
-  "source": "authors",
+  "source": [
+    "https://support.google.com/chrome/answer/188842",
+    "https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint",
+    "现实场景构造来源：新机器装配时常见的“先收藏核心扩展页，再同步基础显示设置并留下 setup note”开发环境启动流程"
+  ],
   "config": [
     {
       "type": "launch",

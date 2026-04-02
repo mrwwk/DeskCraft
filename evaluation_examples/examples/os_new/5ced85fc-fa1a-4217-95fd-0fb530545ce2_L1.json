@@ -4,7 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "In the current directory, create output.txt from input.txt by processing each non-empty line as follows: ignore lines that start with '#'; trim leading/trailing spaces; HTML-escape '&', '<', '>'; wrap each processed line as <li>...</li>; keep original order. Then create summary.txt containing exactly one line: COUNT=<number_of_output_lines>.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -42,17 +42,15 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_text_transform",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -f output.txt ] || ok=0; [ -f summary.txt ] || ok=0; expected_output=$(cat <<'EOF'\n<li>hello world</li>\n<li>a &lt; b &amp; c &gt; d</li>\n<li>keep me</li>\nEOF\n); expected_summary='COUNT=3'; actual_output=$(cat output.txt 2>/dev/null); actual_summary=$(cat summary.txt 2>/dev/null); [ \"$actual_output\" = \"$expected_output\" ] || ok=0; [ \"$actual_summary\" = \"$expected_summary\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "expected_output=$(printf '<li>hello world</li>\\n<li>a &lt; b &amp; c &gt; d</li>\\n<li>keep me</li>\\n'); expected_summary='COUNT=3'; actual_output=$(cat output.txt 2>/dev/null); actual_summary=$(cat summary.txt 2>/dev/null); output_ok='false'; [ \"$actual_output\" = \"$expected_output\" ] && output_ok='true'; summary_ok='false'; [ \"$actual_summary\" = \"$expected_summary\" ] && summary_ok='true'; echo \"output_ok=$output_ok\"; echo \"summary_ok=$summary_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
-      "rules": {
-        "expected": "PASS\n"
-      }
+      "rules": {}
     }
   },
   "proxy": false,

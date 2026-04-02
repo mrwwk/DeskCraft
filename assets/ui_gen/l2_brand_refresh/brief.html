@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Brand Refresh Brief</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 40px auto; max-width: 900px; line-height: 1.6; color: #1d1d1d; }
+    h1, h2 { color: #7a2e1f; }
+    code { background: #f5ece8; padding: 2px 6px; }
+    .source { padding: 14px; background: #fbf6f3; border-left: 4px solid #c86d4c; }
+  </style>
+</head>
+<body>
+  <h1>Brand Refresh Sprint</h1>
+  <p>Refresh the starter landing page in VS Code, but verify the result through a live Chrome preview served from a local HTTP server.</p>
+  <h2>Required changes</h2>
+  <ol>
+    <li>Keep the existing <code>header.site-header</code>, <code>section#hero</code>, and <code>footer.site-footer</code>.</li>
+    <li>Add a new <code>section#testimonials</code> after the feature grid with exactly 2 <code>.quote-card</code> articles.</li>
+    <li>Each quote card must show a local avatar image from <code>assets/avatar-ops.svg</code> or <code>assets/avatar-design.svg</code>, a quote, and a role label.</li>
+    <li>Add a sticky demo callout as <code>aside#request-demo.sticky-demo</code> with a button labeled <code>Request Demo</code>.</li>
+    <li>Update <code>manifest.json</code> so <code>project</code> is <code>ui-brand-refresh</code>, <code>theme</code> is <code>ember</code>, <code>version</code> is <code>2.1</code>, and <code>previewPort</code> is <code>8123</code>.</li>
+    <li>Preview the page in Chrome via <code>http://127.0.0.1:8123/index.html</code> and finish with that preview open.</li>
+  </ol>
+  <div class="source">
+    <p><strong>Source grounding</strong></p>
+    <p>Common front-end patterns adapted from:</p>
+    <ul>
+      <li><a href="https://www.frontendmentor.io/challenges/social-proof-section-6e0qTv_bA">Frontend Mentor Social Proof Section</a></li>
+      <li><a href="https://www.frontendmentor.io/challenges/bookmark-landing-page-5d0b588a9edda32581d29158">Frontend Mentor Bookmark Landing Page</a></li>
+    </ul>
+  </div>
+</body>
+</html>

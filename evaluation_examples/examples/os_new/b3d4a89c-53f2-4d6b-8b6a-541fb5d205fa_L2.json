@@ -4,7 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Enable Bluetooth service and make it persistent across reboot by enabling the bluetooth systemd unit. Also create ~/Desktop/bluetooth_status.txt with two lines: enabled=yes and active=yes.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Turn Bluetooth on or off (https://help.ubuntu.com/lts/ubuntu-help/bluetooth-turn-on-off.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -19,16 +19,17 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_bluetooth_service",
     "result": {
       "type": "vm_command_line",
-      "command": "enabled=$(systemctl is-enabled bluetooth 2>/dev/null || true); active=$(systemctl is-active bluetooth 2>/dev/null || true); ok=1; [ \"$enabled\" = \"enabled\" ] || ok=0; [ \"$active\" = \"active\" ] || ok=0; expected=$(cat <<'EOF'\nenabled=yes\nactive=yes\nEOF\n); actual=$(cat ~/Desktop/bluetooth_status.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "en=$(systemctl is-enabled bluetooth 2>/dev/null || echo 'disabled'); ac=$(systemctl is-active bluetooth 2>/dev/null || echo 'inactive'); expected=$(printf 'enabled=yes\\nactive=yes\\n'); actual=$(cat ~/Desktop/bluetooth_status.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"enabled=$en\"; echo \"active=$ac\"; echo \"file_ok=$file_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "enabled": "enabled",
+        "active": "active"
       }
     }
   },

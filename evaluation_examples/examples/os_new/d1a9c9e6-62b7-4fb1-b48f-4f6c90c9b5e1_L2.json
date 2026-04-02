@@ -4,7 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Inside ~/Desktop/log_audit, collect all unique service names whose log lines contain level ERROR or CRITICAL and status >=500. Ignore anything under archive/. Save the sorted service names (one per line) to ~/Desktop/log_audit/report/failing_services.txt.",
-  "source": "custom hard task",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -50,7 +50,7 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_extract_services",
     "result": {
       "type": "vm_command_line",
       "command": "[ -f ~/Desktop/log_audit/report/failing_services.txt ] && cat ~/Desktop/log_audit/report/failing_services.txt || echo '__MISSING__'",
@@ -59,7 +59,7 @@
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "auth\nbilling\ncache\npayments\n"
+        "expected": "auth\nbilling\ncache\npayments"
       }
     }
   },

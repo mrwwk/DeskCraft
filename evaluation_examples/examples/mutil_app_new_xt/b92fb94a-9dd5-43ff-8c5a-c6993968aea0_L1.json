@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "multi_apps",
   "instruction": "The local policy page at ~/Desktop/workspace_policy.html explains the required workspace editor settings for the project in ~/Desktop/ui-tooling/. Open that policy page in Chrome using the file:// URL, then create ~/Desktop/ui-tooling/.vscode/settings.json and apply the values described on the page: editor.lineNumbers should be relative, files.insertFinalNewline should be enabled, and files.exclude should hide dist and coverage. Finally, create ~/Desktop/ui-tooling/POLICY_ACK.txt containing exactly `policy applied`.",
-  "source": "authors",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "现实场景构造来源：前端项目把工作区显示规则写进本地 policy 页面，要求执行人按页生成 .vscode 设置并回执确认的常见协作流程"
+  ],
   "config": [
     {"type": "execute", "parameters": {"command": "mkdir -p /home/user/Desktop/ui-tooling && printf '<html><body><h1>Workspace Policy</h1><p>editor.lineNumbers=relative</p><p>files.insertFinalNewline=true</p><p>files.exclude=dist,coverage</p></body></html>' > /home/user/Desktop/workspace_policy.html", "shell": true}},
     {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},

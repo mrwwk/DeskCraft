@@ -4,7 +4,11 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please configure VS Code Python productivity defaults. Create a Python user snippet named pytest_func with prefix tpytest, body lines `def test_${1:name}():` and `    assert ${2:actual} == ${3:expected}`, and description `Pytest function template`. Also update User Settings so editor.tabCompletion is on and editor.snippetSuggestions is top.",
-  "source": "https://code.visualstudio.com/docs/editor/userdefinedsnippets",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/userdefinedsnippets",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：Python 测试驱动开发时常见的“自定义 pytest 模板 + 提升 snippet 命中优先级与 Tab 展开效率”个人效率配置需求"
+  ],
   "config": [
     {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/.config/Code/User/snippets"]}},
     {"type": "launch", "parameters": {"command": ["code"]}},

@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please customize VS Code appearance by setting color theme to Default Dark Modern, icon theme to Seti (Visual Studio Code), and disable minimap.",
-  "source": "https://code.visualstudio.com/docs/getstarted/userinterface",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/userinterface",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
   "config": [
     {
       "type": "launch",

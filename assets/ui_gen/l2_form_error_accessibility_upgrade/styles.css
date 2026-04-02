@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  font-family: Cambria, Georgia, serif;
+  background: #fbf7f1;
+  color: #252126;
+}
+
+#app {
+  width: min(720px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 56px 0;
+}
+
+.form-shell {
+  background: #fffdf9;
+  border: 1px solid #dfd1c2;
+  border-radius: 22px;
+  padding: 28px;
+}
+
+input,
+button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 14px;
+}
+
+#error-message {
+  color: #a03131;
+}

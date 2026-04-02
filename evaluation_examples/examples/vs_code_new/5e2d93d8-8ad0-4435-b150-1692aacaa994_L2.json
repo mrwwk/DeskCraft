@@ -3,8 +3,11 @@
   "task_slug": "multi_root_workspace_docs_scripts",
   "difficulty": "L2",
   "snapshot": "vscode",
-  "instruction": "Please open /home/user/project in VS Code, add /home/user/docs and /home/user/scripts into the same workspace, then save the multi-root workspace as /home/user/project_advanced.code-workspace.",
-  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "instruction": "Please open /home/user/project in VS Code, add /home/user/docs and /home/user/scripts into the same workspace, save the multi-root workspace as /home/user/project_advanced.code-workspace, and in that workspace configure files.exclude so .cache and node_modules are hidden.",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
   "config": [
     {
       "type": "command",
@@ -12,7 +15,9 @@
         "command": [
           "mkdir",
           "-p",
-          "/home/user/project"
+          "/home/user/project",
+          "/home/user/project/.cache",
+          "/home/user/project/node_modules"
         ]
       }
     },
@@ -72,7 +77,13 @@
             {
               "path": "scripts"
             }
-          ]
+          ],
+          "settings": {
+            "files.exclude": {
+              ".cache": true,
+              "node_modules": true
+            }
+          }
         }
       }
     },

@@ -4,7 +4,7 @@
   "difficulty": "L3",
   "snapshot": "os",
   "instruction": "In ~/Desktop/photos_hard, recursively collect only .jpg files into ~/Desktop/cpjpg_hard while preserving directory hierarchy. Exclude any file under a private directory and any filename containing _raw. Then create ~/Desktop/cpjpg_hard/manifest.txt containing sha256 and relative path for copied jpgs only, sorted by relative path.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -29,16 +29,22 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_file_operations",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ -f ~/Desktop/cpjpg_hard/trip/a/sun.jpg ] || ok=0; [ -f ~/Desktop/cpjpg_hard/events/sub/night.jpg ] || ok=0; [ ! -f ~/Desktop/cpjpg_hard/family/portrait_raw.jpg ] || ok=0; [ ! -f ~/Desktop/cpjpg_hard/trip/private/secret.jpg ] || ok=0; expected=$(printf '%s\n' \"$(sha256sum ~/Desktop/cpjpg_hard/events/sub/night.jpg | awk '{print $1}')  events/sub/night.jpg\" \"$(sha256sum ~/Desktop/cpjpg_hard/trip/a/sun.jpg | awk '{print $1}')  trip/a/sun.jpg\" | sort); actual=$(cat ~/Desktop/cpjpg_hard/manifest.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "sun_ok='false'; [ -f ~/Desktop/cpjpg_hard/trip/a/sun.jpg ] && sun_ok='true'; night_ok='false'; [ -f ~/Desktop/cpjpg_hard/events/sub/night.jpg ] && night_ok='true'; no_raw='false'; [ ! -f ~/Desktop/cpjpg_hard/family/portrait_raw.jpg ] && no_raw='true'; no_private='false'; [ ! -f ~/Desktop/cpjpg_hard/trip/private/secret.jpg ] && no_private='true'; manifest_ok='false'; expected=$(printf '%s\\n' \"$(sha256sum ~/Desktop/cpjpg_hard/events/sub/night.jpg | awk '{print $1}')  events/sub/night.jpg\" \"$(sha256sum ~/Desktop/cpjpg_hard/trip/a/sun.jpg | awk '{print $1}')  trip/a/sun.jpg\" | sort); actual=$(cat ~/Desktop/cpjpg_hard/manifest.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] && manifest_ok='true'; echo \"sun_ok=$sun_ok\"; echo \"night_ok=$night_ok\"; echo \"no_raw=$no_raw\"; echo \"no_private=$no_private\"; echo \"manifest_ok=$manifest_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "checks": {
+          "sun_ok": "true",
+          "night_ok": "true",
+          "no_raw": "true",
+          "no_private": "true",
+          "manifest_ok": "true"
+        }
       }
     }
   },

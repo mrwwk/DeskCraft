@@ -4,7 +4,9 @@
   "difficulty": "L2",
   "snapshot": "vscode",
   "instruction": "Please open /home/user/workspace1.code-workspace in VS Code, add /home/user/project2 and /home/user/project3 as folders into this workspace, and save the workspace file.",
-  "source": "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces"
+  ],
   "config": [
     {
       "type": "command",

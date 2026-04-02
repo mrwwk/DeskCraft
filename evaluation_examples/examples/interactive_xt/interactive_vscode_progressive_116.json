@@ -3,17 +3,28 @@
   "snapshot": "vscode",
   "interactive": true,
   "scenario_type": "progressive_refinement",
-  "scenario_description": "用户先让 Agent 打开一个基础编辑器设置，随后再补充两个非常常见的 VS Code 设置项。这个任务用于快速排查是任务设计问题还是模型能力问题。",
+  "scenario_description": "用户分三轮把一个数据分析项目补成可直接交接的 VS Code 脚手架：先加项目设置，再补任务，最后补扩展推荐。任务用于测试逐步追加项目级配置时的连续一致性。",
   "user_persona": {
     "expertise_level": "beginner",
     "communication_style": "casual_chinese"
   },
   "config": [
     {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/analytics-app && mkdir -p /home/user/analytics-app/src /home/user/analytics-app/data && printf 'print(\"analytics ready\")\n' > /home/user/analytics-app/src/main.py"
+        ]
+      }
+    },
+    {
       "type": "launch",
       "parameters": {
         "command": [
-          "code"
+          "code",
+          "/home/user/analytics-app"
         ]
       }
     },
@@ -27,14 +38,21 @@
   "phases": [
     {
       "phase_id": 1,
-      "instruction": "先帮我把 VS Code 的自动保存打开，模式设成 afterDelay。",
+      "instruction": "先给当前项目补一个 .vscode/settings.json：把 editor.formatOnSave 打开，files.trimTrailingWhitespace 也打开，再加一条 88 列的 ruler。",
       "trigger": {
         "type": "agent_done"
       }
     },
     {
       "phase_id": 2,
-      "instruction": "然后再把自动保存延迟改成 500 毫秒。",
+      "instruction": "接着在 .vscode/tasks.json 里加两个 shell task：Run analytics 执行 python src/main.py，List data 执行 ls data。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后再补一个 .vscode/extensions.json，推荐 ms-python.python 和 ms-python.vscode-pylance。",
       "trigger": {
         "type": "agent_done"
       }
@@ -45,21 +63,17 @@
     "vscode"
   ],
   "evaluator": {
-    "func": "check_json_settings",
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"import json; from pathlib import Path; base=Path('/home/user/analytics-app/.vscode'); s=base/'settings.json'; t=base/'tasks.json'; e=base/'extensions.json'; ok=s.exists() and t.exists() and e.exists(); settings=json.loads(s.read_text(encoding='utf-8')) if ok else {}; tasks=json.loads(t.read_text(encoding='utf-8')).get('tasks', []) if ok else []; ext=json.loads(e.read_text(encoding='utf-8')) if ok else {}; norm=lambda task:(task.get('command','')+' '+' '.join(task.get('args', []))).strip(); has=lambda label, expected:any(task.get('label')==label and expected in norm(task) for task in tasks); recs=set(ext.get('recommendations', [])); ok=ok and settings.get('editor.formatOnSave') is True and settings.get('files.trimTrailingWhitespace') is True and settings.get('editor.rulers')==[88] and has('Run analytics','python src/main.py') and has('List data','ls data') and {'ms-python.python','ms-python.vscode-pylance'}.issubset(recs); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": {
-          "files.autoSave": "afterDelay",
-          "files.autoSaveDelay": 500,
-          "editor.wordWrap": "on"
-        }
+        "expected": "PASS\n"
       }
-    },
-    "result": {
-      "type": "vm_file",
-      "path": "/home/user/.config/Code/User/settings.json",
-      "dest": "settings.json"
     }
   },
   "proxy": false,

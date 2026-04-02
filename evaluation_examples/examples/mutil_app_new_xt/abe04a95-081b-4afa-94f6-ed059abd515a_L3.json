@@ -1,11 +1,30 @@
 {
   "id": "abe04a95-081b-4afa-94f6-ed059abd515a",
-  "task_slug": "webapp_project_init_vscode_advanced_chrome_bookmark",
+  "task_slug": "webapp_handoff_with_logo_and_css_reference",
   "difficulty": "L3",
   "snapshot": "os",
-  "instruction": "Set up a new web project in the terminal: create the directories ~/Desktop/webapp/src/ and ~/Desktop/webapp/tests/, then create ~/Desktop/webapp/.gitignore with two entries '*.pyc' and '__pycache__/' (one per line), and create ~/Desktop/webapp/src/main.py containing the single line print('Hello, World!'). Configure VS Code User Settings with four changes: enable editor.bracketPairColorization.enabled, set editor.wordWrap to 'on', enable files.insertFinalNewline, and set editor.tabSize to 2. Finally, in Chrome, bookmark https://code.visualstudio.com/ to your bookmarks bar.",
-  "source": "authors",
+  "instruction": "A local handoff page is available at ~/Desktop/webapp_handoff.html and a logo asset is available at ~/Desktop/brand_logo.svg. Open the handoff page in Chrome using the file:// URL and keep it open when you finish. Then build the project described there: create ~/Desktop/webapp/src/, ~/Desktop/webapp/tests/, and ~/Desktop/webapp/assets/; create ~/Desktop/webapp/.gitignore with '*.pyc' and '__pycache__/' on separate lines; create ~/Desktop/webapp/README.md whose first line is '# PulseBoard'; create ~/Desktop/webapp/src/main.py containing the line print('PulseBoard ready'); copy the provided logo to ~/Desktop/webapp/assets/logo.svg; apply the VS Code User Settings from the handoff page; and open the CSS reference URL from the page in another Chrome tab and bookmark it to the bookmarks bar before returning focus to the local handoff page.",
+  "source": [
+    "https://developer.mozilla.org/en-US/docs/Web/CSS",
+    "https://support.google.com/chrome/answer/188842",
+    "现实场景构造来源：设计稿交接后常见的“创建 webapp 骨架、复制 logo、同步编辑器偏好并收藏 CSS 参考”前端启动流程"
+  ],
   "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/mutil_app_new_xt/webapp_handoff.html",
+            "path": "/home/user/Desktop/webapp_handoff.html"
+          },
+          {
+            "local_path": "assets/mutil_app_new_xt/brand_logo.svg",
+            "path": "/home/user/Desktop/brand_logo.svg"
+          }
+        ]
+      }
+    },
     {
       "type": "launch",
       "parameters": {
@@ -35,6 +54,9 @@
   "related_apps": ["os", "vscode", "chrome"],
   "evaluator": {
     "func": [
+      "is_expected_active_tab_approximate",
+      "check_include_exclude",
+      "check_include_exclude",
       "check_include_exclude",
       "check_include_exclude",
       "check_json_settings",
@@ -42,13 +64,26 @@
     ],
     "result": [
       {
+        "type": "active_tab_info"
+      },
+      {
         "type": "vm_command_line",
         "command": "cat /home/user/Desktop/webapp/.gitignore",
         "shell": true
       },
       {
         "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/webapp/README.md",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
         "command": "cat /home/user/Desktop/webapp/src/main.py",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/webapp/assets/logo.svg",
         "shell": true
       },
       {
@@ -64,6 +99,13 @@
       {
         "type": "rule",
         "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/webapp_handoff.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
           "include": ["*.pyc", "__pycache__/"],
           "exclude": []
         }
@@ -71,7 +113,21 @@
       {
         "type": "rule",
         "rules": {
-          "include": ["Hello, World!"],
+          "include": ["# PulseBoard"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["PulseBoard ready"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["PulseBoard", "<svg"],
           "exclude": []
         }
       },
@@ -89,7 +145,7 @@
       {
         "type": "rule",
         "rules": {
-          "url_pattern": "code.visualstudio.com"
+          "url_pattern": "developer.mozilla.org/en-US/docs/Web/CSS"
         }
       }
     ],

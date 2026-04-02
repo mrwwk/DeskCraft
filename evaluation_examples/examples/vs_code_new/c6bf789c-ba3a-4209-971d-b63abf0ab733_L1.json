@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please update VS Code User Settings to hide Python cache folders in Explorer, including __pycache__, .pytest_cache, and .mypy_cache.",
-  "source": "https://code.visualstudio.com/docs/editor/codebasics#_files-explorer",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/getstarted/userinterface"
+  ],
   "config": [
     {
       "type": "launch",

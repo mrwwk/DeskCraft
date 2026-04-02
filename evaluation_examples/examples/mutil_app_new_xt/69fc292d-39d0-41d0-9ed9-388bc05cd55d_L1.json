@@ -4,7 +4,11 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "The Python 3 documentation is already open in Chrome. Please bookmark this page to your bookmarks bar for easy access. Also create ~/Desktop/dev_links.txt containing the URL https://docs.python.org/3/ on the first line.",
-  "source": "authors",
+  "source": [
+    "https://support.google.com/chrome/answer/188842",
+    "https://docs.python.org/3/",
+    "现实场景构造来源：开发者把高频 API 文档加入书签栏，并在桌面维护一份快速链接清单的常见知识检索习惯"
+  ],
   "config": [
     {
       "type": "launch",

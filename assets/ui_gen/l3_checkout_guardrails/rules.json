@@ -1,0 +1,14 @@
+[
+  {
+    "step": "Review cart",
+    "guardrail": "Show threshold warning before tax calculation"
+  },
+  {
+    "step": "Confirm contact",
+    "guardrail": "Block free-email typo domains"
+  },
+  {
+    "step": "Submit order",
+    "guardrail": "Require final confirmation dialog"
+  }
+]

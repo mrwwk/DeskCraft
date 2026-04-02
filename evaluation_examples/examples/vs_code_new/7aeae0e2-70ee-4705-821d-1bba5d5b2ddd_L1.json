@@ -4,7 +4,10 @@
   "difficulty": "L1",
   "snapshot": "vscode",
   "instruction": "Please optimize Python editing in VS Code User Settings: enable inlay hints for variable types and function return types, and enable bracket pair colorization.",
-  "source": "https://code.visualstudio.com/docs/getstarted/settings",
+  "source": [
+    "https://code.visualstudio.com/docs/python/settings-reference",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
   "config": [
     {
       "type": "launch",

@@ -4,7 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "Configure auto screen lock for security: enable screen lock, set idle delay to 5 minutes, and set lock delay to 0 (immediate lock after blank). Also save a report to ~/Desktop/lock_policy.txt with exactly three lines: lock-enabled=true, idle-delay=300, lock-delay=0.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Automatically lock your screen (https://help.ubuntu.com/lts/ubuntu-help/privacy-screen-lock.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
@@ -29,16 +29,18 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_screen_lock",
     "result": {
       "type": "vm_command_line",
-      "command": "ok=1; [ \"$(gsettings get org.gnome.desktop.screensaver lock-enabled)\" = \"true\" ] || ok=0; [ \"$(gsettings get org.gnome.desktop.session idle-delay | tr -d '[:space:]')\" = \"uint32300\" ] || ok=0; [ \"$(gsettings get org.gnome.desktop.screensaver lock-delay | tr -d '[:space:]')\" = \"uint320\" ] || ok=0; expected=$(cat <<'EOF'\nlock-enabled=true\nidle-delay=300\nlock-delay=0\nEOF\n); actual=$(cat ~/Desktop/lock_policy.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "le=$(gsettings get org.gnome.desktop.screensaver lock-enabled 2>/dev/null); id_raw=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null); id_val=$(echo \"$id_raw\" | grep -oE '[0-9]+'); ld_raw=$(gsettings get org.gnome.desktop.screensaver lock-delay 2>/dev/null); ld_val=$(echo \"$ld_raw\" | grep -oE '[0-9]+'); expected=$(printf 'lock-enabled=true\\nidle-delay=300\\nlock-delay=0\\n'); actual=$(cat ~/Desktop/lock_policy.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"lock_enabled=$le\"; echo \"idle_delay=$id_val\"; echo \"lock_delay=$ld_val\"; echo \"file_ok=$file_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "lock_enabled": "true",
+        "idle_delay": "300",
+        "lock_delay": "0"
       }
     }
   },

@@ -3,7 +3,7 @@
   "snapshot": "chrome",
   "interactive": true,
   "scenario_type": "requirement_change",
-  "scenario_description": "用户先让 Agent 保留一个部署清单页面，随后改口说真正要保留的是故障应急手册页面。",
+  "scenario_description": "用户先让 Agent 保留一个部署清单页面，随后改口说真正要保留的是故障应急手册页面，并要求撤销前一个目标，只保留最终手册页。",
   "user_persona": {
     "expertise_level": "intermediate",
     "communication_style": "casual_chinese"
@@ -67,6 +67,13 @@
       "trigger": {
         "type": "agent_done"
       }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后浏览器里只保留 Incident Runbook 这一个文档标签，并停留在那一页。",
+      "trigger": {
+        "type": "agent_done"
+      }
     }
   ],
   "trajectory": "trajectories/",
@@ -75,11 +82,15 @@
   ],
   "evaluator": {
     "func": [
+      "is_expected_tabs",
       "is_expected_active_tab",
       "is_expected_bookmarks"
     ],
     "conj": "and",
     "result": [
+      {
+        "type": "open_tabs_info"
+      },
       {
         "type": "active_url_from_accessTree"
       },
@@ -88,6 +99,15 @@
       }
     ],
     "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/chrome_ops_hub_102/incident_runbook.html"
+          ]
+        }
+      },
       {
         "type": "rule",
         "rules": {

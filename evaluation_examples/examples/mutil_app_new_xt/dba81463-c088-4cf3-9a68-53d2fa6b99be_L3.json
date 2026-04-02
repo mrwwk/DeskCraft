@@ -4,7 +4,10 @@
   "difficulty": "L3",
   "snapshot": "multi_apps",
   "instruction": "The portfolio project in ~/Desktop/portfolio_handoff/ needs a full handoff migration. Read HANDOFF.json to get the new owner information and docs URL. Then use VS Code to update site_config.json so the site title, owner, and contactEmail match the handoff, create a backup named site_config.json.bak, and repair build_signature.py so the provided tests pass. Open the docsUrl from the handoff in Chrome while you work, and finally create MIGRATION_DONE.txt containing exactly `portfolio handoff complete`.",
-  "source": "authors",
+  "source": [
+    "https://docs.github.com/en/pages",
+    "现实场景构造来源：作品集项目 JSON 配置交接时常见的“备份旧配置 + 迁移 owner 信息 + 修签名脚本 + 写 migration 完成标记”维护流程"
+  ],
   "config": [
     {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/portfolio_handoff')\nbase.mkdir(parents=True, exist_ok=True)\njson.dump({'title': 'Ava Portfolio', 'owner': 'Ava Lin', 'contactEmail': 'ava.lin@example.com', 'docsUrl': 'https://docs.github.com/en/pages'}, open(base / 'HANDOFF.json', 'w'), indent=2)\njson.dump({'title': 'Old Portfolio', 'owner': 'Old Owner', 'contactEmail': 'old@example.com'}, open(base / 'site_config.json', 'w'), indent=2)\n(base / 'build_signature.py').write_text(\"\"\"def build_signature(name, email):\n    return f'{email} - {name}'\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from build_signature import build_signature\n\ndef test():\n    assert build_signature('Ava Lin', 'ava.lin@example.com') == 'Ava Lin <ava.lin@example.com>'\n\"\"\")\nPY", "shell": true}},
     {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},

@@ -1,0 +1,75 @@
+{
+  "id": "c0a02003-5f17-4868-8e66-4110d981c923",
+  "task_slug": "save_autofill_address",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "Add a new address to Chrome's autofill settings with the following information: Name 'John Doe', Address '123 Main Street', City 'San Francisco', State 'CA', ZIP '94102'. Leave Chrome on the Addresses settings page when done.",
+  "source": "https://support.google.com/chrome/answer/142893",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "check_direct_json_object",
+      "is_expected_active_tab_approximate"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "chrome_saved_address",
+        "category": "html_text_search",
+        "search_terms": ["John Doe", "123 Main Street", "San Francisco", "CA", "94102"]
+      },
+      {
+        "type": "active_url_from_accessTree",
+        "goto_prefix": ""
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "John Doe": true,
+            "123 Main Street": true,
+            "San Francisco": true,
+            "94102": true
+          },
+          "expect_in_result": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "chrome://settings/addresses"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

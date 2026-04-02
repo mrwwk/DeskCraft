@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  font-family: Garamond, Georgia, serif;
+  background: #f6efe6;
+  color: #241d1a;
+}
+
+#app {
+  width: min(980px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.hero,
+.feature-grid,
+.site-footer {
+  margin-bottom: 24px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.metric-card {
+  background: #fffaf5;
+  border: 1px solid #d9c7b5;
+  border-radius: 18px;
+  padding: 18px;
+}

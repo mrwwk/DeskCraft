@@ -65,7 +65,7 @@
     "func": "exact_match",
     "result": {
       "type": "vm_command_line",
-      "command": "dim=$(gsettings get org.gnome.settings-daemon.plugins.power idle-dim 2>/dev/null | tr -d '[:space:]'); idle=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null | tr -d '[:space:]'); locke=$(gsettings get org.gnome.desktop.screensaver lock-enabled 2>/dev/null | tr -d '[:space:]'); lockd=$(gsettings get org.gnome.desktop.screensaver lock-delay 2>/dev/null | tr -d '[:space:]'); expected=$(printf 'idle-dim=false\nidle-delay=0\nlock-enabled=true\nlock-delay=0'); actual=$(cat /home/user/Desktop/presentation_security.txt 2>/dev/null); if [ \"$dim\" = \"false\" ] && [ \"$idle\" = \"uint320\" ] && [ \"$locke\" = \"true\" ] && [ \"$lockd\" = \"uint320\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "dim=$(gsettings get org.gnome.settings-daemon.plugins.power idle-dim 2>/dev/null | tr -d '[:space:]'); idle=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null | grep -oE '[0-9]+' | head -1); locke=$(gsettings get org.gnome.desktop.screensaver lock-enabled 2>/dev/null | tr -d '[:space:]'); lockd=$(gsettings get org.gnome.desktop.screensaver lock-delay 2>/dev/null | grep -oE '[0-9]+' | head -1); expected=$(printf 'idle-dim=false\nidle-delay=0\nlock-enabled=true\nlock-delay=0'); actual=$(cat /home/user/Desktop/presentation_security.txt 2>/dev/null); if [ \"$dim\" = \"false\" ] && [ \"$idle\" = \"0\" ] && [ \"$locke\" = \"true\" ] && [ \"$lockd\" = \"0\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
       "shell": true
     },
     "expected": {

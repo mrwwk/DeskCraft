@@ -4,13 +4,13 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "My audio is too quiet and sometimes muted. Please configure the default output sink so that volume is exactly 100%, mute is off, and then save the active sink name into /home/user/Desktop/audio_status/active_sink.txt.",
-  "source": "OSWorld custom hard task",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Change the sound volume (https://help.ubuntu.com/lts/ubuntu-help/sound-volume.html.en)；Ubuntu Desktop Guide - If you hear no sound or low volume (https://help.ubuntu.com/lts/ubuntu-help/sound-nosound.html.en)",
   "trajectory": "trajectories/",
   "config": [
     {
       "type": "execute",
       "parameters": {
-        "command": "mkdir -p /home/user/Desktop/audio_status && rm -f /home/user/Desktop/audio_status/active_sink.txt",
+        "command": "pulseaudio --start >/dev/null 2>&1 || true; sink=$(pactl get-default-sink 2>/dev/null); [ -n \"$sink\" ] || sink=$(pactl list short sinks 2>/dev/null | head -n1 | awk '{print $2}'); if [ -n \"$sink\" ]; then pactl set-sink-volume \"$sink\" 35% >/dev/null 2>&1 || true; pactl set-sink-mute \"$sink\" yes >/dev/null 2>&1 || true; fi; mkdir -p /home/user/Desktop/audio_status && rm -f /home/user/Desktop/audio_status/active_sink.txt",
         "shell": true
       }
     },
@@ -29,16 +29,17 @@
     "os"
   ],
   "evaluator": {
-    "func": "exact_match",
+    "func": "check_os_audio_config",
     "result": {
       "type": "vm_command_line",
-      "command": "pulseaudio --start >/dev/null 2>&1 || true; sink=$(pactl get-default-sink 2>/dev/null); [ -n \"$sink\" ] || sink=$(pactl list short sinks 2>/dev/null | head -n1 | awk '{print $2}'); vol=$(pactl get-sink-volume \"$sink\" 2>/dev/null | head -n1 | awk '{print $5}' | sed 's/%//'); mute=$(pactl get-sink-mute \"$sink\" 2>/dev/null | awk '{print $2}'); ok=1; [ \"$vol\" = \"100\" ] || ok=0; [ \"$mute\" = \"no\" ] || ok=0; [ -f /home/user/Desktop/audio_status/active_sink.txt ] || ok=0; [ \"$(cat /home/user/Desktop/audio_status/active_sink.txt 2>/dev/null)\" = \"$sink\" ] || ok=0; if [ \"$ok\" = \"1\" ]; then echo PASS; else echo FAIL; fi",
+      "command": "pulseaudio --start >/dev/null 2>&1 || true; sink=$(pactl get-default-sink 2>/dev/null); [ -n \"$sink\" ] || sink=$(pactl list short sinks 2>/dev/null | head -n1 | awk '{print $2}'); vol=$(pactl get-sink-volume \"$sink\" 2>/dev/null | head -n1 | awk '{print $5}' | sed 's/%//'); mute=$(pactl get-sink-mute \"$sink\" 2>/dev/null | awk '{print $2}'); saved=$(cat /home/user/Desktop/audio_status/active_sink.txt 2>/dev/null); sink_file_ok='false'; [ -f /home/user/Desktop/audio_status/active_sink.txt ] && [ \"$saved\" = \"$sink\" ] && sink_file_ok='true'; echo \"volume=$vol\"; echo \"mute=$mute\"; echo \"sink_file_ok=$sink_file_ok\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected": "PASS\n"
+        "volume": "100",
+        "mute": "no"
       }
     }
   },
