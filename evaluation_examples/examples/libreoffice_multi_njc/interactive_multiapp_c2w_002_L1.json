@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2w_002",
+  "instruction": "Help me record the monthly revenue",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Month'\nws['B1'] = 'Revenue(10K CNY)'\nws['A2'] = 'January'\nws['B2'] = 45.2\nws['A3'] = 'February'\nws['B3'] = 38.7\nws['A4'] = 'March'\nws['B4'] = 52.1\nws['A5'] = 'April'\nws['B5'] = 49.8\nwb.save('/home/user/Desktop/monthly_revenue.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/revenue_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me record the monthly revenue",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Find the month with the highest revenue from /home/user/Desktop/monthly_revenue.xlsx, append to /home/user/Desktop/revenue_report.txt: 'Highest Revenue Month: March (52.1)', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/revenue_report.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Highest Revenue Month: March"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L1"
+}

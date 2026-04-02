@@ -1,0 +1,78 @@
+{
+  "id": "9f172a30-0f37-4155-87b3-2ab704912166",
+  "task_slug": "impress_open_worksummarytemplateenglishpptx_on_slide_1_make_the_title",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open \"work_summary_template_english.pptx\". On slide 1, make the title bold, 48pt, and underlined.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/9f172a30-0f37-4155-87b3-2ab704912166/work_summary_template_english.pptx",
+            "path": "/home/user/Desktop/work_summary_template_english.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/work_summary_template_english.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/9f172a30-0f37-4155-87b3-2ab704912166",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "work_summary_template_english.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "WorkSummary_L1.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/work_summary_template_english.pptx",
+      "dest": "work_summary_template_english.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

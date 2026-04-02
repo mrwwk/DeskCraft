@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2w_003",
+  "instruction": "Record the employee evaluation results",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Employee'\nws['B1'] = 'Completion Rate(%)'\nws['C1'] = 'Rating'\nws['A2'] = 'Liu Yang'\nws['B2'] = 95\nws['C2'] = 'Excellent'\nws['A3'] = 'Chen Jing'\nws['B3'] = 82\nws['C3'] = 'Good'\nws['A4'] = 'Lin Feng'\nws['B4'] = 88\nws['C4'] = 'Good'\nws['A5'] = 'Huang Li'\nws['B5'] = 97\nws['C5'] = 'Excellent'\nwb.save('/home/user/Desktop/employee_kpi.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/kpi_record.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Record the employee evaluation results",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Find employees rated 'Excellent' from /home/user/Desktop/employee_kpi.xlsx, append to /home/user/Desktop/kpi_record.txt: 'Excellent Employees: Liu Yang, Huang Li', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/kpi_record.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Excellent Employees: Liu Yang, Huang Li"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L1"
+}

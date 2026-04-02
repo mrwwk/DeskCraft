@@ -1,0 +1,77 @@
+{
+  "id": "7e3f78c5-9230-47cd-909f-5063da80ae89",
+  "task_slug": "writer_open_proposall207docx_change_the_color_of_all_heading",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Proposal_L2_07.docx\". Change the color of all heading text to dark blue (#003366). Also underline the body text under the \"Objectives\" section.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/7e3f78c5-9230-47cd-909f-5063da80ae89/Proposal_L2_07.docx",
+            "path": "/home/user/Desktop/Proposal_L2_07.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Proposal_L2_07.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/7e3f78c5-9230-47cd-909f-5063da80ae89",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Proposal_L2_07.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Proposal_L2_07_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Proposal_L2_07.docx",
+      "dest": "Proposal_L2_07.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,112 @@
+{
+  "id": "30f6d4dc-f47d-4fb7-8309-8f2d3a2c9cd5",
+  "task_slug": "calc_open_empcomprehensivel302xlsx_and_perform_all_1_add_a",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"EmpComprehensive_L3_02.xlsx\" and perform ALL: (1) Add a \"Salary Rank\" column (H) ranking employees by salary (highest=1). (2) Sort all data by Department (A-Z) then Name (A-Z). (3) Bold the entire header row. (4) Create \"DeptSummary\" sheet: Department, Headcount, Avg Salary (2 decimals), Avg Performance (2 decimals), Total Salary. Sorted by department. (5) Freeze the header row on the Employees sheet. (6) Create \"TopEarners\" sheet: Name, Department, Salary, Performance for the top 5 highest-paid employees.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/30f6d4dc-f47d-4fb7-8309-8f2d3a2c9cd5/EmpComprehensive_L3_02.xlsx",
+            "path": "/home/user/Desktop/EmpComprehensive_L3_02.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/EmpComprehensive_L3_02.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/30f6d4dc-f47d-4fb7-8309-8f2d3a2c9cd5",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "EmpComprehensive_L3_02.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "EmpComprehensive_L3_02_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/EmpComprehensive_L3_02.xlsx",
+      "dest": "EmpComprehensive_L3_02.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_name"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNEmployees",
+          "sheet_idx1": "ENEmployees"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNDeptSummary",
+          "sheet_idx1": "ENDeptSummary"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNTopEarners",
+          "sheet_idx1": "ENTopEarners"
+        },
+        {
+          "type": "freeze",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": [
+            "font_bold"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

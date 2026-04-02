@@ -1,0 +1,107 @@
+{
+  "id": "interactive_writer_005",
+  "snapshot": "libreoffice_writer",
+  "interactive": true,
+  "scenario_type": "ambiguous_detail",
+  "scenario_description": "The user wants to add product specifications to the manual but hasn't provided the specific values. The agent asks first.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Product Manual\n\nProduct Name: Portable Bluetooth Speaker Pro\n\nI. Product Introduction\nThis product features the latest Bluetooth 5.0 technology with clear, powerful sound, ideal for outdoor use.\n\nII. Key Features\n- Bluetooth 5.0 connectivity\n- Waterproof rating: IP67\n- Battery life: approximately 20 hours\n\nIII. Precautions\nDo not place the product in high-temperature or humid environments.\n' > /home/user/Desktop/product_desc.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--writer",
+          "/home/user/Desktop/product_desc.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me add the product specs",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Add \"Weight: 250g, Dimensions: 15cm x 10cm x 3cm\" at the end of the document, then save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/product_desc.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Weight: 250g"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

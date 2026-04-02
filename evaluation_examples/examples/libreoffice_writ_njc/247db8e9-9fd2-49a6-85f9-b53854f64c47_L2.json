@@ -1,0 +1,77 @@
+{
+  "id": "247db8e9-9fd2-49a6-85f9-b53854f64c47",
+  "task_slug": "writer_open_policyl209docx_add_the_following_paragraph_at_the",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Policy_L2_09.docx\". Add the following paragraph at the very beginning of the document: \"DISCLAIMER: This policy is subject to change. Employees should check the HR portal for the latest version.\" Also convert all section heading text to uppercase.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/247db8e9-9fd2-49a6-85f9-b53854f64c47/Policy_L2_09.docx",
+            "path": "/home/user/Desktop/Policy_L2_09.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Policy_L2_09.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/247db8e9-9fd2-49a6-85f9-b53854f64c47",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Policy_L2_09.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Policy_L2_09_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Policy_L2_09.docx",
+      "dest": "Policy_L2_09.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

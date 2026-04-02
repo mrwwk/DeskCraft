@@ -1,0 +1,110 @@
+{
+  "id": "interactive_calc_007",
+  "snapshot": "libreoffice_calc",
+  "interactive": true,
+  "scenario_type": "ambiguous_detail",
+  "scenario_description": "The user says to fill in the profit column but doesn't specify the formula. The agent asks, then fills the Gross profit column with revenue minus expenses.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/libreoffice_calc/035f41ba-6653-43ab-aa63-c86d449d62e5/IncomeStatement2.xlsx",
+            "path": "/home/user/Desktop/IncomeStatement2.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--calc",
+          "/home/user/Desktop/IncomeStatement2.xlsx"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me fill in the profit column",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the Gross profit column with a formula (revenue minus all expenses) for every row, then save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/IncomeStatement2.xlsx'); cols = [c for c in df.columns if 'gross' in str(c).lower() or 'profit' in str(c).lower()]; ok = len(cols) > 0 and df[cols[0]].dropna().shape[0] > 0; print('PASSED' if ok else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

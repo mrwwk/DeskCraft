@@ -1,0 +1,109 @@
+{
+  "id": "interactive_writer_006",
+  "snapshot": "libreoffice_writer",
+  "interactive": true,
+  "scenario_type": "ambiguous_detail",
+  "scenario_description": "The user says to update the completion rate but doesn't specify the new value. The agent asks first.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Weekly Report\n\nReported by: Zhao Lei\nReporting Period: Week 24, 2025 (June 9 - June 13)\n\nI. Work Completed This Week\n1. Completed UI redesign plan\n2. Attended new feature requirements review meeting\n3. Integrated third-party payment API\n\nII. Progress Metrics\nCompletion Rate: 60%%\nBugs Fixed: 12\nCode Commits: 15\n\nIII. Next Week's Plan\nComplete front-end development and submit for testing.\n' > /home/user/Desktop/weekly_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--writer",
+          "/home/user/Desktop/weekly_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me update the completion rate",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Change \"Completion Rate: 60%%\" to \"Completion Rate: 85%%\", then save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/weekly_report.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Completion Rate: 85%"
+        ],
+        "exclude": [
+          "Completion Rate: 60%"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

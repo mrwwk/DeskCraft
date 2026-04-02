@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_010",
+  "instruction": "Enter the supplier audit results into the ledger",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Supplier Audit Report\\nSupplier Name: Eastern Precision Parts Co., Ltd.\\nAudit Date: 2025-03-10\\nAuditors: Wei Dong, Sun Lei\\nAudit Type: Annual Routine Audit\\nQuality System Score: 92\\nDelivery Capability Score: 88\\nOverall Score: 90\\nConclusion: Passed, maintain A-level qualification\\nNext Audit: 2026-03-10' > /home/user/Desktop/supplier_audit.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Supplier'; ws['B1'] = 'Audit Date'; ws['C1'] = 'Auditor'; ws['D1'] = 'Overall Score'; ws['E1'] = 'Conclusion'; ws['F1'] = 'Next Audit'; wb.save('/home/user/Desktop/supplier_audit_log.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Enter the supplier audit results into the ledger",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the audit results from /home/user/Desktop/supplier_audit.txt into /home/user/Desktop/supplier_audit_log.xlsx row 2: A2='Eastern Precision Parts Co., Ltd.', B2='2025-03-10', C2='Wei Dong, Sun Lei', D2=90, E2='Passed, maintain A-level qualification', F2='2026-03-10', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/supplier_audit_log.xlsx'); s = df.to_string(); print('PASSED' if 'Eastern Precision Parts Co., Ltd.' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

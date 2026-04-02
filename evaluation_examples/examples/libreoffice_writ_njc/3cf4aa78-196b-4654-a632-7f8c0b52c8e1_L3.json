@@ -1,0 +1,77 @@
+{
+  "id": "3cf4aa78-196b-4654-a632-7f8c0b52c8e1",
+  "task_slug": "writer_open_meetingl308docx_and_do_all_1_center_the",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Meeting_L3_08.docx\" and do ALL: (1) Center the title, 18pt, bold. (2) Center-align the attendees list paragraph. (3) Make all section headings underlined and bold. (4) Bold all action item lines (starting with names + colon). (5) Set all body text font to \"Arial\". (6) Add at end: \"Recorded by: Meeting Secretary | Distribution: All attendees + Board\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/3cf4aa78-196b-4654-a632-7f8c0b52c8e1/Meeting_L3_08.docx",
+            "path": "/home/user/Desktop/Meeting_L3_08.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Meeting_L3_08.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/3cf4aa78-196b-4654-a632-7f8c0b52c8e1",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Meeting_L3_08.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Meeting_L3_08_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Meeting_L3_08.docx",
+      "dest": "Meeting_L3_08.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
