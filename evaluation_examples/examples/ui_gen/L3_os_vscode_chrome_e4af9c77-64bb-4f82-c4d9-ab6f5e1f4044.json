@@ -1,0 +1,209 @@
+{
+  "id": "e4af9c77-64bb-4f82-c4d9-ab6f5e1f4044",
+  "task_slug": "launch_story_lab_true_l3",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "A local concept brief is already available in Chrome at file:///home/user/Desktop/launch_story_lab_brief.html. Use VS Code to build /home/user/Desktop/launch_story_lab into a richer generative UI story page from the provided story.json and assets/launch-mark.svg. Create index.html, styles.css, app.js, and manifest.json. Build a storytelling page with main#story-app, section#hero, section#insight-grid, section#milestones, canvas#sentimentChart, and dialog#noteDialog. Load story.json with fetch(), render 4 insight cards and 3 milestone items from the data, use the local SVG mark in the hero or header area, and implement an interaction that opens the dialog or toggles a detail panel when a milestone button is clicked. Draw a bar or column chart for the sentiment series on the canvas. Manifest must set project to launch-story-lab, theme to orchid-night, chartType to bar, dataSource to story.json, and previewPort to 8126. Start a local preview server and finish with Chrome open at http://127.0.0.1:8126/index.html.",
+  "source": "https://www.frontendmentor.io/challenges/bento-grid-RMydElrlOj | https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial | authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "rm -rf /home/user/Desktop/launch_story_lab && mkdir -p /home/user/Desktop/launch_story_lab/assets"
+        ]
+      }
+    },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/ui_gen/l3_launch_story_lab/brief.html",
+            "path": "/home/user/Desktop/launch_story_lab_brief.html"
+          },
+          {
+            "local_path": "assets/ui_gen/l3_launch_story_lab/story.json",
+            "path": "/home/user/Desktop/launch_story_lab/story.json"
+          },
+          {
+            "local_path": "assets/ui_gen/l3_launch_story_lab/assets/launch-mark.svg",
+            "path": "/home/user/Desktop/launch_story_lab/assets/launch-mark.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/launch_story_lab_brief.html"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/launch_story_lab"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os",
+    "vscode",
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/launch_story_lab && zip -qr /home/user/Desktop/launch_story_lab_bundle.zip index.html styles.css app.js manifest.json story.json assets"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "is_expected_active_tab_approximate",
+      "check_ui_previewable_generative_bundle"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/launch_story_lab_bundle.zip",
+        "dest": "launch_story_lab_bundle.zip"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "http://127.0.0.1:8126/index.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css",
+            "app.js",
+            "manifest.json",
+            "story.json",
+            "assets/launch-mark.svg"
+          ],
+          "expected_manifest": {
+            "project": "launch-story-lab",
+            "theme": "orchid-night",
+            "chartType": "bar",
+            "dataSource": "story.json",
+            "previewPort": 8126
+          },
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "main#story-app" },
+              { "type": "selector_exists", "selector": "section#hero" },
+              { "type": "selector_exists", "selector": "section#insight-grid" },
+              { "type": "selector_exists", "selector": "section#milestones" },
+              { "type": "selector_exists", "selector": "canvas#sentimentChart" },
+              { "type": "selector_exists", "selector": "dialog#noteDialog" }
+            ]
+          },
+          "required_file_patterns": {
+            "app.js": [
+              "fetch\\(['\"]story\\.json['\"]",
+              "getContext\\(['\"]2d['\"]\\)",
+              "(showModal|classList\\.toggle)",
+              "addEventListener\\(['\"]click['\"]",
+              "(forEach|map)\\("
+            ]
+          },
+          "section_order": {
+            "index.html": [
+              "section#hero",
+              "section#insight-grid",
+              "section#milestones"
+            ]
+          },
+          "css_declarations": {
+            "styles.css": [
+              { "selector": "#insight-grid", "properties": { "display": "grid" } },
+              { "selector": ".insight-card", "properties": { "border-radius": null } },
+              { "selector": "dialog#noteDialog", "properties": { "padding": null } }
+            ]
+          },
+          "local_asset_links": {
+            "index.html": [
+              "assets/launch-mark.svg"
+            ]
+          },
+          "forbid_remote_image_urls": true
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

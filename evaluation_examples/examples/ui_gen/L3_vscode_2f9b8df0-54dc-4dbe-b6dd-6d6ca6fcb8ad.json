@@ -1,0 +1,192 @@
+{
+  "id": "2f9b8df0-54dc-4dbe-b6dd-6d6ca6fcb8ad",
+  "snapshot": "vscode",
+  "instruction": "Build a Generative UI mini-site in VS Code. Create the folder /home/user/Desktop/generative_ui_scene with files index.html, styles.css, app.js, manifest.json, and assets/hero.jpg + assets/logo.png. First download two images from these websites into assets/: (1) https://upload.wikimedia.org/wikipedia/commons/0/08/HERO.png -> hero.jpg, (2) https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/512px-React-icon.svg.png -> logo.png. Then implement a single-page dashboard with: a hero section (id=\"hero\") that displays assets/hero.jpg, a timeline section (id=\"timeline\"), and a canvas chart (id=\"chartCanvas\") rendered by app.js using monthlyRevenue = [120, 180, 150, 210, 260]. In app.js, render bars on canvas and also draw logo.png onto the chart as a watermark (drawImage). Use local image paths only (no remote image URLs inside final html/css/js). In manifest.json, include project=\"generative-ui\", theme=\"aurora\", chartType=\"bar\", and required_images containing both asset paths.",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial | authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/generative_ui_scene/assets"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/generative_ui_scene"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/generative_ui_scene && zip -qr /home/user/Desktop/generative_ui_bundle.zip index.html styles.css app.js manifest.json assets"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_min_file_sizes",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_manifest_subset",
+      "check_ui_bundle_no_remote_image_urls"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css",
+            "app.js",
+            "manifest.json",
+            "assets/hero.jpg",
+            "assets/logo.png"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "min_file_size_bytes": {
+            "assets/hero.jpg": 100000,
+            "assets/logo.png": 8000
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "index.html": [
+              "id=\"hero\"",
+              "id=\"timeline\"",
+              "id=\"chartCanvas\"",
+              "assets/hero.jpg",
+              "assets/logo.png",
+              "app.js"
+            ],
+            "styles.css": [
+              ":root",
+              "--bg",
+              ".hero",
+              ".timeline",
+              "canvas"
+            ],
+            "app.js": [
+              "const monthlyRevenue",
+              "[120, 180, 150, 210, 260]",
+              "getContext",
+              "fillRect",
+              "drawImage",
+              "assets/logo.png"
+            ],
+            "manifest.json": [
+              "generative-ui",
+              "aurora",
+              "bar",
+              "assets/hero.jpg",
+              "assets/logo.png"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_manifest": {
+            "project": "generative-ui",
+            "theme": "aurora",
+            "chartType": "bar",
+            "required_images": [
+              "assets/hero.jpg",
+              "assets/logo.png"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "forbid_remote_image_urls": true
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_bundle.zip",
+        "dest": "generative_ui_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_bundle.zip",
+        "dest": "generative_ui_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_bundle.zip",
+        "dest": "generative_ui_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_bundle.zip",
+        "dest": "generative_ui_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/generative_ui_bundle.zip",
+        "dest": "generative_ui_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

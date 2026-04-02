@@ -1,0 +1,82 @@
+{
+  "id": "f11a0c21-75cc-4d13-8a91-1c01b4d51014",
+  "task_slug": "launch_story_studio_asset_triage",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Local materials are available in Chrome at file:///home/user/Desktop/launch_story_studio_brief.html and file:///home/user/Desktop/launch_story_studio_ref.html. Story data and the glow asset are dropped in /home/user/Desktop/launch_story_drop. Use the OS to place the dropped files into your project, then use VS Code to build /home/user/Desktop/launch_story_studio. Create index.html, styles.css, app.js, and manifest.json. Load story.json with fetch(), render section#hero, section#insight-grid with exactly 3 article.insight-card blocks, section#milestones, dialog#storyDialog, and aside#story-sidecar. Use the local asset assets/launch-glow.svg in the hero or dialog area. Manifest must set project to launch-story-studio, theme to glow-editorial, dataSource to story.json, and previewPort to 8134. Start a local preview server and finish with Chrome open at http://127.0.0.1:8134/index.html.",
+  "source": "https://www.frontendmentor.io/challenges/bento-grid-RMydElrlOj | https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog | authors",
+  "config": [
+    { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "rm -rf /home/user/Desktop/launch_story_studio /home/user/Desktop/launch_story_drop && mkdir -p /home/user/Desktop/launch_story_studio /home/user/Desktop/launch_story_drop"] } },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          { "local_path": "assets/ui_gen/l3_launch_story_studio/brief.html", "path": "/home/user/Desktop/launch_story_studio_brief.html" },
+          { "local_path": "assets/ui_gen/l3_launch_story_studio/reference.html", "path": "/home/user/Desktop/launch_story_studio_ref.html" },
+          { "local_path": "assets/ui_gen/l3_launch_story_studio/story.json", "path": "/home/user/Desktop/launch_story_drop/story.json" },
+          { "local_path": "assets/ui_gen/l3_launch_story_studio/drop/launch-glow.svg", "path": "/home/user/Desktop/launch_story_drop/launch-glow.svg" }
+        ]
+      }
+    },
+    { "type": "launch", "parameters": { "command": ["google-chrome", "--remote-debugging-port=1337"] } },
+    { "type": "launch", "parameters": { "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"] } },
+    { "type": "chrome_open_tabs", "parameters": { "urls_to_open": ["file:///home/user/Desktop/launch_story_studio_ref.html", "file:///home/user/Desktop/launch_story_studio_brief.html"] } },
+    { "type": "launch", "parameters": { "command": ["code", "/home/user/Desktop/launch_story_studio"] } },
+    { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "postconfig": [
+      { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } },
+      { "type": "sleep", "parameters": { "seconds": 0.5 } },
+      { "type": "execute", "parameters": { "command": ["python", "-c", "import pyautogui, time; pyautogui.hotkey('ctrl','s'); time.sleep(0.5)"] } },
+      { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "cd /home/user/Desktop/launch_story_studio && zip -qr /home/user/Desktop/launch_story_studio_bundle.zip index.html styles.css app.js manifest.json story.json assets"] } }
+    ],
+    "func": ["is_expected_active_tab_approximate", "check_ui_previewable_generative_bundle"],
+    "conj": "and",
+    "result": [
+      { "type": "active_tab_info" },
+      { "type": "vm_file", "path": "/home/user/Desktop/launch_story_studio_bundle.zip", "dest": "launch_story_studio_bundle.zip" }
+    ],
+    "expected": [
+      { "type": "rule", "rules": { "type": "url", "url": "http://127.0.0.1:8134/index.html" } },
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": ["index.html", "styles.css", "app.js", "manifest.json", "story.json", "assets/launch-glow.svg"],
+          "expected_manifest": {
+            "project": "launch-story-studio",
+            "theme": "glow-editorial",
+            "dataSource": "story.json",
+            "previewPort": 8134
+          },
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "section#hero" },
+              { "type": "selector_exists", "selector": "section#insight-grid" },
+              { "type": "selector_count", "selector": "section#insight-grid article.insight-card", "count": 3 },
+              { "type": "selector_exists", "selector": "section#milestones" },
+              { "type": "selector_exists", "selector": "dialog#storyDialog" },
+              { "type": "selector_exists", "selector": "aside#story-sidecar" }
+            ]
+          },
+          "required_file_patterns": {
+            "app.js": [
+              "fetch\\(['\"]story\\.json['\"]",
+              "showModal\\(",
+              "addEventListener\\(['\"]click['\"]"
+            ]
+          },
+          "local_asset_links": {
+            "index.html": ["assets/launch-glow.svg"]
+          },
+          "forbid_remote_image_urls": true
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,153 @@
+{
+  "id": "1d7f6b8a-9c41-4e5f-a7d2-5b8d19f0c2a1",
+  "snapshot": "vscode",
+  "instruction": "Create a simple landing page project in VS Code at /home/user/Desktop/mint_hero_page. Create two files: index.html and manifest.json. In index.html, build a simple page for Mint Launch using a main container <main id=\"app\"> and a hero section <section id=\"hero\" class=\"hero\">. Inside the hero section, include a heading with the exact text \"Mint Launch\", a short descriptive paragraph, and a primary button <button id=\"cta\">Get Started</button>. In manifest.json, set project to \"mint-hero-page\", theme to \"mint\", and version to \"1.0\". Save both files.",
+  "source": "https://www.frontendmentor.io/challenges | authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/mint_hero_page"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/mint_hero_page"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/mint_hero_page && zip -qr /home/user/Desktop/mint_hero_page_bundle.zip index.html manifest.json"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_html_checks",
+      "check_ui_bundle_manifest_subset"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "manifest.json"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "index.html": [
+              "id=\"app\"",
+              "id=\"hero\"",
+              "id=\"cta\"",
+              "Get Started"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "main#app" },
+              { "type": "selector_exists", "selector": "section#hero.hero" },
+              { "type": "selector_text_contains", "selector": "h1", "text": "Mint Launch" },
+              { "type": "selector_exists", "selector": "p" },
+              { "type": "selector_text_contains", "selector": "button#cta", "text": "Get Started" }
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_manifest": {
+            "project": "mint-hero-page",
+            "theme": "mint",
+            "version": "1.0"
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/mint_hero_page_bundle.zip",
+        "dest": "mint_hero_page_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/mint_hero_page_bundle.zip",
+        "dest": "mint_hero_page_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/mint_hero_page_bundle.zip",
+        "dest": "mint_hero_page_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/mint_hero_page_bundle.zip",
+        "dest": "mint_hero_page_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
