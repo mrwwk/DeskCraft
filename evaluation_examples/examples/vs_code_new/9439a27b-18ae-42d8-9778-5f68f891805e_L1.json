@@ -1,0 +1,52 @@
+{
+  "id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+  "task_slug": "debug_focus_inline_values",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please update VS Code User Settings for debugging so that the editor does not steal focus on break, auto-expand lazy variables is enabled, and inline values are shown during debug.",
+  "source": [
+    "https://code.visualstudio.com/docs/debugtest/debugging",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "debug.focusEditorOnBreak": false,
+          "debug.autoExpandLazyVariables": true,
+          "debug.inlineValues": true
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

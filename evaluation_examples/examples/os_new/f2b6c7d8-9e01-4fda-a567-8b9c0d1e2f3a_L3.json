@@ -1,0 +1,64 @@
+{
+  "id": "f2b6c7d8-9e01-4fda-a567-8b9c0d1e2f3a",
+  "task_slug": "multi_user_quota_dirs",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Set up a shared project workspace for three teams. (1) Create group 'projectx'. (2) Create users alice, bob, charlie and add them all to group 'projectx'. (3) Create /srv/projectx/ owned by root:projectx with permission 2775 (setgid). (4) Inside /srv/projectx/, create subdirectories team_alpha/, team_beta/, team_gamma/. (5) Set team_alpha/ to be writable only by alice (owner alice:projectx, 2770), team_beta/ writable only by bob (owner bob:projectx, 2770), team_gamma/ writable by all projectx members (owner root:projectx, 2775). (6) Create /srv/projectx/README.txt with content 'Project X shared workspace'.",
+  "source": "外部参考来源：Ubuntu manpage - useradd(8) (https://manpages.ubuntu.com/manpages/jammy/en/man8/useradd.8.html)；Ubuntu manpage - usermod(8) (https://manpages.ubuntu.com/manpages/jammy/en/man8/usermod.8.html)；Ubuntu manpage - chmod(1) (https://manpages.ubuntu.com/manpages/jammy/en/man1/chmod.1.html)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'userdel -r alice 2>/dev/null; userdel -r bob 2>/dev/null; userdel -r charlie 2>/dev/null; groupdel projectx 2>/dev/null; rm -rf /srv/projectx'",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_quota_dirs",
+    "result": {
+      "type": "vm_command_line",
+      "command": "group_ok='false'; getent group projectx >/dev/null 2>&1 && group_ok='true'; alice_ok='false'; id alice >/dev/null 2>&1 && id -nG alice | grep -qw projectx && alice_ok='true'; bob_ok='false'; id bob >/dev/null 2>&1 && id -nG bob | grep -qw projectx && bob_ok='true'; charlie_ok='false'; id charlie >/dev/null 2>&1 && id -nG charlie | grep -qw projectx && charlie_ok='true'; root_dir_ok='false'; [ -d /srv/projectx ] && [ \"$(stat -c '%G' /srv/projectx)\" = 'projectx' ] && [ \"$(stat -c '%a' /srv/projectx)\" = '2775' ] && root_dir_ok='true'; alpha_ok='false'; [ -d /srv/projectx/team_alpha ] && [ \"$(stat -c '%U:%G' /srv/projectx/team_alpha)\" = 'alice:projectx' ] && [ \"$(stat -c '%a' /srv/projectx/team_alpha)\" = '2770' ] && alpha_ok='true'; beta_ok='false'; [ -d /srv/projectx/team_beta ] && [ \"$(stat -c '%U:%G' /srv/projectx/team_beta)\" = 'bob:projectx' ] && [ \"$(stat -c '%a' /srv/projectx/team_beta)\" = '2770' ] && beta_ok='true'; gamma_ok='false'; [ -d /srv/projectx/team_gamma ] && [ \"$(stat -c '%U:%G' /srv/projectx/team_gamma)\" = 'root:projectx' ] && [ \"$(stat -c '%a' /srv/projectx/team_gamma)\" = '2775' ] && gamma_ok='true'; readme_ok='false'; [ -f /srv/projectx/README.txt ] && grep -q 'Project X shared workspace' /srv/projectx/README.txt && readme_ok='true'; echo \"group_ok=$group_ok\"; echo \"alice_ok=$alice_ok\"; echo \"bob_ok=$bob_ok\"; echo \"charlie_ok=$charlie_ok\"; echo \"root_dir_ok=$root_dir_ok\"; echo \"alpha_ok=$alpha_ok\"; echo \"beta_ok=$beta_ok\"; echo \"gamma_ok=$gamma_ok\"; echo \"readme_ok=$readme_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "group_ok": "true",
+          "alice_ok": "true",
+          "bob_ok": "true",
+          "charlie_ok": "true",
+          "root_dir_ok": "true",
+          "alpha_ok": "true",
+          "beta_ok": "true",
+          "gamma_ok": "true",
+          "readme_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

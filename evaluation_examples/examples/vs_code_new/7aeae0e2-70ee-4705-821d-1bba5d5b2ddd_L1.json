@@ -1,0 +1,53 @@
+{
+  "id": "7aeae0e2-70ee-4705-821d-1bba5d5b2ddd",
+  "task_slug": "python_inlay_hints_bracket_colors",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please optimize Python editing in VS Code User Settings: enable inlay hints for variable types and function return types, and enable bracket pair colorization.",
+  "source": [
+    "https://code.visualstudio.com/docs/python/settings-reference",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "editor.inlayHints.enabled": "on",
+          "python.analysis.inlayHints.variableTypes": true,
+          "python.analysis.inlayHints.functionReturnTypes": true,
+          "editor.bracketPairColorization.enabled": true
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

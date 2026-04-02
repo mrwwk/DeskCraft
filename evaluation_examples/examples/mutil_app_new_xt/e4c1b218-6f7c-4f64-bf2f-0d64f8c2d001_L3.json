@@ -1,0 +1,173 @@
+{
+  "id": "e4c1b218-6f7c-4f64-bf2f-0d64f8c2d001",
+  "task_slug": "release_workspace_manifest_fix_with_local_brief",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "A local release brief is available at ~/Desktop/release_workspace_brief.html and a badge asset is available at ~/Desktop/release_badge.svg. Open the brief in Chrome with the file:// URL and keep it open when you finish. Then use ~/Desktop/release_spec.json as the source of truth for all concrete values: update ~/Desktop/release_workspace/release_manifest.json so project, owner, and channel match the spec; create a backup named release_manifest.json.bak; repair build_release_note.py so the provided tests pass; copy the badge asset to ~/Desktop/release_workspace/assets/badge.svg; create ~/Desktop/release_workspace/README.md whose first line is '# <project>' and whose second line is 'Channel: <channel>'; and apply the VS Code User Settings from the spec by setting editor.tabSize, editor.wordWrap, and each entry from excludeDirs in files.exclude.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：发布工作区换班时常见的“按本地 brief 和 release spec 迁移 manifest、修发布说明脚本、复制 badge 并同步编辑器规则”release handoff 流程"
+  ],
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/mutil_app_new_xt/release_workspace_brief.html",
+            "path": "/home/user/Desktop/release_workspace_brief.html"
+          },
+          {
+            "local_path": "assets/mutil_app_new_xt/release_badge.svg",
+            "path": "/home/user/Desktop/release_badge.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/release_workspace')\n(base / 'assets').mkdir(parents=True, exist_ok=True)\njson.dump({'project': 'Release Workspace', 'owner': 'ops-team', 'channel': 'stable', 'tabSize': 2, 'wordWrap': 'bounded', 'excludeDirs': ['dist', 'tmp', '.cache']}, open('/home/user/Desktop/release_spec.json', 'w'), indent=2)\njson.dump({'project': 'Old Workspace', 'owner': 'legacy-team', 'channel': 'beta'}, open(base / 'release_manifest.json', 'w'), indent=2)\n(base / 'build_release_note.py').write_text(\"\"\"def build_release_note(project, channel, owner):\n    return f'{project} / {owner}'\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from build_release_note import build_release_note\n\ndef test():\n    assert build_release_note('Release Workspace', 'stable', 'ops-team') == 'Release Workspace [stable] / ops-team'\n\"\"\")\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code", "/home/user/Desktop/release_workspace"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "func": [
+      "is_expected_active_tab_approximate",
+      "check_json",
+      "check_include_exclude",
+      "check_python_file_by_test_suite",
+      "check_include_exclude",
+      "check_include_exclude",
+      "check_json_settings",
+      "check_include_exclude"
+    ],
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/release_workspace/release_manifest.json",
+        "dest": "release_manifest.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "ls /home/user/Desktop/release_workspace/",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": ["/home/user/Desktop/release_workspace/build_release_note.py"],
+        "dest": ["build_release_note.py"],
+        "multi": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/release_workspace/README.md",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/release_workspace/assets/badge.svg",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/.config/Code/User/settings.json",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/release_workspace_brief.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expect": [
+            {"key": ["project"], "method": "eq", "ref": "Release Workspace"},
+            {"key": ["owner"], "method": "eq", "ref": "ops-team"},
+            {"key": ["channel"], "method": "eq", "ref": "stable"}
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["release_manifest.json.bak"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/release_workspace/test.py",
+        "dest": "test_suite.py"
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["# Release Workspace", "Channel: stable"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["Release Workspace", "<svg"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 2,
+            "editor.wordWrap": "bounded"
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["dist", "tmp", ".cache"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

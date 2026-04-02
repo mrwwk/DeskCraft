@@ -1,0 +1,52 @@
+{
+  "id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+  "task_slug": "run_python_in_terminal_keybinding",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please create a custom VS Code keybinding so that pressing Ctrl+Alt+R runs Python file in terminal, and make it active only when the editor is focused and the current language is Python.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/keybindings",
+    "https://code.visualstudio.com/docs/python/settings-reference"
+  ],
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_keybindings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "key": "ctrl+alt+r",
+          "command": "python.execInTerminal",
+          "when": "editorTextFocus && editorLangId == python"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/keybindings.json",
+      "dest": "keybindings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
