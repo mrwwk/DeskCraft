@@ -1,0 +1,78 @@
+{
+  "id": "a1b00015-0015-4000-8000-000000000015",
+  "snapshot": "audacity",
+  "instruction": "This recording has noticeable background noise. Open /home/user/Documents/noisy_recording.wav in Audacity, capture a noise profile from 0.0s to 0.5s, apply noise reduction to the full track, export to /home/user/Documents/exports/cleaned.wav, and save the project.",
+  "source": "https://manual.audacityteam.org/man/noise_reduction.html",
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/noisy_recording.wav",
+            "path": "/home/user/Documents/noisy_recording.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/noisy_recording.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_duration",
+      "check_audio_rms_level"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/cleaned.wav",
+        "dest": "cleaned.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/cleaned.wav",
+        "dest": "cleaned.wav"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 14.0,
+          "tolerance": 0.5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "min_rms_db": -25.0,
+          "max_rms_db": -3.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

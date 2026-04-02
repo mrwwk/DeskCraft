@@ -113,6 +113,7 @@ def run_interactive_example(
 
             logger.info("Step %d: %s", step_idx + 1, action)
             obs, reward, done, info = env.step(action, args.sleep_after_execution)
+            step_idx += 1  # increment per actual env.step, not per predict call
             logger.info("Reward: %.2f", reward)
             logger.info("Done: %s", done)
 
@@ -120,7 +121,7 @@ def run_interactive_example(
             with open(
                 os.path.join(
                     example_result_dir,
-                    f"step_{step_idx + 1}_{action_timestamp}.png",
+                    f"step_{step_idx}_{action_timestamp}.png",
                 ),
                 "wb",
             ) as _f:
@@ -129,7 +130,7 @@ def run_interactive_example(
             # Save trajectory
             with open(os.path.join(example_result_dir, "traj.jsonl"), "a") as f:
                 f.write(json.dumps({
-                    "step_num": step_idx + 1,
+                    "step_num": step_idx,
                     "action_timestamp": action_timestamp,
                     "action": action,
                     "response": response,
@@ -137,15 +138,15 @@ def run_interactive_example(
                     "done": done,
                     "info": info,
                     "phase": user_sim.current_phase_idx + 1,
-                    "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png",
+                    "screenshot_file": f"step_{step_idx}_{action_timestamp}.png",
                 }, ensure_ascii=False))
                 f.write("\n")
 
             if done:
                 logger.info("The episode is done (agent reported DONE/FAIL).")
                 break
-
-        step_idx += 1
+            if step_idx >= max_steps:
+                break
 
         # ===== Core: Check if user should intervene =====
         screenshot_b64 = None

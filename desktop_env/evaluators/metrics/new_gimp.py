@@ -3601,13 +3601,8 @@ def check_b148e375_rect_select_fill_red(src_path, tgt_path):
 # Function: check_554785e9_saturation_increase_40
 def check_554785e9_saturation_increase_40(src_path, tgt_path):
     """
-    Evaluator for task 554785e9-L1_1: Increase the image saturation by 40% 
-    to enhance color vibrancy and save the result
-
-    This function checks:
-    1. The output image exists
-    2. The saturation of the output image is approximately 40% higher than the original
-    3. The image dimensions and structure are preserved
+    Evaluator for task 554785e9-L1_1: Increase the image saturation by 40%
+    to enhance color vibrancy and save the result.
 
     Args:
         src_path: Source image path (original image) - from cloud
@@ -3620,11 +3615,9 @@ def check_554785e9_saturation_increase_40(src_path, tgt_path):
     import logging
     from PIL import Image
     import numpy as np
-    import colorsys
 
     logger = logging.getLogger(__name__)
 
-    # Check if paths are provided
     if src_path is None or tgt_path is None:
         logger.warning("Source or target path is None")
         return 0.0
@@ -3634,74 +3627,65 @@ def check_554785e9_saturation_increase_40(src_path, tgt_path):
         return 0.0
 
     try:
-        # Load images
         source_img = Image.open(src_path)
         result_img = Image.open(tgt_path)
 
-        # Convert to RGB for consistent processing
         if source_img.mode != 'RGB':
             source_img = source_img.convert('RGB')
         if result_img.mode != 'RGB':
             result_img = result_img.convert('RGB')
 
-        # Check 1: Image dimensions should be the same
         if source_img.size != result_img.size:
             logger.warning(f"Image size changed: {source_img.size} -> {result_img.size}")
             return 0.0
 
-        # Check 2: Verify saturation increase
-        # Convert to HSV and extract saturation channel
-        def get_saturation_mean(img):
-            """Convert RGB image to HSV and return mean saturation"""
-            img_array = np.array(img) / 255.0  # Normalize to 0-1
-            h, s, v = colorsys.rgb_to_hsv(img_array[:,:,0], img_array[:,:,1], img_array[:,:,2])
-            return np.mean(s)
+        def get_s_channel(img):
+            # PIL's HSV conversion is stable here and avoids colorsys scalar-only API issues.
+            hsv = img.convert('HSV')
+            return np.asarray(hsv, dtype=np.uint8)[:, :, 1].astype(np.float32) / 255.0
 
-        source_saturation = get_saturation_mean(source_img)
-        result_saturation = get_saturation_mean(result_img)
+        source_s = get_s_channel(source_img)
+        result_s = get_s_channel(result_img)
 
+        source_saturation = float(np.mean(source_s))
+        result_saturation = float(np.mean(result_s))
         logger.info(f"Saturation: source={source_saturation:.4f}, result={result_saturation:.4f}")
 
-        # Calculate saturation ratio
         if source_saturation > 0:
             saturation_ratio = result_saturation / source_saturation
         else:
             saturation_ratio = 1.0
 
-        # Expected ratio is 1.4 (40% increase), allow tolerance of ±0.15
         expected_ratio = 1.4
         tolerance = 0.15
         ratio_correct = (expected_ratio - tolerance) <= saturation_ratio <= (expected_ratio + tolerance)
-
-        logger.info(f"Saturation ratio: {saturation_ratio:.4f} (expected: {expected_ratio} ± {tolerance}), correct={ratio_correct}")
+        logger.info(
+            f"Saturation ratio: {saturation_ratio:.4f} "
+            f"(expected: {expected_ratio} ± {tolerance}), correct={ratio_correct}"
+        )
 
         if not ratio_correct:
-            logger.warning(f"Saturation ratio incorrect: {saturation_ratio:.4f} not in [{expected_ratio - tolerance}, {expected_ratio + tolerance}]")
+            logger.warning(
+                f"Saturation ratio incorrect: {saturation_ratio:.4f} "
+                f"not in [{expected_ratio - tolerance}, {expected_ratio + tolerance}]"
+            )
             return 0.0
 
-        # Check 3: Verify high saturation pixel ratio increased
-        def get_high_saturation_ratio(img):
-            """Get ratio of high saturation pixels (S > 0.6)"""
-            img_array = np.array(img) / 255.0
-            h, s, v = colorsys.rgb_to_hsv(img_array[:,:,0], img_array[:,:,1], img_array[:,:,2])
-            high_sat_pixels = np.sum(s > 0.6)
-            return high_sat_pixels / s.size
+        source_high_sat_ratio = float(np.mean(source_s > 0.6))
+        result_high_sat_ratio = float(np.mean(result_s > 0.6))
+        logger.info(
+            f"High saturation pixel ratio: source={source_high_sat_ratio:.4f}, "
+            f"result={result_high_sat_ratio:.4f}"
+        )
 
-        source_high_sat_ratio = get_high_saturation_ratio(source_img)
-        result_high_sat_ratio = get_high_saturation_ratio(result_img)
-
-        logger.info(f"High saturation pixel ratio: source={source_high_sat_ratio:.4f}, result={result_high_sat_ratio:.4f}")
-
-        # High saturation pixel ratio should increase
         high_sat_increased = result_high_sat_ratio > source_high_sat_ratio
-
-        # Success criteria
         success = ratio_correct and high_sat_increased
 
         result = 1.0 if success else 0.0
-        logger.info(f"check_554785e9_saturation_increase_40 result: {result} " +
-                   f"(ratio_correct={ratio_correct}, high_sat_increased={high_sat_increased})")
-
+        logger.info(
+            f"check_554785e9_saturation_increase_40 result: {result} "
+            f"(ratio_correct={ratio_correct}, high_sat_increased={high_sat_increased})"
+        )
         return result
 
     except Exception as e:
@@ -3981,3 +3965,4 @@ def check_734d6579_green_background(src_path, tgt_path):
     except Exception as e:
         logger.error(f"check_734d6579_green_background error: {e}")
         return 0.0
+

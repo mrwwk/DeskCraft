@@ -5,6 +5,17 @@
         "interactive_impress_workflow_001",
         "interactive_gimp_correction_001",
         "interactive_os_ambiguous_001",
-        "interactive_writer_interruption_001"
+        "interactive_writer_interruption_001",
+        "interactive_audacity_requirement_change_001",
+        "interactive_audacity_workflow_001",
+        "interactive_audacity_ambiguous_001",
+        "interactive_audacity_interruption_001",
+        "interactive_audacity_progressive_001",
+        "interactive_gimp_watch_white_standard_interruption_001",
+        "interactive_gimp_city_night_run_interruption_001",
+        "interactive_gimp_perfume_listing_workflow_001",
+        "interactive_gimp_avatar_refined_progressive_001",
+        "interactive_gimp_watch_white_standard_ambiguous_001",
+        "interactive_gimp_camera_annotation_ambiguous_001"
     ]
 }

@@ -1,0 +1,97 @@
+{
+  "id": "a1b00012-0012-4000-8000-000000000012",
+  "snapshot": "audacity",
+  "instruction": "I want a louder version with smoother edges. Open /home/user/Documents/volume_test.wav in Audacity, amplify the whole track by +6 dB, apply fade-in to the first 2 seconds and fade-out to the last 2 seconds, export to /home/user/Documents/exports/amp_fades.wav, and save the project.",
+  "source": [
+    "https://manual.audacityteam.org/man/amplify.html",
+    "https://manual.audacityteam.org/man/normalize.html",
+    "https://manual.audacityteam.org/man/fade_and_crossfade.html",
+    "https://manual.audacityteam.org/man/silence.html",
+    "https://manual.audacityteam.org/man/repeat.html"
+  ],
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/volume_test.wav",
+            "path": "/home/user/Documents/volume_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/volume_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_rms_level",
+      "check_audio_fade_in",
+      "check_audio_fade_out"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/amp_fades.wav",
+        "dest": "amp_fades.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/amp_fades.wav",
+        "dest": "amp_fades.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/amp_fades.wav",
+        "dest": "amp_fades.wav"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "min_rms_db": -30.0,
+          "max_rms_db": -5.0
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "fade_duration": 2.0,
+          "num_windows": 5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "fade_duration": 2.0,
+          "num_windows": 5
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

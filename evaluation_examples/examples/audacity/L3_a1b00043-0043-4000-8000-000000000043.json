@@ -1,0 +1,135 @@
+{
+  "id": "a1b00043-0043-4000-8000-000000000043",
+  "snapshot": "audacity",
+  "instruction": "I want a three-track project version that I can keep refining later. Open vocals.wav, import drums.wav and bass.wav, keep vocals at 0 dB, set drums to -4 dB and bass to -2 dB, mute the drums track, add labels Start at 0.0s and Middle at 15.0s, then save as production.aup3.",
+  "source": "多轨制作工程整理：demo 工程搭建、轨道电平预设、标签定位、后续返工留档",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/vocals.wav",
+            "path": "/home/user/Documents/vocals.wav"
+          },
+          {
+            "local_path": "assets/audacity/drums.wav",
+            "path": "/home/user/Documents/drums.wav"
+          },
+          {
+            "local_path": "assets/audacity/bass.wav",
+            "path": "/home/user/Documents/bass.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/vocals.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_aup3_track_count",
+      "check_aup3_track_mute",
+      "check_aup3_labels",
+      "check_aup3_track_gain",
+      "check_aup3_track_gain"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/production.aup3",
+        "dest": "production.aup3"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/production.aup3",
+        "dest": "production.aup3"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/production.aup3",
+        "dest": "production.aup3"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/production.aup3",
+        "dest": "production.aup3"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/production.aup3",
+        "dest": "production.aup3"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_track_count": 4
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "track_index": 1,
+          "expected_mute": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_labels": [
+            {
+              "time": 0.0,
+              "text": "Start"
+            },
+            {
+              "time": 15.0,
+              "text": "Middle"
+            }
+          ],
+          "time_tolerance": 1.0
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "track_index": 1,
+          "expected_gain_db": -4.0,
+          "tolerance": 2.0
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "track_index": 2,
+          "expected_gain_db": -2.0,
+          "tolerance": 2.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

@@ -1,0 +1,85 @@
+{
+  "id": "a1b00021-0021-4000-8000-000000000021",
+  "snapshot": "audacity",
+  "instruction": "I want a quick mono mix preview to share with teammates. Open /home/user/Documents/vocals.wav in Audacity, import drums.wav and bass.wav, mix down to mono, export to /home/user/Documents/exports/mixdown.wav, and save the project.",
+  "source": "https://manual.audacityteam.org/man/tutorial_mixing_a_narration_with_background_music.html",
+  "difficulty": "L3",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/vocals.wav",
+            "path": "/home/user/Documents/vocals.wav"
+          },
+          {
+            "local_path": "assets/audacity/drums.wav",
+            "path": "/home/user/Documents/drums.wav"
+          },
+          {
+            "local_path": "assets/audacity/bass.wav",
+            "path": "/home/user/Documents/bass.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/vocals.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_duration",
+      "check_audio_channels"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/mixdown.wav",
+        "dest": "mixdown.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/mixdown.wav",
+        "dest": "mixdown.wav"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 30.0,
+          "tolerance": 1.0
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_channels": 1
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

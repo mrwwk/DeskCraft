@@ -1,0 +1,187 @@
+{
+  "id": "a2ba5904-0f5f-4282-be35-9976a34b6c33",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. Set up a professional product visualization: (1) Select the \"Cube\" and add a Bevel modifier with width 0.05 and 4 segments. (2) Add a Subdivision Surface modifier with viewport level 2. (3) Set Smooth Shading. (4) Create a material with /home/user/Documents/texture_metal.jpg as Base Color, /home/user/Documents/roughness_metal.jpg connected to Roughness, and Metallic set to 0.9. (5) Load /home/user/Documents/hdri_studio.exr as HDRI environment. (6) Select the Camera, set focal length to 85mm, enable Depth of Field with F-Stop 2.8 and Focus Distance 5.0. (7) Switch to Cycles with 256 samples, resolution 2560×1440. (8) Render to /home/user/Documents/product_render.png. Then save the project file.",
+  "source": "现实场景构造来源（参考产品可视化教程范式）：电商产品主视觉常见的“倒角细分 + PBR + HDRI + DOF + 高分辨率渲染”流程",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/uv_unwrapped_cube.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_modifier.py",
+            "path": "/tmp/check_modifier.py"
+          },
+          {
+            "local_path": "assets/blender/check_mesh.py",
+            "path": "/tmp/check_mesh.py"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/check_world.py",
+            "path": "/tmp/check_world.py"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          },
+          {
+            "local_path": "assets/blender/texture_metal.jpg",
+            "path": "/home/user/Documents/texture_metal.jpg"
+          },
+          {
+            "local_path": "assets/blender/roughness_metal.jpg",
+            "path": "/home/user/Documents/roughness_metal.jpg"
+          },
+          {
+            "local_path": "assets/blender/hdri_studio.exr",
+            "path": "/home/user/Documents/hdri_studio.exr"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_modifier_stack",
+      "check_blender_smooth_shading",
+      "check_blender_pbr_setup",
+      "check_blender_world_hdri",
+      "check_blender_camera_config",
+      "check_blender_render_output"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_modifier.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_mesh.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_world.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/product_render.png",
+        "dest": "product_render.png"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "modifiers": {
+            "BEVEL": {
+              "width": 0.05,
+              "segments": 4
+            },
+            "SUBSURF": {
+              "levels": 2
+            }
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "has_smooth": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "textures": [
+            {
+              "filename": "texture_metal.jpg",
+              "connected_to": "Base Color"
+            },
+            {
+              "filename": "roughness_metal.jpg",
+              "connected_to": "Roughness"
+            }
+          ],
+          "metallic": 0.9,
+          "tolerance": 0.05
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "hdri_filename": "hdri_studio.exr"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "camera_name": "Camera",
+          "focal_length": 85.0,
+          "dof_enabled": true,
+          "tolerance": 0.5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "width": 2560,
+          "height": 1440,
+          "format": "PNG"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

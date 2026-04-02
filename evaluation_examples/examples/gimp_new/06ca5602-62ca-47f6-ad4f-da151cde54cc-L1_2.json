@@ -1,7 +1,7 @@
 {
   "id": "06ca5602-62ca-47f6-ad4f-da151cde54cc-L1_2",
   "snapshot": "gimp",
-  "instruction": "Change the image to palette-based mode with maximum 128 colors and save it as indexed_output.png",
+  "instruction": "Change the image to palette-based indexed mode with a maximum of 128 colors.",
   "source": "https://www.youtube.com/watch?v=lOzSiOIipSM",
   "config": [
     {
@@ -40,7 +40,57 @@
       "type": "vm_file",
       "path": "/home/user/Desktop/indexed_output.png",
       "dest": "indexed_output.png"
-    }
+    },
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.write(\"indexed_output\");time.sleep(1);pyautogui.press([\"enter\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.press([\"enter\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ]
   },
   "proxy": false,
   "fixed_ip": false,

@@ -1,0 +1,64 @@
+{
+  "id": "a2739a6f-9bc0-4d21-abde-2ab8a37349d6",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/multi_rects.svg in Inkscape. Select all three rectangles and align them to the horizontal center of the page (Object > Align and Distribute > Center on vertical axis), then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=align+distribute+center+on+page",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/multi_rects.svg",
+            "path": "/home/user/Documents/multi_rects.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/multi_rects.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_align",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/multi_rects.svg",
+      "dest": "multi_rects.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "element_ids": [
+          "rect_bottom",
+          "rect_middle",
+          "rect_top"
+        ],
+        "align_axis": "horizontal_center",
+        "page_width": 800,
+        "tolerance": 10
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

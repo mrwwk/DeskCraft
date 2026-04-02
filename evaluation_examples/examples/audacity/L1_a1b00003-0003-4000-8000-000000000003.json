@@ -1,0 +1,58 @@
+{
+  "id": "a1b00003-0003-4000-8000-000000000003",
+  "snapshot": "audacity",
+  "instruction": "Please remove the short segment from 3.0s to 5.0s. Open /home/user/Documents/delete_test.wav in Audacity, delete that 2-second section, export to /home/user/Documents/exports/deleted.wav, and save the project.",
+  "source": "https://manual.audacityteam.org/man/tutorial_editing_an_existing_file.html",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/delete_test.wav",
+            "path": "/home/user/Documents/delete_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/delete_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_audio_duration",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/exports/deleted.wav",
+      "dest": "deleted.wav"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_duration": 8.0,
+        "tolerance": 0.5
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

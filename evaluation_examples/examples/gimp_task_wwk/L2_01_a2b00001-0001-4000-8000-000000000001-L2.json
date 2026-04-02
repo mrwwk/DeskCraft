@@ -1,0 +1,161 @@
+{
+  "id": "a2b00001-0001-4000-8000-000000000001-L2",
+  "snapshot": "gimp",
+  "instruction": "Please create a transparent e-commerce hero image from /home/user/Desktop/product_perfume_965989.jpg. Remove the near-white background, place the product centered on a 1200x1200 transparent canvas, keep the product about 70%-80% of canvas height, add a soft shadow below it, and keep the XCF layer names exactly Product, Shadow, and Guide_BG.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-layer-color-to-alpha.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/products/product_perfume_965989.jpg",
+            "path": "/home/user/Desktop/product_perfume_965989.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/product_perfume_965989.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l2_perfume_listing_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2
+      ],
+      "path": [
+        "/home/user/Desktop/perfume_listing.png",
+        "/home/user/Desktop/perfume_listing.xcf",
+        "/home/user/Desktop/product_perfume_965989.jpg"
+      ],
+      "dest": [
+        "perfume_listing.png",
+        "perfume_listing.xcf",
+        "product_perfume_965989.jpg"
+      ]
+    },
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "GNU Image Manipulation Program"
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('perfume_listing.png'); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('perfume_listing.xcf'); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

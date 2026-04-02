@@ -1,0 +1,46 @@
+{
+  "id": "87e0281b-2063-4767-bf00-fb053014f47e",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, create a color clip in the project bin, set its default duration to 10 seconds, then save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/project_and_asset_management/project_bin/color_clip.html",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_clip_duration",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "min_duration_seconds": 9.5,
+        "max_duration_seconds": 10.5
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

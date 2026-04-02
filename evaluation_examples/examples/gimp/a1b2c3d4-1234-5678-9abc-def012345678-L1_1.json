@@ -80,7 +80,7 @@
         }
       }
     ],
-    "func": "check_045bf3ff_rotate",
+    "func": "check_045bf3ff_grayscale",
     "expected": {
       "type": "cloud_file",
       "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/a1b2c3d4-1234-5678-9abc-def012345678/color_photo.png",
