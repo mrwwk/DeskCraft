@@ -1,0 +1,65 @@
+{
+  "id": "a3b00010-0010-4000-8000-000000000010-L3",
+  "snapshot": "gimp",
+  "instruction": "Create a transparency course asset pack using /home/user/Desktop/wikimedia_transparency_demo.png, /home/user/Desktop/pattern_asfalt_light.png, and /home/user/Desktop/icon_camera.svg: /home/user/Desktop/transparency_course_cover.png (1600x900) and /home/user/Desktop/transparency_course_infographic.png (1600x2000, at least 4 step modules). Cover text must include words \"TRANSPARENCY\" and \"COURSE\". Required XCF groups: Cover_Group, Infographic_Group, Icons_Group, Text_Group. Save /home/user/Desktop/transparency_course_assets.xcf.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-using-web-transparency.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/graphic/wikimedia_transparency_demo.png",
+            "path": "/home/user/Desktop/wikimedia_transparency_demo.png"
+          },
+          {
+            "local_path": "assets/gimp_task/graphic/pattern_asfalt_light.png",
+            "path": "/home/user/Desktop/pattern_asfalt_light.png"
+          },
+          {
+            "local_path": "assets/gimp_task/graphic/icon_camera.svg",
+            "path": "/home/user/Desktop/icon_camera.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/wikimedia_transparency_demo.png"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l3_transparency_course_assets_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2
+      ],
+      "path": [
+        "/home/user/Desktop/transparency_course_cover.png",
+        "/home/user/Desktop/transparency_course_infographic.png",
+        "/home/user/Desktop/transparency_course_assets.xcf"
+      ],
+      "dest": [
+        "transparency_course_cover.png",
+        "transparency_course_infographic.png",
+        "transparency_course_assets.xcf"
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

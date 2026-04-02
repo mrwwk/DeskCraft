@@ -1,0 +1,62 @@
+{
+  "id": "42fad922-60c9-4f94-99db-1a78efe0ded7",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, import '/home/user/Videos/6533277-hd_1920_1080_24fps.mp4', add it to the timeline, apply the 'Brightness' (or 'Brightness/Contrast') effect to the clip, then save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/effects_and_filters.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_effect_applied",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "effect_service": [
+          "brightness",
+          "brightcontrast",
+          "frei0r.brightness",
+          "avfilter.eq"
+        ],
+        "source_file": "6533277-hd_1920_1080_24fps.mp4"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

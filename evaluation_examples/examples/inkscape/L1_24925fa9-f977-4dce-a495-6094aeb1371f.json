@@ -1,0 +1,58 @@
+{
+  "id": "24925fa9-f977-4dce-a495-6094aeb1371f",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/simple_rect_circle.svg in Inkscape. Change the fill color of the blue rectangle to red (#ff0000), then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=fill+color+object+fill+and+stroke",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/simple_rect_circle.svg",
+            "path": "/home/user/Documents/simple_rect_circle.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/simple_rect_circle.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_fill_color",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/simple_rect_circle.svg",
+      "dest": "simple_rect_circle.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "element_id": "rect1",
+        "expected_fill": "#ff0000"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

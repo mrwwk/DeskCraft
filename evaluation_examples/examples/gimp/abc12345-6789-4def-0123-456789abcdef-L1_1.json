@@ -80,7 +80,7 @@
         }
       }
     ],
-    "func": "check_045bf3ff_crop",
+    "func": "check_saturation_increase_and_structure_sim",
     "expected": {
       "type": "cloud_file",
       "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/abc12345-6789-4def-0123-456789abcdef/example_image.png",

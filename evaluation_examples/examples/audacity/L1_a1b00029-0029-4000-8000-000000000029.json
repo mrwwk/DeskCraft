@@ -1,0 +1,47 @@
+{
+  "id": "a1b00029-0029-4000-8000-000000000029",
+  "snapshot": "audacity",
+  "instruction": "I need a test tone generated from scratch. Open Audacity without opening any existing file, generate a 5-second sine tone at 440 Hz with amplitude 0.8, export to /home/user/Documents/exports/generated_tone.wav, and save the project.",
+  "source": "https://manual.audacityteam.org/man/tone.html",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_audio_properties",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/exports/generated_tone.wav",
+      "dest": "generated_tone.wav"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_duration": 5.0,
+        "tolerance": 0.5,
+        "expected_channels": 1
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

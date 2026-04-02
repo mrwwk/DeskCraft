@@ -1,0 +1,127 @@
+{
+  "id": "8919e24a-4acf-4364-8ea8-27d331833f63",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. The \"Cube\" has a material \"CubeMaterial\" and is UV unwrapped. Do the following: (1) In the Shader Editor, load /home/user/Documents/texture_wood.jpg as the Base Color texture. (2) Load /home/user/Documents/normal_wood.jpg and connect it through a Normal Map node to the Normal input. (3) Set Metallic to 0.0 and Roughness to 0.7. (4) Go to World Properties, set the environment to use /home/user/Documents/hdri_studio.exr. (5) Switch the render engine to Cycles with 64 samples. (6) Set resolution to 1920×1080 and render the current frame, saving the image to /home/user/Documents/render_output.png. Then save the project file.",
+  "source": "Blender Guru 教程站（https://www.blenderguru.com/tutorials）Donut Beginner Workflow（纹理、法线、HDRI、Cycles 渲染）",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/uv_unwrapped_cube.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/check_world.py",
+            "path": "/tmp/check_world.py"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          },
+          {
+            "local_path": "assets/blender/texture_wood.jpg",
+            "path": "/home/user/Documents/texture_wood.jpg"
+          },
+          {
+            "local_path": "assets/blender/normal_wood.jpg",
+            "path": "/home/user/Documents/normal_wood.jpg"
+          },
+          {
+            "local_path": "assets/blender/hdri_studio.exr",
+            "path": "/home/user/Documents/hdri_studio.exr"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_material_textures",
+      "check_blender_world_hdri",
+      "check_blender_render_output"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_world.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/render_output.png",
+        "dest": "render_output.png"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "textures": [
+            {
+              "filename": "texture_wood.jpg",
+              "connected_to": "Base Color"
+            },
+            {
+              "filename": "normal_wood.jpg",
+              "connected_to": "Normal"
+            }
+          ],
+          "metallic": 0.0,
+          "roughness": 0.7,
+          "tolerance": 0.05
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "hdri_filename": "hdri_studio.exr"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "width": 1920,
+          "height": 1080,
+          "format": "PNG"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

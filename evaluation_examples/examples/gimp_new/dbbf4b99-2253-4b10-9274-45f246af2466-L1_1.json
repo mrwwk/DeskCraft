@@ -1,7 +1,7 @@
 {
   "id": "dbbf4b99-2253-4b10-9274-45f246af2466-L1_1",
   "snapshot": "gimp",
-  "instruction": "Use GIMP to open and edit a PSD file with all layers preserved.",
+  "instruction": "Edit a PSD file in GIMP with all layers preserved.",
   "source": "https://www.gimp.org/",
   "config": [
     {

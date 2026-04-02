@@ -1,0 +1,60 @@
+{
+  "id": "539ae4e0-0f75-4580-bf82-f45b1d1d69c8",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/text_hello.svg in Inkscape. Select the title text (id=text_title) and change its font size to 72px, font weight to bold, and fill color to dark red (#8b0000). Save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=text+color+bold+font+family",
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/text_hello.svg",
+            "path": "/home/user/Documents/text_hello.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/text_hello.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_text_style",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/text_hello.svg",
+      "dest": "text_hello.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "element_id": "text_title",
+        "expected_font_size": "72",
+        "expected_font_weight": "bold",
+        "expected_fill": "#8b0000"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

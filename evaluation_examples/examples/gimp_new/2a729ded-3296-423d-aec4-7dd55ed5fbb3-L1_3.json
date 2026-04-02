@@ -1,7 +1,7 @@
 {
   "id": "2a729ded-3296-423d-aec4-7dd55ed5fbb3-L1_3",
   "snapshot": "gimp",
-  "instruction": "Save the image as a PNG file named transparent_output.png to preserve transparency",
+  "instruction": "Keep the current image in PNG format while preserving transparency.",
   "source": "https://www.youtube.com/watch?v=lOzSiOIipSM",
   "config": [
     {
@@ -40,7 +40,57 @@
       "type": "vm_file",
       "path": "/home/user/Desktop/transparent_output.png",
       "dest": "transparent_output.png"
-    }
+    },
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.write(\"transparent_output\");time.sleep(1);pyautogui.press([\"enter\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time; import pyautogui; time.sleep(1);pyautogui.press([\"enter\"]);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ]
   },
   "proxy": false,
   "fixed_ip": false,

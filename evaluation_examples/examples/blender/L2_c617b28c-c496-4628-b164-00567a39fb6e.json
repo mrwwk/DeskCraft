@@ -1,0 +1,68 @@
+{
+  "id": "c617b28c-c496-4628-b164-00567a39fb6e",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. This scene has four objects: \"Sphere\", \"Cylinder\", \"Torus\", and \"Ground\". Set Smooth Shading on \"Sphere\", \"Cylinder\", and \"Torus\" (but NOT on \"Ground\"), then save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Object > Shade Smooth / Shade Flat",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/smooth_objects.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_mesh.py",
+            "path": "/tmp/check_mesh.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_blender_selective_smooth",
+    "result": {
+      "type": "vm_command_line",
+      "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_mesh.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "smooth_objects": [
+          "Sphere",
+          "Cylinder",
+          "Torus"
+        ],
+        "flat_objects": [
+          "Ground"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

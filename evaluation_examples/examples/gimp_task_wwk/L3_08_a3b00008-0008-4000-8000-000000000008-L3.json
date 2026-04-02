@@ -1,0 +1,64 @@
+{
+  "id": "a3b00008-0008-4000-8000-000000000008-L3",
+  "snapshot": "gimp",
+  "instruction": "Create two 1800x2400 outputs from /home/user/Desktop/pet_dog_1108099_alt.jpg (you may use /home/user/Desktop/texture_wood_172289.jpg): /home/user/Desktop/dog_portrait_natural.jpg and /home/user/Desktop/dog_portrait_clean.png. The two styles must be visually different, the natural version should increase overall contrast by at least 4%, fur detail should be enhanced, and add a bottom-right signature containing \"BY\" on the natural version. Required XCF layers: Dog_Subject, BG_Natural, BG_Clean, Detail_Enhance, Signature. Save /home/user/Desktop/dog_portrait_project.xcf.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-layer-mask-add.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/photos/pet_dog_1108099_alt.jpg",
+            "path": "/home/user/Desktop/pet_dog_1108099_alt.jpg"
+          },
+          {
+            "local_path": "assets/gimp_task/texture/texture_wood_172289.jpg",
+            "path": "/home/user/Desktop/texture_wood_172289.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/pet_dog_1108099_alt.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l3_dog_portrait_dual_output_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "path": [
+        "/home/user/Desktop/dog_portrait_natural.jpg",
+        "/home/user/Desktop/dog_portrait_clean.png",
+        "/home/user/Desktop/dog_portrait_project.xcf",
+        "/home/user/Desktop/pet_dog_1108099_alt.jpg"
+      ],
+      "dest": [
+        "dog_portrait_natural.jpg",
+        "dog_portrait_clean.png",
+        "dog_portrait_project.xcf",
+        "pet_dog_1108099_alt.jpg"
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

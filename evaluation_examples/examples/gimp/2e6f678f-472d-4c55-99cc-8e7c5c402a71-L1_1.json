@@ -80,16 +80,16 @@
         }
       }
     ],
-    "func": "",
+    "func": "check_brightness_decrease_and_structure_sim",
     "expected": {
-      "type": "cloud_file",
-      "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/2e6f678f-472d-4c55-99cc-8e7c5c402a71/sample_image.png",
-      "dest": "sample_image.png"
-    },
-    "result": {
       "type": "vm_file",
       "path": "/home/user/Desktop/brightened_50.png",
       "dest": "brightened_50.png"
+    },
+    "result": {
+      "type": "cloud_file",
+      "path": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/gimp/2e6f678f-472d-4c55-99cc-8e7c5c402a71/sample_image.png",
+      "dest": "sample_image.png"
     }
   },
   "proxy": false,

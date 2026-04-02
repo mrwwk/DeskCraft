@@ -1,0 +1,80 @@
+{
+  "id": "a1b00040-0040-4000-8000-000000000040",
+  "snapshot": "audacity",
+  "instruction": "In this stereo file, I only want the left channel and I want it louder. Open /home/user/Documents/stereo_test.wav in Audacity, split stereo to mono, amplify the left channel by +6 dB, export only the left channel to /home/user/Documents/exports/left_loud.wav, and save the project.",
+  "source": [
+    "https://manual.audacityteam.org/man/splitting_and_joining_stereo_tracks.html",
+    "https://manual.audacityteam.org/man/amplify.html"
+  ],
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/stereo_test.wav",
+            "path": "/home/user/Documents/stereo_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/stereo_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_channels",
+      "check_audio_rms_level"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/left_loud.wav",
+        "dest": "left_loud.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/left_loud.wav",
+        "dest": "left_loud.wav"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_channels": 1
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "min_rms_db": -30.0,
+          "max_rms_db": -3.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

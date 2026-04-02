@@ -1,0 +1,59 @@
+{
+  "id": "5cf823e4-f9fa-47c0-8944-9e77fb40ab36",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/simple_rect_circle.svg in Inkscape. Add a horizontal guide line at y=300 by double-clicking on the horizontal ruler and entering 300 in the guide dialog (Edit > Guides...), then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=guides+create+from+ruler",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/simple_rect_circle.svg",
+            "path": "/home/user/Documents/simple_rect_circle.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/simple_rect_circle.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_snap_to_grid",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/simple_rect_circle.svg",
+      "dest": "simple_rect_circle.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "guide_orientation": "horizontal",
+        "guide_position": 300,
+        "tolerance": 2
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

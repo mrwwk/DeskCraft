@@ -1,0 +1,79 @@
+{
+  "id": "e8176133-1453-4ddc-9771-248e971e3437",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. Select the \"Cube\" which has a material \"CubeMaterial\". In the Shader Editor, add an Image Texture node and load /home/user/Documents/texture_brick.jpg as the Base Color. Add another Image Texture node and load /home/user/Documents/normal_brick.jpg, connect it through a Normal Map node to the Normal input of the Principled BSDF, then save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Rendering > Shader Nodes > Image Texture；Principled BSDF（Base Color / Roughness）",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/uv_unwrapped_cube.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/texture_brick.jpg",
+            "path": "/home/user/Documents/texture_brick.jpg"
+          },
+          {
+            "local_path": "assets/blender/normal_brick.jpg",
+            "path": "/home/user/Documents/normal_brick.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_blender_material_textures",
+    "result": {
+      "type": "vm_command_line",
+      "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "object_name": "Cube",
+        "textures": [
+          {
+            "filename": "texture_brick.jpg",
+            "connected_to": "Base Color"
+          },
+          {
+            "filename": "normal_brick.jpg",
+            "connected_to": "Normal"
+          }
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

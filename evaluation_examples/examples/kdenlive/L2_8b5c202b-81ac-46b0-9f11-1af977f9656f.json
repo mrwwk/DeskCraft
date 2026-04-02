@@ -1,0 +1,57 @@
+{
+  "id": "8b5c202b-81ac-46b0-9f11-1af977f9656f",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, import '/home/user/Videos/14307439_1920_1080_60fps.mp4', add it to the timeline on track V1, split the clip at the 5-second mark using the Razor tool so that it becomes two separate segments, then save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/cutting_and_assembling/editing.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/14307439_1920_1080_60fps.mp4",
+            "path": "/home/user/Videos/14307439_1920_1080_60fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_clip_split",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "source_file": "14307439_1920_1080_60fps.mp4",
+        "min_segments": 2
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

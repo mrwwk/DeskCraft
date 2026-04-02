@@ -1,0 +1,66 @@
+{
+  "id": "a3b00007-0007-4000-8000-000000000007-L3",
+  "snapshot": "gimp",
+  "instruction": "Build a tutorial asset pack from /home/user/Desktop/architecture_247431.jpg with outputs: /home/user/Desktop/step1_base.jpg, /home/user/Desktop/step2_grade.jpg, /home/user/Desktop/step3_compare.jpg, and /home/user/Desktop/architecture_tutorial_overview.png. step2 must show clear color grading vs source with higher contrast and saturation; step3 must be a before/after split; overview PNG must be 3-column and contain titles with \"STEP 1\", \"STEP 2\", \"STEP 3\". Required XCF layers/groups: Step1_Base, Step2_Grade, Step3_Compare, Overview_Board. Save /home/user/Desktop/architecture_tutorial_pack.xcf.",
+  "source": "https://www.gimp.org/tutorials/Blending_Exposures/",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/photos/architecture_247431.jpg",
+            "path": "/home/user/Desktop/architecture_247431.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/architecture_247431.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l3_tutorial_pack_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "path": [
+        "/home/user/Desktop/step1_base.jpg",
+        "/home/user/Desktop/step2_grade.jpg",
+        "/home/user/Desktop/step3_compare.jpg",
+        "/home/user/Desktop/architecture_tutorial_overview.png",
+        "/home/user/Desktop/architecture_tutorial_pack.xcf",
+        "/home/user/Desktop/architecture_247431.jpg"
+      ],
+      "dest": [
+        "step1_base.jpg",
+        "step2_grade.jpg",
+        "step3_compare.jpg",
+        "architecture_tutorial_overview.png",
+        "architecture_tutorial_pack.xcf",
+        "architecture_247431.jpg"
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

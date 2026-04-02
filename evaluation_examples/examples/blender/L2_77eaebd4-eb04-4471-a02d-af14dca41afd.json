@@ -1,0 +1,67 @@
+{
+  "id": "77eaebd4-eb04-4471-a02d-af14dca41afd",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. The \"Emitter\" plane has an existing particle system. Change the particle count to 2000, set the lifetime to 100 frames, set the emission start frame to 1 and end frame to 50, and change the normal velocity to 5.0, then save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Physics > Particles > Emitter",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/particles_ready.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_particles.py",
+            "path": "/tmp/check_particles.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_blender_particle_params",
+    "result": {
+      "type": "vm_command_line",
+      "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_particles.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "object_name": "Emitter",
+        "count": 2000,
+        "lifetime": 100.0,
+        "frame_start": 1.0,
+        "frame_end": 50.0,
+        "normal_factor": 5.0,
+        "tolerance": 1.0
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

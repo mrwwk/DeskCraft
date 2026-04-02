@@ -1,0 +1,169 @@
+{
+  "id": "a2b00008-0008-4000-8000-000000000008-L2",
+  "snapshot": "gimp",
+  "instruction": "Could you make a billboard mockup on /home/user/Desktop/street_city_466685.jpg? Keep the original 2200x1365 canvas, build billboard art from /home/user/Desktop/texture_paper_723311.jpg, add the text CITY DEALS plus /home/user/Desktop/icon_search.svg, perspective-fit it to the billboard area near points (1130,260), (1580,250), (1600,620), and (1100,640), and keep the XCF layer names exactly Billboard_Art, Billboard_Text, and Billboard_Composite.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-tool-perspective.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/photos/street_city_466685.jpg",
+            "path": "/home/user/Desktop/street_city_466685.jpg"
+          },
+          {
+            "local_path": "assets/gimp_task/texture/texture_paper_723311.jpg",
+            "path": "/home/user/Desktop/texture_paper_723311.jpg"
+          },
+          {
+            "local_path": "assets/gimp_task/graphic/icon_search.svg",
+            "path": "/home/user/Desktop/icon_search.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/street_city_466685.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l2_street_billboard_mockup_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2
+      ],
+      "path": [
+        "/home/user/Desktop/street_billboard_mockup.jpg",
+        "/home/user/Desktop/street_billboard_mockup.xcf",
+        "/home/user/Desktop/street_city_466685.jpg"
+      ],
+      "dest": [
+        "street_billboard_mockup.jpg",
+        "street_billboard_mockup.xcf",
+        "street_city_466685.jpg"
+      ]
+    },
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "GNU Image Manipulation Program"
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('street_billboard_mockup.jpg'); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('street_billboard_mockup.xcf'); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

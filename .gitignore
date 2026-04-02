@@ -164,6 +164,22 @@ __MACOSX/
 **/tmp/**/*
 api_key.py
 tmp.*
+core.*
+
+# local large artifacts
+*.qcow2
+*.img
+*.iso
+*.bin
+
+# local crash dumps
+core.2453433
+core.2464003
+core.2724714
+core.3632067
+core.3822860
+core.4080398
+core.4089141
 
 ## Server logging
 **/.logging/**/*
@@ -218,6 +234,27 @@ dataimpulse_proxy_config.json
 reference/
 draft/
 manual_examine.py
+
+# Ignore non-target example domains
+evaluation_examples/examples/chrome/
+evaluation_examples/examples/chrome_new/
+evaluation_examples/examples/gimp/
+evaluation_examples/examples/gimp_new/
+evaluation_examples/examples/interactive/
+evaluation_examples/examples/interactive_xt/
+evaluation_examples/examples/libreoffice_calc/
+evaluation_examples/examples/libreoffice_impress/
+evaluation_examples/examples/libreoffice_suite_njc/
+evaluation_examples/examples/libreoffice_writer/
+evaluation_examples/examples/multi_apps/
+evaluation_examples/examples/mutil_app_new_xt/
+evaluation_examples/examples/os/
+evaluation_examples/examples/os_new/
+evaluation_examples/examples/thunderbird/
+evaluation_examples/examples/ui_gen/
+evaluation_examples/examples/vlc/
+evaluation_examples/examples/vs_code/
+evaluation_examples/examples/vs_code_new/
 run_human_examine.sh
 quick_start.py
 result_multi_apps_pengxiang_transformers12evaluation_examples/settings/proxy/dataimpulse.json
@@ -235,5 +272,13 @@ calc_success_rate.py
 # Screenshot and log directories
 kdenlive_screenshots/
 logs/
-assets/
 blender_screenshots/
+
+# LaTeX project
+anips2026_latex/
+
+# Local auxiliary repo
+Research-Paper-Writing-Skills/
+
+# Local Hugging Face upload helper with embedded token
+scripts/bash/upload_hf_qcow2.sh

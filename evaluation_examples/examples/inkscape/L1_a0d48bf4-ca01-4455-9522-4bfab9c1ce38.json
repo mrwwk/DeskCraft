@@ -1,0 +1,58 @@
+{
+  "id": "a0d48bf4-ca01-4455-9522-4bfab9c1ce38",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/star_polygon.svg in Inkscape. Select the five-pointed star path (id=star1) and change its fill rule to \"even-odd\" (Object > Fill and Stroke > Fill tab > Even-odd toggle), then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=fill+rule+evenodd+nonzero",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/star_polygon.svg",
+            "path": "/home/user/Documents/star_polygon.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/star_polygon.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_fill_rule",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/star_polygon.svg",
+      "dest": "star_polygon.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "element_id": "star1",
+        "expected_fill_rule": "evenodd"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

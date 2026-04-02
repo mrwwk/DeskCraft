@@ -1,0 +1,62 @@
+{
+  "id": "0fbdd695-5224-4f6d-80ae-b06ee48e5c61",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. Rename the \"Cube\" object to \"MyCube\" in the Outliner or Properties panel, then save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Scene Layout > Object > Properties（对象命名与属性管理）",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/default_cube.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_blender_object_renamed",
+    "result": {
+      "type": "vm_command_line",
+      "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_name": "MyCube",
+        "old_name": "Cube"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

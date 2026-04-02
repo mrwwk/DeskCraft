@@ -1,0 +1,58 @@
+{
+  "id": "a1b00007-0007-4000-8000-000000000007",
+  "snapshot": "audacity",
+  "instruction": "This track is a little quiet overall. Open /home/user/Documents/volume_test.wav in Audacity, select all, amplify by +6 dB, export to /home/user/Documents/exports/amplified.wav, and save the project.",
+  "source": "https://manual.audacityteam.org/man/amplify.html",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/volume_test.wav",
+            "path": "/home/user/Documents/volume_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/volume_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_audio_rms_level",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/exports/amplified.wav",
+      "dest": "amplified.wav"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "min_rms_db": -8.0,
+        "max_rms_db": 0.0
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

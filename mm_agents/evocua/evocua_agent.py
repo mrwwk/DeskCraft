@@ -4,6 +4,7 @@ import json
 import logging
 import backoff
 import openai
+import httpx
 from typing import Dict, List, Tuple, Optional
 
 from io import BytesIO
@@ -678,14 +679,18 @@ Previous actions:
         error_str = str(e)
         return "Too Large" in error_str or "context_length_exceeded" in error_str or "413" in error_str
 
-    @backoff.on_exception(backoff.constant, Exception, interval=120, max_tries=20, giveup=_should_giveup_on_context_error.__func__)
+    @backoff.on_exception(backoff.constant, Exception, interval=30, max_tries=20, giveup=_should_giveup_on_context_error.__func__)
     def call_llm(self, payload):
         """Unified OpenAI-compatible API call"""
         # Get env vars
         base_url = os.environ.get("OPENAI_BASE_URL", "url-xxx")
         api_key = os.environ.get("OPENAI_API_KEY", "sk-xxx")
 
-        client = openai.OpenAI(base_url=base_url, api_key=api_key)
+        client = openai.OpenAI(
+            base_url=base_url,
+            api_key=api_key,
+            timeout=httpx.Timeout(600.0, connect=60.0)  # Total timeout 600s, connect timeout 60s
+        )
         
         messages = payload["messages"]
         log_messages(messages, "LLM Request")

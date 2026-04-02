@@ -1,0 +1,45 @@
+{
+  "id": "a9092adf-8064-48e2-99ea-ee6cb7dcabf8",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, delete video tracks from the timeline until only 1 video track remains (the default project has 2 video tracks, so you need to remove one), then save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/user_interface/timeline.html",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_track_count",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "exact_video_tracks": 1
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

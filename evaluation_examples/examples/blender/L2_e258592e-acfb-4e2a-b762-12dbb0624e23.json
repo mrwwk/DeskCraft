@@ -1,0 +1,88 @@
+{
+  "id": "e258592e-acfb-4e2a-b762-12dbb0624e23",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. This scene contains a \"Cube\" and a \"Sphere\" that overlap. Add a Boolean modifier to the \"Cube\" with the Difference operation, using \"Sphere\" as the boolean object. Then hide the \"Sphere\" in the viewport (click the eye icon in the Outliner), and save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Modeling > Modifiers > Generate > Boolean；Scene Layout > Object > Show/Hide",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/cube_sphere_boolean.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_modifier.py",
+            "path": "/tmp/check_modifier.py"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_modifier_boolean",
+      "check_blender_object_visibility"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_modifier.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "modifier_type": "BOOLEAN",
+          "operation": "DIFFERENCE",
+          "target_object": "Sphere"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Sphere",
+          "hide_viewport": true
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

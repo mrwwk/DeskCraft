@@ -1,0 +1,104 @@
+{
+  "id": "8a99d706-7fbc-48be-a26a-f3780c30416b",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/poster_template.svg in Inkscape. Redesign the poster: (1) Change the poster title (id=poster_title) font size to 72px and make it bold. (2) Change the poster subtitle (id=poster_subtitle) fill color to white (#ffffff). (3) Change the top bar (id=top_bar) fill to teal (#008080). (4) Apply a linear gradient to the featured circle (id=featured_circle) fill. (5) Rotate the featured circle 15 degrees. (6) Resize the document to 600x850. Save the file. Then export as PDF to /home/user/Documents/poster_final.pdf.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=poster+design+workflow+export+pdf",
+  "difficulty": "L3",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/poster_template.svg",
+            "path": "/home/user/Documents/poster_template.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/poster_template.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_inkscape_full_poster_workflow",
+      "check_inkscape_export_file_exists"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/poster_template.svg",
+        "dest": "poster_template.svg"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "python3 -c \"import os; print('OK' if os.path.exists('/home/user/Documents/poster_final.pdf') else 'MISSING')\"",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "text_checks": [
+            {
+              "element_id": "poster_title",
+              "expected_font_size": "72",
+              "expected_font_weight": "bold"
+            },
+            {
+              "element_id": "poster_subtitle",
+              "expected_fill": "#ffffff"
+            }
+          ],
+          "fill_checks": [
+            {
+              "element_id": "top_bar",
+              "expected_fill": "#008080"
+            }
+          ],
+          "gradient_check": {
+            "element_id": "featured_circle",
+            "expected_gradient_type": "linearGradient"
+          },
+          "transform_check": {
+            "element_id": "featured_circle",
+            "expected_transform_contains": "rotate"
+          },
+          "doc_check": {
+            "expected_width": "600",
+            "expected_height": "850"
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "OK"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

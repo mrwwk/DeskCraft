@@ -1,0 +1,57 @@
+{
+  "id": "7c66c2fd-9188-4f58-9259-7f375f06ad6d",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/simple_rect_circle.svg in Inkscape. Delete the red circle, then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=select+object+delete",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/simple_rect_circle.svg",
+            "path": "/home/user/Documents/simple_rect_circle.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/simple_rect_circle.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_element_deleted",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/simple_rect_circle.svg",
+      "dest": "simple_rect_circle.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "deleted_element_id": "circle1"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
