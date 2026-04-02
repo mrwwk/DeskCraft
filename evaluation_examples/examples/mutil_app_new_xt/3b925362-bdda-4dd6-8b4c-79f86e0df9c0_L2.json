@@ -1,0 +1,43 @@
+{
+  "id": "3b925362-bdda-4dd6-8b4c-79f86e0df9c0",
+  "task_slug": "email_validator_bugfix_with_regex_docs",
+  "difficulty": "L2",
+  "snapshot": "multi_apps",
+  "instruction": "The email validator in ~/Desktop/email_validator/ is too permissive and accepts malformed addresses. Read ISSUE.txt to understand the expected behavior, open the Python regular expression documentation in Chrome, and then use VS Code to fix validator.py so the test suite passes. When you are done, create ~/Desktop/email_validator/FIXED.txt containing exactly `email validator fixed`.",
+  "source": [
+    "https://docs.python.org/3/library/re.html",
+    "现实场景构造来源：表单校验 bug 修复时，开发者借助正则官方文档收敛邮箱匹配规则的常见测试驱动维护场景"
+  ],
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/email_validator')\nbase.mkdir(parents=True, exist_ok=True)\n(base / 'ISSUE.txt').write_text('Valid emails must contain exactly one @, no spaces, and at least one dot after the @.\\n')\n(base / 'validator.py').write_text(\"\"\"def is_valid_email(email):\n    return '@' in email\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from validator import is_valid_email\n\ndef test():\n    assert is_valid_email('alice@example.com') is True\n    assert is_valid_email('alice @example.com') is False\n    assert is_valid_email('aliceexample.com') is False\n    assert is_valid_email('alice@@example.com') is False\n    assert is_valid_email('alice@example') is False\n\"\"\")\nPY",
+        "shell": true
+      }
+    },
+    {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},
+    {"type": "launch", "parameters": {"command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]}},
+    {"type": "chrome_open_tabs", "parameters": {"urls_to_open": ["https://docs.python.org/3/library/re.html"]}},
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/Desktop/email_validator"]}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode", "os"],
+  "evaluator": {
+    "func": ["check_python_file_by_test_suite", "is_expected_active_tab_approximate", "check_include_exclude"],
+    "result": [
+      {"type": "vm_file", "path": ["/home/user/Desktop/email_validator/validator.py"], "dest": ["validator.py"], "multi": true},
+      {"type": "active_tab_info"},
+      {"type": "vm_command_line", "command": "cat /home/user/Desktop/email_validator/FIXED.txt", "shell": true}
+    ],
+    "expected": [
+      {"type": "vm_file", "path": "/home/user/Desktop/email_validator/test.py", "dest": "test_suite.py"},
+      {"type": "rule", "rules": {"type": "url", "url": "https://docs.python.org/3/library/re.html"}},
+      {"type": "rule", "rules": {"include": ["email validator fixed"], "exclude": []}}
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

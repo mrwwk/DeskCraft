@@ -1,0 +1,136 @@
+{
+  "id": "interactive_chrome_interruption_205",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户起初想留下一个 hero prompt 参考页，但浏览途中突然改变目标，要求 Agent 改为保留 dashboard 和 onboarding 两组 UI prompt 参考。",
+  "source": "https://www.frontendmentor.io/challenges/time-tracking-dashboard-UIQ7167Jw | https://www.frontendmentor.io/challenges/intro-component-with-signup-form-5cf91bd49edda32581d28fd1 | authors",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/ui_prompt_library_205'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>UI Prompt Library</h1><ul><li><a href=\"hero_prompts.html\">Hero Prompts</a></li><li><a href=\"dashboard_prompts.html\">Dashboard Prompts</a></li><li><a href=\"onboarding_prompts.html\">Onboarding Prompts</a></li></ul></body></html>', encoding='utf-8'); (d/'hero_prompts.html').write_text('<html><body><h1>Hero Prompts</h1></body></html>', encoding='utf-8'); (d/'dashboard_prompts.html').write_text('<html><body><h1>Dashboard Prompts</h1></body></html>', encoding='utf-8'); (d/'onboarding_prompts.html').write_text('<html><body><h1>Onboarding Prompts</h1></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/ui_prompt_library_205/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先打开 Hero Prompts，并把它加入书签栏。",
+      "trigger": {
+        "type": "step_count",
+        "value": 2
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等等，我现在不想留 hero prompt 了。请把 Dashboard Prompts 和 Onboarding Prompts 都打开，并只保留这两个书签。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后只保留 Dashboard Prompts 和 Onboarding Prompts 这两个文档标签，并停留在 Onboarding Prompts 页面。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_tabs",
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "open_tabs_info"
+      },
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/ui_prompt_library_205/dashboard_prompts.html",
+            "file:///home/user/Desktop/ui_prompt_library_205/onboarding_prompts.html"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/ui_prompt_library_205/onboarding_prompts.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/ui_prompt_library_205/dashboard_prompts.html",
+            "file:///home/user/Desktop/ui_prompt_library_205/onboarding_prompts.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

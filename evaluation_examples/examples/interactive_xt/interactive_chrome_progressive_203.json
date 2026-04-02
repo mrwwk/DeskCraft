@@ -1,0 +1,136 @@
+{
+  "id": "interactive_chrome_progressive_203",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户逐步补充自己做 design system 时要保留的本地参考页：先开一页，再扩展到更多标签，最后只保留必要标签并挑选书签。",
+  "source": "https://www.frontendmentor.io/challenges | authors",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/design_system_docs_203'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>Design System Docs</h1><ul><li><a href=\"tokens.html\">Tokens</a></li><li><a href=\"spacing.html\">Spacing</a></li><li><a href=\"motion.html\">Motion</a></li></ul></body></html>', encoding='utf-8'); (d/'tokens.html').write_text('<html><body><h1>Tokens</h1></body></html>', encoding='utf-8'); (d/'spacing.html').write_text('<html><body><h1>Spacing</h1></body></html>', encoding='utf-8'); (d/'motion.html').write_text('<html><body><h1>Motion</h1></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/design_system_docs_203/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 Tokens 页面打开成一个单独标签页。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "再把 Spacing 页面也打开成单独标签页。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后把 Motion 页面也打开出来，只保留 Tokens、Spacing、Motion 这 3 个文档标签，不要留首页标签；把 Tokens 和 Motion 加入书签栏，并停留在 Motion 页面。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_tabs",
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "open_tabs_info"
+      },
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/design_system_docs_203/tokens.html",
+            "file:///home/user/Desktop/design_system_docs_203/spacing.html",
+            "file:///home/user/Desktop/design_system_docs_203/motion.html"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/design_system_docs_203/motion.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/design_system_docs_203/tokens.html",
+            "file:///home/user/Desktop/design_system_docs_203/motion.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

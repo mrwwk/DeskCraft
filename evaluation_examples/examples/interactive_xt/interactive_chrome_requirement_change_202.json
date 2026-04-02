@@ -1,0 +1,121 @@
+{
+  "id": "interactive_chrome_requirement_change_202",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户最初想保存一个 landing page 参考，但随后改口，更想保留移动结账和排版规范页面，要求 Agent 调整书签选择。",
+  "source": "https://www.frontendmentor.io/challenges/bookmark-landing-page-5d0b588a9edda32581d29158 | https://www.frontendmentor.io/challenges/contact-form--G-hYlqKJj | authors",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/ui_review_portal_202'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>UI Review Portal</h1><ul><li><a href=\"landing_mock.html\">Landing Mock</a></li><li><a href=\"typography_system.html\">Typography System</a></li><li><a href=\"mobile_checkout.html\">Mobile Checkout</a></li></ul></body></html>', encoding='utf-8'); (d/'landing_mock.html').write_text('<html><body><h1>Landing Mock</h1></body></html>', encoding='utf-8'); (d/'typography_system.html').write_text('<html><body><h1>Typography System</h1></body></html>', encoding='utf-8'); (d/'mobile_checkout.html').write_text('<html><body><h1>Mobile Checkout</h1></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/ui_review_portal_202/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先打开 Landing Mock，并把这一页加入书签栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我改主意了，不要保留 Landing Mock 的书签了。改成把 Mobile Checkout 和 Typography System 加入书签栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后停留在 Mobile Checkout 页面。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/ui_review_portal_202/mobile_checkout.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/ui_review_portal_202/typography_system.html",
+            "file:///home/user/Desktop/ui_review_portal_202/mobile_checkout.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

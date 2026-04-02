@@ -1,0 +1,174 @@
+{
+  "id": "7c3ae54d-74e8-46ec-bf67-7ef0e8f4b1c2",
+  "task_slug": "docs_portal_handoff_with_logo_yaml_and_bookmark",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "A local handoff page is available at ~/Desktop/docs_portal_handoff.html and a logo asset is available at ~/Desktop/docs_portal_logo.svg. Open the handoff page in Chrome with the file:// URL and keep it open when you finish. Then build the docs portal package in ~/Desktop/docs_portal: create the folders assets, docs, and scripts; update ~/Desktop/docs_portal/docs/site.yml so site_name, repo_url, and theme.name match the handoff; create a backup named site.yml.bak in the same docs folder; repair scripts/render_nav.py so the provided tests pass; create ~/Desktop/docs_portal/README.md whose first line is '# Agent Docs Portal'; copy the provided logo to ~/Desktop/docs_portal/assets/logo.svg; apply the VS Code User Settings from the handoff page; and open the CSS reference URL from the page in another Chrome tab and bookmark it to the bookmarks bar before returning focus to the local handoff page.",
+  "source": [
+    "https://www.mkdocs.org/user-guide/configuration/",
+    "https://developer.mozilla.org/en-US/docs/Web/CSS/color",
+    "https://support.google.com/chrome/answer/188842",
+    "现实场景构造来源：文档门户重建时常见的“按本地 handoff 页迁移 site.yml、修脚本、拷 logo、收藏 CSS 参考并保持 brief 页聚焦”内容平台交接流程"
+  ],
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/mutil_app_new_xt/docs_portal_handoff.html",
+            "path": "/home/user/Desktop/docs_portal_handoff.html"
+          },
+          {
+            "local_path": "assets/mutil_app_new_xt/docs_portal_logo.svg",
+            "path": "/home/user/Desktop/docs_portal_logo.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/docs_portal')\n(base / 'docs').mkdir(parents=True, exist_ok=True)\n(base / 'scripts').mkdir(parents=True, exist_ok=True)\n(base / 'assets').mkdir(parents=True, exist_ok=True)\n(base / 'docs' / 'site.yml').write_text(\"\"\"site_name: Legacy Docs\nrepo_url: https://git.example.com/legacy-docs\ntheme:\n  name: readthedocs\n\"\"\")\n(base / 'scripts' / 'render_nav.py').write_text(\"\"\"def render_nav(title, slug):\n    return f'{slug} - {title}'\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from scripts.render_nav import render_nav\n\ndef test():\n    assert render_nav('Setup Guide', 'setup-guide') == 'Setup Guide (/setup-guide/)'\n\"\"\")\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code", "/home/user/Desktop/docs_portal"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "func": [
+      "is_expected_active_tab_approximate",
+      "check_json",
+      "check_include_exclude",
+      "check_python_file_by_test_suite",
+      "check_include_exclude",
+      "check_include_exclude",
+      "check_json_settings",
+      "check_bookmark_contains_url"
+    ],
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/docs_portal/docs/site.yml",
+        "dest": "site.yml"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "ls /home/user/Desktop/docs_portal/docs/",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": ["/home/user/Desktop/docs_portal/scripts/render_nav.py"],
+        "dest": ["render_nav.py"],
+        "multi": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/docs_portal/README.md",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/docs_portal/assets/logo.svg",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/docs_portal_handoff.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expect": [
+            {"key": ["site_name"], "method": "eq", "ref": "Agent Docs Portal"},
+            {"key": ["repo_url"], "method": "eq", "ref": "https://git.example.com/agent-docs"},
+            {"key": ["theme", "name"], "method": "eq", "ref": "material"}
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["site.yml.bak"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/docs_portal/test.py",
+        "dest": "test_suite.py"
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["# Agent Docs Portal"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["Docs Portal", "<svg"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 2,
+            "editor.wordWrap": "on",
+            "files.insertFinalNewline": true
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "url_pattern": "developer.mozilla.org/en-US/docs/Web/CSS"
+        }
+      }
+    ],
+    "options": [null, {"is_yaml": true}, null, null, null, null, null, null],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

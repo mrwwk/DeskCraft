@@ -1,0 +1,202 @@
+{
+  "id": "interactive_vscode_progressive_203",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户逐步补全一个运营看板的 UI 原型：先搭结构，再补指标卡和图表脚本，最后写 manifest。任务强调多轮增量构建。",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial | authors",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "rm -rf /home/user/Desktop/ui_ops_console_203 && mkdir -p /home/user/Desktop/ui_ops_console_203"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/ui_ops_console_203"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先创建 index.html 和 styles.css，搭一个运营看板外壳：要有 <main id=\"app\">、<aside id=\"sidebar\"> 和 <section id=\"hero\">，页面标题出现 Ops Console。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "接着在主区域里加一个 id=\"metrics\" 的区域，里面放 3 个 class=\"metric-card\" 的卡片。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后补 app.js 和 manifest.json。index.html 里要有 <canvas id=\"chartCanvas\"></canvas> 并引入 app.js；app.js 里声明 const activeUsers = [42, 58, 63, 71] 并用 canvas 画简单柱状图；manifest.json 里写 project=ops-console, theme=slate, chartType=bar。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/ui_ops_console_203 && zip -qr /home/user/Desktop/ui_ops_console_203_bundle.zip index.html styles.css app.js manifest.json"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
+      "check_ui_bundle_manifest_subset",
+      "check_ui_bundle_html_checks"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css",
+            "app.js",
+            "manifest.json"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "index.html": [
+              "Ops Console",
+              "id=\"app\"",
+              "id=\"sidebar\"",
+              "id=\"hero\"",
+              "id=\"metrics\"",
+              "id=\"chartCanvas\"",
+              "app.js"
+            ],
+            "styles.css": [
+              "#sidebar",
+              "#metrics",
+              ".metric-card"
+            ],
+            "app.js": [
+              "const activeUsers",
+              "[42, 58, 63, 71]",
+              "getContext",
+              "fillRect"
+            ],
+            "manifest.json": [
+              "ops-console",
+              "slate",
+              "bar"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_manifest": {
+            "project": "ops-console",
+            "theme": "slate",
+            "chartType": "bar"
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "main#app" },
+              { "type": "selector_exists", "selector": "aside#sidebar" },
+              { "type": "selector_count", "selector": ".metric-card", "count": 3 },
+              { "type": "selector_exists", "selector": "canvas#chartCanvas" }
+            ]
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/ui_ops_console_203_bundle.zip",
+        "dest": "ui_ops_console_203_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/ui_ops_console_203_bundle.zip",
+        "dest": "ui_ops_console_203_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/ui_ops_console_203_bundle.zip",
+        "dest": "ui_ops_console_203_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/ui_ops_console_203_bundle.zip",
+        "dest": "ui_ops_console_203_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

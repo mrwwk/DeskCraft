@@ -1,0 +1,87 @@
+{
+  "id": "interactive_os_correction_204",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "correction",
+  "scenario_description": "用户先让 Agent 归档几张 UI 模拟图，但随后纠正最终文件名和目录位置，要求按最后的命名规范收敛。",
+  "source": "authors | professional UI mock asset renaming workflow",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/mockup_drop_204 /home/user/Desktop/mockup_archive_204 && mkdir -p /home/user/Desktop/mockup_drop_204 /home/user/Desktop/mockup_archive_204/assets /home/user/Desktop/mockup_archive_204/previews"
+        ]
+      }
+    },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/ui_gen/interactive_os/correction_204/login_mock.png",
+            "path": "/home/user/Desktop/mockup_drop_204/login_mock.png"
+          },
+          {
+            "local_path": "assets/ui_gen/interactive_os/correction_204/hero_final.png",
+            "path": "/home/user/Desktop/mockup_drop_204/hero_final.png"
+          },
+          {
+            "local_path": "assets/ui_gen/interactive_os/correction_204/style_notes.txt",
+            "path": "/home/user/Desktop/mockup_drop_204/style_notes.txt"
+          }
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先把 login_mock.png 和 hero_final.png 都放进 mockup_archive_204/assets 里，把 style_notes.txt 放进 mockup_archive_204。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我纠正一下：login_mock.png 不该在 assets，它应该放到 previews，而且改名成 login-screen.png。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再把 hero_final.png 在 assets 里改名成 hero-banner.png，style_notes.txt 留在 mockup_archive_204 根目录。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; base=Path('/home/user/Desktop/mockup_archive_204'); ok=(base/'previews/login-screen.png').exists() and (base/'assets/hero-banner.png').exists() and (base/'style_notes.txt').exists() and not (base/'assets/login_mock.png').exists() and not (base/'assets/hero_final.png').exists(); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

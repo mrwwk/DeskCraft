@@ -1,0 +1,53 @@
+{
+  "id": "7c4cc09e-7a92-40dd-8338-b2286535c4ed",
+  "task_slug": "unicode_highlight_multilingual",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please configure VS Code User Settings for multilingual coding by setting Unicode highlight to include ambiguous and invisible characters, while allowing comments and strings.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：多语言开发与内容安全审查场景下常见的“高亮歧义字符与不可见字符，同时保留注释和字符串可读性”编辑器防误判需求"
+  ],
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "editor.unicodeHighlight.ambiguousCharacters": true,
+          "editor.unicodeHighlight.invisibleCharacters": true,
+          "editor.unicodeHighlight.includeComments": true,
+          "editor.unicodeHighlight.includeStrings": true
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
