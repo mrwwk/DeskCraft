@@ -4,14 +4,14 @@
 *.tar
 
 # Image files
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.ico
-*.webp
-*.svg
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+# *.bmp
+# *.ico
+# *.webp
+# *.svg
 
 # Credential files
 evaluation_examples/settings/google/settings.json

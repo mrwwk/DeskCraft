@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Growth avatar">
+  <circle cx="48" cy="48" r="46" fill="#e7b37a" />
+  <circle cx="48" cy="38" r="17" fill="#3f281e" />
+  <path d="M24 78c7-15 18-22 24-22s17 7 24 22" fill="#3f281e" />
+</svg>
