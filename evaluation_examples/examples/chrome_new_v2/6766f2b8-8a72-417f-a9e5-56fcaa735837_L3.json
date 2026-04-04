@@ -1,26 +1,15 @@
 {
   "id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
-  "task_slug": "load_unpacked_extension",
+  "task_slug": "load_nested_extension_and_enable_dnt",
   "difficulty": "L3",
   "snapshot": "chrome",
-  "instruction": "Load the unpacked extension from /home/user/Desktop/helloExtension into Chrome, then keep the Extensions management page open when you are done.",
-  "source": "https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world",
+  "instruction": "The Desktop QA handoff contains several extension builds. Load the unpacked extension from /home/user/Desktop/chrome_extension_review_kit/release_candidate/palettePreviewExt into Chrome, enable Chrome's 'Send a Do Not Track request' setting, and keep the Extensions management page open when you are done.",
+  "source": "authors",
   "config": [
-    {
-      "type": "download",
-      "parameters": {
-        "files": [
-          {
-            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/chrome/6766f2b8-8a72-417f-a9e5-56fcaa735837/helloExtension.zip",
-            "path": "/home/user/Desktop/helloExtension.zip"
-          }
-        ]
-      }
-    },
     {
       "type": "execute",
       "parameters": {
-        "command": "echo {CLIENT_PASSWORD} | sudo -S apt-get update -y && echo {CLIENT_PASSWORD} | sudo -S apt-get install unzip -y && unzip /home/user/Desktop/helloExtension.zip -d /home/user/Desktop/ && rm /home/user/Desktop/helloExtension.zip",
+        "command": "python3 - <<'PY'\nimport json\nimport shutil\nfrom pathlib import Path\n\nbase = Path('/home/user/Desktop/chrome_extension_review_kit')\nif base.exists():\n    shutil.rmtree(base)\n\nrelease_dir = base / 'release_candidate'\naudit_dir = release_dir / 'paletteAuditExt'\npreview_dir = release_dir / 'palettePreviewExt'\nlegacy_dir = base / 'archive' / 'palettePreviewLegacy'\ndocs_dir = base / 'docs_archive'\nimages_dir = base / 'reference_images'\n\nfor path in [audit_dir, preview_dir, legacy_dir, docs_dir, images_dir]:\n    path.mkdir(parents=True, exist_ok=True)\n\n(base / 'README_path_hint.txt').write_text(\n    'QA handoff bundle\\n'\n    'Target build: release_candidate/palettePreviewExt\\n'\n    'Do not load draft or archive builds.\\n'\n)\n(docs_dir / 'build_notes.txt').write_text(\n    'release_candidate/palettePreviewExt is the approved QA build.\\n'\n    'paletteAuditExt is an internal comparison build.\\n'\n    'archive/palettePreviewLegacy is deprecated.\\n'\n)\n(images_dir / 'palette_map.txt').write_text('swatches: coral, moss, slate\\n')\n\ndef write_extension(folder: Path, name: str, description: str, badge: str) -> None:\n    manifest = {\n        'manifest_version': 3,\n        'name': name,\n        'version': '1.0.0',\n        'description': description,\n        'action': {'default_title': name, 'default_popup': 'popup.html'},\n        'background': {'service_worker': 'background.js'}\n    }\n    (folder / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\\n')\n    (folder / 'background.js').write_text(\n        \"chrome.runtime.onInstalled.addListener(() => { console.log(\" + json.dumps(name + \" ready\") + \"); });\\n\"\n    )\n    (folder / 'popup.html').write_text(\n        '<!doctype html><html><body><h1>' + name + '</h1><p>' + description + '</p><span>' + badge + '</span></body></html>\\n'\n    )\n\nwrite_extension(audit_dir, 'Palette Audit', 'Internal audit build for contrast checks.', 'AUDIT')\nwrite_extension(preview_dir, 'Palette Preview', 'Approved release candidate for palette previews.', 'APPROVED')\nwrite_extension(legacy_dir, 'Palette Preview Legacy', 'Deprecated archive build kept for reference only.', 'LEGACY')\nPY",
         "shell": true
       }
     },
@@ -51,12 +40,16 @@
   "evaluator": {
     "func": [
       "is_in_list",
+      "exact_match",
       "is_expected_active_tab_approximate"
     ],
     "conj": "and",
     "result": [
       {
         "type": "find_unpacked_extension_path"
+      },
+      {
+        "type": "enable_do_not_track"
       },
       {
         "type": "active_url_from_accessTree",
@@ -67,7 +60,13 @@
       {
         "type": "rule",
         "rules": {
-          "expected": "/home/user/Desktop/helloExtension"
+          "expected": "/home/user/Desktop/chrome_extension_review_kit/release_candidate/palettePreviewExt"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
         }
       },
       {
