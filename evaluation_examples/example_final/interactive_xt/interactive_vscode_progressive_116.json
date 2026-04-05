@@ -1,0 +1,82 @@
+{
+  "id": "interactive_vscode_progressive_116",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户分三轮把一个数据分析项目补成可直接交接的 VS Code 脚手架：先加项目设置，再补任务，最后补扩展推荐。任务用于测试逐步追加项目级配置时的连续一致性。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/analytics-app && mkdir -p /home/user/analytics-app/src /home/user/analytics-app/data && printf 'print(\"analytics ready\")\n' > /home/user/analytics-app/src/main.py"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/analytics-app"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先给当前项目补一个 .vscode/settings.json：把 editor.formatOnSave 打开，files.trimTrailingWhitespace 也打开，再加一条 88 列的 ruler。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "接着在 .vscode/tasks.json 里加两个 shell task：Run analytics 执行 python src/main.py，List data 执行 ls data。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后再补一个 .vscode/extensions.json，推荐 ms-python.python 和 ms-python.vscode-pylance。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"import json; from pathlib import Path; base=Path('/home/user/analytics-app/.vscode'); s=base/'settings.json'; t=base/'tasks.json'; e=base/'extensions.json'; ok=s.exists() and t.exists() and e.exists(); settings=json.loads(s.read_text(encoding='utf-8')) if ok else {}; tasks=json.loads(t.read_text(encoding='utf-8')).get('tasks', []) if ok else []; ext=json.loads(e.read_text(encoding='utf-8')) if ok else {}; norm=lambda task:(task.get('command','')+' '+' '.join(task.get('args', []))).strip(); has=lambda label, expected:any(task.get('label')==label and expected in norm(task) for task in tasks); recs=set(ext.get('recommendations', [])); ok=ok and settings.get('editor.formatOnSave') is True and settings.get('files.trimTrailingWhitespace') is True and settings.get('editor.rulers')==[88] and has('Run analytics','python src/main.py') and has('List data','ls data') and {'ms-python.python','ms-python.vscode-pylance'}.issubset(recs); print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

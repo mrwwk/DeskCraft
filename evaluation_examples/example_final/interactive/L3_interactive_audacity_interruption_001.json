@@ -1,0 +1,89 @@
+{
+  "id": "interactive_audacity_interruption_001",
+  "snapshot": "audacity",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "The user interrupts an ongoing mixing request by adding a silence-gap and mono-export constraint after the agent has started working.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/vocals.wav",
+            "path": "/home/user/Documents/vocals.wav"
+          },
+          {
+            "local_path": "assets/audacity/audio/drums.wav",
+            "path": "/home/user/Documents/drums.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/vocals.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Open vocals.wav, import drums.wav, and make a reasonably balanced mix first.",
+      "trigger": {
+        "type": "step_count",
+        "value": 2
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Additional requirement: insert silence from 15s to 17s in the mix, then export the final output as mono to /home/user/Documents/exports/mix_with_gap.wav.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_interactive_audacity_ia04",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/exports/mix_with_gap.wav",
+      "dest": "mix_with_gap.wav"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "min_duration": 29.5,
+        "max_duration": 33.5,
+        "silence_start": 15.0,
+        "silence_end": 16.8,
+        "max_rms_db": -38.0,
+        "expected_channels": 1
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "混音中断追加约束（进行中新增“插入静音 + 单声道导出”）"
+}

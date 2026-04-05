@@ -1,0 +1,104 @@
+{
+  "id": "a1b00010-0010-4000-8000-000000000010-L1",
+  "snapshot": "gimp",
+  "instruction": "Could you turn the near-white background in the current image transparent?",
+  "source": "https://docs.gimp.org/2.10/en/plug-in-colortoalpha.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/products/product_headphone_3394650.jpg",
+            "path": "/home/user/Desktop/product_headphone_3394650.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/product_headphone_3394650.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_white_to_alpha_transparency",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/headphone_transparent.png",
+      "dest": "headphone_transparent.png"
+    },
+    "expected": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/product_headphone_3394650.jpg",
+      "dest": "product_headphone_3394650.jpg"
+    },
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "GNU Image Manipulation Program"
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey([\"ctrl\", \"a\"]); pyautogui.write(\"headphone_transparent.png\"); pyautogui.press([\"enter\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.press([\"enter\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,52 @@
+{
+  "id": "57242fad-77ca-454f-b71b-f187181a9f23",
+  "task_slug": "python_new_file_defaults",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please update VS Code User Settings for creating Python files faster: set default language for new untitled files to python, enable auto save on focus change, and enable rendering of whitespace for all characters.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/python/settings-reference"
+  ],
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "files.defaultLanguage": "python",
+          "files.autoSave": "onFocusChange",
+          "editor.renderWhitespace": "all"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

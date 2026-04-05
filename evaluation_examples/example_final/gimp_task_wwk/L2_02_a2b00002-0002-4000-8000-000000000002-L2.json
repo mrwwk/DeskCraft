@@ -1,0 +1,161 @@
+{
+  "id": "a2b00002-0002-4000-8000-000000000002-L2",
+  "snapshot": "gimp",
+  "instruction": "Could you turn /home/user/Desktop/product_watch_190819.jpg into a white-background marketplace image? Please use a 1600x1600 white canvas, keep the watch centered, increase contrast by at least 8%, add a subtle soft shadow, and keep the XCF layer names exactly Watch_Main, Shadow_Soft, and BG_White.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-filter-dropshadow.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/products/product_watch_190819.jpg",
+            "path": "/home/user/Desktop/product_watch_190819.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/product_watch_190819.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l2_watch_white_standard_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2
+      ],
+      "path": [
+        "/home/user/Desktop/watch_white_standard.jpg",
+        "/home/user/Desktop/watch_white_standard.xcf",
+        "/home/user/Desktop/product_watch_190819.jpg"
+      ],
+      "dest": [
+        "watch_white_standard.jpg",
+        "watch_white_standard.xcf",
+        "product_watch_190819.jpg"
+      ]
+    },
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "GNU Image Manipulation Program"
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('watch_white_standard.jpg'); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('watch_white_standard.xcf'); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

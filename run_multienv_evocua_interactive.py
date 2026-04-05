@@ -42,6 +42,8 @@ from desktop_env.desktop_env import DesktopEnv
 from mm_agents.evocua.evocua_agent import EvoCUAAgent
 from mm_agents.user_simulator import UserSimulator
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Global variables for signal handling
 active_environments = []
 processes = []
@@ -186,6 +188,20 @@ def distribute_tasks(test_all_meta: dict) -> List[tuple]:
     return all_tasks
 
 
+def resolve_config_file(test_config_base_dir: str, domain: str, example_id: str) -> str:
+    """Support both evaluation_examples/examples/<domain>/<id>.json and <base>/<domain>/<id>.json."""
+    if not os.path.isabs(test_config_base_dir):
+        test_config_base_dir = os.path.join(SCRIPT_DIR, test_config_base_dir)
+    candidate_paths = [
+        os.path.join(test_config_base_dir, "examples", domain, f"{example_id}.json"),
+        os.path.join(test_config_base_dir, domain, f"{example_id}.json"),
+    ]
+    for candidate_path in candidate_paths:
+        if os.path.exists(candidate_path):
+            return candidate_path
+    return candidate_paths[0]
+
+
 def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, logger):
     active_environments = []
     env = None
@@ -220,8 +236,8 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, log
                 break
             domain, example_id = item
             try:
-                config_file = os.path.join(
-                    args.test_config_base_dir, f"examples/{domain}/{example_id}.json"
+                config_file = resolve_config_file(
+                    args.test_config_base_dir, domain, example_id
                 )
                 with open(config_file, "r", encoding="utf-8") as f:
                     example = json.load(f)
@@ -533,6 +549,11 @@ if __name__ == "__main__":
     try:
         args = config()
         logger = setup_logging(args)
+
+        if not os.path.isabs(args.test_config_base_dir):
+            args.test_config_base_dir = os.path.join(SCRIPT_DIR, args.test_config_base_dir)
+        if not os.path.isabs(args.test_all_meta_path):
+            args.test_all_meta_path = os.path.join(SCRIPT_DIR, args.test_all_meta_path)
         
         # 设置结果目录名称
         if args.run_name:

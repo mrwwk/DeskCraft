@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_007",
+  "instruction": "Help me enter the order information into the tracker",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Sales Order\\nOrder No: SO-20250315-0088\\nClient: Shanghai Minghua Trading Co.\\nOrder Date: 2025-03-15\\nProduct: Industrial Sensor X-200\\nQuantity: 500 pcs\\nUnit Price: 380 CNY\\nTotal Amount: 190000 CNY\\nDelivery Date: 2025-04-15\\nSales Rep: Zhou Peng' > /home/user/Desktop/order_detail.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Order No'; ws['B1'] = 'Client'; ws['C1'] = 'Product'; ws['D1'] = 'Quantity'; ws['E1'] = 'Total Amount(CNY)'; ws['F1'] = 'Delivery Date'; ws['G1'] = 'Sales Rep'; wb.save('/home/user/Desktop/order_tracker.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me enter the order information into the tracker",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the order information from /home/user/Desktop/order_detail.txt into /home/user/Desktop/order_tracker.xlsx row 2: A2='SO-20250315-0088', B2='Shanghai Minghua Trading Co.', C2='Industrial Sensor X-200', D2=500, E2=190000, F2='2025-04-15', G2='Zhou Peng', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/order_tracker.xlsx'); s = df.to_string(); print('PASSED' if 'SO-20250315-0088' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

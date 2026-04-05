@@ -1,0 +1,70 @@
+{
+  "id": "a02f4ed4-e918-4109-b3e3-a746a0260187",
+  "task_slug": "wc_lines_vscode_wrapcolumn_from_file",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "The file /tmp/reference_code.py serves as your project's canonical line-length reference. Count the exact number of lines in this file using the terminal and write only the plain integer result to ~/Desktop/line_count.txt. That line count is the agreed maximum line length for your project — configure VS Code User Settings to set editor.wordWrapColumn to that exact integer value.",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/codebasics#_how-do-i-turn-on-word-wrap",
+    "现实场景构造来源：团队用参考代码样本反推统一换行列宽，再写回个人编辑器默认值的轻量规范同步需求"
+  ],
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 -c \"f=open('/tmp/reference_code.py','w'); [f.write('# line {}\\n'.format(i)) for i in range(1,101)]; f.close()\"",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode"],
+  "evaluator": {
+    "func": ["check_include_exclude", "check_json_settings"],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/line_count.txt",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["100"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.wordWrapColumn": 100
+          }
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

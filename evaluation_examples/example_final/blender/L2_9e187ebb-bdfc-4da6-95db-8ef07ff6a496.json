@@ -1,0 +1,74 @@
+{
+  "id": "9e187ebb-bdfc-4da6-95db-8ef07ff6a496",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. Select the \"Cube\", add a Solidify modifier with thickness 0.1, then add a Subdivision Surface modifier with viewport level 2. Move the Subdivision Surface above the Solidify in the modifier stack (so Subdivision applies first), then save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Modifiers（Stack Order / Solidify / Subdivision Surface）",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/default_cube.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_modifier.py",
+            "path": "/tmp/check_modifier.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_blender_modifier_order",
+    "result": {
+      "type": "vm_command_line",
+      "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_modifier.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "object_name": "Cube",
+        "modifier_order": [
+          "SUBSURF",
+          "SOLIDIFY"
+        ],
+        "params": {
+          "SOLIDIFY": {
+            "thickness": 0.1
+          },
+          "SUBSURF": {
+            "levels": 2
+          }
+        },
+        "tolerance": 0.01
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

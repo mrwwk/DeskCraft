@@ -1,0 +1,69 @@
+{
+  "id": "d9212d8c-eb7e-44b9-af6b-2f64558d0a91",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/star_polygon.svg in Inkscape. Select the star (id=star1) and the hexagon (id=hexagon1) and group them together (Object > Group). Rotate the group 30 degrees. Change the triangle's (id=triangle1) fill to red (#ff0000). Save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=group+objects+transform+group",
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/star_polygon.svg",
+            "path": "/home/user/Documents/star_polygon.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/star_polygon.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_l2_group_transform",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/star_polygon.svg",
+      "dest": "star_polygon.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "group_check": {
+          "element_ids": [
+            "star1",
+            "hexagon1"
+          ]
+        },
+        "transform_check": {
+          "expected_transform_contains": "rotate"
+        },
+        "fill_check": {
+          "element_id": "triangle1",
+          "expected_fill": "#ff0000"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

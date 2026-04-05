@@ -1,0 +1,77 @@
+{
+  "id": "0348a68c-a33e-47e9-9e07-d189c43e9bec",
+  "task_slug": "writer_open_meetingl203docx_apply_strikethrough_formatting_to_the_last",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Meeting_L2_03.docx\". Apply strikethrough formatting to the last action item (the one starting with \"Tom:\"). Then add the following paragraph at the end of the document: \"Summary: All Q1 targets were met or exceeded. The team will focus on scaling operations and executing the Q2 product roadmap. Next review meeting scheduled for April 25.\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/0348a68c-a33e-47e9-9e07-d189c43e9bec/Meeting_L2_03.docx",
+            "path": "/home/user/Desktop/Meeting_L2_03.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Meeting_L2_03.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/0348a68c-a33e-47e9-9e07-d189c43e9bec",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Meeting_L2_03.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Meeting_L2_03_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Meeting_L2_03.docx",
+      "dest": "Meeting_L2_03.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

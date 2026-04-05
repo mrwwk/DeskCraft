@@ -1,0 +1,167 @@
+{
+  "id": "interactive_inkscape_infographic_progressive_001",
+  "snapshot": "inkscape",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "周报信息图在会前逐步细化，用户按数据更新、视觉调整、交付导出三轮推进。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/infographic_report.svg",
+            "path": "/home/user/Documents/infographic_report.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/infographic_report.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先更新季度柱状图：把 bar_q3 的高度改到 230、bar_q4 的高度改到 210。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "继续改：把 donut_outer 改成 #27ae60，donut_label 改成 14.2K。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后把页脚 footer_text 改成 Updated March 2026，导出 /home/user/Desktop/report_review.png（宽度 1600），并保存 SVG。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_inkscape_element_geometry",
+      "check_inkscape_element_geometry",
+      "check_inkscape_fill_color",
+      "check_inkscape_text_content",
+      "check_inkscape_text_content",
+      "check_include_exclude"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/infographic_report.svg",
+        "dest": "interactive_inkscape_infographic_progressive_001_barq3.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/infographic_report.svg",
+        "dest": "interactive_inkscape_infographic_progressive_001_barq4.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/infographic_report.svg",
+        "dest": "interactive_inkscape_infographic_progressive_001_donut.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/infographic_report.svg",
+        "dest": "interactive_inkscape_infographic_progressive_001_label.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/infographic_report.svg",
+        "dest": "interactive_inkscape_infographic_progressive_001_footer.svg"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "python3 -c \"import os; from PIL import Image; p='/home/user/Desktop/report_review.png'; print('EXISTS' if os.path.exists(p) else 'MISSING'); img=Image.open(p) if os.path.exists(p) else None; print(f'SIZE:{img.size[0]}x{img.size[1]}' if img else 'SIZE:0x0')\" 2>/dev/null || echo 'MISSING'",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "element_id": "bar_q3",
+          "expected_height": "230",
+          "tolerance": 8
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "element_id": "bar_q4",
+          "expected_height": "210",
+          "tolerance": 8
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "element_id": "donut_outer",
+          "expected_fill": "#27ae60"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "element_id": "donut_label",
+          "expected_text": "14.2K"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "element_id": "footer_text",
+          "expected_text": "Updated March 2026"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": [
+            "EXISTS",
+            "SIZE:1600x"
+          ],
+          "exclude": [
+            "MISSING",
+            "SIZE:0x0"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "真实需求原型：分析师会前信息图渐进细化"
+}

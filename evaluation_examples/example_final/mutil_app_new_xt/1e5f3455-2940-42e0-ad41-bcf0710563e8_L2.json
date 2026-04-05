@@ -1,0 +1,92 @@
+{
+  "id": "1e5f3455-2940-42e0-ad41-bcf0710563e8",
+  "task_slug": "json_merge_bugfix_with_dict_docs",
+  "difficulty": "L2",
+  "snapshot": "multi_apps",
+  "instruction": "The profile builder project in ~/Desktop/jsonmerge_app/ is producing incorrect merged settings because user-specific values are being overwritten by defaults. Read ISSUE.md, open the Python dictionary methods documentation in Chrome, and then use VS Code to fix the code so the test suite passes. After the repair, create ~/Desktop/jsonmerge_app/MERGE_FIXED.txt containing exactly `merge fixed`.",
+  "source": [
+    "https://docs.python.org/3/library/stdtypes.html#dict.update",
+    "现实场景构造来源：配置合并逻辑回归时，开发者对照标准库文档修复 defaults 覆盖用户配置问题的常见 Python 维护场景"
+  ],
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/jsonmerge_app')\nbase.mkdir(parents=True, exist_ok=True)\n(base / 'ISSUE.md').write_text('User values must override defaults when building the final profile.\\n')\n(base / 'utils.py').write_text(\"\"\"def merge_user_defaults(defaults, user):\n    merged = user.copy()\n    merged.update(defaults)\n    return merged\n\"\"\")\n(base / 'merge.py').write_text(\"\"\"from utils import merge_user_defaults\n\ndef build_profile(user):\n    defaults = {'theme': 'light', 'language': 'en', 'timezone': 'UTC'}\n    return merge_user_defaults(defaults, user)\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from merge import build_profile\n\ndef test():\n    profile = build_profile({'theme': 'dark', 'timezone': 'Asia/Shanghai'})\n    assert profile == {'theme': 'dark', 'language': 'en', 'timezone': 'Asia/Shanghai'}\n\"\"\")\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://docs.python.org/3/library/stdtypes.html#dict.update"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code", "/home/user/Desktop/jsonmerge_app"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode", "os"],
+  "evaluator": {
+    "func": ["check_python_file_by_test_suite", "is_expected_active_tab_approximate", "check_include_exclude"],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": ["/home/user/Desktop/jsonmerge_app/utils.py", "/home/user/Desktop/jsonmerge_app/merge.py"],
+        "dest": ["utils.py", "merge.py"],
+        "multi": true
+      },
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/jsonmerge_app/MERGE_FIXED.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/jsonmerge_app/test.py",
+        "dest": "test_suite.py"
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://docs.python.org/3/library/stdtypes.html#dict.update"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["merge fixed"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

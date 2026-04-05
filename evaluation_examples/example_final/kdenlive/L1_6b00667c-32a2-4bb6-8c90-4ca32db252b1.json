@@ -1,0 +1,45 @@
+{
+  "id": "6b00667c-32a2-4bb6-8c90-4ca32db252b1",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, open the project settings and enable proxy clips for the current project, then save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/project_and_asset_management/project_settings/proxy_settings.html",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_proxy_setting",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "proxy_enabled": true
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

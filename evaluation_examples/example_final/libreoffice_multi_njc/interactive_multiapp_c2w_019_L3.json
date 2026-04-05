@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_c2w_019",
+  "instruction": "Help me summarize the supplier evaluation",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Supplier'\nws['B1'] = 'Rating'\nws['C1'] = 'On-time Delivery(%)'\nws['D1'] = 'Price Index'\nws['A2'] = 'Premium Materials'\nws['B2'] = 'A'\nws['C2'] = 98.5\nws['D2'] = 1.05\nws['A3'] = 'Emerging Materials'\nws['B3'] = 'B'\nws['C3'] = 92.1\nws['D3'] = 0.95\nws['A4'] = 'Traditional Processor'\nws['B4'] = 'A'\nws['C4'] = 96.8\nws['D4'] = 1.0\nws['A5'] = 'Import Agent'\nws['B5'] = 'C'\nws['C5'] = 85.3\nws['D5'] = 1.2\nwb.save('/home/user/Desktop/supplier_info.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/supplier_note.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me summarize the supplier evaluation",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Find the A-rated supplier with the highest on-time delivery rate from /home/user/Desktop/supplier_info.xlsx, append to /home/user/Desktop/supplier_note.txt: 'Preferred Supplier: Premium Materials (On-time 98.5%)', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/supplier_note.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Preferred Supplier: Premium Materials",
+          "98.5%"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L3"
+}

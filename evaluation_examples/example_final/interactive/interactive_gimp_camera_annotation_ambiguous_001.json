@@ -1,0 +1,169 @@
+{
+  "id": "interactive_gimp_camera_annotation_ambiguous_001",
+  "snapshot": "gimp",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户先模糊说做相机说明图，澄清后收敛为可验证的标注图。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/products/product_camera_90946.jpg",
+            "path": "/home/user/Desktop/product_camera_90946.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/product_camera_90946.jpg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我做一张相机说明图。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "具体要求：保持原分辨率，标注 Lens、Grip、Mode Dial 三个 callout，并在底部加半透明说明栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "导出到 /home/user/Desktop/camera_annotation.png，并保存 /home/user/Desktop/camera_annotation.xcf。图层名必须是 Base_Image、Callout_1、Callout_2、Callout_3、Footer_Note。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_interactive_gimp_camera_annotation_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [0, 1, 2],
+      "path": [
+        "/home/user/Desktop/camera_annotation.png",
+        "/home/user/Desktop/camera_annotation.xcf",
+        "/home/user/Desktop/product_camera_90946.jpg"
+      ],
+      "dest": [
+        "camera_annotation.png",
+        "camera_annotation.xcf",
+        "product_camera_90946.jpg"
+      ]
+    },
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "GNU Image Manipulation Program"
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('camera_annotation.png'); pyautogui.press('enter')"]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.6
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('camera_annotation.xcf'); pyautogui.press('enter')"]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "真实场景：说明图需求先澄清再执行"
+}

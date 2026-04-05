@@ -1,0 +1,49 @@
+{
+  "id": "6cf2d275-3ea6-47c3-9715-fe5744848835",
+  "task_slug": "navigate_chrome_version_page",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "Open Chrome's internal version information page (chrome://version) so I can check the browser version and command-line flags.",
+  "source": "https://support.google.com/chrome/answer/95414",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": "is_expected_active_tab",
+    "result": {
+      "type": "active_tab_info"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "type": "url",
+        "url": "chrome://version/"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

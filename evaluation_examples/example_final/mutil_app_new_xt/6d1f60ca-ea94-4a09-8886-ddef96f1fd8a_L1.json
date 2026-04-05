@@ -1,0 +1,39 @@
+{
+  "id": "6d1f60ca-ea94-4a09-8886-ddef96f1fd8a",
+  "task_slug": "workspace_recommendations_from_handoff_json",
+  "difficulty": "L1",
+  "snapshot": "multi_apps",
+  "instruction": "The workspace handoff file at ~/Desktop/editor_handoff.json describes how the new project should be initialized. Read that file, create the workspace folder ~/Desktop/ml-dashboard/.vscode/, and add an extensions.json file containing the recommended extensions from the handoff. Also create a workspace settings.json file in the same .vscode folder and apply the tabSize and trimTrailingWhitespace values from the handoff.",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "现实场景构造来源：项目交接时常见的“根据 handoff JSON 生成 .vscode 推荐扩展和工作区设置”初始化需求"
+  ],
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\njson.dump({'projectName': 'ml-dashboard', 'recommendations': ['ms-python.python', 'ms-toolsai.jupyter'], 'tabSize': 2, 'trimTrailingWhitespace': True}, open('/home/user/Desktop/editor_handoff.json', 'w'), indent=2)\nPath('/home/user/Desktop/ml-dashboard').mkdir(parents=True, exist_ok=True)\nPY",
+        "shell": true
+      }
+    },
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/Desktop/ml-dashboard"]}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode"],
+  "evaluator": {
+    "func": ["check_json", "check_json_settings"],
+    "result": [
+      {"type": "vm_file", "path": "/home/user/Desktop/ml-dashboard/.vscode/extensions.json", "dest": "extensions.json"},
+      {"type": "vm_file", "path": "/home/user/Desktop/ml-dashboard/.vscode/settings.json", "dest": "settings.json"}
+    ],
+    "expected": [
+      {"type": "rule", "rules": {"expect": [{"key": ["recommendations"], "method": "eq", "ref": ["ms-python.python", "ms-toolsai.jupyter"]}]}},
+      {"type": "rule", "rules": {"expected": {"editor.tabSize": 2, "files.trimTrailingWhitespace": true}}}
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

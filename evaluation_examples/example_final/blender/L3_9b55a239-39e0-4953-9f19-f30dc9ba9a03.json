@@ -1,0 +1,158 @@
+{
+  "id": "9b55a239-39e0-4953-9f19-f30dc9ba9a03",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. Do the following: (1) Delete the default \"Cube\". (2) Add a UV Sphere. (3) Add a Subdivision Surface modifier to the sphere with viewport level 3. (4) Set the sphere to Smooth Shading. (5) Create a new material named \"BlueSphere\" with Base Color (R=0.0, G=0.2, B=1.0), Metallic 0.8, and Roughness 0.1. (6) Switch the render engine to Cycles. Then save the file.",
+  "source": "Grant Abbitt 教学频道（https://www.youtube.com/@grabbitt）初学者建模/修改器/材质组合练习",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/default_cube.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          },
+          {
+            "local_path": "assets/blender/check_modifier.py",
+            "path": "/tmp/check_modifier.py"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/check_mesh.py",
+            "path": "/tmp/check_mesh.py"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_object_deleted",
+      "check_blender_object_exists",
+      "check_blender_modifier_subsurf",
+      "check_blender_smooth_shading",
+      "check_blender_material_pbr",
+      "check_blender_render_engine"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_modifier.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_mesh.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_render.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "deleted_object": "Cube"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_type": "MESH",
+          "name_contains": "Sphere"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name_contains": "Sphere",
+          "modifier_type": "SUBSURF",
+          "levels": 3
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name_contains": "Sphere",
+          "has_smooth": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name_contains": "Sphere",
+          "material_name": "BlueSphere",
+          "expected_color": [
+            0.0,
+            0.2,
+            1.0,
+            1.0
+          ],
+          "metallic": 0.8,
+          "roughness": 0.1,
+          "tolerance": 0.05
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "engine": "CYCLES"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

@@ -1,0 +1,73 @@
+{
+  "id": "interactive_vscode_interruption_105",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户原本想配一个偏阅读的显示模式，但在执行过程中突然切换成审稿模式，要求 Agent 中断原计划并按新的显示偏好收敛。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把 minimap 打开，再把行号改成 relative，并加一条 80 列的 ruler。",
+      "trigger": {
+        "type": "step_count",
+        "value": 2
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等等，改成审稿用的配置：minimap 不要开，改成关闭 minimap，行号显示设成 off，ruler 改成 100，同时把自动换行打开，并把 render whitespace 设成 boundary。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "editor.minimap.enabled": false,
+          "editor.wordWrap": "on",
+          "editor.lineNumbers": "off",
+          "editor.rulers": [
+            100
+          ],
+          "editor.renderWhitespace": "boundary"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

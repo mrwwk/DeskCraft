@@ -1,0 +1,119 @@
+{
+  "id": "interactive_chrome_requirement_change_107",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先让 Agent 保留财务总览页面，但随后意识到真正常用的是安全 FAQ，要求撤销原本的书签选择并改留新的页面。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/chrome_finance_wiki_107'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>Finance Wiki</h1><ul><li><a href=\"pricing_overview.html\">Pricing Overview</a></li><li><a href=\"security_faq.html\">Security FAQ</a></li><li><a href=\"integration_notes.html\">Integration Notes</a></li></ul></body></html>', encoding='utf-8'); (d/'pricing_overview.html').write_text('<html><body><h1>Pricing Overview</h1><p>Quarterly pricing summary.</p></body></html>', encoding='utf-8'); (d/'security_faq.html').write_text('<html><body><h1>Security FAQ</h1><p>Security review answers for finance vendors.</p></body></html>', encoding='utf-8'); (d/'integration_notes.html').write_text('<html><body><h1>Integration Notes</h1><p>ERP import constraints.</p></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/chrome_finance_wiki_107/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先打开 Pricing Overview，并把这一页加入书签栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等一下，我真正需要常看的是 Security FAQ，不要保留 Pricing Overview 的书签了，改成把 Security FAQ 加到书签栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后停留在 Security FAQ 页面。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/chrome_finance_wiki_107/security_faq.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/chrome_finance_wiki_107/security_faq.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

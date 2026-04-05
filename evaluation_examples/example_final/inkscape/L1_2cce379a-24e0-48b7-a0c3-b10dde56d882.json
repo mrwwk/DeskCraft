@@ -1,0 +1,58 @@
+{
+  "id": "2cce379a-24e0-48b7-a0c3-b10dde56d882",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/simple_rect_circle.svg in Inkscape. Draw a straight line from approximately (100, 500) to (700, 500) using the Bezier/Pen tool (B key) in straight-line mode (click start, double-click end), then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=draw+line+bezier+tool",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/simple_rect_circle.svg",
+            "path": "/home/user/Documents/simple_rect_circle.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/simple_rect_circle.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_element_count",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/simple_rect_circle.svg",
+      "dest": "simple_rect_circle.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "element_tag": "path",
+        "min_count": 1
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

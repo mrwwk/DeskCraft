@@ -1,0 +1,77 @@
+{
+  "id": "cd8b1536-0d23-4ffc-b4d1-2e534ac4bf9e",
+  "task_slug": "writer_open_policyl304docx_and_do_all_1_center_title",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Policy_L3_04.docx\" and do ALL: (1) Center title, set to 22pt bold. (2) Convert all section heading text to uppercase. (3) Set all body text to Times New Roman 11pt. (4) Bold the body text under \"4. Equipment and Security\" (after uppercase conversion). (5) Add \"CONFIDENTIAL - Internal Use Only\" as the very first paragraph. (6) Add at the end: \"Document Control: Version 3.0 | Last Updated: January 1, 2025 | Next Review: July 1, 2025\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/cd8b1536-0d23-4ffc-b4d1-2e534ac4bf9e/Policy_L3_04.docx",
+            "path": "/home/user/Desktop/Policy_L3_04.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Policy_L3_04.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/cd8b1536-0d23-4ffc-b4d1-2e534ac4bf9e",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Policy_L3_04.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Policy_L3_04_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Policy_L3_04.docx",
+      "dest": "Policy_L3_04.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

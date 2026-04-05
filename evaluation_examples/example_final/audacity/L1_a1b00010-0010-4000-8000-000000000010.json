@@ -1,0 +1,80 @@
+{
+  "id": "a1b00010-0010-4000-8000-000000000010",
+  "snapshot": "audacity",
+  "instruction": "In this stereo file, I only want the left channel. Open /home/user/Documents/stereo_test.wav in Audacity, split stereo into two mono tracks, delete the right channel, export only the left channel as mono WAV to /home/user/Documents/exports/left_channel.wav, and save the project.",
+  "source": [
+    "https://manual.audacityteam.org/man/splitting_and_joining_stereo_tracks.html",
+    "https://manual.audacityteam.org/man/audio_track_dropdown_menu.html"
+  ],
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/stereo_test.wav",
+            "path": "/home/user/Documents/stereo_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/stereo_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_channels",
+      "check_audio_duration"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/left_channel.wav",
+        "dest": "left_channel.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/left_channel.wav",
+        "dest": "left_channel.wav"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_channels": 1
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 15.0,
+          "tolerance": 0.5
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

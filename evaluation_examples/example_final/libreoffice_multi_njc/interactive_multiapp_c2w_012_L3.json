@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2w_012",
+  "instruction": "Help me organize the department expenses",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Department'\nws['B1'] = 'Travel(CNY)'\nws['C1'] = 'Office(CNY)'\nws['D1'] = 'Entertainment(CNY)'\nws['A2'] = 'Sales Dept'\nws['B2'] = 18500\nws['C2'] = 3200\nws['D2'] = 8600\nws['A3'] = 'Tech Dept'\nws['B3'] = 5200\nws['C3'] = 12800\nws['D3'] = 1200\nws['A4'] = 'Admin Dept'\nws['B4'] = 2100\nws['C4'] = 6500\nws['D4'] = 4300\nws['A5'] = 'Marketing Dept'\nws['B5'] = 22000\nws['C5'] = 4100\nws['D5'] = 15200\nwb.save('/home/user/Desktop/expense_report.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/expense_memo.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the department expenses",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Calculate the total expense for Marketing Dept from /home/user/Desktop/expense_report.xlsx, append to /home/user/Desktop/expense_memo.txt: 'Marketing Dept Total Expense: 41300 CNY', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/expense_memo.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Marketing Dept Total Expense: 41300 CNY"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L3"
+}

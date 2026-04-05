@@ -1,0 +1,76 @@
+{
+  "id": "interactive_vscode_ambiguous_101",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户一开始只笼统地说想把 VS Code 调整得更适合日常写作和记笔记，期望 Agent 先主动追问，再逐步完成设置。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我把 VS Code 调整得更适合我平时写笔记，用起来省心一点。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "具体一点：打开自动保存并设为 afterDelay，延迟 800 毫秒，再把自动换行打开。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "顺手把保存时自动去掉行尾空格也打开。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "files.autoSave": "afterDelay",
+          "files.autoSaveDelay": 800,
+          "editor.wordWrap": "on",
+          "files.trimTrailingWhitespace": true
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

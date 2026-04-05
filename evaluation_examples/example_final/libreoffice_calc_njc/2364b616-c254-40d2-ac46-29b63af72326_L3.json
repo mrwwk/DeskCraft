@@ -1,0 +1,112 @@
+{
+  "id": "2364b616-c254-40d2-ac46-29b63af72326",
+  "task_slug": "calc_open_invrestockl308xlsx_and_do_all_1_add_total",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"InvRestock_L3_08.xlsx\" and do ALL: (1) Add \"Total Value\" (H) = Quantity * Unit Cost (2 dec). (2) Add \"Restock Qty\" (I) = max(0, Reorder Level * 2 - Quantity). (3) Add \"Restock Cost\" (J) = Restock Qty * Unit Cost (2 dec). (4) Sort by Category A-Z then Product Name A-Z. (5) Bold header row. (6) Create \"SupplierOrders\" sheet: Supplier, Items to Restock, Total Restock Cost (2 dec). Only suppliers with items needing restock. Sorted alphabetically. (7) Create \"CategoryBreakdown\" sheet: Category, Items, Total Qty, Total Value (2 dec), Restock Items, Restock Cost (2 dec). Sorted by Category. (8) Freeze header row on Inventory sheet.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/2364b616-c254-40d2-ac46-29b63af72326/InvRestock_L3_08.xlsx",
+            "path": "/home/user/Desktop/InvRestock_L3_08.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/InvRestock_L3_08.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/2364b616-c254-40d2-ac46-29b63af72326",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "InvRestock_L3_08.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "InvRestock_L3_08_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/InvRestock_L3_08.xlsx",
+      "dest": "InvRestock_L3_08.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_name"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNInventory",
+          "sheet_idx1": "ENInventory"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNSupplierOrders",
+          "sheet_idx1": "ENSupplierOrders"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNCategoryBreakdown",
+          "sheet_idx1": "ENCategoryBreakdown"
+        },
+        {
+          "type": "freeze",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": [
+            "font_bold"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

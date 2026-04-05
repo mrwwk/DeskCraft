@@ -1,0 +1,77 @@
+{
+  "id": "c1e0cd7a-e112-446b-a855-563a3aa9be0f",
+  "task_slug": "writer_open_annualreportl101docx_make_all_section_headings_bold",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"AnnualReport_L1_01.docx\". Make all section headings bold.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/c1e0cd7a-e112-446b-a855-563a3aa9be0f/AnnualReport_L1_01.docx",
+            "path": "/home/user/Desktop/AnnualReport_L1_01.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/AnnualReport_L1_01.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/c1e0cd7a-e112-446b-a855-563a3aa9be0f",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "AnnualReport_L1_01.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "AnnualReport_L1_01_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/AnnualReport_L1_01.docx",
+      "dest": "AnnualReport_L1_01.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

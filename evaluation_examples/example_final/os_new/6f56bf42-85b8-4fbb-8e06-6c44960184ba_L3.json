@@ -1,0 +1,77 @@
+{
+  "id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+  "task_slug": "deploy_to_nodes",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/deploy_lab/clusters, recursively find every directory whose basename matches node* and copy source/file1 into each of them, excluding any path containing /backup/. Keep the copied file name as file1, preserve the source file modification time, and set copied file permission to 600.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/deploy_lab && mkdir -p ~/Desktop/deploy_lab/source ~/Desktop/deploy_lab/clusters/node1 ~/Desktop/deploy_lab/clusters/node2/sub/node2a ~/Desktop/deploy_lab/clusters/group/node3 ~/Desktop/deploy_lab/clusters/backup/node4 ~/Desktop/deploy_lab/clusters/node5/backup/deep",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf 'deploy_payload_v2\\n' > ~/Desktop/deploy_lab/source/file1; touch -d '2024-11-11 10:11:12' ~/Desktop/deploy_lab/source/file1",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.write('cd ~/Desktop/deploy_lab'); time.sleep(0.5); pyautogui.press('enter')"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_deploy_files",
+    "result": {
+      "type": "vm_command_line",
+      "command": "src=~/Desktop/deploy_lab/source/file1; node1_ok='false'; [ -f ~/Desktop/deploy_lab/clusters/node1/file1 ] && cmp -s \"$src\" ~/Desktop/deploy_lab/clusters/node1/file1 && [ \"$(stat -c '%a' ~/Desktop/deploy_lab/clusters/node1/file1)\" = '600' ] && [ \"$(stat -c '%Y' ~/Desktop/deploy_lab/clusters/node1/file1)\" = \"$(stat -c '%Y' \"$src\")\" ] && node1_ok='true'; node2a_ok='false'; [ -f ~/Desktop/deploy_lab/clusters/node2/sub/node2a/file1 ] && cmp -s \"$src\" ~/Desktop/deploy_lab/clusters/node2/sub/node2a/file1 && [ \"$(stat -c '%a' ~/Desktop/deploy_lab/clusters/node2/sub/node2a/file1)\" = '600' ] && [ \"$(stat -c '%Y' ~/Desktop/deploy_lab/clusters/node2/sub/node2a/file1)\" = \"$(stat -c '%Y' \"$src\")\" ] && node2a_ok='true'; node3_ok='false'; [ -f ~/Desktop/deploy_lab/clusters/group/node3/file1 ] && cmp -s \"$src\" ~/Desktop/deploy_lab/clusters/group/node3/file1 && [ \"$(stat -c '%a' ~/Desktop/deploy_lab/clusters/group/node3/file1)\" = '600' ] && [ \"$(stat -c '%Y' ~/Desktop/deploy_lab/clusters/group/node3/file1)\" = \"$(stat -c '%Y' \"$src\")\" ] && node3_ok='true'; no_backup_node4='false'; [ ! -f ~/Desktop/deploy_lab/clusters/backup/node4/file1 ] && no_backup_node4='true'; no_backup_deep='false'; [ ! -f ~/Desktop/deploy_lab/clusters/node5/backup/deep/file1 ] && no_backup_deep='true'; echo \"node1_ok=$node1_ok\"; echo \"node2a_ok=$node2a_ok\"; echo \"node3_ok=$node3_ok\"; echo \"no_backup_node4=$no_backup_node4\"; echo \"no_backup_deep=$no_backup_deep\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "node1_ok": "true",
+          "node2a_ok": "true",
+          "node3_ok": "true",
+          "no_backup_node4": "true",
+          "no_backup_deep": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

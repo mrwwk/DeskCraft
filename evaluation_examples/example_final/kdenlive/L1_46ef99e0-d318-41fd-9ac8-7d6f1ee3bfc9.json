@@ -1,0 +1,58 @@
+{
+  "id": "46ef99e0-d318-41fd-9ac8-7d6f1ee3bfc9",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, the video file '/home/user/Videos/6533277-hd_1920_1080_24fps.mp4' has been imported into the project bin, add it to the timeline on track V1, then use Ctrl+Z to undo the add operation so that the clip is removed from the timeline (the file should still remain in the project bin), and save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/user_interface/timeline.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive",
+          "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_timeline_empty",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_in_bin": "6533277-hd_1920_1080_24fps.mp4",
+        "expected_not_on_timeline": true
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

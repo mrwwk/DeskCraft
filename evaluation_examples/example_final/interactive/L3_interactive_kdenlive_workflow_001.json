@@ -1,0 +1,113 @@
+{
+  "id": "interactive_kdenlive_workflow_001",
+  "snapshot": "kdenlive",
+  "interactive": true,
+  "scenario_type": "multi_step_workflow",
+  "scenario_description": "A content team uses staged delivery: first submit a rough cut for manager approval, then add BGM and finalize for media distribution.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          },
+          {
+            "local_path": "assets/kdenlive/14307439_1920_1080_60fps.mp4",
+            "path": "/home/user/Videos/14307439_1920_1080_60fps.mp4"
+          },
+          {
+            "local_path": "assets/kdenlive/98f73cb483a429d5edf2313da9077769.mp3",
+            "path": "/home/user/Music/98f73cb483a429d5edf2313da9077769.mp3"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Build a rough cut first: place the two videos in sequence on V1, add a Dissolve transition between them, and save a preview project to /home/user/Videos/workflow_preview.kdenlive.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Approved. Add /home/user/Music/98f73cb483a429d5edf2313da9077769.mp3 to A1 as background music, then save as /home/user/Videos/workflow_final.kdenlive.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Now render the final delivery to /home/user/Videos/workflow_final.mp4.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_kdenlive_render_with_audio",
+      "check_kdenlive_transition"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/workflow_final.mp4",
+        "dest": "workflow_final.mp4"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/workflow_final.kdenlive",
+        "dest": "workflow_final.kdenlive"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "min_duration": 1.0,
+          "require_audio": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "transition_type": "luma"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "kdenlive_interactive;source_type=internal_workflow;source_ref=<id_or_url>;evidence=staged_delivery"
+}

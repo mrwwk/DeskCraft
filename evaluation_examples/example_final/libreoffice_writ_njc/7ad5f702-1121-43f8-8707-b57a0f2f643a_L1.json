@@ -1,0 +1,77 @@
+{
+  "id": "7ad5f702-1121-43f8-8707-b57a0f2f643a",
+  "task_slug": "writer_open_remotepolicyl103docx_change_the_font_of_all_body",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"RemotePolicy_L1_03.docx\". Change the font of all body text to \"Arial\".",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/7ad5f702-1121-43f8-8707-b57a0f2f643a/RemotePolicy_L1_03.docx",
+            "path": "/home/user/Desktop/RemotePolicy_L1_03.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/RemotePolicy_L1_03.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/7ad5f702-1121-43f8-8707-b57a0f2f643a",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "RemotePolicy_L1_03.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "RemotePolicy_L1_03_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/RemotePolicy_L1_03.docx",
+      "dest": "RemotePolicy_L1_03.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

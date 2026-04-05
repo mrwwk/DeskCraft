@@ -1,0 +1,100 @@
+{
+  "id": "847a96b6-df94-4927-97e6-8cc9ea66ced7",
+  "task_slug": "workspace_add_project_folders",
+  "difficulty": "L2",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/workspace1.code-workspace in VS Code, add /home/user/project2 and /home/user/project3 as folders into this workspace, and save the workspace file.",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces"
+  ],
+  "config": [
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/project1"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/project2"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/project3"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "cat > /home/user/workspace1.code-workspace <<'EOF'\n{\n  \"folders\": [\n    {\"path\": \"project1\"}\n  ]\n}\nEOF"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/workspace1.code-workspace"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "folders": [
+            {
+              "path": "project1"
+            },
+            {
+              "path": "project2"
+            },
+            {
+              "path": "project3"
+            }
+          ]
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/workspace1.code-workspace",
+      "dest": "workspace1.code-workspace"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

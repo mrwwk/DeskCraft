@@ -1,0 +1,48 @@
+{
+  "id": "79f9131c-bfbd-4b01-a177-b31fde8c4a63",
+  "task_slug": "downloads_collect_pngs_flat",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "In ~/Downloads/mock_downloads, copy only the top-level .png files into ~/Desktop/selected_pngs. Do not copy non-png files or anything inside subdirectories. Then create ~/Desktop/selected_pngs/selected_count.txt containing exactly count=2.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Downloads/mock_downloads ~/Desktop/selected_pngs && mkdir -p ~/Downloads/mock_downloads/subdir && printf 'png1\n' > ~/Downloads/mock_downloads/chart.png && printf 'png2\n' > ~/Downloads/mock_downloads/logo.png && printf 'jpg\n' > ~/Downloads/mock_downloads/photo.jpg && printf 'nested\n' > ~/Downloads/mock_downloads/subdir/deep.png",
+        "shell": true
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_copy_filter",
+    "result": {
+      "type": "vm_command_line",
+      "command": "present_chart='false'; [ -f ~/Desktop/selected_pngs/chart.png ] && present_chart='true'; present_logo='false'; [ -f ~/Desktop/selected_pngs/logo.png ] && present_logo='true'; absent_photo='false'; [ ! -f ~/Desktop/selected_pngs/photo.jpg ] && absent_photo='true'; absent_deep='false'; [ ! -f ~/Desktop/selected_pngs/deep.png ] && absent_deep='true'; count_ok='false'; status=$(cat ~/Desktop/selected_pngs/selected_count.txt 2>/dev/null); [ \"$status\" = 'count=2' ] && count_ok='true'; echo \"present_chart.png=$present_chart\"; echo \"present_logo.png=$present_logo\"; echo \"absent_photo.jpg=$absent_photo\"; echo \"absent_deep.png=$absent_deep\"; echo \"count_ok=$count_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "present": [
+          "chart.png",
+          "logo.png"
+        ],
+        "absent": [
+          "photo.jpg",
+          "deep.png"
+        ],
+        "extra_checks": {
+          "count_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,49 @@
+{
+  "id": "f1d3f941-75ba-49bf-abd0-4c92163671e5",
+  "task_slug": "night_light_status_report",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Enable Night Light, set the color temperature to 3700, and create ~/Desktop/night_light_status.txt with exactly two lines: enabled=true and temperature=3700.",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Adjust the Night Light color temperature (https://help.ubuntu.com/lts/ubuntu-help/display-night-light.html.en)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled false; gsettings set org.gnome.settings-daemon.plugins.color night-light-temperature uint32 4000; rm -f ~/Desktop/night_light_status.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_night_light",
+    "result": {
+      "type": "vm_command_line",
+      "command": "en=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled 2>/dev/null | tr -d ' '); tp_raw=$(gsettings get org.gnome.settings-daemon.plugins.color night-light-temperature 2>/dev/null | tr -d ' '); tp=$(echo \"$tp_raw\" | grep -oE '[0-9]+'); expected=$(printf 'enabled=true\\ntemperature=3700\\n'); actual=$(cat ~/Desktop/night_light_status.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"enabled=$en\"; echo \"temperature=$tp\"; echo \"file_ok=$file_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "enabled": "true",
+        "temperature": "3700"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

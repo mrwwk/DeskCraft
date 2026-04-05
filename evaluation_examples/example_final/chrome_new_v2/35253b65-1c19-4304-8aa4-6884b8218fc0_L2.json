@@ -1,0 +1,75 @@
+{
+  "id": "35253b65-1c19-4304-8aa4-6884b8218fc0",
+  "task_slug": "create_2048_desktop_shortcut",
+  "difficulty": "L2",
+  "snapshot": "chrome",
+  "instruction": "Create a desktop shortcut for this website using Chrome's built-in Create shortcut feature, rename it to '2048 Daily Practice', and keep the game page open.",
+  "source": "https://support.google.com/chrome/answer/15085120",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://www.mathsisfun.com/games/2048.html"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_shortcut_on_desktop",
+      "is_expected_active_tab"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "shortcuts_on_desktop"
+      },
+      {
+        "type": "active_tab_info"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "name",
+          "name": "2048 Daily Practice"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://www.mathsisfun.com/games/2048.html"
+        }
+      }
+    ]
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

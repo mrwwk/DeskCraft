@@ -1,0 +1,60 @@
+{
+  "id": "a004f85d-6f1b-4e58-97ea-f6dc7dbf06a1",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/simple_rect_circle.svg in Inkscape. Resize the blue rectangle to width=400 and height=200 (using the W/H fields in the toolbar), then save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=object+resize+W+H+toolbar",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/simple_rect_circle.svg",
+            "path": "/home/user/Documents/simple_rect_circle.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/simple_rect_circle.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_element_geometry",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/simple_rect_circle.svg",
+      "dest": "simple_rect_circle.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "element_id": "rect1",
+        "expected_width": "400",
+        "expected_height": "200",
+        "tolerance": 5
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

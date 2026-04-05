@@ -1,0 +1,162 @@
+{
+  "id": "interactive_blender_ib09_barbershop_aspect_switch_001",
+  "snapshot": "blender",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "复古空间道具图中断插单：横版目录图改为竖版社媒封面。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "source": "blender_interactive;source_type=social_media_interruption;source_ref=<id_or_url>;evidence=aspect_ratio_switch",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/BarberShopChair_01_1k.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/textures/BarberShopChair_01_diff_1k.jpg",
+            "path": "/home/user/Documents/textures/BarberShopChair_01_diff_1k.jpg"
+          },
+          {
+            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/textures/BarberShopChair_01_nor_gl_1k.jpg",
+            "path": "/home/user/Documents/textures/BarberShopChair_01_nor_gl_1k.jpg"
+          },
+          {
+            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/textures/BarberShopChair_01_arm_1k.jpg",
+            "path": "/home/user/Documents/textures/BarberShopChair_01_arm_1k.jpg"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先做 16:9 横版目录图 /home/user/Documents/chair_catalog.png（1920x1080）。如果贴图丢失，请从 /home/user/Documents/textures/ 重新链接。",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "临时插单：改成 9:16 竖版封面 /home/user/Documents/chair_story.png（1080x1920），主体保持居中偏下。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后保存工程到 /home/user/Documents/chair_pack.blend。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_render_settings",
+      "check_blender_render_output",
+      "check_blender_render_output",
+      "check_include_exclude"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/chair_pack.blend --python /tmp/check_render.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/chair_catalog.png",
+        "dest": "ib09_chair_catalog.png"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/chair_story.png",
+        "dest": "ib09_chair_story.png"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "for p in /home/user/Documents/chair_catalog.png /home/user/Documents/chair_story.png /home/user/Documents/chair_pack.blend; do if [ -f \"$p\" ]; then echo \"EXISTS:$p\"; else echo \"MISSING:$p\"; fi; done",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "engine": "CYCLES",
+          "resolution_x": 1080,
+          "resolution_y": 1920,
+          "image_format": "PNG"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "width": 1920,
+          "height": 1080,
+          "format": "PNG"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "width": 1080,
+          "height": 1920,
+          "format": "PNG"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": [
+            "EXISTS:/home/user/Documents/chair_catalog.png",
+            "EXISTS:/home/user/Documents/chair_story.png",
+            "EXISTS:/home/user/Documents/chair_pack.blend"
+          ],
+          "exclude": [
+            "MISSING:/home/user/Documents/chair_catalog.png",
+            "MISSING:/home/user/Documents/chair_story.png",
+            "MISSING:/home/user/Documents/chair_pack.blend"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

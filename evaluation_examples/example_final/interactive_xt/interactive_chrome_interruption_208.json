@@ -1,0 +1,135 @@
+{
+  "id": "interactive_chrome_interruption_208",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户起初在看 hero 和 waitlist 参考页，但中途突然把重点切到 checkout 与 validation 参考，要求 Agent 立刻清理旧目标并留下新的阅读栈。",
+  "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation | https://www.w3.org/WAI/tutorials/forms/validation/ | https://www.frontendmentor.io/challenges/multistep-form-YVAnSdqQBJ | authors",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/ui_pivot_refs_208'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>UI Pivot Refs</h1><ul><li><a href=\"hero_layout.html\">Hero Layout</a></li><li><a href=\"waitlist_flow.html\">Waitlist Flow</a></li><li><a href=\"checkout_guardrails.html\">Checkout Guardrails</a></li><li><a href=\"validation_notes.html\">Validation Notes</a></li></ul></body></html>', encoding='utf-8'); (d/'hero_layout.html').write_text('<html><body><h1>Hero Layout</h1></body></html>', encoding='utf-8'); (d/'waitlist_flow.html').write_text('<html><body><h1>Waitlist Flow</h1></body></html>', encoding='utf-8'); (d/'checkout_guardrails.html').write_text('<html><body><h1>Checkout Guardrails</h1></body></html>', encoding='utf-8'); (d/'validation_notes.html').write_text('<html><body><h1>Validation Notes</h1></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/ui_pivot_refs_208/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先打开 Hero Layout 和 Waitlist Flow 这两个参考页。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "打断一下，别继续看 hero 方向了。改成打开 Checkout Guardrails 和 Validation Notes，并把这两个页面加入书签栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后把 Hero Layout、Waitlist Flow 和首页标签都关掉，只保留 Checkout Guardrails 与 Validation Notes 两个标签，并停留在 Validation Notes。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_tabs",
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "open_tabs_info"
+      },
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "urls": [
+            "file:///home/user/Desktop/ui_pivot_refs_208/checkout_guardrails.html",
+            "file:///home/user/Desktop/ui_pivot_refs_208/validation_notes.html"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/ui_pivot_refs_208/validation_notes.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/ui_pivot_refs_208/checkout_guardrails.html",
+            "file:///home/user/Desktop/ui_pivot_refs_208/validation_notes.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

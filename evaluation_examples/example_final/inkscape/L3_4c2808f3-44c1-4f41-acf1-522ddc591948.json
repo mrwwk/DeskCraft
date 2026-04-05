@@ -1,0 +1,77 @@
+{
+  "id": "4c2808f3-44c1-4f41-acf1-522ddc591948",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/complex_path.svg in Inkscape. Rework the complex shape (id=complex_shape): (1) Ensure it is a path element (use Path > Object to Path if needed). (2) Apply a Gaussian Blur filter (Filters > Blurs > Blur...). (3) Set the stroke to bright red (#ff0000) with width 5. (4) Set the fill-rule to evenodd. (5) Change the fill color to cyan (#00ffff). Save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=path+editing+stroke+dash+blur+z+order+workflow",
+  "difficulty": "L3",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/complex_path.svg",
+            "path": "/home/user/Documents/complex_path.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/complex_path.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_complex_path_workflow",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/complex_path.svg",
+      "dest": "complex_path.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "path_check": {
+          "original_id": "complex_shape",
+          "expected_tag": "path"
+        },
+        "filter_check": {
+          "element_id": "complex_shape",
+          "expected_filter_type": "feGaussianBlur"
+        },
+        "stroke_check": {
+          "element_id": "complex_shape",
+          "expected_stroke": "#ff0000",
+          "expected_stroke_width": "5"
+        },
+        "fill_rule_check": {
+          "element_id": "complex_shape",
+          "expected_fill_rule": "evenodd"
+        },
+        "fill_check": {
+          "element_id": "complex_shape",
+          "expected_fill": "#00ffff"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

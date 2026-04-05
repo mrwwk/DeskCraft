@@ -1,0 +1,78 @@
+{
+  "id": "03e0e85a-bfbf-4155-b706-dc5bd60fb8a0",
+  "task_slug": "impress_open_bitcoin_the_digital_revolutionpptx_on_slide_1",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open \"Bitcoin_ The Digital Revolution.pptx\". On slide 1, change the color of all text to orange (#FF7F00) and make all text bold.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/03e0e85a-bfbf-4155-b706-dc5bd60fb8a0/Bitcoin_ The Digital Revolution.pptx",
+            "path": "/home/user/Desktop/Bitcoin_ The Digital Revolution.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Bitcoin_ The Digital Revolution.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/03e0e85a-bfbf-4155-b706-dc5bd60fb8a0",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Bitcoin_ The Digital Revolution.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Bitcoin_L1.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Bitcoin_ The Digital Revolution.pptx",
+      "dest": "Bitcoin_ The Digital Revolution.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
