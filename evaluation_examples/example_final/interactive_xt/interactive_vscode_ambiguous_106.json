@@ -1,0 +1,82 @@
+{
+  "id": "interactive_vscode_ambiguous_106",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户想把当前工作区整理成便于交接的状态，但一开始表述很模糊，期望 Agent 先追问，再补齐交接文档和阅读相关设置。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/vscode_handoff_106 && mkdir -p /home/user/Desktop/vscode_handoff_106 && printf 'release in progress\n' > /home/user/Desktop/vscode_handoff_106/overview.txt && printf 'check login redirect\nconfirm billing export\n' > /home/user/Desktop/vscode_handoff_106/deploy_notes.txt"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/vscode_handoff_106"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我把这个工作区整理成适合交接的样子。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "先新建一个 HANDOFF.md，内容按下面写：第一行是 # Handoff Notes，第二行是 ## Open Items，接着两条列表分别是 Verify login redirect 和 Confirm billing export。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再把 VS Code 用户设置改一下：自动保存设成 afterDelay，延迟 1200 毫秒，并打开自动换行。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; import json; p=Path('/home/user/Desktop/vscode_handoff_106/HANDOFF.md'); s=Path('/home/user/.config/Code/User/settings.json'); expected='# Handoff Notes\\n## Open Items\\n- Verify login redirect\\n- Confirm billing export\\n'; data=json.loads(s.read_text(encoding='utf-8')) if s.exists() else {}; ok=p.exists() and p.read_text(encoding='utf-8')==expected and data.get('files.autoSave')=='afterDelay' and data.get('files.autoSaveDelay')==1200 and data.get('editor.wordWrap')=='on'; print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

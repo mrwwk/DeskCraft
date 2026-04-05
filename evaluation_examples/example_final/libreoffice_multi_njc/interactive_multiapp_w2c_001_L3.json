@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_001",
+  "instruction": "Help me fill the Q2 targets from the meeting minutes into the spreadsheet",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Meeting Minutes: 2025 Q1 Review\\nAttendees: Zhang Wei, Li Na, Wang Qiang, Zhao Min\\nMeeting Date: March 15, 2025\\nDiscussion Items:\\n  1. Q1 sales completion: 105% of annual target achieved\\n  2. Q2 target setting: 15% growth over Q1\\n  3. Key client follow-up: prioritize top 10 clients\\nResolution: Q2 target set at 11.5M CNY, led by Zhang Wei' > /home/user/Desktop/meeting_record.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Item'; ws['B1'] = 'Owner'; ws['C1'] = 'Target Value'; ws['D1'] = 'Remarks'; wb.save('/home/user/Desktop/q2_targets.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me fill the Q2 targets from the meeting minutes into the spreadsheet",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the Q2 target information from /home/user/Desktop/meeting_record.txt into /home/user/Desktop/q2_targets.xlsx row 2: A2='Q2 Sales Target', B2='Zhang Wei', C2=1150, D2='15% growth over Q1', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/q2_targets.xlsx'); s = df.to_string(); print('PASSED' if 'Zhang Wei' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

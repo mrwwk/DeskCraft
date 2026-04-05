@@ -1,0 +1,67 @@
+{
+  "id": "81a9ba8c-f591-425f-8700-5addaf2f3ad6",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. This is a solar system hierarchy scene. Currently \"Moon\" is parented to \"Planet2\". Change \"Moon\"'s parent to \"Planet1\" instead. Also parent \"Planet3\" to \"Sun\" (it currently has no parent), then save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Scene Layout > Object > Parent",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/hierarchy_scene.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_blender_hierarchy",
+    "result": {
+      "type": "vm_command_line",
+      "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "parent_map": {
+          "Moon": "Planet1",
+          "Planet3": "Sun"
+        },
+        "not_parent": {
+          "Moon": "Planet2"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

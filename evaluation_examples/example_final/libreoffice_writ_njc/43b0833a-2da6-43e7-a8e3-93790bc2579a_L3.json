@@ -1,0 +1,77 @@
+{
+  "id": "43b0833a-2da6-43e7-a8e3-93790bc2579a",
+  "task_slug": "writer_open_proposall307docx_and_do_all_1_replace_q1",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Proposal_L3_07.docx\" and do ALL: (1) Replace \"Q1 2025\" with \"First Quarter 2025\", \"Q2-Q3 2025\" with \"Second-Third Quarter 2025\", \"Q4 2025\" with \"Fourth Quarter 2025\", \"Q1 2026\" with \"First Quarter 2026\". (2) Center the title and set to 20pt bold. (3) Change all heading text color to dark blue (#00008B). (4) Set all body text font to \"Georgia\". (5) Add at end: \"This proposal requires executive approval before implementation.\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/43b0833a-2da6-43e7-a8e3-93790bc2579a/Proposal_L3_07.docx",
+            "path": "/home/user/Desktop/Proposal_L3_07.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Proposal_L3_07.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/43b0833a-2da6-43e7-a8e3-93790bc2579a",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Proposal_L3_07.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Proposal_L3_07_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Proposal_L3_07.docx",
+      "dest": "Proposal_L3_07.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

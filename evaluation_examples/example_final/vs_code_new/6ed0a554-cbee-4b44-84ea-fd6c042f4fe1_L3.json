@@ -1,0 +1,119 @@
+{
+  "id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+  "task_slug": "workspace_add_folders_hide_python_dirs",
+  "difficulty": "L3",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/project.code-workspace in VS Code, add /home/user/data1, /home/user/data2 and /home/user/data3 into this workspace, configure workspace settings to hide __pycache__ and .venv folders in Explorer, and create .vscode/extensions.json inside /home/user/project recommending ms-python.python and ms-python.vscode-pylance.",
+  "source": [
+    "https://code.visualstudio.com/docs/editor/multi-root-workspaces",
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：数据与代码分目录维护的 Python 团队常见的“扩展已有工作区 + 隐藏虚拟环境与缓存目录 + 推荐语言扩展”协作配置需求"
+  ],
+  "config": [
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/project",
+          "/home/user/project/.venv",
+          "/home/user/project/__pycache__"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/data1"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/data2"
+        ]
+      }
+    },
+    {
+      "type": "command",
+      "parameters": {
+        "command": [
+          "mkdir",
+          "-p",
+          "/home/user/data3"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "cat > /home/user/project.code-workspace <<'EOF'\n{\n  \"folders\": [\n    {\"path\": \"project\"}\n  ]\n}\nEOF"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/project.code-workspace"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": ["compare_config", "compare_config"],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "{\n  \"folders\": [\n    {\"path\": \"project\"},\n    {\"path\": \"data1\"},\n    {\"path\": \"data2\"},\n    {\"path\": \"data3\"}\n  ],\n  \"settings\": {\n    \"files.exclude\": {\n      \"**/__pycache__\": true,\n      \"**/.venv\": true\n    }\n  }\n}"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "{\n  \"recommendations\": [\n    \"ms-python.python\",\n    \"ms-python.vscode-pylance\"\n  ]\n}"
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/project.code-workspace",
+        "dest": "project.code-workspace"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/project/.vscode/extensions.json",
+        "dest": "extensions.json"
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

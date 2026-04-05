@@ -1,0 +1,69 @@
+{
+  "id": "interactive_os_interruption_104",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户最开始想在桌面建立一个看板式目录结构，但在 Agent 执行中途打断并改成更简单的两列结构。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/project_board"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "在桌面上建一个 project_board 文件夹，并在里面建 todo、doing、done 三个子文件夹。",
+      "trigger": {
+        "type": "step_count",
+        "value": 2
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "先停一下，改成只保留 backlog 和 completed 两个文件夹就可以了。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ls /home/user/Desktop/project_board 2>/dev/null | sort | tr '\\n' ' '",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "backlog",
+          "completed"
+        ],
+        "exclude": [
+          "todo",
+          "doing",
+          "done"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

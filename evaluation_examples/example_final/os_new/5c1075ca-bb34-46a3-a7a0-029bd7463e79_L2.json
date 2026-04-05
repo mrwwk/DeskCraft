@@ -1,0 +1,78 @@
+{
+  "id": "5c1075ca-bb34-46a3-a7a0-029bd7463e79",
+  "task_slug": "copy_failed_notebooks",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/test_environment_hard, copy all files matching *failed.ipynb into ./fails while preserving directory hierarchy, but exclude any files under a tmp directory and any file whose basename starts with draft_. Then create ./fails/fails_manifest.txt containing sha256 and relative path (format: <sha256>  <relative_path_from_fails>) for copied .ipynb files only, sorted by relative path.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/test_environment_hard && mkdir -p ~/Desktop/test_environment_hard/projectA/run1 ~/Desktop/test_environment_hard/projectA/tmp ~/Desktop/test_environment_hard/projectB/deep ~/Desktop/test_environment_hard/projectB/tmp/deeper ~/Desktop/test_environment_hard/projectC",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf '{\\\"ok\\\":1}\\n' > ~/Desktop/test_environment_hard/projectA/run1/model_failed.ipynb; printf '{\\\"ok\\\":2}\\n' > ~/Desktop/test_environment_hard/projectA/tmp/cache_failed.ipynb; printf '{\\\"ok\\\":3}\\n' > ~/Desktop/test_environment_hard/projectB/deep/eval_failed.ipynb; printf '{\\\"ok\\\":4}\\n' > ~/Desktop/test_environment_hard/projectB/deep/draft_experiment_failed.ipynb; printf '{\\\"ok\\\":5}\\n' > ~/Desktop/test_environment_hard/projectB/tmp/deeper/secret_failed.ipynb; printf 'notebook\\n' > ~/Desktop/test_environment_hard/projectC/notes.ipynb; printf 'txt\\n' > ~/Desktop/test_environment_hard/projectC/readme.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.write('cd ~/Desktop/test_environment_hard'); time.sleep(0.5); pyautogui.press('enter')"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_file_operations",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cd ~/Desktop/test_environment_hard; model_ok='false'; [ -f fails/projectA/run1/model_failed.ipynb ] && model_ok='true'; eval_ok='false'; [ -f fails/projectB/deep/eval_failed.ipynb ] && eval_ok='true'; no_cache='false'; [ ! -f fails/projectA/tmp/cache_failed.ipynb ] && no_cache='true'; no_secret='false'; [ ! -f fails/projectB/tmp/deeper/secret_failed.ipynb ] && no_secret='true'; no_draft='false'; [ ! -f fails/projectB/deep/draft_experiment_failed.ipynb ] && no_draft='true'; manifest_ok='false'; [ -f fails/fails_manifest.txt ] && { expected=$(printf '%s\\n' \"$(sha256sum fails/projectA/run1/model_failed.ipynb | awk '{print $1}')  projectA/run1/model_failed.ipynb\" \"$(sha256sum fails/projectB/deep/eval_failed.ipynb | awk '{print $1}')  projectB/deep/eval_failed.ipynb\" | sort); actual=$(cat fails/fails_manifest.txt 2>/dev/null); [ \"$actual\" = \"$expected\" ] && manifest_ok='true'; }; echo \"model_ok=$model_ok\"; echo \"eval_ok=$eval_ok\"; echo \"no_cache=$no_cache\"; echo \"no_secret=$no_secret\"; echo \"no_draft=$no_draft\"; echo \"manifest_ok=$manifest_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "model_ok": "true",
+          "eval_ok": "true",
+          "no_cache": "true",
+          "no_secret": "true",
+          "no_draft": "true",
+          "manifest_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

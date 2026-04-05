@@ -1,0 +1,98 @@
+{
+  "id": "f11a0c21-75cc-4d13-8a91-1c01b4d51010",
+  "task_slug": "team_health_control_center",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "A local build brief is available in Chrome at file:///home/user/Desktop/team_health_control_center_brief.html. Use VS Code to build /home/user/Desktop/team_health_control_center from the provided data.json and assets/team-pulse.svg. Create index.html, styles.css, app.js, and manifest.json. Load data.json with fetch(), render section#hero, div#health-filter with buttons All, Healthy, Watch, and Risk, section#team-grid, section#risk-timeline, canvas#healthChart, and aside#detail-drawer. Use the local SVG badge in the hero area. Manifest must set project to team-health-control-center, theme to storm-glass, chartType to bar, dataSource to data.json, and previewPort to 8130. Start a local preview server and finish with Chrome open at http://127.0.0.1:8130/index.html.",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch | https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial | https://www.frontendmentor.io/challenges/time-tracking-dashboard-UIQ7167Jw",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": ["/bin/bash", "-c", "rm -rf /home/user/Desktop/team_health_control_center && mkdir -p /home/user/Desktop/team_health_control_center/assets"]
+      }
+    },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          { "local_path": "assets/ui_gen/l3_team_health_control_center/brief.html", "path": "/home/user/Desktop/team_health_control_center_brief.html" },
+          { "local_path": "assets/ui_gen/l3_team_health_control_center/data.json", "path": "/home/user/Desktop/team_health_control_center/data.json" },
+          { "local_path": "assets/ui_gen/l3_team_health_control_center/assets/team-pulse.svg", "path": "/home/user/Desktop/team_health_control_center/assets/team-pulse.svg" }
+        ]
+      }
+    },
+    { "type": "launch", "parameters": { "command": ["google-chrome", "--remote-debugging-port=1337"] } },
+    { "type": "launch", "parameters": { "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"] } },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": { "urls_to_open": ["file:///home/user/Desktop/team_health_control_center_brief.html"] }
+    },
+    { "type": "launch", "parameters": { "command": ["code", "/home/user/Desktop/team_health_control_center"] } },
+    { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "postconfig": [
+      { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } },
+      { "type": "sleep", "parameters": { "seconds": 0.5 } },
+      { "type": "execute", "parameters": { "command": ["python", "-c", "import pyautogui, time; pyautogui.hotkey('ctrl','s'); time.sleep(0.5)"] } },
+      { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "cd /home/user/Desktop/team_health_control_center && zip -qr /home/user/Desktop/team_health_control_center_bundle.zip index.html styles.css app.js manifest.json data.json assets"] } }
+    ],
+    "func": ["is_expected_active_tab_approximate", "check_ui_previewable_generative_bundle"],
+    "conj": "and",
+    "result": [
+      { "type": "active_tab_info" },
+      { "type": "vm_file", "path": "/home/user/Desktop/team_health_control_center_bundle.zip", "dest": "team_health_control_center_bundle.zip" }
+    ],
+    "expected": [
+      { "type": "rule", "rules": { "type": "url", "url": "http://127.0.0.1:8130/index.html" } },
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": ["index.html", "styles.css", "app.js", "manifest.json", "data.json", "assets/team-pulse.svg"],
+          "expected_manifest": {
+            "project": "team-health-control-center",
+            "theme": "storm-glass",
+            "chartType": "bar",
+            "dataSource": "data.json",
+            "previewPort": 8130
+          },
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "section#hero" },
+              { "type": "selector_exists", "selector": "div#health-filter" },
+              { "type": "selector_count", "selector": "div#health-filter button", "count": 4 },
+              { "type": "selector_exists", "selector": "section#team-grid" },
+              { "type": "selector_exists", "selector": "section#risk-timeline" },
+              { "type": "selector_exists", "selector": "canvas#healthChart" },
+              { "type": "selector_exists", "selector": "aside#detail-drawer" }
+            ]
+          },
+          "required_file_patterns": {
+            "app.js": [
+              "fetch\\(['\"]data\\.json['\"]",
+              "getContext\\(['\"]2d['\"]\\)",
+              "addEventListener\\(['\"]click['\"]",
+              "detail-drawer"
+            ]
+          },
+          "css_declarations": {
+            "styles.css": [
+              { "selector": "#team-grid", "properties": { "display": "grid" } },
+              { "selector": "#detail-drawer", "properties": { "padding": null } }
+            ]
+          },
+          "local_asset_links": {
+            "index.html": ["assets/team-pulse.svg"]
+          },
+          "forbid_remote_image_urls": true
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,65 @@
+{
+  "id": "a3b00005-0005-4000-8000-000000000005-L3",
+  "snapshot": "gimp",
+  "instruction": "Create a premium hero visual at 2200x1400 by combining /home/user/Desktop/product_perfume_965989.jpg, /home/user/Desktop/texture_concrete_129733.jpg, and /home/user/Desktop/texture_metal_220182.jpg. Keep product as focal point, blend both texture backgrounds, add a light-glow effect, increase contrast and saturation slightly, and include text containing words \"ESSENCE\" and \"PREMIUM\". Required XCF layers: Perfume_Main, BG_Concrete, BG_Metal, Light_Glow, Title, Subtitle. Export /home/user/Desktop/perfume_hero_banner.png and save /home/user/Desktop/perfume_hero_banner.xcf.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-layer-mask-add.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/products/product_perfume_965989.jpg",
+            "path": "/home/user/Desktop/product_perfume_965989.jpg"
+          },
+          {
+            "local_path": "assets/gimp_task/texture/texture_concrete_129733.jpg",
+            "path": "/home/user/Desktop/texture_concrete_129733.jpg"
+          },
+          {
+            "local_path": "assets/gimp_task/texture/texture_metal_220182.jpg",
+            "path": "/home/user/Desktop/texture_metal_220182.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/product_perfume_965989.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_l3_perfume_hero_complete",
+    "result": {
+      "type": "vm_file",
+      "multi": true,
+      "gives": [
+        0,
+        1,
+        2
+      ],
+      "path": [
+        "/home/user/Desktop/perfume_hero_banner.png",
+        "/home/user/Desktop/perfume_hero_banner.xcf",
+        "/home/user/Desktop/product_perfume_965989.jpg"
+      ],
+      "dest": [
+        "perfume_hero_banner.png",
+        "perfume_hero_banner.xcf",
+        "product_perfume_965989.jpg"
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

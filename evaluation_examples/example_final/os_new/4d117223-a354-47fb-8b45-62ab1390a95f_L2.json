@@ -1,0 +1,69 @@
+{
+  "id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+  "task_slug": "set_log_perms",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/perm_lab, recursively set permission 640 for all regular .log files, but do not change anything under archive/ and do not modify non-.log files. Keep directory permissions unchanged.",
+  "source": "外部参考来源：Ubuntu manpage - chmod(1) (https://manpages.ubuntu.com/manpages/jammy/en/man1/chmod.1.html)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/perm_lab && mkdir -p ~/Desktop/perm_lab/serviceA ~/Desktop/perm_lab/serviceB/sub ~/Desktop/perm_lab/archive ~/Desktop/perm_lab/serviceB/.hidden",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf 'a\\n' > ~/Desktop/perm_lab/serviceA/app.log; printf 'b\\n' > ~/Desktop/perm_lab/serviceA/readme.txt; printf 'c\\n' > ~/Desktop/perm_lab/serviceB/sub/error.log; printf 'd\\n' > ~/Desktop/perm_lab/serviceB/sub/run.sh; printf 'e\\n' > ~/Desktop/perm_lab/archive/old.log; printf 'f\\n' > ~/Desktop/perm_lab/serviceB/.hidden/hidden.log",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "chmod 600 ~/Desktop/perm_lab/serviceA/app.log; chmod 777 ~/Desktop/perm_lab/serviceB/sub/error.log; chmod 664 ~/Desktop/perm_lab/serviceB/.hidden/hidden.log; chmod 755 ~/Desktop/perm_lab/archive/old.log; chmod 666 ~/Desktop/perm_lab/serviceA/readme.txt; chmod 700 ~/Desktop/perm_lab/serviceB/sub/run.sh",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5);"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_file_permissions",
+    "result": {
+      "type": "vm_command_line",
+      "command": "echo \"perm_serviceA_app=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/app.log 2>/dev/null)\"; echo \"perm_serviceB_error=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/error.log 2>/dev/null)\"; echo \"perm_hidden=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/.hidden/hidden.log 2>/dev/null)\"; echo \"perm_archive_old=$(stat -c '%a' ~/Desktop/perm_lab/archive/old.log 2>/dev/null)\"; echo \"perm_readme=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/readme.txt 2>/dev/null)\"; echo \"perm_run=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/run.sh 2>/dev/null)\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "permissions": {
+          "serviceA_app": "640",
+          "serviceB_error": "640",
+          "hidden": "640",
+          "archive_old": "755",
+          "readme": "666",
+          "run": "700"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

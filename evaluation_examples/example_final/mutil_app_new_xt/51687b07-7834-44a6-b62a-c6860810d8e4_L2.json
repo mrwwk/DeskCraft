@@ -1,0 +1,96 @@
+{
+  "id": "51687b07-7834-44a6-b62a-c6860810d8e4",
+  "task_slug": "py_count_vscode_multiconfig_chrome_docs",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "Count all .py files recursively under /tmp/code_proj/ and write only the integer count to ~/Desktop/py_count.txt (e.g. '5'). Then configure VS Code User Settings with these four keys: editor.fontSize=14, editor.lineHeight=24, editor.wordWrap='on', and files.trimTrailingWhitespace=true. Finally, open https://docs.python.org/ in a new Chrome tab.",
+  "source": [
+    "https://docs.python.org/3/",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：代码走查前先统计 Python 文件规模，再统一字号、行高和换行设置并打开官方文档的常见开发准备流程"
+  ],
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "mkdir -p /tmp/code_proj/utils /tmp/code_proj/tests && printf '# main\\n' > /tmp/code_proj/main.py && printf '# helpers\\n' > /tmp/code_proj/utils/helpers.py && printf '# config\\n' > /tmp/code_proj/utils/config.py && printf '# test_main\\n' > /tmp/code_proj/tests/test_main.py && printf '# test_utils\\n' > /tmp/code_proj/tests/test_utils.py",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "func": ["check_include_exclude", "check_json_settings", "is_expected_active_tab_approximate"],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/py_count.txt",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "active_tab_info"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["5"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.fontSize": 14,
+            "editor.lineHeight": 24,
+            "editor.wordWrap": "on",
+            "files.trimTrailingWhitespace": true
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://docs.python.org/"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

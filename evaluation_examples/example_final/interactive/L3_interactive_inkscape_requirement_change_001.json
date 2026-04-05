@@ -1,0 +1,125 @@
+{
+  "id": "interactive_inkscape_requirement_change_001",
+  "snapshot": "inkscape",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "The user changes requirements from an internal draft to a public release version before final export.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/infographic_report.svg",
+            "path": "/home/user/Documents/infographic_report.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/infographic_report.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Prepare the internal review version first and keep the footer as 'Confidential — Internal Use Only'.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Requirement changed: switch to public version by changing footer text to 'Public Release' and deleting the right customer card group (card_right, card_right_title, donut_outer, donut_inner, donut_label).",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Now export PNG to /home/user/Documents/report_public.png with width 2000.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_interactive_inkscape_ii05",
+      "check_inkscape_export_file_exists"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/infographic_report.svg",
+        "dest": "interactive_inkscape_requirement_change_001.svg"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "python3 -c \"import os; print('OK' if os.path.exists('/home/user/Documents/report_public.png') else 'MISSING')\"",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "text_check": {
+            "element_id": "footer_text",
+            "expected_text": "Public Release"
+          },
+          "delete_checks": [
+            {
+              "deleted_element_id": "card_right"
+            },
+            {
+              "deleted_element_id": "card_right_title"
+            },
+            {
+              "deleted_element_id": "donut_outer"
+            },
+            {
+              "deleted_element_id": "donut_inner"
+            },
+            {
+              "deleted_element_id": "donut_label"
+            }
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "OK"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "需求变更：内部稿切公开稿并删除敏感视觉块"
+}

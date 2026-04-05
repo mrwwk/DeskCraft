@@ -10,7 +10,8 @@
             --observation_type screenshot \
             --model EvoCUA-S2 \
             --result_dir ./results \
-            --test_all_meta_path evaluation_examples/test_all.json \
+            --test_all_meta_path evaluation_examples/example_final_non_interactive_all.json \
+            --test_config_base_dir evaluation_examples/example_final \
             --max_steps 50 \
             --num_envs 10 \
             --temperature 0.01 \
@@ -26,7 +27,8 @@
             --observation_type screenshot \
             --model EvoCUA-S1 \
             --result_dir ./results \
-            --test_all_meta_path evaluation_examples/test_all.json \
+            --test_all_meta_path evaluation_examples/example_final_non_interactive_all.json \
+            --test_config_base_dir evaluation_examples/example_final \
             --max_steps 50 \
             --num_envs 10 \
             --max_history_turns 3 \
@@ -52,6 +54,8 @@ from multiprocessing import current_process
 import lib_run_single
 from desktop_env.desktop_env import DesktopEnv
 from mm_agents.evocua.evocua_agent import EvoCUAAgent
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Global variables for signal handling
 active_environments = []
@@ -88,7 +92,7 @@ def config() -> argparse.Namespace:
     
     # evaluation config
     parser.add_argument(
-        "--test_config_base_dir", type=str, default="evaluation_examples"
+        "--test_config_base_dir", type=str, default="evaluation_examples/example_final"
     )
 
     # model config
@@ -108,7 +112,7 @@ def config() -> argparse.Namespace:
     # example config
     parser.add_argument("--domain", type=str, default="all")
     parser.add_argument(
-        "--test_all_meta_path", type=str, default="evaluation_examples/test_all.json"
+        "--test_all_meta_path", type=str, default="evaluation_examples/example_final_non_interactive_all.json"
     )
 
     # logging related
@@ -187,6 +191,20 @@ def distribute_tasks(test_all_meta: dict) -> List[tuple]:
     return all_tasks
 
 
+def resolve_config_file(test_config_base_dir: str, domain: str, example_id: str) -> str:
+    """Support both evaluation_examples/examples/<domain>/<id>.json and <base>/<domain>/<id>.json."""
+    if not os.path.isabs(test_config_base_dir):
+        test_config_base_dir = os.path.join(SCRIPT_DIR, test_config_base_dir)
+    candidate_paths = [
+        os.path.join(test_config_base_dir, "examples", domain, f"{example_id}.json"),
+        os.path.join(test_config_base_dir, domain, f"{example_id}.json"),
+    ]
+    for candidate_path in candidate_paths:
+        if os.path.exists(candidate_path):
+            return candidate_path
+    return candidate_paths[0]
+
+
 def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, logger):
     active_environments = []
     env = None
@@ -221,8 +239,8 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list, log
                 break
             domain, example_id = item
             try:
-                config_file = os.path.join(
-                    args.test_config_base_dir, f"examples/{domain}/{example_id}.json"
+                config_file = resolve_config_file(
+                    args.test_config_base_dir, domain, example_id
                 )
                 with open(config_file, "r", encoding="utf-8") as f:
                     example = json.load(f)
@@ -494,6 +512,11 @@ if __name__ == "__main__":
     try:
         args = config()
         logger = setup_logging(args)
+
+        if not os.path.isabs(args.test_config_base_dir):
+            args.test_config_base_dir = os.path.join(SCRIPT_DIR, args.test_config_base_dir)
+        if not os.path.isabs(args.test_all_meta_path):
+            args.test_all_meta_path = os.path.join(SCRIPT_DIR, args.test_all_meta_path)
         
         # 设置结果目录名称
         if args.run_name:

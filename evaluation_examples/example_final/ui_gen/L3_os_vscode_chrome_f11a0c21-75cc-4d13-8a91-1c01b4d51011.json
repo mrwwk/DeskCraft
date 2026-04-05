@@ -1,0 +1,83 @@
+{
+  "id": "f11a0c21-75cc-4d13-8a91-1c01b4d51011",
+  "task_slug": "checkout_guardrails_workspace",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "A local brief is available in Chrome at file:///home/user/Desktop/checkout_guardrails_brief.html. Use VS Code to build /home/user/Desktop/checkout_guardrails_workspace from the provided rules.json and assets/checkout-shield.svg. Create index.html, styles.css, app.js, and manifest.json. Load rules.json with fetch(), render section#hero, ol#checkout-stepper with exactly 3 li.step-chip items, section#guardrail-list with exactly 3 article.guardrail-card blocks, form#review-form, dialog#saveDialog, section#policy-faq, and canvas#guardrailChart. Use the local shield asset in the hero or stepper. Manifest must set project to checkout-guardrails-workspace, theme to ember-checkout, dataSource to rules.json, and previewPort to 8131. Start a local preview server and finish with Chrome open at http://127.0.0.1:8131/index.html.",
+  "source": "https://www.frontendmentor.io/challenges/multistep-form-YVAnSdqQBJ | https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog",
+  "config": [
+    { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "rm -rf /home/user/Desktop/checkout_guardrails_workspace && mkdir -p /home/user/Desktop/checkout_guardrails_workspace/assets"] } },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          { "local_path": "assets/ui_gen/l3_checkout_guardrails/brief.html", "path": "/home/user/Desktop/checkout_guardrails_brief.html" },
+          { "local_path": "assets/ui_gen/l3_checkout_guardrails/rules.json", "path": "/home/user/Desktop/checkout_guardrails_workspace/rules.json" },
+          { "local_path": "assets/ui_gen/l3_checkout_guardrails/assets/checkout-shield.svg", "path": "/home/user/Desktop/checkout_guardrails_workspace/assets/checkout-shield.svg" }
+        ]
+      }
+    },
+    { "type": "launch", "parameters": { "command": ["google-chrome", "--remote-debugging-port=1337"] } },
+    { "type": "launch", "parameters": { "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"] } },
+    { "type": "chrome_open_tabs", "parameters": { "urls_to_open": ["file:///home/user/Desktop/checkout_guardrails_brief.html"] } },
+    { "type": "launch", "parameters": { "command": ["code", "/home/user/Desktop/checkout_guardrails_workspace"] } },
+    { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "postconfig": [
+      { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } },
+      { "type": "sleep", "parameters": { "seconds": 0.5 } },
+      { "type": "execute", "parameters": { "command": ["python", "-c", "import pyautogui, time; pyautogui.hotkey('ctrl','s'); time.sleep(0.5)"] } },
+      { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "cd /home/user/Desktop/checkout_guardrails_workspace && zip -qr /home/user/Desktop/checkout_guardrails_workspace_bundle.zip index.html styles.css app.js manifest.json rules.json assets"] } }
+    ],
+    "func": ["is_expected_active_tab_approximate", "check_ui_previewable_generative_bundle"],
+    "conj": "and",
+    "result": [
+      { "type": "active_tab_info" },
+      { "type": "vm_file", "path": "/home/user/Desktop/checkout_guardrails_workspace_bundle.zip", "dest": "checkout_guardrails_workspace_bundle.zip" }
+    ],
+    "expected": [
+      { "type": "rule", "rules": { "type": "url", "url": "http://127.0.0.1:8131/index.html" } },
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": ["index.html", "styles.css", "app.js", "manifest.json", "rules.json", "assets/checkout-shield.svg"],
+          "expected_manifest": {
+            "project": "checkout-guardrails-workspace",
+            "theme": "ember-checkout",
+            "dataSource": "rules.json",
+            "previewPort": 8131
+          },
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "section#hero" },
+              { "type": "selector_count", "selector": "ol#checkout-stepper li.step-chip", "count": 3 },
+              { "type": "selector_count", "selector": "section#guardrail-list article.guardrail-card", "count": 3 },
+              { "type": "selector_exists", "selector": "form#review-form" },
+              { "type": "selector_exists", "selector": "dialog#saveDialog" },
+              { "type": "selector_exists", "selector": "section#policy-faq" },
+              { "type": "selector_exists", "selector": "canvas#guardrailChart" }
+            ]
+          },
+          "required_file_patterns": {
+            "app.js": [
+              "fetch\\(['\"]rules\\.json['\"]",
+              "showModal\\(",
+              "getContext\\(['\"]2d['\"]\\)",
+              "addEventListener\\(['\"]click['\"]"
+            ]
+          },
+          "local_asset_links": {
+            "index.html": ["assets/checkout-shield.svg"]
+          },
+          "forbid_remote_image_urls": true
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

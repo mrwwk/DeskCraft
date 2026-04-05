@@ -1,0 +1,78 @@
+{
+  "id": "ac961eb2-aaee-41c1-941a-0277373c7831",
+  "task_slug": "impress_open_blackconciseworkreporttemplateenglishpptx_on_slide_1_change_all_tex",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open \"black_concise_work_report_template_english.pptx\". On slide 1, change all text to \"Times New Roman\" font.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/ac961eb2-aaee-41c1-941a-0277373c7831/black_concise_work_report_template_english.pptx",
+            "path": "/home/user/Desktop/black_concise_work_report_template_english.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/black_concise_work_report_template_english.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/ac961eb2-aaee-41c1-941a-0277373c7831",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "black_concise_work_report_template_english.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "BlackWorkReport_L1.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/black_concise_work_report_template_english.pptx",
+      "dest": "black_concise_work_report_template_english.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

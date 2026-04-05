@@ -1,0 +1,62 @@
+{
+  "id": "c9e3f4a5-6b78-4cad-d234-5e6f7a8b9c0d",
+  "task_slug": "batch_extract_classify",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/archives_inbox, extract all .tar.gz and .zip files into ~/Desktop/extracted/. After extraction, classify the resulting files: move all .csv files into ~/Desktop/extracted/data/, all .txt files into ~/Desktop/extracted/docs/, and all .sh files into ~/Desktop/extracted/scripts/. Create ~/Desktop/extracted/summary.txt with three lines: csv=<count>, txt=<count>, sh=<count>.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/archives_inbox ~/Desktop/extracted; mkdir -p ~/Desktop/archives_inbox /tmp/arc_src; printf 'a,b,c\\n1,2,3\\n' > /tmp/arc_src/sales.csv; printf 'readme content\\n' > /tmp/arc_src/readme.txt; printf '#!/bin/bash\\necho hi\\n' > /tmp/arc_src/deploy.sh; cd /tmp/arc_src && tar czf ~/Desktop/archives_inbox/bundle1.tar.gz sales.csv readme.txt; printf 'd,e,f\\n4,5,6\\n' > /tmp/arc_src/report.csv; printf 'notes here\\n' > /tmp/arc_src/notes.txt; printf '#!/bin/bash\\necho bye\\n' > /tmp/arc_src/cleanup.sh; cd /tmp/arc_src && zip -q ~/Desktop/archives_inbox/bundle2.zip report.csv notes.txt cleanup.sh; rm -rf /tmp/arc_src",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_batch_extract",
+    "result": {
+      "type": "vm_command_line",
+      "command": "csv1='false'; [ -f ~/Desktop/extracted/data/sales.csv ] && csv1='true'; csv2='false'; [ -f ~/Desktop/extracted/data/report.csv ] && csv2='true'; txt1='false'; [ -f ~/Desktop/extracted/docs/readme.txt ] && txt1='true'; txt2='false'; [ -f ~/Desktop/extracted/docs/notes.txt ] && txt2='true'; sh1='false'; [ -f ~/Desktop/extracted/scripts/deploy.sh ] && sh1='true'; sh2='false'; [ -f ~/Desktop/extracted/scripts/cleanup.sh ] && sh2='true'; expected=$(printf 'csv=2\\ntxt=2\\nsh=2\\n'); actual=$(cat ~/Desktop/extracted/summary.txt 2>/dev/null); summary_ok='false'; [ \"$actual\" = \"$expected\" ] && summary_ok='true'; echo \"csv1=$csv1\"; echo \"csv2=$csv2\"; echo \"txt1=$txt1\"; echo \"txt2=$txt2\"; echo \"sh1=$sh1\"; echo \"sh2=$sh2\"; echo \"summary_ok=$summary_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "csv1": "true",
+          "csv2": "true",
+          "txt1": "true",
+          "txt2": "true",
+          "sh1": "true",
+          "sh2": "true",
+          "summary_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

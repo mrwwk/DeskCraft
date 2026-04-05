@@ -1,6 +1,7 @@
 import logging
 import os
 import platform
+import socket
 import time
 import docker
 import psutil
@@ -15,7 +16,12 @@ logger.setLevel(logging.INFO)
 
 WAIT_TIME = 3
 RETRY_INTERVAL = 1
-LOCK_TIMEOUT = 10
+LOCK_TIMEOUT = 100
+OSWORLD_DOCKER_IMAGE = "happysixd/osworld-docker"
+OSWORLD_LABEL_KEY = "osworld.managed"
+OSWORLD_LABEL_VALUE = "true"
+OSWORLD_SESSION_LABEL = "osworld.session"
+OSWORLD_HOST_LABEL = "osworld.host"
 
 
 class PortAllocationError(Exception):
@@ -25,16 +31,40 @@ class PortAllocationError(Exception):
 class DockerProvider(Provider):
     def __init__(self, region: str):
         self.client = docker.from_env()
+        self.region = region
         self.server_port = None
         self.vnc_port = None
         self.chromium_port = None
         self.vlc_port = None
         self.container = None
-        self.environment = {"DISK_SIZE": "32G", "RAM_SIZE": "4G", "CPU_CORES": "4"}  # Modify if needed
+        self.environment = {"DISK_SIZE": "32G", "RAM_SIZE": "6G", "CPU_CORES": "6"}  # Modify if needed
+        self.labels = {
+            OSWORLD_LABEL_KEY: OSWORLD_LABEL_VALUE,
+            OSWORLD_HOST_LABEL: socket.gethostname(),
+            OSWORLD_SESSION_LABEL: f"{os.getpid()}-{int(time.time())}",
+        }
 
         temp_dir = Path(os.getenv('TEMP') if platform.system() == 'Windows' else '/tmp')
         self.lock_file = temp_dir / "docker_port_allocation.lck"
         self.lock_file.parent.mkdir(parents=True, exist_ok=True)
+
+    def _cleanup_stale_containers(self):
+        """Remove leftover OSWorld containers before allocating ports."""
+        for status in ["created", "exited", "dead"]:
+            stale_containers = self.client.containers.list(
+                all=True,
+                filters={
+                    "label": f"{OSWORLD_LABEL_KEY}={OSWORLD_LABEL_VALUE}",
+                    "status": status,
+                }
+            )
+
+            for stale_container in stale_containers:
+                try:
+                    logger.info("Removing stale OSWorld container %s", stale_container.name)
+                    stale_container.remove(force=True)
+                except Exception as exc:
+                    logger.warning("Failed to remove stale container %s: %s", stale_container.name, exc)
 
     def _get_used_ports(self):
         """Get all currently used ports (both system and Docker)."""
@@ -90,6 +120,8 @@ class DockerProvider(Provider):
         
         try:
             with lock:
+                self._cleanup_stale_containers()
+
                 # Allocate all required ports
                 self.vnc_port = self._get_available_port(8006)
                 self.server_port = self._get_available_port(5000)
@@ -107,10 +139,11 @@ class DockerProvider(Provider):
                     logger.warning("KVM device not found, running without hardware acceleration (will be slower)")
 
                 self.container = self.client.containers.run(
-                    "happysixd/osworld-docker",
+                    OSWORLD_DOCKER_IMAGE,
                     environment=self.environment,
                     cap_add=["NET_ADMIN"],
                     devices=devices,
+                    labels=self.labels,
                     volumes={
                         os.path.abspath(path_to_vm): {
                             "bind": "/System.qcow2",
@@ -123,6 +156,7 @@ class DockerProvider(Provider):
                         9222: self.chromium_port,
                         8080: self.vlc_port
                     },
+                    auto_remove=True,
                     detach=True
                 )
 
@@ -137,7 +171,7 @@ class DockerProvider(Provider):
             if self.container:
                 try:
                     self.container.stop()
-                    self.container.remove()
+                    self.container.wait(timeout=WAIT_TIME)
                 except:
                     pass
             raise e
@@ -160,7 +194,7 @@ class DockerProvider(Provider):
             logger.info("Stopping VM...")
             try:
                 self.container.stop()
-                self.container.remove()
+                self.container.wait(timeout=WAIT_TIME)
                 time.sleep(WAIT_TIME)
             except Exception as e:
                 logger.error(f"Error stopping container: {e}")

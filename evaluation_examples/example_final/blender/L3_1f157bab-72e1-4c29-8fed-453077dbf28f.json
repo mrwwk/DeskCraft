@@ -1,0 +1,138 @@
+{
+  "id": "1f157bab-72e1-4c29-8fed-453077dbf28f",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. Do the following: (1) Select the \"Title\" text object and change its body to \"BLENDER\". (2) Set the font size to 3.0 and horizontal alignment to CENTER. (3) Set extrude depth to 0.3 and bevel depth to 0.02. (4) Create a material named \"GoldText\" with Base Color (R=1.0, G=0.84, B=0.0), Metallic 1.0, Roughness 0.2. (5) Load HDRI /home/user/Documents/hdri_studio.exr as the world environment. (6) Switch to Cycles with 64 samples, resolution 1920×1080. (7) Render to /home/user/Documents/text_render.png. Then save the project file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Modeling > Texts；Rendering > Materials/World；Text 渲染流程",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/text_3d_scene.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_text.py",
+            "path": "/tmp/check_text.py"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/check_world.py",
+            "path": "/tmp/check_world.py"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          },
+          {
+            "local_path": "assets/blender/hdri_studio.exr",
+            "path": "/home/user/Documents/hdri_studio.exr"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_text_styling",
+      "check_blender_material_pbr",
+      "check_blender_world_hdri",
+      "check_blender_render_output"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_text.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_world.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/text_render.png",
+        "dest": "text_render.png"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Title",
+          "body": "BLENDER",
+          "size": 3.0,
+          "align_x": "CENTER",
+          "extrude": 0.3,
+          "bevel_depth": 0.02,
+          "tolerance": 0.05
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Title",
+          "material_name": "GoldText",
+          "expected_color": [
+            1.0,
+            0.84,
+            0.0,
+            1.0
+          ],
+          "metallic": 1.0,
+          "roughness": 0.2,
+          "tolerance": 0.05
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "hdri_filename": "hdri_studio.exr"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "width": 1920,
+          "height": 1080,
+          "format": "PNG"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

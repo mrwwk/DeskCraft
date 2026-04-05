@@ -1,0 +1,73 @@
+{
+  "id": "0b1b6179-db02-408c-a1cc-f6f1408829ed",
+  "task_slug": "team_editor_spec_apply_vscode_artifact",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Your team stores shared editor preferences in ~/.team_editor_spec. Read this file to find the three settings listed there (tabSize, fontSize, lineHeight). Apply all three to VS Code User Settings using the key names editor.tabSize, editor.fontSize, and editor.lineHeight. Also copy the entire contents of the spec file to ~/Desktop/applied_editor_spec.txt so there is a record of what was applied.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "https://code.visualstudio.com/docs/editor/codebasics",
+    "现实场景构造来源：团队成员按共享 editor spec 同步字号、行高与缩进，并留存应用结果供交接核对的常见入项流程"
+  ],
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf 'tabSize=3\\nfontSize=13\\nlineHeight=22\\n' > /home/user/.team_editor_spec",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode"],
+  "evaluator": {
+    "func": ["check_json_settings", "check_include_exclude"],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/applied_editor_spec.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 3,
+            "editor.fontSize": 13,
+            "editor.lineHeight": 22
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["tabSize=3", "fontSize=13"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

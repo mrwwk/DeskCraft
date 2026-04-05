@@ -1,0 +1,119 @@
+{
+  "id": "interactive_chrome_correction_114",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "correction",
+  "scenario_description": "用户最初让 Agent 加载了一个并非最终要调试的本地扩展，随后纠正成另一个扩展，并追加隐私设置要求，检验 Agent 是否能根据更正信息完成最终目标。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/meetingHelperExt /home/user/Desktop/noteHighlighterExt && mkdir -p /home/user/Desktop/meetingHelperExt /home/user/Desktop/noteHighlighterExt && printf '{\"manifest_version\":3,\"name\":\"Meeting Helper\",\"version\":\"1.0\",\"background\":{\"service_worker\":\"background.js\"}}\n' > /home/user/Desktop/meetingHelperExt/manifest.json && printf 'console.log(\"Meeting Helper loaded\");\n' > /home/user/Desktop/meetingHelperExt/background.js && printf '{\"manifest_version\":3,\"name\":\"Note Highlighter\",\"version\":\"1.0\",\"background\":{\"service_worker\":\"background.js\"}}\n' > /home/user/Desktop/noteHighlighterExt/manifest.json && printf 'console.log(\"Note Highlighter loaded\");\n' > /home/user/Desktop/noteHighlighterExt/background.js"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把桌面的 /home/user/Desktop/meetingHelperExt 这个 unpacked extension 加载进来。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我说错扩展了，我真正要调的是 /home/user/Desktop/noteHighlighterExt。请把这个也加载进来，接下来以它为准。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "另外把 Do Not Track 打开，最后停留在扩展管理页面。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_in_list",
+      "exact_match",
+      "is_expected_active_tab_approximate"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "find_unpacked_extension_path"
+      },
+      {
+        "type": "enable_do_not_track"
+      },
+      {
+        "type": "active_url_from_accessTree",
+        "goto_prefix": ""
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "/home/user/Desktop/noteHighlighterExt"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "chrome://extensions"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,37 @@
+{
+  "id": "c46a7eb6-c0ed-4ef9-9987-a8254815df1d",
+  "task_slug": "frontend_workspace_scaffold_bundle",
+  "difficulty": "L3",
+  "snapshot": "vscode",
+  "instruction": "Please open /home/user/frontend-app in VS Code and scaffold the project workspace. Create .vscode/extensions.json recommending dbaeumer.vscode-eslint and esbenp.prettier-vscode. Create .vscode/tasks.json with two shell tasks named npm: build running `npm run build` and npm: test running `npm test`. Also create .vscode/settings.json so editor.formatOnSave is true, editor.defaultFormatter is esbenp.prettier-vscode, and files.associations maps *.css to tailwindcss.",
+  "source": [
+    "https://code.visualstudio.com/docs/debugtest/tasks",
+    "https://code.visualstudio.com/docs/editor/extension-marketplace",
+    "https://code.visualstudio.com/docs/getstarted/settings",
+    "现实场景构造来源：前端项目开工时常见的“推荐 ESLint/Prettier + 预置 build/test 任务 + 默认格式器与文件关联”脚手架需求"
+  ],
+  "config": [
+    {"type": "command", "parameters": {"command": ["mkdir", "-p", "/home/user/frontend-app"]}},
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/frontend-app"]}},
+    {"type": "activate_window", "parameters": {"window_name": "Visual Studio Code"}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode"],
+  "evaluator": {
+    "func": ["compare_config", "compare_config", "check_json_settings"],
+    "result": [
+      {"type": "vm_file", "path": "/home/user/frontend-app/.vscode/extensions.json", "dest": "extensions.json"},
+      {"type": "vm_file", "path": "/home/user/frontend-app/.vscode/tasks.json", "dest": "tasks.json"},
+      {"type": "vm_file", "path": "/home/user/frontend-app/.vscode/settings.json", "dest": "settings.json"}
+    ],
+    "expected": [
+      {"type": "rule", "rules": {"expected": "{\n  \"recommendations\": [\n    \"dbaeumer.vscode-eslint\",\n    \"esbenp.prettier-vscode\"\n  ]\n}"}},
+      {"type": "rule", "rules": {"expected": "{\n  \"version\": \"2.0.0\",\n  \"tasks\": [\n    {\n      \"label\": \"npm: build\",\n      \"type\": \"shell\",\n      \"command\": \"npm run build\"\n    },\n    {\n      \"label\": \"npm: test\",\n      \"type\": \"shell\",\n      \"command\": \"npm test\"\n    }\n  ]\n}"}},
+      {"type": "rule", "rules": {"expected": {"editor.formatOnSave": true, "editor.defaultFormatter": "esbenp.prettier-vscode", "files.associations": {"*.css": "tailwindcss"}}}}
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

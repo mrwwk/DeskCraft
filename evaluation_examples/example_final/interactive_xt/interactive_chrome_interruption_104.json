@@ -1,0 +1,113 @@
+{
+  "id": "interactive_chrome_interruption_104",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户本来让 Agent 找 FAQ 页面，但在浏览过程中突然打断，改成要求打开 Troubleshooting 页面并保留它。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; d=Path('/home/user/Desktop/chrome_help_center_104'); d.mkdir(parents=True, exist_ok=True); (d/'index.html').write_text('<html><body><h1>Help Center</h1><ul><li><a href=\"faq.html\">FAQ</a></li><li><a href=\"troubleshooting.html\">Troubleshooting</a></li></ul></body></html>', encoding='utf-8'); (d/'faq.html').write_text('<html><body><h1>FAQ</h1><p>Frequently asked questions.</p></body></html>', encoding='utf-8'); (d/'troubleshooting.html').write_text('<html><body><h1>Troubleshooting</h1><p>Problem solving steps.</p></body></html>', encoding='utf-8')"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/chrome_help_center_104/index.html"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我找到 FAQ 页面并先保留在前台。",
+      "trigger": {
+        "type": "step_count",
+        "value": 2
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等等，不看 FAQ 了，改成打开 Troubleshooting 页面并把那一页加入书签栏。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_active_tab",
+      "is_expected_bookmarks"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "active_url_from_accessTree"
+      },
+      {
+        "type": "bookmarks"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/chrome_help_center_104/troubleshooting.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "bookmark_bar_websites_urls",
+          "urls": [
+            "file:///home/user/Desktop/chrome_help_center_104/troubleshooting.html"
+          ]
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

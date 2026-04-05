@@ -1,0 +1,97 @@
+{
+  "id": "7232142e-4f9c-4994-a12a-ab2d8feef1ea",
+  "task_slug": "calc_open_qtrannuall210xlsx_add_two_columns_annual_revenue_j",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"QtrAnnual_L2_10.xlsx\". Add two columns: \"Annual Revenue\" (J) summing Q1-Q4 Revenue, and \"Annual Cost\" (K) summing Q1-Q4 Cost for each department. Make the entire header row bold.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/7232142e-4f9c-4994-a12a-ab2d8feef1ea/QtrAnnual_L2_10.xlsx",
+            "path": "/home/user/Desktop/QtrAnnual_L2_10.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/QtrAnnual_L2_10.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/7232142e-4f9c-4994-a12a-ab2d8feef1ea",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "QtrAnnual_L2_10.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "QtrAnnual_L2_10_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/QtrAnnual_L2_10.xlsx",
+      "dest": "QtrAnnual_L2_10.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_name"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNQ1-Q4",
+          "sheet_idx1": "ENQ1-Q4"
+        },
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": [
+            "font_bold"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

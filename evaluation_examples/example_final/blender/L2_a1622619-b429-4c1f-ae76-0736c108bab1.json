@@ -1,0 +1,83 @@
+{
+  "id": "a1622619-b429-4c1f-ae76-0736c108bab1",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. The \"Cube\" has a Subdivision Surface modifier with level 2. Apply the modifier so the extra geometry becomes permanent. Then set the object's shading to Smooth Shading (Right-click > Shade Smooth), and save the file.",
+  "source": "Blender Manual（https://docs.blender.org/manual/en/latest/）Modeling > Modifiers（Apply）；Object > Shade Smooth",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/cube_with_subsurf.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_mesh.py",
+            "path": "/tmp/check_mesh.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_applied_modifier",
+      "check_blender_smooth_shading"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_mesh.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_mesh.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "min_vertices": 20,
+          "no_modifier_type": "SUBSURF"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Cube",
+          "has_smooth": true
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

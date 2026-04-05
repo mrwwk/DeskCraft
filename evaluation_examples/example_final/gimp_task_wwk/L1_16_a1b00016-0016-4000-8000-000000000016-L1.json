@@ -1,0 +1,56 @@
+{
+  "id": "a1b00016-0016-4000-8000-000000000016-L1",
+  "snapshot": "gimp",
+  "instruction": "Please set GIMP to show up to 15 recent files.",
+  "source": "https://www.youtube.com/watch?v=G_PjQAy0iiU",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_7b7617bd_recent_files",
+    "result": {
+      "type": "gimp_config_file",
+      "file_name": "gimprc",
+      "dest": "gimprc"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "key": "max-recent-files",
+        "value": "15"
+      }
+    },
+    "postconfig": [
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey([\"ctrl\", \"q\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

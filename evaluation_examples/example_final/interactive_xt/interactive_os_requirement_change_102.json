@@ -1,0 +1,68 @@
+{
+  "id": "interactive_os_requirement_change_102",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先让 Agent 在桌面建立按季度分类的文件夹，随后改变主意，改为按区域建立文件夹。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/Archive"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "在桌面上建一个 Archive 文件夹，然后在里面建三个子文件夹：Q1、Q2、Q3。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "等一下，不用按季度了，把 Q1、Q2、Q3 去掉，改成 North 和 South 两个文件夹。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ls /home/user/Desktop/Archive 2>/dev/null | sort | tr '\\n' ' '",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "North",
+          "South"
+        ],
+        "exclude": [
+          "Q1",
+          "Q2",
+          "Q3"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

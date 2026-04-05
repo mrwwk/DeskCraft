@@ -1,0 +1,28 @@
+{
+    "id": "e931fa3c-62de-4ae3-b789-9bd1787c800b",
+    "snapshot": "blender",
+    "instruction": "Open Blender",
+    "source": "Custom created for testing",
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "python",
+                    "-c",
+                    "import pyautogui; import time; pyautogui.click(960, 540); time.sleep(0.5);"
+                ]
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "blender"
+    ],
+    "evaluator": {
+        "func": "infeasible"
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}

@@ -1,0 +1,145 @@
+{
+  "id": "interactive_chrome_requirement_change_112",
+  "snapshot": "chrome",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先让 Agent 做一套常规隐私加固，但在过程中又补充了更严格的数据清理需求，并要求最终停留在安全设置页方便复查。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把 Do Not Track 打开，再把 Safe Browsing 提升到 Enhanced protection。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我再加一个要求：关掉所有窗口时要自动清除 cookies 和站点数据。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "都处理完之后，把浏览器停留在 Security 设置页面，我想顺手再看一眼。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "pkill",
+            "chrome"
+          ]
+        }
+      },
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "google-chrome",
+            "--remote-debugging-port=1337"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": [
+      "exact_match",
+      "exact_match",
+      "exact_match",
+      "is_expected_active_tab_approximate"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "enable_do_not_track"
+      },
+      {
+        "type": "enable_enhanced_safety_browsing"
+      },
+      {
+        "type": "data_delete_automacally"
+      },
+      {
+        "type": "active_url_from_accessTree",
+        "goto_prefix": ""
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "chrome://settings/security"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

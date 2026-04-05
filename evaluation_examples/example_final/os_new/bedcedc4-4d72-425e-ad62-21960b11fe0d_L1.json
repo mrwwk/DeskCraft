@@ -1,0 +1,49 @@
+{
+  "id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+  "task_slug": "power_no_dim",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "Configure power behavior for presentations: turn off dim screen when inactive, disable automatic screen blanking (idle-delay=0), and save ~/Desktop/power_policy_audit.txt with exactly two lines: idle-dim=false and idle-delay=0.",
+  "source": "外部参考来源：Ubuntu Desktop Guide - Why does my screen go dim after a while? (https://help.ubuntu.com/lts/ubuntu-help/power-whydim.html.en)；Ubuntu Desktop Guide - Set screen blanking time (https://help.ubuntu.com/lts/ubuntu-help/display-blank.html.en)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.settings-daemon.plugins.power idle-dim true; gsettings set org.gnome.desktop.session idle-delay 300; rm -f ~/Desktop/power_policy_audit.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_power_settings",
+    "result": {
+      "type": "vm_command_line",
+      "command": "dim=$(gsettings get org.gnome.settings-daemon.plugins.power idle-dim 2>/dev/null); idle_raw=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null); idle_val=$(echo \"$idle_raw\" | grep -oE '[0-9]+'); expected=$(printf 'idle-dim=false\\nidle-delay=0\\n'); actual=$(cat ~/Desktop/power_policy_audit.txt 2>/dev/null); file_ok='false'; [ \"$actual\" = \"$expected\" ] && file_ok='true'; echo \"idle_dim=$dim\"; echo \"idle_delay=$idle_val\"; echo \"file_ok=$file_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "idle_dim": "false",
+        "idle_delay": "0"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

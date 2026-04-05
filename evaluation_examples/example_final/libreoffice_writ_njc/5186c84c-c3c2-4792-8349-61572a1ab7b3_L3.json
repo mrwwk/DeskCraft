@@ -1,0 +1,77 @@
+{
+  "id": "5186c84c-c3c2-4792-8349-61572a1ab7b3",
+  "task_slug": "writer_open_policyl309docx_and_do_all_1_center_title",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Policy_L3_09.docx\" and do ALL: (1) Center title, 22pt, bold, dark red (#8B0000). (2) Make section headings bold and navy blue (#003366). (3) Set all body text to Calibri 11pt. (4) Italic the body under \"3. Work Schedule\". (5) Add \"INTERNAL DOCUMENT - DO NOT DISTRIBUTE\" as the first paragraph. (6) Add at end: \"Policy Owner: Human Resources Department | Review Cycle: Semi-annual\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/5186c84c-c3c2-4792-8349-61572a1ab7b3/Policy_L3_09.docx",
+            "path": "/home/user/Desktop/Policy_L3_09.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Policy_L3_09.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/5186c84c-c3c2-4792-8349-61572a1ab7b3",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Policy_L3_09.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Policy_L3_09_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Policy_L3_09.docx",
+      "dest": "Policy_L3_09.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

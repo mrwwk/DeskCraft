@@ -1,0 +1,52 @@
+{
+  "id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+  "task_slug": "wrapped_tabs_close_button_left",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Please tune VS Code tab behavior in User Settings by enabling wrapped tabs, disabling tab pinning, and setting tab close button visibility to left.",
+  "source": [
+    "https://code.visualstudio.com/docs/getstarted/userinterface",
+    "https://code.visualstudio.com/docs/getstarted/settings"
+  ],
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "check_json_settings",
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": {
+          "workbench.editor.wrapTabs": true,
+          "workbench.editor.enablePreview": false,
+          "workbench.editor.tabCloseButton": "left"
+        }
+      }
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/.config/Code/User/settings.json",
+      "dest": "settings.json"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2w_009",
+  "instruction": "Help me organize the customer feedback",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Client'\nws['B1'] = 'Score(1-5)'\nws['C1'] = 'Repurchase'\nws['D1'] = 'Feedback Category'\nws['A2'] = 'Client A'\nws['B2'] = 5\nws['C2'] = 'Yes'\nws['D2'] = 'Product'\nws['A3'] = 'Client B'\nws['B3'] = 3\nws['C3'] = 'No'\nws['D3'] = 'Service'\nws['A4'] = 'Client C'\nws['B4'] = 4\nws['C4'] = 'Yes'\nws['D4'] = 'Product'\nws['A5'] = 'Client D'\nws['B5'] = 5\nws['C5'] = 'Yes'\nws['D5'] = 'Price'\nws['A6'] = 'Client E'\nws['B6'] = 2\nws['C6'] = 'No'\nws['D6'] = 'Service'\nwb.save('/home/user/Desktop/customer_feedback.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/feedback_digest.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the customer feedback",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Count the number of customers with a score >= 4 from /home/user/Desktop/customer_feedback.xlsx, append to /home/user/Desktop/feedback_digest.txt: 'High Satisfaction Customers: 3', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/feedback_digest.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "High Satisfaction Customers: 3"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L3"
+}

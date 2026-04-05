@@ -1,0 +1,87 @@
+{
+  "id": "interactive_audacity_requirement_change_001",
+  "snapshot": "audacity",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "The user first asks for global denoise, then changes the requirement mid-task to keep the intro untouched and denoise only the later segment.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/noisy_recording.wav",
+            "path": "/home/user/Documents/noisy_recording.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/noisy_recording.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Please open /home/user/Documents/noisy_recording.wav in Audacity, reduce the background noise, and export a clean version first.",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "I changed my mind: keep 0s-2s untouched (no denoise), apply noise reduction only after 2s, and export to /home/user/Documents/exports/clean_partial.wav.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_interactive_audacity_ia01",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/exports/clean_partial.wav",
+      "dest": "clean_partial.wav"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_duration": 14.0,
+        "duration_tolerance": 1.0,
+        "intro_start": 0.0,
+        "intro_end": 2.0,
+        "tail_start": 2.0,
+        "tail_end": 14.0,
+        "intro_min_rms_db": -28.0,
+        "tail_min_rms_db": -38.0
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "录音降噪中的中途需求变更（先全局降噪，后要求前段保留原样）"
+}

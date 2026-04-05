@@ -1,0 +1,96 @@
+{
+  "id": "interactive_inkscape_correction_001",
+  "snapshot": "inkscape",
+  "interactive": true,
+  "scenario_type": "error_correction",
+  "scenario_description": "The user corrects an initially wrong target object and asks the agent to redo edits accordingly.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/complex_path.svg",
+            "path": "/home/user/Documents/complex_path.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/complex_path.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Please change zigzag to a blue dashed stroke with width 4.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Correction: not zigzag. Instead, set blob_shape fill to #ff8c00 and delete spiral_path.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Then bring complex_curve to the top of the stacking order and save.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_interactive_inkscape_ii04",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/complex_path.svg",
+      "dest": "interactive_inkscape_correction_001.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "fill_check": {
+          "element_id": "blob_shape",
+          "expected_fill": "#ff8c00"
+        },
+        "delete_check": {
+          "deleted_element_id": "spiral_path"
+        },
+        "zorder_check": {
+          "element_id": "complex_curve",
+          "expected_position": "top"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "需求纠偏：先改错对象再按更正指令收口"
+}

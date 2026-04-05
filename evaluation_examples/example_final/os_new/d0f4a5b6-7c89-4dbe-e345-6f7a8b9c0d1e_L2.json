@@ -1,0 +1,61 @@
+{
+  "id": "d0f4a5b6-7c89-4dbe-e345-6f7a8b9c0d1e",
+  "task_slug": "hosts_block_domains",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "Block the following domains by adding entries to /etc/hosts that redirect them to 127.0.0.1: ads.example.com, tracker.example.net, malware.badsite.org. Before making changes, create a backup at /etc/hosts.bak. Do not remove any existing entries in /etc/hosts. After modification, create ~/Desktop/hosts_block_report.txt with exactly: blocked=3 and backup=/etc/hosts.bak on separate lines.",
+  "source": "外部参考来源：Ubuntu manpage - hosts(5) (https://manpages.ubuntu.com/manpages/jammy/en/man5/hosts.5.html)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'cp /etc/hosts /etc/hosts.osworld_original; sed -i \"/ads.example.com\\|tracker.example.net\\|malware.badsite.org/d\" /etc/hosts; rm -f /etc/hosts.bak'; rm -f ~/Desktop/hosts_block_report.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_hosts_block",
+    "result": {
+      "type": "vm_command_line",
+      "command": "blocked_ads='false'; grep -q '127.0.0.1.*ads.example.com' /etc/hosts && blocked_ads='true'; blocked_tracker='false'; grep -q '127.0.0.1.*tracker.example.net' /etc/hosts && blocked_tracker='true'; blocked_malware='false'; grep -q '127.0.0.1.*malware.badsite.org' /etc/hosts && blocked_malware='true'; preserved_ok='false'; grep -q 'localhost' /etc/hosts && preserved_ok='true'; backup_ok='false'; [ -f /etc/hosts.bak ] && backup_ok='true'; expected=$(printf 'blocked=3\\nbackup=/etc/hosts.bak\\n'); actual=$(cat ~/Desktop/hosts_block_report.txt 2>/dev/null); report_ok='false'; [ \"$actual\" = \"$expected\" ] && report_ok='true'; echo \"blocked_ads=$blocked_ads\"; echo \"blocked_tracker=$blocked_tracker\"; echo \"blocked_malware=$blocked_malware\"; echo \"preserved_ok=$preserved_ok\"; echo \"backup_ok=$backup_ok\"; echo \"report_ok=$report_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "blocked_ads": "true",
+          "blocked_tracker": "true",
+          "blocked_malware": "true",
+          "preserved_ok": "true",
+          "backup_ok": "true",
+          "report_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

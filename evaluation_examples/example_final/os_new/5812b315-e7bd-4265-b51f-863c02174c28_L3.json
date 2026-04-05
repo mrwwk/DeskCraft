@@ -1,0 +1,47 @@
+{
+  "id": "5812b315-e7bd-4265-b51f-863c02174c28",
+  "task_slug": "create_sftp_user",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Create an SFTP-only user named charles with password Ex@mpleP@55w0rd!, home directory /home/test1, shell /usr/sbin/nologin, and primary group sftpusers. Set /home/test1 ownership to root:root with permission 755, then create /home/test1/upload owned by charles:sftpusers with permission 750. Also create /etc/ssh/sshd_config.d/charles-sftp.conf so members of sftpusers are forced to use internal-sftp with ChrootDirectory /home/test1, AllowTcpForwarding no, and X11Forwarding no.",
+  "source": "外部参考来源：Ubuntu manpage - useradd(8) (https://manpages.ubuntu.com/manpages/jammy/en/man8/useradd.8.html)；Ubuntu manpage - usermod(8) (https://manpages.ubuntu.com/manpages/jammy/en/man8/usermod.8.html)；OpenSSH manual - sshd_config(5) (https://man7.org/linux/man-pages/man5/sshd_config.5.html)",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'userdel -r charles >/dev/null 2>&1 || true; groupdel sftpusers >/dev/null 2>&1 || true; rm -rf /home/test1; rm -f /etc/ssh/sshd_config.d/charles-sftp.conf; mkdir -p /home/test1'",
+        "shell": true
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_sftp_user",
+    "result": {
+      "type": "vm_command_line",
+      "command": "group_ok='false'; getent group sftpusers >/dev/null 2>&1 && group_ok='true'; user_ok='false'; getent passwd charles >/dev/null 2>&1 && user_ok='true'; home_ok='false'; [ \"$(getent passwd charles 2>/dev/null | cut -d: -f6)\" = '/home/test1' ] && home_ok='true'; shell_ok='false'; [ \"$(getent passwd charles 2>/dev/null | cut -d: -f7)\" = '/usr/sbin/nologin' ] && shell_ok='true'; primary_group_ok='false'; [ \"$(id -gn charles 2>/dev/null)\" = 'sftpusers' ] && primary_group_ok='true'; home_perm_ok='false'; [ \"$(stat -c '%U:%G %a' /home/test1 2>/dev/null)\" = 'root:root 755' ] && home_perm_ok='true'; upload_perm_ok='false'; [ \"$(stat -c '%U:%G %a' /home/test1/upload 2>/dev/null)\" = 'charles:sftpusers 750' ] && upload_perm_ok='true'; ssh_conf_ok='false'; conf=/etc/ssh/sshd_config.d/charles-sftp.conf; [ -f \"$conf\" ] && grep -Eq '^Match[[:space:]]+Group[[:space:]]+sftpusers$' \"$conf\" && grep -Eq '^[[:space:]]+ChrootDirectory[[:space:]]+/home/test1$' \"$conf\" && grep -Eq '^[[:space:]]+ForceCommand[[:space:]]+internal-sftp$' \"$conf\" && grep -Eq '^[[:space:]]+AllowTcpForwarding[[:space:]]+no$' \"$conf\" && grep -Eq '^[[:space:]]+X11Forwarding[[:space:]]+no$' \"$conf\" && ssh_conf_ok='true'; echo \"group_ok=$group_ok\"; echo \"user_ok=$user_ok\"; echo \"home_ok=$home_ok\"; echo \"shell_ok=$shell_ok\"; echo \"primary_group_ok=$primary_group_ok\"; echo \"home_perm_ok=$home_perm_ok\"; echo \"upload_perm_ok=$upload_perm_ok\"; echo \"ssh_conf_ok=$ssh_conf_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+        "rules": {
+          "checks": {
+            "group_ok": "true",
+            "user_ok": "true",
+            "home_ok": "true",
+            "shell_ok": "true",
+            "primary_group_ok": "true",
+            "home_perm_ok": "true",
+            "upload_perm_ok": "true",
+            "ssh_conf_ok": "true"
+          }
+        }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}
