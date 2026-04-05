@@ -1,7 +1,7 @@
 {
   "id": "2f9b8df0-54dc-4dbe-b6dd-6d6ca6fcb8ad",
   "snapshot": "vscode",
-  "instruction": "Build a Generative UI mini-site in VS Code. Create the folder /home/user/Desktop/generative_ui_scene with files index.html, styles.css, app.js, manifest.json, and assets/hero.jpg + assets/logo.png. First download two images from these websites into assets/: (1) https://upload.wikimedia.org/wikipedia/commons/0/08/HERO.png -> hero.jpg, (2) https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/512px-React-icon.svg.png -> logo.png. Then implement a single-page dashboard with: a hero section (id=\"hero\") that displays assets/hero.jpg, a timeline section (id=\"timeline\"), and a canvas chart (id=\"chartCanvas\") rendered by app.js using monthlyRevenue = [120, 180, 150, 210, 260]. In app.js, render bars on canvas and also draw logo.png onto the chart as a watermark (drawImage). Use local image paths only (no remote image URLs inside final html/css/js). In manifest.json, include project=\"generative-ui\", theme=\"aurora\", chartType=\"bar\", and required_images containing both asset paths.",
+  "instruction": "Build a Generative UI mini-site in VS Code. Create the folder /home/user/Desktop/generative_ui_scene with files index.html, styles.css, app.js, manifest.json, and assets/hero.jpg + assets/logo.svg. First download two images from these websites into assets/: (1) https://upload.wikimedia.org/wikipedia/commons/0/08/HERO.png -> hero.jpg, (2) https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg -> logo.svg. Then implement a single-page dashboard with: a hero section (id=\"hero\") that displays assets/hero.jpg, a timeline section (id=\"timeline\"), and a canvas chart (id=\"chartCanvas\") rendered by app.js using monthlyRevenue = [120, 180, 150, 210, 260]. In app.js, render bars on canvas and also draw logo.svg onto the chart as a watermark (drawImage). Use local image paths only (no remote image URLs inside final html/css/js). In manifest.json, include project=\"generative-ui\", theme=\"aurora\", chartType=\"bar\", and required_images containing both asset paths.",
   "source": "https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial | authors",
   "config": [
     {
@@ -87,7 +87,7 @@
             "app.js",
             "manifest.json",
             "assets/hero.jpg",
-            "assets/logo.png"
+            "assets/logo.svg"
           ]
         }
       },
@@ -96,7 +96,7 @@
         "rules": {
           "min_file_size_bytes": {
             "assets/hero.jpg": 100000,
-            "assets/logo.png": 8000
+            "assets/logo.svg": 1000
           }
         }
       },
@@ -109,7 +109,7 @@
               "id=\"timeline\"",
               "id=\"chartCanvas\"",
               "assets/hero.jpg",
-              "assets/logo.png",
+              "assets/logo.svg",
               "app.js"
             ],
             "styles.css": [
@@ -125,14 +125,14 @@
               "getContext",
               "fillRect",
               "drawImage",
-              "assets/logo.png"
+              "assets/logo.svg"
             ],
             "manifest.json": [
               "generative-ui",
               "aurora",
               "bar",
               "assets/hero.jpg",
-              "assets/logo.png"
+              "assets/logo.svg"
             ]
           }
         }
@@ -146,7 +146,7 @@
             "chartType": "bar",
             "required_images": [
               "assets/hero.jpg",
-              "assets/logo.png"
+              "assets/logo.svg"
             ]
           }
         }
