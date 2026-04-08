@@ -1,0 +1,80 @@
+{
+  "id": "d6f02b62-4b3e-4ac0-ba56-07b8d24e532f",
+  "task_slug": "workspace_manifest_bootstrap_and_settings",
+  "difficulty": "L1",
+  "snapshot": "multi_apps",
+  "instruction": "A workspace manifest is available at ~/Desktop/workspace_manifest.json. Read it to determine the project name, the notes file path, and the editor settings your team expects. Then use the terminal to create the project directory and the requested notes file, writing the project name into that notes file. Finally, apply the tabSize and insertFinalNewline settings from the manifest to VS Code User Settings.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nPath('/home/user/Desktop').mkdir(parents=True, exist_ok=True)\njson.dump({'projectName': 'vision-pipeline', 'notesPath': '/home/user/Desktop/vision_notes.txt', 'tabSize': 3, 'insertFinalNewline': True}, open('/home/user/Desktop/workspace_manifest.json', 'w'), indent=2)\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode"],
+  "evaluator": {
+    "func": ["check_include_exclude", "check_json_settings", "check_include_exclude"],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "ls /home/user/Desktop/",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/vision_notes.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["vision_notes.txt"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 3,
+            "files.insertFinalNewline": true
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["vision-pipeline"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
