@@ -1,0 +1,92 @@
+{
+  "id": "d5bc8185-21b3-4c7a-ad02-9e564549e1a6",
+  "task_slug": "release_plan_html_to_vscode_and_note",
+  "difficulty": "L1",
+  "snapshot": "multi_apps",
+  "instruction": "Your teammate exported the release checklist to ~/Desktop/release_plan.html. Open that file in Chrome using the file:// URL and use it as the source of truth. The page specifies that editor.lineNumbers should be set to relative and files.insertFinalNewline should be enabled. Apply those settings in VS Code User Settings, then create ~/Desktop/release_ready.txt containing the docs URL shown on the page.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf '<html><body><h1>Release Plan</h1><p>editor.lineNumbers=relative</p><p>files.insertFinalNewline=true</p><p>docsUrl=https://code.visualstudio.com/docs/getstarted/settings</p></body></html>' > /home/user/Desktop/release_plan.html",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "file:///home/user/Desktop/release_plan.html"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode", "os"],
+  "evaluator": {
+    "func": ["is_expected_active_tab_approximate", "check_json_settings", "check_include_exclude"],
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/release_ready.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/release_plan.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.lineNumbers": "relative",
+            "files.insertFinalNewline": true
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["https://code.visualstudio.com/docs/getstarted/settings"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

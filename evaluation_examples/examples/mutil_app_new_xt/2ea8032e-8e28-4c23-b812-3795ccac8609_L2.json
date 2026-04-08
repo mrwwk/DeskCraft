@@ -1,0 +1,95 @@
+{
+  "id": "2ea8032e-8e28-4c23-b812-3795ccac8609",
+  "task_slug": "academic_site_config_migration_from_handoff",
+  "difficulty": "L2",
+  "snapshot": "multi_apps",
+  "instruction": "The local academic site in ~/Desktop/academic_site/ needs to be handed over to a new owner. Review the public site structure at https://academicpages.github.io/ in Chrome, then read HANDOFF.txt in the project folder and update _config.yml in VS Code so the site reflects the new owner information. Before editing, create a backup named _config.yml.bak in the same folder.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/academic_site')\nbase.mkdir(parents=True, exist_ok=True)\n(base / 'HANDOFF.txt').write_text('name=Mei Chen\\nemail=mei.chen@example.org\\ngithub=meichen-dev\\n')\n(base / '_config.yml').write_text(\"\"\"name: Old Owner\nauthor:\n  name: Old Owner\n  email: old.owner@example.org\ngithub_username: old-owner\n\"\"\")\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://academicpages.github.io/"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code", "/home/user/Desktop/academic_site"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode", "os"],
+  "evaluator": {
+    "func": ["is_expected_active_tab_approximate", "check_json", "check_include_exclude"],
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/academic_site/_config.yml",
+        "dest": "_config.yml"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "ls /home/user/Desktop/academic_site/",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://academicpages.github.io/"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expect": [
+            {"key": ["name"], "method": "eq", "ref": "Mei Chen"},
+            {"key": ["author", "name"], "method": "eq", "ref": "Mei Chen"},
+            {"key": ["author", "email"], "method": "eq", "ref": "mei.chen@example.org"},
+            {"key": ["github_username"], "method": "eq", "ref": "meichen-dev"}
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["_config.yml.bak"],
+          "exclude": []
+        }
+      }
+    ],
+    "options": [null, {"is_yaml": true}, null],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

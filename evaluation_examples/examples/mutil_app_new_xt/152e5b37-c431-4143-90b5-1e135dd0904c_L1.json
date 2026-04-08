@@ -1,0 +1,66 @@
+{
+  "id": "152e5b37-c431-4143-90b5-1e135dd0904c",
+  "task_slug": "chrome_local_html_read_vscode_config",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "A teammate has left the project's recommended editor settings in ~/Desktop/editor_prefs.html for everyone to read. Open this file in Chrome using the file:// protocol so you can review the preferences. The page shows tabSize=4 and fontSize=15. Apply these exact values to VS Code User Settings (editor.tabSize and editor.fontSize). Chrome must still be showing the file when you are done.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "printf '<!DOCTYPE html><html><body><h1>Project Editor Preferences</h1><p>tabSize=4</p><p>fontSize=15</p></body></html>' > /home/user/Desktop/editor_prefs.html",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode"],
+  "evaluator": {
+    "func": ["is_expected_active_tab_approximate", "check_json_settings"],
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "file:///home/user/Desktop/editor_prefs.html"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 4,
+            "editor.fontSize": 15
+          }
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
