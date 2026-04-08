@@ -1,0 +1,107 @@
+{
+  "id": "5811683a-fd91-418a-9c59-e9f306764875",
+  "task_slug": "deploy_config_full_pipeline_os_vscode_chrome",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "You are bootstrapping a new micro-service using the central deployment configuration at ~/Desktop/deploy_config.json. Every action you take must be driven by values from that file — do not use any hard-coded values that differ from what is in the config. Complete all four steps: (1) OS — create the log directory specified in the config's 'logDir' field (/tmp/fastapi_logs/), then write ~/Desktop/env_summary.txt with exactly these two lines taken from the config: 'project=FastAPI Service' and 'author=dev_team'. (2) VS Code — apply the settings from the config to VS Code User Settings: set editor.tabSize to the 'tabSize' field (2), set editor.rulers to a single-element array with the 'maxLineLength' value (88), and add each directory in the 'excludeDirs' list (__pycache__, .env, venv) to files.exclude mapped to true. (3) Chrome — open the URL stored in the config's 'docsUrl' field (https://fastapi.tiangolo.com/) in a new Chrome tab.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 -c \"import json; json.dump({'project': 'FastAPI Service', 'author': 'dev_team', 'tabSize': 2, 'maxLineLength': 88, 'logDir': '/tmp/fastapi_logs', 'docsUrl': 'https://fastapi.tiangolo.com/', 'excludeDirs': ['__pycache__', '.env', 'venv']}, open('/home/user/Desktop/deploy_config.json', 'w'), indent=2)\"",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "func": [
+      "check_include_exclude",
+      "check_include_exclude",
+      "check_json_settings",
+      "is_expected_active_tab_approximate"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "[ -d /tmp/fastapi_logs ] && echo DIREXISTS || echo NOTFOUND",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/env_summary.txt",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "active_tab_info"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["DIREXISTS"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["project=FastAPI Service", "author=dev_team"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 2,
+            "editor.rulers": [88]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://fastapi.tiangolo.com/"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

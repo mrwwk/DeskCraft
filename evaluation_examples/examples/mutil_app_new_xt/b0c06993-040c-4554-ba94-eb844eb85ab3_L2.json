@@ -1,0 +1,84 @@
+{
+  "id": "b0c06993-040c-4554-ba94-eb844eb85ab3",
+  "task_slug": "project_audit_from_spec_and_reference_docs",
+  "difficulty": "L2",
+  "snapshot": "multi_apps",
+  "instruction": "A code-style spec is stored in ~/Desktop/audit_spec.json, and the project it describes is under /tmp/audit_target/. Use the terminal to inspect that project and write ~/Desktop/audit_summary.txt with exactly two lines: `py_files=<count>` and `total_lines=<count>`. Then apply the VS Code settings described in the spec: set editor.tabSize and editor.rulers exactly as requested. Finally, open the docsUrl from the spec in Chrome so the style reference is available while you work.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/tmp/audit_target')\n(base / 'core').mkdir(parents=True, exist_ok=True)\n(base / 'tests').mkdir(parents=True, exist_ok=True)\n(base / 'main.py').write_text('\\n'.join(f'# line {i}' for i in range(1, 21)) + '\\n')\n(base / 'core' / 'utils.py').write_text('\\n'.join(f'# line {i}' for i in range(1, 19)) + '\\n')\n(base / 'core' / 'config.py').write_text('\\n'.join(f'# line {i}' for i in range(1, 16)) + '\\n')\n(base / 'tests' / 'test_main.py').write_text('\\n'.join(f'# line {i}' for i in range(1, 20)) + '\\n')\njson.dump({'tabSize': 4, 'ruler': 79, 'docsUrl': 'https://peps.python.org/pep-0008/'}, open('/home/user/Desktop/audit_spec.json', 'w'), indent=2)\nPY",
+        "shell": true
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "func": ["check_include_exclude", "check_json_settings", "is_expected_active_tab_approximate"],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/audit_summary.txt",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "active_tab_info"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["py_files=4", "total_lines=73"],
+          "exclude": []
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.tabSize": 4,
+            "editor.rulers": [79]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://peps.python.org/pep-0008/"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

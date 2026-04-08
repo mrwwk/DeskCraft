@@ -1,0 +1,61 @@
+{
+  "id": "0545144d-82cb-484d-842f-d5e4b6e58b2d",
+  "task_slug": "vscode_formatonsave_minimap_devnotes",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "In VS Code User Settings, disable the editor minimap and enable 'Format on Save'. Then create the file ~/Desktop/dev_notes.txt with the first line reading exactly 'VS Code ready'.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["code"]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["vscode", "os"],
+  "evaluator": {
+    "func": ["check_json_settings", "check_include_exclude"],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/.config/Code/User/settings.json",
+        "dest": "settings.json"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/dev_notes.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected": {
+            "editor.minimap.enabled": false,
+            "editor.formatOnSave": true
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["VS Code ready"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,36 @@
+{
+  "id": "b255560d-0a97-4914-aafe-310917fa3dfb",
+  "task_slug": "package_metadata_refresh_from_npm_handoff",
+  "difficulty": "L2",
+  "snapshot": "multi_apps",
+  "instruction": "A package handoff for the local project in ~/Desktop/widget-lib/ is stored in HANDOFF.json. Review the package.json documentation in Chrome, then use VS Code to update package.json so its name, description, repository URL, and homepage match the handoff. Also update README.md so it mentions the new package name. Create a backup named package.json.bak before editing.",
+  "source": "authors",
+  "config": [
+    {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/widget-lib')\nbase.mkdir(parents=True, exist_ok=True)\njson.dump({'name': '@acme/widget-lib', 'description': 'Reusable dashboard widgets', 'repository': 'https://github.com/acme/widget-lib', 'homepage': 'https://github.com/acme/widget-lib#readme'}, open(base / 'HANDOFF.json', 'w'), indent=2)\njson.dump({'name': 'old-widget', 'description': 'old description', 'repository': {'type': 'git', 'url': 'https://example.com/old.git'}, 'homepage': 'https://example.com/old'}, open(base / 'package.json', 'w'), indent=2)\n(base / 'README.md').write_text('# old-widget\\nLegacy package.\\n')\nPY", "shell": true}},
+    {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},
+    {"type": "launch", "parameters": {"command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]}},
+    {"type": "chrome_open_tabs", "parameters": {"urls_to_open": ["https://docs.npmjs.com/cli/v10/configuring-npm/package-json"]}},
+    {"type": "launch", "parameters": {"command": ["code", "/home/user/Desktop/widget-lib"]}}
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "vscode", "os"],
+  "evaluator": {
+    "func": ["is_expected_active_tab_approximate", "check_json", "check_include_exclude", "check_include_exclude"],
+    "result": [
+      {"type": "active_tab_info"},
+      {"type": "vm_file", "path": "/home/user/Desktop/widget-lib/package.json", "dest": "package.json"},
+      {"type": "vm_command_line", "command": "cat /home/user/Desktop/widget-lib/README.md", "shell": true},
+      {"type": "vm_command_line", "command": "ls /home/user/Desktop/widget-lib/", "shell": true}
+    ],
+    "expected": [
+      {"type": "rule", "rules": {"type": "url", "url": "https://docs.npmjs.com/cli/v10/configuring-npm/package-json"}},
+      {"type": "rule", "rules": {"expect": [{"key": ["name"], "method": "eq", "ref": "@acme/widget-lib"}, {"key": ["description"], "method": "eq", "ref": "Reusable dashboard widgets"}, {"key": ["repository", "url"], "method": "eq", "ref": "https://github.com/acme/widget-lib"}, {"key": ["homepage"], "method": "eq", "ref": "https://github.com/acme/widget-lib#readme"}]}},
+      {"type": "rule", "rules": {"include": ["@acme/widget-lib"], "exclude": []}},
+      {"type": "rule", "rules": {"include": ["package.json.bak"], "exclude": []}}
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
