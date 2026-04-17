@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="800" height="600" viewBox="0 0 800 600"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Layer 1: Background -->
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Background"
+     style="display:inline">
+    <rect
+       id="bg_rect"
+       style="fill:#f0f0f0;stroke:none"
+       width="800"
+       height="600"
+       x="0"
+       y="0" />
+  </g>
+  <!-- Layer 2: Shapes -->
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Shapes"
+     style="display:inline">
+    <rect
+       id="green_rect"
+       style="fill:#00cc00;stroke:#006600;stroke-width:2"
+       width="150"
+       height="100"
+       x="100"
+       y="150" />
+    <ellipse
+       id="orange_ellipse"
+       style="fill:#ff9900;stroke:#cc6600;stroke-width:2"
+       cx="500"
+       cy="300"
+       rx="100"
+       ry="60" />
+  </g>
+  <!-- Layer 3: Labels -->
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Labels"
+     style="display:inline">
+    <text
+       id="label1"
+       xml:space="preserve"
+       style="font-size:18px;font-family:sans-serif;fill:#000000"
+       x="120"
+       y="140">Rectangle</text>
+    <text
+       id="label2"
+       xml:space="preserve"
+       style="font-size:18px;font-family:sans-serif;fill:#000000"
+       x="460"
+       y="240">Ellipse</text>
+  </g>
+</svg>

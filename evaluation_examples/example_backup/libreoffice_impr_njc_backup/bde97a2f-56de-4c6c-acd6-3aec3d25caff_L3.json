@@ -1,0 +1,78 @@
+{
+  "id": "bde97a2f-56de-4c6c-acd6-3aec3d25caff",
+  "task_slug": "impress_open_the_birthday_paradoxpptx_and_perform_all_changes",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open \"The Birthday Paradox.pptx\" and perform all changes: (1) On slide 1, set all text to Times New Roman, italic, bold. Set background to purple (#800080) and text color to white. (2) On slide 4, make title purple (#800080), bold, underlined. (3) On slide 5, make body text dark blue (#00008B) and italic. (4) On slide 6, add note: \"The birthday paradox illustrates how human intuition about probability often fails when dealing with combinatorial problems.\" (5) On slide 7, set background to light gray (#D3D3D3). (6) On slide 8, make title bold, 36pt, maroon (#800000). Save.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/bde97a2f-56de-4c6c-acd6-3aec3d25caff/The Birthday Paradox.pptx",
+            "path": "/home/user/Desktop/The Birthday Paradox.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/The Birthday Paradox.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/bde97a2f-56de-4c6c-acd6-3aec3d25caff",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "The Birthday Paradox.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "BirthdayParadox_L3.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/The Birthday Paradox.pptx",
+      "dest": "The Birthday Paradox.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

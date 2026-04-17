@@ -1,0 +1,134 @@
+{
+  "id": "c862b70f-9b34-4d47-aeba-19bf1f578af5",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. This is an empty scene with only a Camera. Build a complete animated scene: (1) Add a Plane at the origin, scale to (10, 10, 1) as the ground. (2) Add a UV Sphere at position (0, 0, 2), name it \"Ball\". (3) Create a material for \"Ball\" with red color (R=1.0, G=0.0, B=0.0) and Metallic 0.5. (4) Add a Sun light at position (5, 5, 10) with energy 3.0. (5) Set the scene frame range to 1-60. (6) Select \"Ball\", insert a Location keyframe at frame 1 with position (0, 0, 5). (7) Insert a Location keyframe at frame 30 with position (0, 0, 1). (8) Insert a Location keyframe at frame 60 with position (0, 0, 5). (9) Switch to Cycles with 32 samples, resolution 1280×720. Then save the file.",
+  "source": "现实场景构造来源：3D 动画岗位入门测试中的“从空场景完成建模、材质、动画、渲染设置”综合题",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/empty_scene.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/check_animation.py",
+            "path": "/tmp/check_animation.py"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_scene_objects",
+      "check_blender_material_color",
+      "check_blender_animation_keyframes",
+      "check_blender_render_settings"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_animation.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_render.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "has_objects": [
+            "Ball"
+          ],
+          "has_light_type": "SUN",
+          "has_plane": true,
+          "min_mesh_count": 2
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Ball",
+          "expected_color": [
+            1.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "metallic": 0.5,
+          "tolerance": 0.1
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "object_name": "Ball",
+          "min_keyframe_count": 3,
+          "has_location_keys": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "engine": "CYCLES",
+          "samples": 32,
+          "resolution_x": 1280,
+          "resolution_y": 720
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

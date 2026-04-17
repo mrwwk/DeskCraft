@@ -1,4 +1,5 @@
 import base64
+import json
 import logging
 import os
 import time
@@ -9,6 +10,31 @@ from openai import OpenAI
 
 
 logger = logging.getLogger("desktopenv.agent")
+
+INTERACTIVE_PROMPT_SUFFIX = """
+
+This is an interactive session.
+- If the instruction is ambiguous or missing details, call `call_user` to ask a precise clarification question.
+- If the user provides an update or changes the requirement later, incorporate it and continue from the current desktop state.
+- Do not pretend the user already answered if they have not.
+"""
+
+CALL_USER_TOOL = {
+    "type": "function",
+    "name": "call_user",
+    "description": "Ask the user for clarification when the instruction is ambiguous, incomplete, or updated mid-task.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "A short, specific question for the user.",
+            }
+        },
+        "required": ["question"],
+        "additionalProperties": False,
+    },
+}
 
 OPERATOR_PROMPT = """
 
@@ -24,6 +50,31 @@ Here are some helpful tips:
 - When possible, bundle multiple GUI actions into one computer-use turn.
 - If the task is infeasible because of missing apps, permissions, contradictory requirements, or other hard blockers, output exactly "[INFEASIBLE]".
 """
+
+GUI_ONLY_APP_GUARDRAILS = {
+    "blender": (
+        "For Blender tasks in this benchmark, use only the visible Blender GUI. "
+        "Do not use Blender Python, the Scripting workspace, the Python console, terminal commands, "
+        "heredocs, temporary .py files, or `--python` / `--python-expr`. "
+        "If a Blender task would require scripting, do not script it; keep using GUI actions only."
+    ),
+    "gimp": (
+        "For GIMP tasks in this benchmark, use only the visible GUI. "
+        "Do not use Python-Fu, Script-Fu, plug-in consoles, terminal commands, heredocs, or temporary scripts."
+    ),
+    "inkscape": (
+        "For Inkscape tasks in this benchmark, use only the visible GUI. "
+        "Do not use command-line batch mode, extensions as a scripting shortcut, terminal commands, heredocs, or temporary scripts."
+    ),
+    "libreoffice_writer": (
+        "For LibreOffice Writer tasks in this benchmark, use only the visible Writer GUI. "
+        "Do not use macros, UNO scripting, terminal commands, heredocs, or temporary scripts."
+    ),
+    "vscode": (
+        "For VS Code tasks in this benchmark, use only the visible VS Code GUI and direct text editing inside the editor. "
+        "Do not use terminal Python scripts, shell scripts, heredocs, temporary .py files, notebook execution, or command-line automation to modify files."
+    ),
+}
 
 
 class Action:
@@ -76,6 +127,43 @@ def encode_image(image_content: bytes) -> str:
     return base64.b64encode(image_content).decode("utf-8")
 
 
+def _normalize_base_url(base_url: Optional[str]) -> Optional[str]:
+    if not base_url:
+        return None
+    base_url = base_url.rstrip("/")
+    if not base_url.endswith("/v1"):
+        base_url = base_url + "/v1"
+    return base_url
+
+
+def _build_openai_client(model: str) -> OpenAI:
+    raw_base_url = os.getenv("BASE_URL") or os.getenv("OPENAI_BASE_URL")
+    base_url = _normalize_base_url(raw_base_url)
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    app_id = os.getenv("APP_ID")
+    app_key = os.getenv("API_KEY") or os.getenv("APP_KEY")
+
+    client_kwargs: Dict[str, Any] = {}
+    if base_url:
+        client_kwargs["base_url"] = base_url
+    timeout = os.getenv("OPENAI_TIMEOUT") or os.getenv("OPENAI_AUTH_TIMEOUT")
+    if timeout:
+        try:
+            client_kwargs["timeout"] = float(timeout)
+        except ValueError:
+            logger.warning("Ignoring invalid timeout value: %s", timeout)
+
+    if openai_api_key:
+        client_kwargs["api_key"] = openai_api_key
+        return OpenAI(**client_kwargs)
+
+    if app_id and app_key:
+        client_kwargs["api_key"] = f"{app_id}:{app_key}"
+        return OpenAI(**client_kwargs)
+
+    raise ValueError("OPENAI_API_KEY or APP_ID/APP_KEY must be set for GPT54Agent")
+
+
 def _model_dump(value: Any) -> Any:
     if hasattr(value, "model_dump"):
         return value.model_dump()
@@ -120,7 +208,7 @@ class GPT54Agent:
         self,
         env,
         platform: str = "ubuntu",
-        model: str = "gpt-5.4",
+        model: str = "api_azure_openai_gpt-5.4",
         max_tokens: Optional[int] = None,
         top_p: float = 0.9,
         temperature: float = 0.5,
@@ -159,19 +247,75 @@ class GPT54Agent:
         )
 
         # GPT-5.4 GA computer-use uses the plain "computer" tool shape.
-        self.tools = [{"type": "computer"}]
+        self.computer_tool = {"type": "computer"}
 
         self.previous_response_id: Optional[str] = None
         self.pending_input_items: List[Dict[str, Any]] = []
         self.current_batch_call_id: Optional[str] = None
         self.current_batch_expected_outputs = 0
+        self.pending_user_messages: List[str] = []
+        self.pending_user_call_id: Optional[str] = None
+        self.is_interactive = False
+        self.gui_only_instruction_suffix = ""
+
+    def _build_tools(self) -> List[Dict[str, Any]]:
+        tools = [self.computer_tool]
+        if self.is_interactive:
+            tools.append(CALL_USER_TOOL)
+        return tools
+
+    def _format_additional_user_messages(self, messages: List[str]) -> str:
+        if not messages:
+            return ""
+        return "\n\n".join(
+            f"[User Additional Message]:\n{message}" for message in messages if message
+        )
+
+    def receive_user_message(self, message: str) -> None:
+        if not message:
+            return
+        self.pending_user_messages.append(message)
+
+    def set_interactive_prompt(self, enable: bool = True) -> None:
+        self.is_interactive = enable
+
+    def set_gui_only_constraint(self, related_apps: Optional[List[str]] = None) -> None:
+        related_apps = related_apps or []
+        suffixes: List[str] = []
+        for app in related_apps:
+            text = GUI_ONLY_APP_GUARDRAILS.get(str(app).lower())
+            if text and text not in suffixes:
+                suffixes.append(text)
+        self.gui_only_instruction_suffix = "\n".join(suffixes)
+
+    def clear_done_from_history(self) -> None:
+        """Legacy full reset – clears conversation history entirely."""
+        self.previous_response_id = None
+        self.pending_input_items = []
+        self.pending_user_call_id = None
+        self.pending_user_messages = []
+
+    def clear_terminal_state(self) -> None:
+        """Clear terminal-related state while preserving conversation history.
+
+        After the agent reports DONE/FAIL but more phases remain, call this
+        instead of clear_done_from_history so that:
+        - previous_response_id is kept → next predict() walks Case 3 (unsolicited
+          user message) rather than Case 1 (first request with stale instruction).
+        - pending_input_items are cleared because the DONE response has no
+          computer_call_output to feed back.
+        - pending_user_call_id is cleared in case the DONE came from a call_user
+          flow that is now stale.
+        """
+        self.pending_input_items = []
+        self.pending_user_call_id = None
 
     def _create_response(self, request_input: List[Dict[str, Any]], instructions: str):
         retry_count = 0
         last_error = None
         while retry_count < 5:
             try:
-                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                client = _build_openai_client(self.model)
                 logger.info(
                     "Sending GPT-5.4 request with previous_response_id=%s and %d input item(s)",
                     self.previous_response_id,
@@ -182,7 +326,7 @@ class GPT54Agent:
                     "model": self.model,
                     "instructions": instructions,
                     "input": request_input,
-                    "tools": self.tools,
+                    "tools": self._build_tools(),
                     "parallel_tool_calls": False,
                     "reasoning": {
                         "effort": self.reasoning_effort,
@@ -207,6 +351,18 @@ class GPT54Agent:
                 last_error = exc
                 retry_count += 1
                 logger.error("OpenAI API error on GPT54Agent call: %s", exc)
+
+                error_text = str(exc)
+                # Do not resend the same interactive user message on deterministic
+                # client-side request errors. Those retries only duplicate the
+                # payload and cannot succeed without changing the request shape.
+                if (
+                    "Error code: 400" in error_text
+                    or "invalid_request_error" in error_text
+                    or "BadRequestError" in error_text
+                ):
+                    break
+
                 time.sleep(min(5, retry_count * 2))
         raise RuntimeError(f"OpenAI API failed too many times: {last_error}")
 
@@ -472,16 +628,30 @@ class GPT54Agent:
             HOME_DIR=home_dir,
             PLATFORM=self.platform,
         )
+        if self.gui_only_instruction_suffix:
+            instructions += "\n" + self.gui_only_instruction_suffix + "\n"
+        if self.is_interactive:
+            instructions += INTERACTIVE_PROMPT_SUFFIX
+
+        # Consume pending user messages once at the top
+        pending_user_text = self._format_additional_user_messages(self.pending_user_messages)
+        self.pending_user_messages = []
+
         screenshot_b64 = encode_image(obs["screenshot"])
 
         if not self.previous_response_id:
+            # ── Case 1: First request ──
+            # Append any early user messages to the task instruction text.
+            task_text = instruction
+            if pending_user_text:
+                task_text = f"{instruction}\n\n{pending_user_text}"
             request_input = [
                 {
                     "role": "user",
                     "content": [
                         {
                             "type": "input_text",
-                            "text": instruction,
+                            "text": task_text,
                         },
                         {
                             "type": "input_image",
@@ -493,23 +663,40 @@ class GPT54Agent:
             ]
         else:
             request_input = list(self.pending_input_items)
-            if not request_input:
-                request_input = [
+
+            if self.pending_user_call_id and pending_user_text:
+                # ── Case 2: Responding to call_user ──
+                # Deliver user reply ONLY as function_call_output (no duplication).
+                request_input.append(
+                    {
+                        "type": "function_call_output",
+                        "call_id": self.pending_user_call_id,
+                        "output": pending_user_text,
+                    }
+                )
+                self.pending_user_call_id = None
+                # Already consumed via function_call_output; do not inject again.
+                pending_user_text = ""
+
+            if pending_user_text or not request_input:
+                # ── Case 3: Unsolicited user message (phase transition) or empty input ──
+                # When previous_response_id is present, the latest screen state
+                # must travel via computer_call_output only. Adding input_image
+                # to the user message triggers a Responses API 400.
+                continue_text = "Continue from the latest screenshot."
+                if pending_user_text:
+                    continue_text = f"{continue_text}\n\n[New message from user]:\n{pending_user_text}"
+                request_input.append(
                     {
                         "role": "user",
                         "content": [
                             {
                                 "type": "input_text",
-                                "text": "Continue from the latest screenshot.",
-                            },
-                            {
-                                "type": "input_image",
-                                "image_url": f"data:image/png;base64,{screenshot_b64}",
-                                "detail": "original",
+                                "text": continue_text,
                             },
                         ],
                     }
-                ]
+                )
 
         with Timer() as model_timer:
             response = self._create_response(request_input, instructions)
@@ -518,10 +705,11 @@ class GPT54Agent:
         self.pending_input_items = []
 
         raw_output = _get_field(response, "output", []) or []
-        actions: List[Dict[str, Any]] = []
+        actions: List[Any] = []
         responses: List[str] = []
         unsupported_action = False
         infeasible_message = False
+        call_user_requested = False
 
         for item in raw_output:
             item_type = _get_field(item, "type")
@@ -539,6 +727,27 @@ class GPT54Agent:
                 reasoning_text = self._reasoning_text(item)
                 if reasoning_text:
                     responses.append(reasoning_text)
+            elif item_type == "function_call":
+                tool_name = _get_field(item, "name", "")
+                if tool_name != "call_user":
+                    unsupported_action = True
+                    responses.append(f"Unsupported function tool from model: {tool_name}")
+                    continue
+
+                raw_arguments = _get_field(item, "arguments", {})
+                if isinstance(raw_arguments, str):
+                    try:
+                        raw_arguments = json.loads(raw_arguments)
+                    except json.JSONDecodeError:
+                        raw_arguments = {"question": raw_arguments}
+                elif raw_arguments is None:
+                    raw_arguments = {}
+
+                question = str(raw_arguments.get("question", "")).strip()
+                self.pending_user_call_id = _get_field(item, "call_id", None)
+                call_user_requested = True
+                actions.append("CALL_USER")
+                responses.append(f"[CALL_USER] {question}" if question else "[CALL_USER]")
             elif item_type == "computer_call":
                 logger.info("Raw computer_call item: %s", _sanitize_for_log(item))
                 raw_actions = _get_field(item, "actions")
@@ -582,6 +791,9 @@ class GPT54Agent:
                         }
                     )
 
+        if call_user_requested:
+            actions = ["CALL_USER"]
+
         state_correct = bool(actions) and not unsupported_action and not infeasible_message
         if unsupported_action:
             actions = []
@@ -603,13 +815,17 @@ class GPT54Agent:
 
         return predict_info, actions
 
-    def reset(self, _logger=None):
+    def reset(self, _logger=None, vm_ip=None):
         global logger
         logger = _logger if _logger is not None else logging.getLogger("desktopenv.agent")
         self.previous_response_id = None
         self.pending_input_items = []
         self.current_batch_call_id = None
         self.current_batch_expected_outputs = 0
+        self.pending_user_messages = []
+        self.pending_user_call_id = None
+        self.is_interactive = False
+        self.gui_only_instruction_suffix = ""
 
     def step(self, action: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
         try:

@@ -1,0 +1,77 @@
+{
+  "id": "a10c5680-643f-4446-805f-e2e749efff6e",
+  "task_slug": "writer_open_meetingl208docx_replace_all_occurrences_of_q1_with",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Meeting_L2_08.docx\". Replace all occurrences of \"Q1\" with \"First Quarter\" throughout the document. Also make the attendees list paragraph bold.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/a10c5680-643f-4446-805f-e2e749efff6e/Meeting_L2_08.docx",
+            "path": "/home/user/Desktop/Meeting_L2_08.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Meeting_L2_08.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/a10c5680-643f-4446-805f-e2e749efff6e",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Meeting_L2_08.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Meeting_L2_08_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Meeting_L2_08.docx",
+      "dest": "Meeting_L2_08.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

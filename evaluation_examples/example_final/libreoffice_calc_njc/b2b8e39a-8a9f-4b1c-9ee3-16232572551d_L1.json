@@ -1,0 +1,92 @@
+{
+  "id": "b2b8e39a-8a9f-4b1c-9ee3-16232572551d",
+  "task_slug": "calc_format_unit_price_column_as_two_decimal_places",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"/home/user/Price_Number_Format.xlsx\" in LibreOffice Calc. Format the cells in the \"Unit Price ($)\" column (C2:C11) to display numbers with exactly 2 decimal places (format code: 0.00). Save the file.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/b2b8e39a-8a9f-4b1c-9ee3-16232572551d/Price_Number_Format.xlsx",
+            "path": "/home/user/Price_Number_Format.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Price_Number_Format.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/b2b8e39a-8a9f-4b1c-9ee3-16232572551d",
+  "related_apps": [
+    "libreoffice calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Price_Number_Format.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Price_Number_Format_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Price_Number_Format.xlsx",
+      "dest": "Price_Number_Format.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": ["number_format"]
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

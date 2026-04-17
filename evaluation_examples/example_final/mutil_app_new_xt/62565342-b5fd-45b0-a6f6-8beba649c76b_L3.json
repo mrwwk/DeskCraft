@@ -4,10 +4,7 @@
   "difficulty": "L3",
   "snapshot": "multi_apps",
   "instruction": "The command-line status formatter in ~/Desktop/task_cli/ is broken after a refactor. Read ISSUE.md to understand the expected output, open the Python formatted string literals documentation in Chrome, and then use VS Code to repair the tool so the full test suite passes. The fix may require edits across multiple files. When finished, create ~/Desktop/task_cli/FIX_SUMMARY.txt containing exactly `issue=CLI-204`.",
-  "source": [
-    "https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals",
-    "现实场景构造来源：CLI 工具重构后格式串失效，开发者对照 f-string 文档跨文件修复并回填 issue 编号的常见命令行工具维护场景"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

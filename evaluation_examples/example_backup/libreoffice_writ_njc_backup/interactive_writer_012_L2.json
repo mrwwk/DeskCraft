@@ -1,0 +1,107 @@
+{
+  "id": "interactive_writer_012",
+  "snapshot": "libreoffice_writer",
+  "interactive": true,
+  "scenario_type": "ambiguous_scope",
+  "scenario_description": "The meeting minutes cover multiple agenda items. The user wants to add a resolution but doesn't say which item. The agent asks, then only adds it under the first item.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Project Weekly Meeting Minutes\n\nTime: June 17, 2025, 10:00 AM - 11:30 AM\nLocation: Building A, Room 315\nChair: Project Manager Li Qiang\n\nAgenda Item 1: Front-End Development Progress\n  Presenter: Zhang Min\n  Notes: Currently about 70%% complete; expected to finish all features by next Friday.\n\nAgenda Item 2: Test Environment Setup\n  Presenter: Zhao Hui\n  Notes: Test environment is ready; waiting for front-end code to begin testing.\n\nAgenda Item 3: Release Plan\n  Presenter: Li Qiang\n  Notes: Planned go-live on August 1, with two rounds of internal testing beforehand.\n' > /home/user/Desktop/meeting_minutes.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--writer",
+          "/home/user/Desktop/meeting_minutes.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me add a resolution to the minutes",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Only add \"Resolution: Approved Plan A\" under Agenda Item 1, then save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/meeting_minutes.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Resolution: Approved Plan A"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

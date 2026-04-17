@@ -369,7 +369,7 @@ class DesktopEnv(gym.Env):
         self.metric_options: Union[List[Dict[str, Any]], Dict[str, Any]] = [opt if opt else {} for opt in
                                                                             self.evaluator["options"]] \
             if isinstance(self.evaluator.get("options", {}), list) \
-            else self.evaluator["options"] \
+            else (self.evaluator["options"] or {}) \
             if "options" in self.evaluator \
             else [{}] * len(self.metric) \
             if isinstance(self.metric, list) \
@@ -390,14 +390,25 @@ class DesktopEnv(gym.Env):
         done = False  # todo: Define episode termination condition for each example
         info = {}
         logger.info(f"Step {self._step_no} in trajectory {self._traj_no} with action: {action}")
-        # handle the special actions
-        if action in ['WAIT', 'FAIL', 'DONE'] or (type(action) == dict and action['action_type'] in ['WAIT', 'FAIL', 'DONE']):
-            if action == 'WAIT' or (type(action) == dict and action.get('action_type') == 'WAIT'):
+
+        dict_action_type = action.get('action_type') if isinstance(action, dict) else None
+        dict_command = None
+        if isinstance(action, dict):
+            dict_command = action.get('command', action.get('action'))
+
+        special_action = action if isinstance(action, str) else dict_action_type
+        if special_action is None and isinstance(dict_command, str) and dict_command in ['WAIT', 'FAIL', 'DONE']:
+            special_action = dict_command
+
+        # Accept both legacy action dicts (action_type/command) and newer
+        # pyautogui tool-call dicts (action_space/action).
+        if special_action in ['WAIT', 'FAIL', 'DONE']:
+            if special_action == 'WAIT':
                 time.sleep(pause)
-            elif action == 'FAIL' or (type(action) == dict and action.get('action_type') == 'FAIL'):
+            elif special_action == 'FAIL':
                 done = True
                 info = {"fail": True}
-            elif action == 'DONE' or (type(action) == dict and action.get('action_type') == 'DONE'):
+            elif special_action == 'DONE':
                 done = True
                 info = {"done": True}
 
@@ -405,7 +416,7 @@ class DesktopEnv(gym.Env):
             # the set of all possible actions defined in the action representation
             self.controller.execute_action(action)
         elif self.action_space == "pyautogui" or self.action_space == "claude_computer_use":
-            if action in ['WAIT', 'FAIL', 'DONE'] or (type(action) == dict and action.get('action_type') in ['WAIT', 'FAIL', 'DONE']):
+            if special_action in ['WAIT', 'FAIL', 'DONE']:
                 self.controller.execute_action(action)
             else:
                 # the set of all possible python commands insides `pyautogui`
@@ -414,8 +425,10 @@ class DesktopEnv(gym.Env):
                     fixed_command = _fix_pyautogui_less_than_bug(action)
                     self.controller.execute_python_command(fixed_command)
                 elif type(action) == dict:
+                    if not isinstance(dict_command, str):
+                        raise KeyError("Expected 'command' or 'action' in pyautogui action dict")
                     # Fix PyAutoGUI '<' character bug before execution
-                    fixed_command = _fix_pyautogui_less_than_bug(action['command'])
+                    fixed_command = _fix_pyautogui_less_than_bug(dict_command)
                     self.controller.execute_python_command(fixed_command)
 
         time.sleep(pause)

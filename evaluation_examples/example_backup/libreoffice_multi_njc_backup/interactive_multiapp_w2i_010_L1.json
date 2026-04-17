@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_w2i_010",
+  "instruction": "Help me organize the company milestones into the company profile",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Company Milestones\\n2018: Company founded, angel round funding 5M CNY\\n2019: Launched first SaaS product, 50 clients\\n2020: Series A funding 30M CNY, 100+ employees\\n2021: Annual revenue exceeded 100M CNY\\n2022: Overseas expansion, entered 3 Southeast Asian countries\\n2023: Series B funding 120M CNY, valuation 1B CNY\\n2024: Global client count exceeded 1000\\n2025: IPO preparation underway' > /home/user/Desktop/company_milestone.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/company_profile.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the company milestones into the company profile",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Extract the latest funding information from /home/user/Desktop/company_milestone.txt, append to /home/user/Desktop/company_profile.txt: '2023 Series B funding 120M CNY, valuation 1B CNY, preparing for IPO in 2025', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/company_profile.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Series B funding 120M CNY",
+          "valuation 1B CNY"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L1"
+}

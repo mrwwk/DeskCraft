@@ -235,6 +235,7 @@ def run_single_example_openaicua(agent, env, example, max_steps, instruction, ar
 def run_single_example_gpt54(agent, env, example, max_steps, instruction, args, example_result_dir, scores):
     runtime_logger = setup_logger(example, example_result_dir)
     agent.reset(runtime_logger)
+    agent.set_gui_only_constraint(example.get("related_apps", []))
     env.reset(task_config=example)
     time.sleep(60) # Wait for the environment to be ready
     obs = env._get_obs() # Get the initial observation

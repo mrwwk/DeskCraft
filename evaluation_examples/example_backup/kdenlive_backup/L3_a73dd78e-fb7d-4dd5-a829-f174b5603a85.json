@@ -1,0 +1,71 @@
+{
+  "id": "a73dd78e-fb7d-4dd5-a829-f174b5603a85",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, import two video files '/home/user/Videos/15368811_1920_1080_30fps.mp4' and '/home/user/Videos/6533277-hd_1920_1080_24fps.mp4', place the first video on track V1 (main background) and the second on track V2 (overlay), apply a 'Transform' or 'Position and Zoom' effect on the V2 clip to resize it to 1/4 of the screen and position it in the top-left corner, save the project to '/home/user/Videos/project.kdenlive', then render the project to '/home/user/Videos/output.mp4'.",
+  "source": "https://docs.kdenlive.org/en/exporting/render.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/15368811_1920_1080_30fps.mp4",
+            "path": "/home/user/Videos/15368811_1920_1080_30fps.mp4"
+          },
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_render_pip",
+    "result": {
+      "type": "vm_file",
+      "path": [
+        "/home/user/Videos/output.mp4",
+        "/home/user/Videos/project.kdenlive"
+      ],
+      "dest": [
+        "output.mp4",
+        "project.kdenlive"
+      ],
+      "multi": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "min_duration": 1.0,
+        "expected_codec": "h264",
+        "main_file": "15368811_1920_1080_30fps.mp4",
+        "overlay_file": "6533277-hd_1920_1080_24fps.mp4",
+        "require_transform": true
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

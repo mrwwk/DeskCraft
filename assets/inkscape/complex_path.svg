@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="800" height="600" viewBox="0 0 800 600"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Complex curved path for node editing -->
+  <path
+     id="complex_curve"
+     style="fill:none;stroke:#e74c3c;stroke-width:4"
+     d="M 50,300 C 100,100 200,500 300,250 S 500,400 600,200 Q 700,100 750,300" />
+  <!-- Closed complex path -->
+  <path
+     id="complex_shape"
+     style="fill:#3498db;fill-opacity:0.5;stroke:#2980b9;stroke-width:2"
+     d="M 100,450 C 150,380 250,380 300,450 C 350,520 250,560 200,520 C 150,480 50,520 100,450 Z" />
+  <!-- Spiral path -->
+  <path
+     id="spiral_path"
+     style="fill:none;stroke:#27ae60;stroke-width:3"
+     d="M 600,400 C 620,380 660,380 660,400 C 660,430 610,440 600,420 C 585,390 640,370 670,400 C 700,440 620,470 590,430 C 555,380 640,350 690,400 C 740,460 620,500 570,440" />
+  <!-- Multi-segment polyline -->
+  <polyline
+     id="zigzag"
+     style="fill:none;stroke:#f39c12;stroke-width:3"
+     points="50,150 100,50 150,150 200,50 250,150 300,50 350,150 400,50 450,150" />
+  <!-- Smooth closed shape for simplification -->
+  <path
+     id="blob_shape"
+     style="fill:#9b59b6;fill-opacity:0.6;stroke:#8e44ad;stroke-width:2"
+     d="M 500,100 C 530,70 580,80 600,110 C 620,140 640,120 660,150 C 680,180 660,220 630,230 C 600,240 580,260 550,240 C 520,220 490,230 470,200 C 450,170 470,130 500,100 Z" />
+</svg>

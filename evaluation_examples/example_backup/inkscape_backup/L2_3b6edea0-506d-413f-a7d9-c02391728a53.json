@@ -1,0 +1,68 @@
+{
+  "id": "3b6edea0-506d-413f-a7d9-c02391728a53",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/logo_design.svg in Inkscape. Select the outer circle (id=logo_outer) and create 2 clones of it (Edit > Clone > Create Clone, do this twice). Change the fill color of the original outer circle to dark green (#006400). Resize the document to 600x600 pixels (File > Document Properties). Save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=create+clone+edit+clone+fill",
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/logo_design.svg",
+            "path": "/home/user/Documents/logo_design.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/logo_design.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_l2_clone_restyle",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/logo_design.svg",
+      "dest": "logo_design.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "clone_check": {
+          "source_id": "logo_outer",
+          "min_clones": 2
+        },
+        "fill_check": {
+          "element_id": "logo_outer",
+          "expected_fill": "#006400"
+        },
+        "doc_check": {
+          "expected_width": "600",
+          "expected_height": "600"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

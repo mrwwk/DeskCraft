@@ -1,0 +1,110 @@
+{
+    "id": "interactive_calc_008",
+    "snapshot": "libreoffice_calc",
+    "interactive": true,
+    "scenario_type": "ambiguous_detail",
+    "scenario_description": "用户要给学生加等级，但没说评分标准和列名。Agent 询问后按90+/80/70段给出 A/B/C/D 等级写入 Grade 列。",
+    "user_persona": {
+        "expertise_level": "intermediate",
+        "communication_style": "casual_chinese"
+    },
+    "config": [
+        {
+            "type": "download",
+            "parameters": {
+                "files": [
+                    {
+                        "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/libreoffice_calc/d681960f-7bc3-4286-9913-a8812ba3261a/Student_Grades_and_Remarks.xlsx",
+                        "path": "/home/user/Desktop/Student_Grades.xlsx"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "launch",
+            "parameters": {
+                "command": [
+                    "libreoffice",
+                    "--norestore",
+                    "--nologo",
+                    "--calc",
+                    "/home/user/Desktop/Student_Grades.xlsx"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 12
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我把等级加进去",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "用IF公式：90分以上为A，80-89为B，70-79为C，其余为D，结果写在'Grade'列，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_calc"
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/Student_Grades.xlsx'); all_vals = set(df.astype(str).values.flatten()); print('PASSED' if len(set('ABCD') & all_vals) > 0 else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}

@@ -765,7 +765,7 @@ def get_active_url_from_accessTree(env, config):
         print("Controller or method 'get_accessibility_tree' not found.")
         return None
 
-    logger.debug("AT@eval: %s", accessibility_tree)
+    # logger.debug("AT@eval: %s", accessibility_tree)
 
     at = None
     try:

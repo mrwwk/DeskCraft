@@ -30,7 +30,7 @@
       "instruction": "先帮我把 minimap 打开，再把行号改成 relative，并加一条 80 列的 ruler。",
       "trigger": {
         "type": "step_count",
-        "value": 2
+        "value": 3
       }
     },
     {

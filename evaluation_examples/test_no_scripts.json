@@ -1,0 +1,53 @@
+{
+  "blender": [
+    "L1_d5622f1d-0bc7-4e5f-8bf4-51a930fd2269",
+    "L2_812ee9e0-c2a1-41e4-bb62-cb23ccd68dbb",
+    "L2_86766b15-f7a2-44f6-a5be-e4004ade98c0",
+    "L2_9e187ebb-bdfc-4da6-95db-8ef07ff6a496",
+    "L2_b74ac330-3f5e-4a0d-94d4-33fbcb1e2e0b",
+    "L2_c304b812-b3f2-465f-9b63-95e364941270",
+    "L2_e8176133-1453-4ddc-9771-248e971e3437",
+    "L2_eef91461-f7d3-478a-93f4-eb4298051d17",
+    "L3_1f157bab-72e1-4c29-8fed-453077dbf28f",
+    "L3_407b1850-9689-49a9-b4fa-abddbfeede0a",
+    "L3_a2ba5904-0f5f-4282-be35-9976a34b6c33",
+    "L3_d0c6f54f-7489-454f-a7ff-bc97460cd3e7"
+  ],
+  "gimp_task_wwk": [
+    "L2_01_a2b00001-0001-4000-8000-000000000001-L2",
+    "L3_02_a3b00002-0002-4000-8000-000000000002-L3"
+  ],
+  "inkscape": [
+    "L2_f86a64e9-03a3-47b1-9ff5-17373016e26a",
+    "L3_4300db79-4191-4a16-bf6d-c12e6070b3e7"
+  ],
+  "libreoffice_writ_njc": [
+    "3dad2051-0596-4886-93c5-9ed78df81f99_L3",
+    "409f8738-31ec-406f-898f-01ed419b74b4_L3"
+  ],
+  "mutil_app_new_xt": [
+    "0b1b6179-db02-408c-a1cc-f6f1408829ed_L1",
+    "2824f346-6ec2-4cf8-968c-99ccbd3421d8_L2",
+    "5811683a-fd91-418a-9c59-e9f306764875_L3",
+    "6d1f60ca-ea94-4a09-8886-ddef96f1fd8a_L1",
+    "abe04a95-081b-4afa-94f6-ed059abd515a_L3",
+    "b255560d-0a97-4914-aafe-310917fa3dfb_L2",
+    "b95ce0eb-98a1-4192-88e2-168dc6097601_L1",
+    "d6f02b62-4b3e-4ac0-ba56-07b8d24e532f_L1",
+    "f1a30ea3-6e7b-4cdc-94d2-65c901308713_L3"
+  ],
+  "vs_code_new": [
+    "05a13a28-f108-4db4-bb75-575d37e0025e_L2",
+    "0ed39f63-6049-43d4-ba4d-5fa2fe04a951_L1",
+    "1f9b6bcc-bcc6-4c23-b874-c79a4ec0c81a_L3",
+    "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1_L3",
+    "847a96b6-df94-4927-97e6-8cc9ea66ced7_L2",
+    "85281b81-0f3a-4ed7-aed9-05c883aec8fe_L3",
+    "9159259c-ef0e-42f5-9dbb-cb28c8f3642f_L2",
+    "971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6_L1",
+    "c6bf789c-ba3a-4209-971d-b63abf0ab733_L1",
+    "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2_L1",
+    "eabc805a-bfcf-4460-b250-ac92135819f6_L1",
+    "f66b89b9-f980-496d-9a3f-9b02af82f249_L2"
+  ]
+}

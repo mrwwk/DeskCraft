@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="800" height="600" viewBox="0 0 800 600"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Main title text -->
+  <text
+     id="text_title"
+     xml:space="preserve"
+     style="font-size:48px;font-family:sans-serif;fill:#333333;text-anchor:middle"
+     x="400"
+     y="200">Hello World</text>
+  <!-- Subtitle text -->
+  <text
+     id="text_subtitle"
+     xml:space="preserve"
+     style="font-size:24px;font-family:serif;fill:#666666;text-anchor:middle"
+     x="400"
+     y="300">This is a sample subtitle</text>
+</svg>

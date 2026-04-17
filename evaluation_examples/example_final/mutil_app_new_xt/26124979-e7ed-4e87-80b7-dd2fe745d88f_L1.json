@@ -4,10 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "A project specification file is waiting at ~/Desktop/project_spec.json. Read the file to discover the required editor settings and project structure. Apply tabSize and wordWrap to VS Code User Settings exactly as specified in the JSON. Then use the terminal to create the log directory and empty log file whose path is listed under 'logPath' in that same spec.",
-  "source": [
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：项目 kickoff 时从 JSON 规格一次性落地日志目录与编辑器默认值的轻量脚手架需求"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

@@ -25,53 +25,54 @@ TRIGGER_AGENT_ASKS = "agent_asks"
 TRIGGER_LLM_JUDGE = "llm_judge"
 
 
-USER_SIMULATOR_SYSTEM_PROMPT = """你是一个模拟真实用户的角色扮演者。你正在使用电脑完成一项任务，有一个 AI 助手在帮你操作屏幕。
+USER_SIMULATOR_SYSTEM_PROMPT = """You are roleplaying as a realistic computer user. You are trying to complete a task on a computer, and an AI assistant is helping operate the screen for you.
 
-## 当前场景
+## Current Scenario
 {scenario_description}
 
-## 你的人设
-- 专业水平：{expertise_level}
-- 说话风格：{communication_style}
+## Your Persona
+- Expertise level: {expertise_level}
+- Communication style: {communication_style}
 {completed_phases_section}
-## 当前阶段目标（第 {current_phase_number} 阶段，共 {total_phases} 阶段）
-你需要向 AI 助手提出以下要求：
+## Current Phase Goal (Phase {current_phase_number} of {total_phases})
+You need to ask the AI assistant to do the following:
 {current_phase_instruction}
 {next_phase_section}
 
-## 规则
-1. 像真实用户一样说话，不要使用过于精确的技术术语（除非你的人设是专业用户）
-2. 根据屏幕截图判断 AI 助手是否已完成当前要求
-3. 如果上面提供了“下一阶段目标”，就自然地提出那个要求；不要自行编造新的需求
-4. 如果当前阶段已经完成，且没有提供下一阶段目标，就表示任务都完成了，不要再新增要求
-5. 保持对话自然连贯，像真人在和 AI 聊天一样
-6. 如果 AI 助手没有完成当前阶段的要求，phase_complete为 flase，也继续提出新的要求
-7. phase_complete 判断需要在 json 格式中给出原因
+## Rules
+1. Speak like a real user. Do not use overly precise technical terms unless your persona is a professional user.
+2. Use the screenshot to judge whether the AI assistant has completed the current requirement.
+3. If a "Next Phase Goal" is provided above, naturally ask for that requirement next. Do not invent new requests on your own.
+4. If the current phase is complete and there is no next phase goal, indicate that the whole task is finished and do not add any new requests.
+5. Keep the conversation natural and coherent, like a real person chatting with an AI assistant.
+6. Your `message` should follow the language implied by the scenario and current instruction. If the task context is in Chinese, reply in Chinese; if it is in English, reply in English.
+7. In normal cases, always set `action` to `new_instruction`.
+8. If the AI assistant has not completed the current phase, keep the interaction in the same phase: set `phase_complete` to false and use `message` to restate or correct the current requirement.
+9. If the AI assistant has completed the current phase and there is a next phase goal, set `phase_complete` to true and use `message` to naturally express that next phase goal.
+10. If the current phase expects the AI assistant to ask the user a question, answer that question directly and naturally. In that case, use `clarify` and set `phase_complete` to true.
+11. If the AI assistant explicitly asks the user a question unexpectedly, you may use `clarify`, and in that case `phase_complete` must be false.
 
-## 输出格式
-你必须以 JSON 格式输出，包含以下字段：
+## Output Format
+You must output valid JSON with the following fields:
 {{
-    "action": "new_instruction" 或 "feedback" 或 "clarify" 或 "wait" 或 "done",
-    "message": "你要对 AI 助手说的话",
-    "phase_complete": true 或 false（当前阶段的任务是否已被 AI 完成）,
-    "reason": "phase_complete 为 false 时，给出 AI 未完成当前阶段任务的原因"
+    "action": "new_instruction" or "clarify",
+    "message": "What you want to say to the AI assistant",
+    "phase_complete": true or false,
+    "reason": "When phase_complete is false, explain why the current phase is not complete"
 }}
 
-action 含义：
-- "new_instruction": 提出新的操作要求（进入下一阶段）
-- "feedback": 对 AI 的操作给出反馈（如"不对"、"做得好"）
-- "clarify": 回答 AI 的问题或澄清要求
-- "wait": AI 还在操作中，继续等待
-- "done": 所有任务都已完成，结束交互
+Meaning of `action`:
+- "new_instruction": The default and normal case. Use it for both correcting the current phase requirement and expressing the next phase requirement.
+- "clarify": Only use this when the AI assistant explicitly asks the user a question unexpectedly. Do not use it otherwise.
 
-只输出 JSON，不要输出其他内容。
+Output JSON only. Do not output any extra text.
 """
 
-USER_SIMULATOR_JUDGE_PROMPT = """你正在观察一个 AI 助手操作电脑屏幕。请根据屏幕截图判断：AI 助手是否已经完成了以下操作？
+USER_SIMULATOR_JUDGE_PROMPT = """You are observing an AI assistant operating a computer screen. Based on the screenshot, decide whether the AI assistant has already completed the following requirement.
 
-要求完成的操作：{instruction}
+Required operation: {instruction}
 
-请只回答 "yes" 或 "no"。
+Answer only "yes" or "no".
 """
 
 
@@ -113,7 +114,7 @@ class UserSimulator:
         self.scenario = scenario_config
         self.phases: List[Dict] = scenario_config.get("phases", [])
         self.scenario_description = scenario_config.get(
-            "scenario_description", "用户需要完成一项电脑操作任务"
+            "scenario_description", "The user needs to complete a computer task"
         )
 
         # User persona
@@ -147,7 +148,7 @@ class UserSimulator:
         # phases can see what the user originally asked for.
         self.conversation_history.append({
             "role": "user",
-            "content": f"[初始指令] {first_instruction}",
+            "content": f"[Initial instruction] {first_instruction}",
         })
 
         return first_instruction
@@ -157,6 +158,7 @@ class UserSimulator:
         agent_reply: Optional[str],
         screenshot_b64: Optional[str] = None,
         is_unexpected_call_user: bool = False,
+        agent_question: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Generate the next user message based on the current phase, agent's reply,
@@ -168,17 +170,18 @@ class UserSimulator:
             is_unexpected_call_user: If True, the agent issued CALL_USER on a phase
                 whose trigger type is NOT agent_asks.  The LLM will be instructed
                 to only answer the agent's question without advancing the phase.
+            agent_question: Extracted call_user question text from the GUI agent, if any.
             
         Returns:
             dict with keys:
-                "action": str - "new_instruction"|"feedback"|"clarify"|"wait"|"done"
+                "action": str - "new_instruction"|"clarify"
                 "message": str - The user message to send to the agent
                 "phase_complete": bool - Whether the current phase is considered done
         """
         if self.all_phases_complete:
             return {
-                "action": "done",
-                "message": "好的，所有操作都完成了，谢谢！",
+                "action": "new_instruction",
+                "message": "All steps are complete. Thank you.",
                 "phase_complete": True,
             }
 
@@ -219,6 +222,25 @@ class UserSimulator:
         # Add current turn context
         user_content = []
 
+        current_trigger_type = current_phase.get("trigger", {}).get("type", TRIGGER_AGENT_DONE)
+        is_expected_call_user = current_trigger_type == TRIGGER_AGENT_ASKS and bool(agent_question)
+
+        # When the agent asks a question in an agent_asks phase, answer that
+        # question directly and treat the reply as phase completion.
+        if is_expected_call_user:
+            user_content.append({
+                "type": "text",
+                "text": (
+                    "[Important] This phase expects the AI assistant to ask the user a question. "
+                    "Answer the question directly and naturally. Do not introduce a new request. "
+                    'Your action should be "clarify", and phase_complete should be true.'
+                ),
+            })
+            user_content.append({
+                "type": "text",
+                "text": f"The AI assistant's question is: {agent_question}",
+            })
+
         # When the agent unexpectedly asks a question on a phase that does
         # not expect CALL_USER, prepend a clear instruction to the LLM so
         # it only answers the question without advancing the phase.
@@ -226,22 +248,27 @@ class UserSimulator:
             user_content.append({
                 "type": "text",
                 "text": (
-                    "【重要提示】AI 助手在你没有期望它提问的情况下向你提了一个问题。"
-                    "你只需要根据当前阶段目标，简单、自然地回答它的问题即可。"
-                    "不要提出新的要求，不要说任务已完成，不要推进到下一阶段。"
-                    '你的 action 应该是 "clarify"，phase_complete 应该是 false。'
+                    "[Important] The AI assistant asked you a question when this phase was not expected to require user input. "
+                    "You should only answer its question briefly and naturally based on the current phase goal. "
+                    "Do not introduce a new request, do not say the task is finished, and do not advance to the next phase. "
+                    'Your action should be "clarify", and phase_complete should be false.'
                 ),
             })
+            if agent_question:
+                user_content.append({
+                    "type": "text",
+                    "text": f"The AI assistant's question is: {agent_question}",
+                })
 
         if agent_reply:
             user_content.append({
                 "type": "text",
-                "text": f"AI 助手刚才的回复：{agent_reply}",
+                "text": f"The AI assistant just replied: {agent_reply}",
             })
         if screenshot_b64:
             user_content.append({
                 "type": "text",
-                "text": "当前屏幕截图如下：",
+                "text": "The current screenshot is shown below:",
             })
             user_content.append({
                 "type": "image_url",
@@ -250,7 +277,7 @@ class UserSimulator:
         if not user_content:
             user_content.append({
                 "type": "text",
-                "text": "请根据当前阶段目标生成用户消息。",
+                "text": "Generate the next user message based on the current phase goal.",
             })
 
         messages.append({"role": "user", "content": user_content})
@@ -261,18 +288,24 @@ class UserSimulator:
             result = self._parse_response(response)
         except Exception as e:
             logger.error(f"[UserSim] Error generating response: {e}")
-            # Fallback: just provide the next phase instruction directly
+            # Fallback: keep the response shape simple and deterministic.
             result = {
                 "action": "new_instruction",
                 "message": current_instruction,
                 "phase_complete": False,
             }
 
+        result = self._normalize_user_action(
+            result,
+            is_unexpected_call_user=is_unexpected_call_user,
+            is_expected_call_user=is_expected_call_user,
+        )
+
         # Track conversation history
         if agent_reply:
             self.conversation_history.append({
                 "role": "assistant",
-                "content": f"[AI助手回复] {agent_reply}",
+                "content": f"[AI assistant reply] {agent_reply}",
             })
         self.conversation_history.append({
             "role": "user",
@@ -479,6 +512,30 @@ class UserSimulator:
                 "phase_complete": False,
             }
 
+    def _normalize_user_action(
+        self,
+        result: Dict[str, Any],
+        is_unexpected_call_user: bool,
+        is_expected_call_user: bool,
+    ) -> Dict[str, Any]:
+        """Normalize legacy simulator actions into the simplified protocol."""
+        action = str(result.get("action", "new_instruction") or "new_instruction").strip().lower()
+
+        if is_expected_call_user:
+            result["action"] = "clarify"
+            result["phase_complete"] = True
+            return result
+
+        if is_unexpected_call_user:
+            result["action"] = "clarify"
+            result["phase_complete"] = False
+            return result
+
+        if action != "new_instruction":
+            result["action"] = "new_instruction"
+
+        return result
+
     def _extract_json_object(self, text: str) -> Optional[str]:
         """Extract the last balanced JSON object from a mixed-text response."""
         last_candidate = None
@@ -553,7 +610,7 @@ class UserSimulator:
         prompt = USER_SIMULATOR_JUDGE_PROMPT.format(instruction=current_instruction)
 
         messages = [
-            {"role": "system", "content": "你是一个判断任务是否完成的助手。只回答 yes 或 no。"},
+            {"role": "system", "content": "You are an assistant that judges task completion. Reply only with yes or no."},
             {
                 "role": "user",
                 "content": [
@@ -582,9 +639,9 @@ class UserSimulator:
         if not self.completed_phases_summary:
             return ""
 
-        lines = ["\n## 已完成的阶段（供参考，不要重复提出这些要求）"]
+        lines = ["\n## Completed Phases (for reference, do not ask for these again)"]
         for item in self.completed_phases_summary:
-            lines.append(f"- 第 {item['phase_id']} 阶段：{item['instruction']}")
+            lines.append(f"- Phase {item['phase_id']}: {item['instruction']}")
         lines.append("")  # trailing newline
         return "\n".join(lines)
 
@@ -592,13 +649,13 @@ class UserSimulator:
         """Build an explicit next-phase hint so the LLM does not invent new tasks."""
         next_phase_idx = self.current_phase_idx + 1
         if next_phase_idx >= len(self.phases):
-            return "\n## 下一阶段目标\n没有下一阶段了。"
+            return "\n## Next Phase Goal\nThere is no next phase."
 
         next_instruction = self.phases[next_phase_idx].get("instruction", "")
         return (
-            "\n## 下一阶段目标\n"
-            "如果当前阶段已经完成，下一条用户消息应该自然地表达下面这个要求，"
-            "不要改写成别的需求：\n"
+            "\n## Next Phase Goal\n"
+            "If the current phase is complete, the next user message should naturally express the requirement below. "
+            "Do not rewrite it into a different request:\n"
             f"{next_instruction}"
         )
 

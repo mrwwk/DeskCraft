@@ -4,11 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "The team's development notes are at ~/Desktop/DEVNOTES.md. Read this file carefully — it specifies three editor settings and a reference documentation URL. Apply every specified setting to VS Code User Settings: set editor.tabSize to the tabSize value in the notes, set editor.wordWrapColumn to the wrapColumn value, and set editor.rulers to a single-element array containing the rulerAt value. Then extract the docsUrl from the notes and open it in a Chrome tab. Finally mark the notes as processed by creating ~/Desktop/DEVNOTES.applied with the single line 'applied'.",
-  "source": [
-    "https://code.visualstudio.com/docs/editor/codebasics",
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：团队把 tab size、wrap column、ruler 和文档链接写进 DEVNOTES，要求成员解析后同步到 VS Code 的常见规范下发流程"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

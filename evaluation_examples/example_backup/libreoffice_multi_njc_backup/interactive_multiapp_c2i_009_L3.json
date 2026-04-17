@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2i_009",
+  "instruction": "Help me organize the NPS data into the memo",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Customer Group'\nws['B1'] = 'Survey Count'\nws['C1'] = 'Promoters(%)'\nws['D1'] = 'Passives(%)'\nws['E1'] = 'Detractors(%)'\nws['A2'] = 'Enterprise Clients'\nws['B2'] = 520\nws['C2'] = 62\nws['D2'] = 25\nws['E2'] = 13\nws['A3'] = 'Individual Users'\nws['B3'] = 1850\nws['C3'] = 45\nws['D3'] = 32\nws['E3'] = 23\nws['A4'] = 'Agents'\nws['B4'] = 280\nws['C4'] = 58\nws['D4'] = 28\nws['E4'] = 14\nwb.save('/home/user/Desktop/nps_survey.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/nps_memo.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the NPS data into the memo",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Find the customer group with the highest promoter percentage from /home/user/Desktop/nps_survey.xlsx, append to /home/user/Desktop/nps_memo.txt: 'Best NPS Customer Group: Enterprise Clients (Promoters 62%)', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/nps_memo.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Best NPS Customer Group: Enterprise Clients (Promoters 62%)"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L3"
+}

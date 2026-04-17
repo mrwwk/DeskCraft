@@ -1,0 +1,107 @@
+{
+  "id": "interactive_writer_001",
+  "snapshot": "libreoffice_writer",
+  "interactive": true,
+  "scenario_type": "ambiguous_target",
+  "scenario_description": "The user wants to add the recorder's name to the meeting minutes but doesn't say who. The agent must ask for the specific name before filling it in.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Meeting Minutes\n\nDate: June 10, 2025\nLocation: Conference Room 3F\n\nAttendees: John Smith, Alice Wang, Bob Zhang\n\nAgenda Item 1: Q2 Sales Target Review\n  - Discussion: Q2 sales achievement rate was 102%%, overall target met.\n  - Next Steps: Prepare Q3 sales plan.\n\nAgenda Item 2: New Product Launch Timeline\n  - Discussion: New product expected to launch in August.\n\nRecorded by:\n' > /home/user/Desktop/meeting_notes.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--writer",
+          "/home/user/Desktop/meeting_notes.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me add that person's name to the minutes",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Write \"Wang Fang\" on the \"Recorded by:\" line, then save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/meeting_notes.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Wang Fang"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

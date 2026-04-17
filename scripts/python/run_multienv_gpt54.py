@@ -19,6 +19,7 @@ from desktop_env.desktop_env import DesktopEnv
 from mm_agents.gpt54_agent import GPT54Agent
 
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 active_environments = []
 processes = []
 is_terminating = False
@@ -49,7 +50,7 @@ def config() -> argparse.Namespace:
     parser.add_argument("--max_trajectory_length", type=int, default=3)
     parser.add_argument("--test_config_base_dir", type=str, default="evaluation_examples")
 
-    parser.add_argument("--model", type=str, default="gpt-5.4")
+    parser.add_argument("--model", type=str, default="api_azure_openai_gpt-5.4")
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top_p", type=float, default=0.9)
     parser.add_argument(
@@ -62,7 +63,7 @@ def config() -> argparse.Namespace:
         "--reasoning_effort",
         type=str,
         choices=["none", "low", "medium", "high", "xhigh"],
-        default="xhigh",
+        default="low",
     )
     parser.add_argument("--stop_token", type=str, default=None)
 
@@ -72,6 +73,7 @@ def config() -> argparse.Namespace:
     )
 
     parser.add_argument("--result_dir", type=str, default="./results")
+    parser.add_argument("--run_name", type=str, default=None)
     parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to run in parallel")
     parser.add_argument(
         "--log_level",
@@ -132,6 +134,21 @@ def distribute_tasks(test_all_meta: dict) -> List[tuple]:
         for example_id in examples:
             all_tasks.append((domain, example_id))
     return all_tasks
+
+
+def resolve_config_file(base_dir: str, domain: str, example_id: str) -> str:
+    candidates = [
+        os.path.join(base_dir, "examples", domain, f"{example_id}.json"),
+        os.path.join(base_dir, domain, f"{example_id}.json"),
+    ]
+
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+
+    raise FileNotFoundError(
+        "Unable to locate task config. Checked: " + ", ".join(os.path.abspath(path) for path in candidates)
+    )
 
 
 def process_signal_handler(signum, frame, env_idx):
@@ -200,9 +217,7 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list):
 
             domain, example_id = item
             try:
-                config_file = os.path.join(
-                    args.test_config_base_dir, f"examples/{domain}/{example_id}.json"
-                )
+                config_file = resolve_config_file(args.test_config_base_dir, domain, example_id)
                 with open(config_file, "r", encoding="utf-8") as f:
                     example = json.load(f)
 
@@ -448,6 +463,18 @@ if __name__ == "__main__":
 
     try:
         args = config()
+
+        if not os.path.isabs(args.test_config_base_dir):
+            args.test_config_base_dir = os.path.abspath(
+                os.path.join(SCRIPT_DIR, "../..", args.test_config_base_dir)
+            )
+        if not os.path.isabs(args.test_all_meta_path):
+            args.test_all_meta_path = os.path.abspath(
+                os.path.join(SCRIPT_DIR, "../..", args.test_all_meta_path)
+            )
+
+        if args.run_name:
+            args.result_dir = os.path.join(args.result_dir, args.run_name)
 
         path_to_args = os.path.join(
             args.result_dir,

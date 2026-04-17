@@ -1,0 +1,77 @@
+{
+  "id": "97d8736f-8d91-48ef-a299-256e11c742fb",
+  "task_slug": "writer_open_reportl301docx_and_perform_all_1_centeralign_the",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Report_L3_01.docx\" and perform ALL: (1) Center-align the document title. (2) Set title font to 24pt bold. (3) Change all body text to Times New Roman 12pt. (4) Make all section headings (Heading 1) dark blue (#003366). (5) Make the body text under \"5. Strategic Outlook\" bold. (6) Add at the end: \"This report was reviewed and approved by the Board of Directors on March 31, 2025.\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/97d8736f-8d91-48ef-a299-256e11c742fb/Report_L3_01.docx",
+            "path": "/home/user/Desktop/Report_L3_01.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Report_L3_01.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/97d8736f-8d91-48ef-a299-256e11c742fb",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Report_L3_01.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Report_L3_01_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Report_L3_01.docx",
+      "dest": "Report_L3_01.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

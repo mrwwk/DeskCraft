@@ -1,0 +1,77 @@
+{
+  "id": "538e6e61-4709-41f0-8acc-12bb4489058f",
+  "task_slug": "writer_open_annualreportl211docx_set_the_document_title_font_size",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"AnnualReport_L2_11.docx\". Set the document title font size to 20pt and center-align it.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/538e6e61-4709-41f0-8acc-12bb4489058f/AnnualReport_L2_11.docx",
+            "path": "/home/user/Desktop/AnnualReport_L2_11.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/AnnualReport_L2_11.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/538e6e61-4709-41f0-8acc-12bb4489058f",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "AnnualReport_L2_11.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "AnnualReport_L2_11_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/AnnualReport_L2_11.docx",
+      "dest": "AnnualReport_L2_11.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

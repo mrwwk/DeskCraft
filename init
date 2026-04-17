@@ -1,0 +1,44 @@
+Interactive Dev Rules
+
+1. Trigger counting
+- Interactive trigger counters use turn count, not action count.
+- One turn = one `agent.predict(...)` call.
+
+2. Phase advancement
+- Do not trust `user_response["phase_complete"]` for control flow.
+- If the phase trigger fires, always inject the user message into the agent.
+- Auto-advance to the next phase unless the agent emitted an unexpected `CALL_USER`.
+- Unexpected `CALL_USER` = current trigger is not `agent_asks`.
+
+3. User message persistence
+- All generated user messages must be written to `interaction_log.json`.
+- All generated user messages must be passed into `agent.receive_user_message(...)`.
+- `task_instruction.jsonl` stores only the initial instruction snapshot.
+
+4. GPT-5.4 request rules
+- First/root request: send `input_text` + `input_image`.
+- Continued request with `previous_response_id`: do not send `input_image` in the user message.
+- Continued request should send only:
+  `computer_call_output`
+  optional text continuation message
+- Reason: Responses API rejects computer-tool image input when `previous_response_id` exists.
+
+5. GPT-5.4 DONE handling
+- If GPT-5.4 reaches final answer but more phases remain, call `clear_done_from_history()`.
+- `clear_done_from_history()` must reset:
+  `previous_response_id`
+  `pending_input_items`
+  `pending_user_call_id`
+  `pending_user_messages`
+- Do not clear `accumulated_user_messages`.
+- Reason: next phase should start a fresh root request while preserving prior user history.
+
+6. GPT-5.4 instruction composition
+- Root request instruction = original instruction + all `accumulated_user_messages`.
+- New phase after DONE is a fresh root request, not a continuation of the old response chain.
+
+7. Debugging checklist
+- `interaction_log.json`: expected user turns and phase progression.
+- `runtime.log`: actual injected request payloads under `Request input items`.
+- `traj.jsonl`: executed actions and model metadata.
+- `task_instruction.jsonl`: initial instruction only; do not use it to verify follow-up injection.

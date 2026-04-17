@@ -87,11 +87,15 @@ S2_ACTION_DESCRIPTION_BASE = """
 * `answer`: Answer a question.
 """
 
+S2_ACTION_CALL_USER_INLINE = """* `call_user`: When the user's instruction is unclear or ambiguous, ask the user for clarification before proceeding. Requires `question` argument.
+"""
+
 S2_ACTION_CALL_USER = """* `call_user`: When the user's instruction is unclear or ambiguous, ask the user for clarification before proceeding.
 """
 
 # Keep the combined version for backward compatibility
 S2_ACTION_DESCRIPTION = S2_ACTION_DESCRIPTION_BASE + S2_ACTION_CALL_USER
+S2_ACTION_DESCRIPTION_INTERACTIVE = S2_ACTION_DESCRIPTION_BASE + S2_ACTION_CALL_USER_INLINE
 
 S2_DESCRIPTION_PROMPT_TEMPLATE = """Use a mouse and keyboard to interact with a computer, and take screenshots.
 * This is an interface to a desktop GUI. You must click on desktop icons to start applications.
@@ -128,6 +132,8 @@ Rules:
 - If finishing, use action=terminate in the tool call."""
 
 
+
+
 def build_s2_tools_def(description_prompt, is_interactive=False):
     """Build S2 tool definition.
 
@@ -146,7 +152,7 @@ def build_s2_tools_def(description_prompt, is_interactive=False):
     ]
     if is_interactive:
         action_enum = base_actions + ["call_user"]
-        action_description = S2_ACTION_DESCRIPTION_BASE + S2_ACTION_CALL_USER
+        action_description = S2_ACTION_DESCRIPTION_INTERACTIVE
     else:
         action_enum = base_actions
         action_description = S2_ACTION_DESCRIPTION_BASE
@@ -162,19 +168,13 @@ def build_s2_tools_def(description_prompt, is_interactive=False):
         "coordinate": {"description": "The x,y coordinates for mouse actions.", "type": "array"},
         "pixels": {"description": "The amount of scrolling.", "type": "number"},
         "time": {"description": "The seconds to wait.", "type": "number"},
+        "question": {"description": "Required only by `action=call_user`. The question to ask the user.", "type": "string"},
         "status": {
             "description": "The status of the task.",
             "type": "string",
             "enum": ["success", "failure"]
         }
     }
-
-    # Only expose the question parameter when call_user is available
-    if is_interactive:
-        properties["question"] = {
-            "description": "The question to ask the user (required only by `action=call_user`).",
-            "type": "string"
-        }
 
     return {
         "type": "function",

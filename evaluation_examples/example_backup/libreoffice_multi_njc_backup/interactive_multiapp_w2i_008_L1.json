@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_w2i_008",
+  "instruction": "Help me record the sales review information into the ledger",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Sales Review Analysis\\nAnalysis Period: 2025 Q1\\nAnalyst: Sales Director Peng Lei\\nAchievement: Target 15M, actual 16.2M, completion rate 108%\\nGrowth Drivers: Key client renewals (+3.2M), new client acquisition (+1.8M)\\nUnderperforming Region: Northwest (completion rate 82%)\\nQ2 Strategy: Focus on Northwest client acquisition, add 1 regional manager' > /home/user/Desktop/sales_analysis.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/sales_record.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me record the sales review information into the ledger",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Extract the Q1 achievement from /home/user/Desktop/sales_analysis.txt, append to /home/user/Desktop/sales_record.txt: 'Q1 Sales: Target 15M, actual 16.2M, completion rate 108%, Analyst: Peng Lei', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/sales_record.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "actual 16.2M, completion rate 108%",
+          "Peng Lei"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L1"
+}

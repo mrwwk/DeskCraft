@@ -1,22 +1,11 @@
 {
   "id": "7654b5dc-1acb-401d-9c81-13fed5fbf55e",
-  "task_slug": "startup_guide_new_tab_and_word_wrap",
+  "task_slug": "chrome_newtab_startup_vscode_wordwrap",
   "difficulty": "L1",
   "snapshot": "os",
-  "instruction": "A browser and editor startup guide is saved at ~/Desktop/editor_startup_guide.html. Open it in Chrome using the file:// URL, follow its setup instructions by configuring Chrome to open a New Tab page on startup and enabling word wrap in VS Code User Settings, and leave the guide open in Chrome when finished.",
-  "source": [
-    "https://support.google.com/chrome/answer/95314",
-    "https://code.visualstudio.com/docs/editing/codebasics#_how-do-i-turn-on-word-wrap",
-    "现实场景构造来源：新设备开工前统一浏览器启动行为与编辑器换行策略的常见个人环境整理流程"
-  ],
+  "instruction": "Configure Chrome to open a New Tab page on startup (under Settings → On startup, select 'Open the New Tab page'). Then open VS Code and enable word wrap in User Settings.",
+  "source": "authors",
   "config": [
-    {
-      "type": "execute",
-      "parameters": {
-        "command": "python3 - <<'PY'\nfrom pathlib import Path\nPath('/home/user/Desktop/editor_startup_guide.html').write_text('<!DOCTYPE html><html><body><h1>Editor Startup Guide</h1><p>1. In Chrome, set On startup to Open the New Tab page.</p><p>2. In VS Code, turn on editor.wordWrap.</p></body></html>')\nPY",
-        "shell": true
-      }
-    },
     {
       "type": "launch",
       "parameters": {
@@ -28,22 +17,13 @@
       "parameters": {
         "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
       }
-    },
-    {
-      "type": "launch",
-      "parameters": {
-        "command": ["code"]
-      }
     }
   ],
   "trajectory": "trajectories/",
   "related_apps": ["chrome", "vscode"],
   "evaluator": {
-    "func": ["is_expected_active_tab_approximate", "check_include_exclude", "check_json_settings"],
+    "func": ["check_include_exclude", "check_json_settings"],
     "result": [
-      {
-        "type": "active_tab_info"
-      },
       {
         "type": "new_startup_page"
       },
@@ -54,13 +34,6 @@
       }
     ],
     "expected": [
-      {
-        "type": "rule",
-        "rules": {
-          "type": "url",
-          "url": "file:///home/user/Desktop/editor_startup_guide.html"
-        }
-      },
       {
         "type": "rule",
         "rules": {
