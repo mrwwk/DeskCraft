@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_w2i_003",
+  "instruction": "Help me record the project progress into the digest file",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Project Status Update\\nProject: Customer Data Platform (CDP) Development\\nCurrent Progress: 55% (planned 60%, slightly behind)\\nCompleted: Requirements analysis, data architecture design, core module development\\nIn Progress: Data integration layer development (70% done)\\nPending: Frontend UI development, system testing, production deployment\\nRisk: Insufficient dev resources, recommend adding 2 engineers\\nExpected Completion: June 30, 2025 (original May 31, delayed by 1 month)' > /home/user/Desktop/project_status.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/project_digest.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me record the project progress into the digest file",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Extract the project progress and completion date from /home/user/Desktop/project_status.txt, append to /home/user/Desktop/project_digest.txt: 'CDP Project Progress: 55%, expected completion June 30, 2025 (delayed by 1 month)', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/project_digest.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "CDP Project Progress: 55%",
+          "delayed by 1 month"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L2"
+}

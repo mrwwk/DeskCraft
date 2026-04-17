@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_w2i_004",
+  "instruction": "Help me organize the meeting agenda into the minutes file",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Quarterly Business Review Meeting\\nMeeting Time: April 10, 2025, 9:00-12:00\\nLocation: HQ 19F Main Conference Room\\nModerator: CEO Zhang Zhiyuan\\nAttendees: All business line directors and department managers (~35 people)\\nAgenda:\\n  1. Q1 business data analysis (CFO, 30 min)\\n  2. Regional business review (Regional Directors, 20 min each)\\n  3. Q2 strategic priorities (CEO, 40 min)\\n  4. Q&A and discussion (20 min)' > /home/user/Desktop/meeting_agenda.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/meeting_minutes.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the meeting agenda into the minutes file",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Extract the meeting time and moderator from /home/user/Desktop/meeting_agenda.txt, append to /home/user/Desktop/meeting_minutes.txt: 'Meeting Time: April 10, 2025, Moderator: Zhang Zhiyuan, ~35 attendees', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/meeting_minutes.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Meeting Time: April 10, 2025",
+          "Zhang Zhiyuan"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L2"
+}

@@ -4,10 +4,7 @@
   "difficulty": "L2",
   "snapshot": "multi_apps",
   "instruction": "A package handoff for the local project in ~/Desktop/widget-lib/ is stored in HANDOFF.json. Review the package.json documentation in Chrome, then use VS Code to update package.json so its name, description, repository URL, and homepage match the handoff. Also update README.md so it mentions the new package name. Create a backup named package.json.bak before editing.",
-  "source": [
-    "https://docs.npmjs.com/cli/v10/configuring-npm/package-json",
-    "现实场景构造来源：npm 包交接时常见的“按 handoff 更新 package.json / README 并先备份旧元数据”发布准备流程"
-  ],
+  "source": "authors",
   "config": [
     {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/widget-lib')\nbase.mkdir(parents=True, exist_ok=True)\njson.dump({'name': '@acme/widget-lib', 'description': 'Reusable dashboard widgets', 'repository': 'https://github.com/acme/widget-lib', 'homepage': 'https://github.com/acme/widget-lib#readme'}, open(base / 'HANDOFF.json', 'w'), indent=2)\njson.dump({'name': 'old-widget', 'description': 'old description', 'repository': {'type': 'git', 'url': 'https://example.com/old.git'}, 'homepage': 'https://example.com/old'}, open(base / 'package.json', 'w'), indent=2)\n(base / 'README.md').write_text('# old-widget\\nLegacy package.\\n')\nPY", "shell": true}},
     {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},

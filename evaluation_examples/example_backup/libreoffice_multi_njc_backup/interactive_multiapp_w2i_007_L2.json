@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_w2i_007",
+  "instruction": "Help me organize the course information into the training brief",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Training Course Outline\\nCourse Name: Digital Transformation in Practice\\nDuration: 12 hours (completed in 3 days)\\nTarget Audience: Middle and senior management\\nTraining Objective: Understand digital transformation strategy and master implementation methodology\\nModule 1: Digital Transformation Cognitive Framework (3 hours)\\nModule 2: Enterprise Digital Assessment and Roadmap (4 hours)\\nModule 3: Digital Transformation Case Studies (3 hours)\\nModule 4: Action Plan Development (2 hours)' > /home/user/Desktop/course_outline.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/training_brief.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the course information into the training brief",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Extract the course name and duration from /home/user/Desktop/course_outline.txt, append to /home/user/Desktop/training_brief.txt: 'Course: Digital Transformation in Practice, 12 hours total, for middle and senior management', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/training_brief.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Digital Transformation in Practice, 12 hours total",
+          "middle and senior management"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L2"
+}

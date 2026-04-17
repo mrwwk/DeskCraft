@@ -1,0 +1,78 @@
+{
+  "id": "209c3917-259e-4329-9f94-bb7a849e679c",
+  "task_slug": "impress_in_the_golden_age_of_arcade_gamespptx_1",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_impress",
+  "instruction": "In \"The Golden Age of Arcade Games.pptx\": (1) Set ALL slides background to black (#000000). (2) On slide 1, make all text bold, underlined, and yellow (#FFFF00).",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/209c3917-259e-4329-9f94-bb7a849e679c/The Golden Age of Arcade Games.pptx",
+            "path": "/home/user/Desktop/The Golden Age of Arcade Games.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/The Golden Age of Arcade Games.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/209c3917-259e-4329-9f94-bb7a849e679c",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "The Golden Age of Arcade Games.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "ArcadeGames_L2.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/The Golden Age of Arcade Games.pptx",
+      "dest": "The Golden Age of Arcade Games.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,90 @@
+{
+  "id": "f7c9725b-9f02-4131-a007-68de65161a3c",
+  "task_slug": "calc_create_a_clustered_column_chart_showing_the_sales",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Create a clustered column chart showing the \"Sales ($)\" and \"Target ($)\" data for each region in a new sheet named \"Sheet2\". Set the chart title as \"Sales vs Target\".",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/f7c9725b-9f02-4131-a007-68de65161a3c/Region_SalesVsTarget_Chart.xlsx",
+            "path": "/home/user/Region_SalesVsTarget_Chart.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Region_SalesVsTarget_Chart.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/f7c9725b-9f02-4131-a007-68de65161a3c",
+  "related_apps": [
+    "libreoffice calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Region_SalesVsTarget_Chart.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Region_SalesVsTarget_Chart_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Region_SalesVsTarget_Chart.xlsx",
+      "dest": "Region_SalesVsTarget_Chart.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "chart",
+          "sheet_idx0": "RNSheet2",
+          "sheet_idx1": "ENSheet2",
+          "chart_props": [
+            "type",
+            "title"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

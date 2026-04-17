@@ -32,3 +32,13 @@ if [ ! -f "docker_vm_data/Ubuntu.qcow2" ]; then
     echo ">>> Start unzipping Ubuntu.qcow2.zip..."
     unzip Ubuntu.qcow2.zip && rm -f Ubuntu.qcow2.zip && cd ..
 fi
+
+curl --request POST \ 
+  --url "http://trpc-gpt-eval.production.polaris:8080/v1/responses" \ 
+  --header "Content-Type: application/json" \ 
+  --header "Authorization: Bearer $APP_ID:$API_KEY?provider=azure_openai&model=gpt-5.4&timeout=120" \ 
+  --data '{
+    "model": "gpt-5.4",
+    "input": "你好，请回复 OK",
+    "stream": false
+  }'

@@ -4,10 +4,7 @@
   "difficulty": "L1",
   "snapshot": "multi_apps",
   "instruction": "Your teammate exported the release checklist to ~/Desktop/release_plan.html. Open that file in Chrome using the file:// URL and use it as the source of truth. The page specifies that editor.lineNumbers should be set to relative and files.insertFinalNewline should be enabled. Apply those settings in VS Code User Settings, then create ~/Desktop/release_ready.txt containing the docs URL shown on the page.",
-  "source": [
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：发布负责人把操作清单导出为本地 HTML，要求执行人按页同步设置并记录后续文档入口的常见 release ready 流程"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

@@ -1,0 +1,86 @@
+{
+  "id": "3fd989e0-61f2-4f77-a604-a0c0ae0f8c7b",
+  "task_slug": "calc_calculate_the_due_date_for_each_loan_by",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Calculate the due date for each loan by adding the \"Term (Days)\" to the \"Issue Date\" and fill in the \"Due Date\" column.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/3fd989e0-61f2-4f77-a604-a0c0ae0f8c7b/Loan_Due_Date.xlsx",
+            "path": "/home/user/Loan_Due_Date.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Loan_Due_Date.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/3fd989e0-61f2-4f77-a604-a0c0ae0f8c7b",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Loan_Due_Date.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Loan_Due_Date_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Loan_Due_Date.xlsx",
+      "dest": "Loan_Due_Date.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

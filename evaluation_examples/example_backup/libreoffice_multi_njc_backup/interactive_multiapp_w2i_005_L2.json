@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_w2i_005",
+  "instruction": "Help me organize the product info into the release notes",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Product Feature Overview\\nProduct Name: DataInsight Pro\\nVersion: v3.0\\nCore Features:\\n  - Real-time Data Dashboard: supports 50+ data sources\\n  - Smart Predictive Analytics: 20+ built-in prediction models\\n  - Automated Report Generation: one-click PDF/PPT reports\\n  - Multi-level Access Control: organization-level permissions\\nHighlight: New AI conversational data analysis feature\\nRelease Date: 2025-05-15' > /home/user/Desktop/product_features.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/product_release_note.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me organize the product info into the release notes",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Extract the product name and version from /home/user/Desktop/product_features.txt, append to /home/user/Desktop/product_release_note.txt: 'Product: DataInsight Pro v3.0, Release Date: 2025-05-15', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/product_release_note.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "DataInsight Pro v3.0",
+          "2025-05-15"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L2"
+}

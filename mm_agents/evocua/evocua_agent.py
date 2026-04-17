@@ -27,7 +27,7 @@ from mm_agents.evocua.prompts import (
     S2_DESCRIPTION_PROMPT_TEMPLATE,
     S2_SYSTEM_PROMPT,
     build_s2_tools_def,
-    build_s1_system_prompt
+    build_s1_system_prompt,
 )
 
 logger = logging.getLogger("desktopenv.evocua")
@@ -85,7 +85,7 @@ class EvoCUAAgent:
         self.cots = [] # For S1 style history
         
         self.pending_user_messages = []
-        self.accumulated_user_messages = []  # 累积的所有用户追加消息
+        self._pending_call_user_question = ""  # question text for history reconstruction
         self.is_interactive = False
 
     def reset(self, _logger=None, vm_ip=None):
@@ -100,13 +100,12 @@ class EvoCUAAgent:
         self.screenshots = []
         self.cots = []
         self.pending_user_messages = []
-        self.accumulated_user_messages = []  # 重置累积消息
+        self._pending_call_user_question = ""
         self.is_interactive = False
 
     def receive_user_message(self, message: str):
         """Receive a new user message for multi-turn interactive evaluation."""
         self.pending_user_messages.append(message)
-        self.accumulated_user_messages.append(message)  # 累积消息，不会在predict中清空
 
     def set_interactive_prompt(self, enable: bool = True):
         """Switch to interactive prompt that includes call_user action."""
@@ -125,6 +124,9 @@ class EvoCUAAgent:
             self.responses.pop()
         if len(self.screenshots) > len(self.actions):
             self.screenshots.pop()
+        # Reset pending call_user state
+        self._pending_call_user_question = ""
+        self.pending_user_messages = []
 
     def predict(self, instruction: str, obs: Dict) -> List:
         """
@@ -133,13 +135,6 @@ class EvoCUAAgent:
         
         logger.info(f"========================== {self.model} ===================================")
         
-        # 构建instruction：使用累积的用户消息（而不是pending，因为pending会被清空）
-        # 每条追加消息都有独立的[User Additional Message]:前缀
-        if self.accumulated_user_messages:
-            extra_messages = "\n\n".join(
-                f"[User Additional Message]:\n{msg}" for msg in self.accumulated_user_messages
-            )
-            instruction = f"{instruction}\n\n{extra_messages}"
         self.task_instruction = instruction
 
         logger.info(f"Instruction: \n{instruction}")
@@ -216,10 +211,17 @@ class EvoCUAAgent:
                     logger.error(f"Error in predict: {e}")
                     break
         
-        self.responses.append(response)
-        
+        # response is now a string (text_content)
+        if response is None:
+            logger.error("LLM call failed after all retries, returning FAIL.")
+            self.responses.append("")
+            self.actions.append("Fail due to LLM call failure.")
+            return "", ["FAIL"]
+        response_text = response
+        self.responses.append(response_text)
+
         low_level_instruction, pyautogui_code = self._parse_response_s2(
-            response, p_width, p_height, original_width, original_height
+            response_text, p_width, p_height, original_width, original_height
         )
         
         # new added
@@ -234,11 +236,11 @@ class EvoCUAAgent:
         logger.info(f"Pyautogui code: {pyautogui_code}")
 
         self.actions.append(low_level_instruction)
-        return response, pyautogui_code
+        return response_text, pyautogui_code
 
     def _build_s2_messages(self, instruction, current_img, step, history_n, system_prompt):
         messages = [{"role": "system", "content": [{"type": "text", "text": system_prompt}]}]
-        
+
         previous_actions = []
         history_start_idx = max(0, step - history_n)
         for i in range(history_start_idx):
@@ -281,21 +283,31 @@ Previous actions:
                             ]
                         })
                 
+                # Build assistant message; if this is the last history item and we have
+                # a pending call_user reply, append the user reply as a regular user message.
+                is_last_hist = (i == history_len - 1)
                 messages.append({
                     "role": "assistant",
                     "content": [{"type": "text", "text": hist_responses[i]}]
                 })
+                if is_last_hist and self.pending_user_messages:
+                    pending_text = "\n".join(self.pending_user_messages)
+                    messages.append({
+                        "role": "user",
+                        "content": [{"type": "text", "text": f"[User Reply]: {pending_text}"}]
+                    })
+                    self.pending_user_messages = []
         
         # Current Turn
         # We re-use previous_actions_str logic for the case where history_len == 0
         
-        # Interactive hint: remind the agent it can call_user when confused
+        # Interactive hint: remind the agent it can use call_user action when confused
         interactive_hint = ""
         if self.is_interactive:
             interactive_hint = (
                 "\n\nNote: This is an interactive session. "
                 "If the user's instruction is unclear or you need more information, "
-                "use the `call_user` action to ask the user for clarification."
+                "use `action=call_user` with a `question` argument to ask the user for clarification."
             )
 
         if history_len == 0:
@@ -489,6 +501,11 @@ Previous actions:
                         pyautogui_code.append("WAIT")
 
                     elif action == "call_user":
+                        q = args.get("question", "") if isinstance(args, dict) else ""
+                        self._pending_call_user_question = q
+                        logger.info("[CALL_USER] question=%s", q)
+                        nonlocal low_level_instruction
+                        low_level_instruction = f"[CALL_USER] {q}" if q else "[CALL_USER]"
                         pyautogui_code.append("CALL_USER")
 
                     elif action == "terminate":
@@ -618,20 +635,20 @@ Previous actions:
             ]
         })
 
-        response = self.call_llm({
+        response_text = self.call_llm({
             "model": self.model,
             "messages": messages,
             "max_tokens": self.max_tokens
         })
         
-        low_level, codes, cot_data = self._parse_response_s1(response)
+        low_level, codes, cot_data = self._parse_response_s1(response_text)
         
         self.observations.append(obs)
         self.cots.append(cot_data)
         self.actions.append(low_level)
-        self.responses.append(response)
+        self.responses.append(response_text)
         
-        return response, codes
+        return response_text, codes
 
 
     def _parse_response_s1(self, response):
@@ -681,7 +698,11 @@ Previous actions:
 
     @backoff.on_exception(backoff.constant, Exception, interval=30, max_tries=20, giveup=_should_giveup_on_context_error.__func__)
     def call_llm(self, payload):
-        """Unified OpenAI-compatible API call"""
+        """Unified OpenAI-compatible API call.
+
+        Returns:
+            str: The text content from the response message.
+        """
         # Get env vars
         base_url = os.environ.get("OPENAI_BASE_URL", "url-xxx")
         api_key = os.environ.get("OPENAI_API_KEY", "sk-xxx")
@@ -691,10 +712,10 @@ Previous actions:
             api_key=api_key,
             timeout=httpx.Timeout(600.0, connect=60.0)  # Total timeout 600s, connect timeout 60s
         )
-        
+
         messages = payload["messages"]
         log_messages(messages, "LLM Request")
-        
+
         params = {
             "model": payload["model"],
             "messages": messages,
@@ -702,10 +723,11 @@ Previous actions:
             "temperature": self.temperature,
             "top_p": self.top_p
         }
-        
+
         try:
             resp = client.chat.completions.create(**params)
-            content = resp.choices[0].message.content
+            message = resp.choices[0].message
+            content = message.content or ""
             logger.info(f"LLM Response:\n{content}")
             return content
         except Exception as e:

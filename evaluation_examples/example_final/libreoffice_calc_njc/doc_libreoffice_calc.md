@@ -140,7 +140,7 @@ def compare_table(result: str, expected: str, **options) -> float:
 ## 3. 任务定义
 
 
-### 3.1 第一级（L1）—— 基础操作 —— 3 个
+### 3.1 第一级（L1）—— 基础操作 —— 10 个
 
 > agent 在实测中 10 步内完成且得分 1.0 的任务
 
@@ -174,6 +174,83 @@ def compare_table(result: str, expected: str, **options) -> float:
 - **规则类型**：`freeze`, `sheet_data`
 - **Gold 文件**：`Inventory_Freeze_Row_gold.xlsx`
 
+#### 任务 L1-4：Staff_Header_Bold
+
+- **ID**：`2409860c-0c5b-4916-990b-5ddaa49935bf`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Staff_Header_Bold.xlsx" in LibreOffice Calc. Make the entire header row (row 1) bold. Save the file.
+- **素材文件**：`Staff_Header_Bold.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`style`, `sheet_data`
+- **Gold 文件**：`Staff_Header_Bold_gold.xlsx`
+- **设计说明**：纯单步格式化操作——仅加粗表头行，无需公式、新建工作表或排序，agent 选中第 1 行后点击加粗按钮即可完成，属于典型的 L1 级别。
+
+#### 任务 L1-5：Product_Sheet_Rename
+
+- **ID**：`44debc21-019a-4254-8f9a-f0f7592916a8`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Product_Sheet_Rename.xlsx" in LibreOffice Calc. Rename the worksheet tab from "Sheet1" to "Products". Save the file.
+- **素材文件**：`Product_Sheet_Rename.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`sheet_name`, `sheet_data`
+- **Gold 文件**：`Product_Sheet_Rename_gold.xlsx`
+- **设计说明**：单步工作表重命名操作——右键点击标签页并输入新名称，无其他操作要求，属于典型的 L1 级别。
+
+#### 任务 L1-6：Sales_Tax_Formula
+
+- **ID**：`96936552-f3f7-43ce-aedf-6db5c190ce2a`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Sales_Tax_Formula.xlsx" in LibreOffice Calc. In the "Tax ($)" column, calculate the tax amount for each sale by multiplying the value in the "Amount ($)" column by 0.08. Fill in all rows (D2:D11). Save the file.
+- **素材文件**：`Sales_Tax_Formula.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`sheet_data`
+- **Gold 文件**：`Sales_Tax_Formula_gold.xlsx`
+- **设计说明**：单列简单算术公式填充——仅涉及一个固定乘数的乘法公式，无需 IF/VLOOKUP 等复杂函数，属于典型的 L1 级别。
+
+#### 任务 L1-7：Report_Header_Fill_Color
+
+- **ID**：`1413054c-02dc-4786-a33d-2303211fb272`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Report_Header_Fill_Color.xlsx" in LibreOffice Calc. Set the background (fill) color of the header row cells A1:E1 to light blue (#add8e6). Save the file.
+- **素材文件**：`Report_Header_Fill_Color.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`style`, `sheet_data`
+- **Gold 文件**：`Report_Header_Fill_Color_gold.xlsx`
+- **设计说明**：单步单色填充操作——选中固定范围后选择指定颜色，与 L3-12（Exam_Score_Highlight）的条件式高亮不同，本任务为无条件的静态背景色设置，属于典型的 L1 级别。
+
+#### 任务 L1-8：Inventory_Freeze_Col
+
+- **ID**：`9e0b253f-db3b-4dd1-a49e-704557a314d4`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Inventory_Freeze_Col.xlsx" in LibreOffice Calc. Freeze the first column (column A) so that it stays visible when scrolling horizontally. Save the file.
+- **素材文件**：`Inventory_Freeze_Col.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`freeze`, `sheet_data`
+- **Gold 文件**：`Inventory_Freeze_Col_gold.xlsx`
+- **设计说明**：与 L1-3（冻结首行）互补，冻结首列是同一功能的不同维度；操作仅需将光标置于 B1 并执行冻结行列，属于典型 L1 级别。
+
+#### 任务 L1-9：Price_Number_Format
+
+- **ID**：`b2b8e39a-8a9f-4b1c-9ee3-16232572551d`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Price_Number_Format.xlsx" in LibreOffice Calc. Format the cells in the "Unit Price ($)" column (C2:C11) to display numbers with exactly 2 decimal places (format code: 0.00). Save the file.
+- **素材文件**：`Price_Number_Format.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`style(number_format)`, `sheet_data`
+- **Gold 文件**：`Price_Number_Format_gold.xlsx`
+- **设计说明**：单列数字格式设置——仅选中范围后在"Format Cells"中输入 0.00，不涉及公式或数据修改，属于典型 L1 级别；与现有 style 任务（bold/italic/fgcolor）覆盖不同属性。
+
+#### 任务 L1-10：Sales_Header_Italic
+
+- **ID**：`4d693426-e19d-45e3-a641-78418506c30f`
+- **来源**：`calc_new`
+- **指令**：Open "/home/user/Sales_Header_Italic.xlsx" in LibreOffice Calc. Make the entire header row (row 1) italic. Save the file.
+- **素材文件**：`Sales_Header_Italic.xlsx`
+- **评估函数**：`compare_table`
+- **规则类型**：`style(font_italic)`, `sheet_data`
+- **Gold 文件**：`Sales_Header_Italic_gold.xlsx`
+- **设计说明**：与 L1-4（加粗）相同操作路径但使用斜体，覆盖 `font_italic` 属性；单步操作，属于典型 L1 级别。
+
 #### L1 任务来源标注
 
 | 任务 | 来源类型 | 具体来源 | 标注理由 |
@@ -181,6 +258,13 @@ def compare_table(result: str, expected: str, **options) -> float:
 | L1-1 | 官方帮助 | [Managing Sheets](https://help.libreoffice.org/latest/en-US/text/scalc/guide/multitables.html) + [Copying Cells](https://help.libreoffice.org/latest/en-US/text/scalc/guide/cellcopy.html) | Copy the "Expenses ($)" column along with its header to a new sheet named "Sheet |
 | L1-2 | 官方帮助 | [Managing Sheets](https://help.libreoffice.org/latest/en-US/text/scalc/guide/multitables.html) | Create a "Full Name" column by concatenating "First Name" and "Last Name" with a |
 | L1-3 | 官方帮助 | [Freezing Rows/Columns](https://help.libreoffice.org/latest/en-US/text/scalc/guide/line_fix.html) | Help me freeze the first row on this sheet to keep the headers always visible wh |
+| L1-4 | 官方帮助 | [Cell Formatting](https://help.libreoffice.org/latest/en-US/text/scalc/guide/format_value.html) | Make the entire header row (row 1) bold — 单步加粗操作，无公式/新建工作表，10 步内可完成 |
+| L1-5 | 官方帮助 | [Managing Sheets](https://help.libreoffice.org/latest/en-US/text/scalc/guide/multitables.html) | Rename the worksheet tab from "Sheet1" to "Products" — 单步重命名操作，右键标签即可完成 |
+| L1-6 | 官方帮助 | [Calculating with Formulas](https://help.libreoffice.org/latest/en-US/text/scalc/guide/formulas.html) | Fill "Tax ($)" column with Amount*0.08 — 单列固定乘法公式，无复杂函数，10 步内可完成 |
+| L1-7 | 官方帮助 | [Cell Formatting](https://help.libreoffice.org/latest/en-US/text/scalc/guide/format_value.html) | Set background color of A1:E1 to light blue — 静态单色填充，与条件式高亮不同，10 步内可完成 |
+| L1-8 | 官方帮助 | [Freezing Rows/Columns](https://help.libreoffice.org/latest/en-US/text/scalc/guide/line_fix.html) | Freeze the first column (column A) — 与 L1-3 冻结行互补，冻结列操作，10 步内可完成 |
+| L1-9 | 官方帮助 | [Cell Formatting](https://help.libreoffice.org/latest/en-US/text/scalc/guide/format_value.html) | Format C2:C11 as 0.00 — 单列数字格式，Format Cells 对话框操作，10 步内可完成 |
+| L1-10 | 官方帮助 | [Cell Formatting](https://help.libreoffice.org/latest/en-US/text/scalc/guide/format_value.html) | Make the entire header row (row 1) italic — 单步斜体操作，覆盖 font_italic 属性，10 步内可完成 |
 
 #### L1 任务汇总表
 
@@ -189,6 +273,13 @@ def compare_table(result: str, expected: str, **options) -> float:
 | 1 | Financial_Data_CopyCol | `Financial_Data_CopyCol.xlsx` | `compare_table` (sheet_data) |
 | 2 | Employee_Name_Concat | `Employee_Name_Concat.xlsx` | `compare_table` (sheet_data) |
 | 3 | Inventory_Freeze_Row | `Inventory_Freeze_Row.xlsx` | `compare_table` (freeze, sheet_data) |
+| 4 | Staff_Header_Bold | `Staff_Header_Bold.xlsx` | `compare_table` (style, sheet_data) |
+| 5 | Product_Sheet_Rename | `Product_Sheet_Rename.xlsx` | `compare_table` (sheet_name, sheet_data) |
+| 6 | Sales_Tax_Formula | `Sales_Tax_Formula.xlsx` | `compare_table` (sheet_data) |
+| 7 | Report_Header_Fill_Color | `Report_Header_Fill_Color.xlsx` | `compare_table` (style, sheet_data) |
+| 8 | Inventory_Freeze_Col | `Inventory_Freeze_Col.xlsx` | `compare_table` (freeze, sheet_data) |
+| 9 | Price_Number_Format | `Price_Number_Format.xlsx` | `compare_table` (style, sheet_data) |
+| 10 | Sales_Header_Italic | `Sales_Header_Italic.xlsx` | `compare_table` (style, sheet_data) |
 
 
 ### 3.2 第二级（L2）—— 复合操作 —— 6 个

@@ -1,0 +1,79 @@
+{
+  "id": "interactive_multiapp_c2w_020",
+  "instruction": "Help me summarize the annual KPI results",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Metric'\nws['B1'] = 'Target'\nws['C1'] = 'Actual'\nws['D1'] = 'Achievement(%)'\nws['A2'] = 'Revenue(10K CNY)'\nws['B2'] = 5000\nws['C2'] = 5280\nws['D2'] = 105.6\nws['A3'] = 'Net Profit(10K CNY)'\nws['B3'] = 800\nws['C3'] = 752\nws['D3'] = 94.0\nws['A4'] = 'New Clients'\nws['B4'] = 200\nws['C4'] = 235\nws['D4'] = 117.5\nws['A5'] = 'Customer Satisfaction(%)'\nws['B5'] = 90\nws['C5'] = 93.2\nws['D5'] = 103.6\nwb.save('/home/user/Desktop/annual_kpi.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/kpi_summary.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me summarize the annual KPI results",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Find the metric with the highest over-achievement rate from /home/user/Desktop/annual_kpi.xlsx, append to /home/user/Desktop/kpi_summary.txt: 'Highest Over-achievement: New Clients (Achievement 117.5%)', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/kpi_summary.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "New Clients",
+          "117.5%"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L3"
+}

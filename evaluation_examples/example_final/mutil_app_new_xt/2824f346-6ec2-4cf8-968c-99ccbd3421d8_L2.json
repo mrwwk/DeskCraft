@@ -4,11 +4,7 @@
   "difficulty": "L2",
   "snapshot": "os",
   "instruction": "Create the directory ~/Desktop/my_project and initialize a Git repository inside it using the terminal. Add a .gitignore file with two entries: 'node_modules/' and '*.log' (one per line). Then open VS Code and configure User Settings: set renderWhitespace to 'all' and tabSize to 4.",
-  "source": [
-    "https://git-scm.com/docs/gitignore",
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：新仓库创建时常见的“终端初始化 Git + 写 .gitignore + 收敛 VS Code 显示设置”开工流程"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "launch",

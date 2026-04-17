@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_008",
+  "instruction": "Enter the training plan information into the training ledger",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Training Plan\\nTraining Name: New Employee Orientation\\nTraining Date: 2025-04-07 to 2025-04-11\\nLocation: 3F Training Room\\nInstructor: HR Dept, Liao Yan\\nParticipants: 12\\nTraining Cost: 8500 CNY\\nTraining Objective: Understand company culture, policies and basic business processes' > /home/user/Desktop/training_plan.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Training Name'; ws['B1'] = 'Date'; ws['C1'] = 'Location'; ws['D1'] = 'Instructor'; ws['E1'] = 'Headcount'; ws['F1'] = 'Cost(CNY)'; wb.save('/home/user/Desktop/training_record.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Enter the training plan information into the training ledger",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the training information from /home/user/Desktop/training_plan.txt into /home/user/Desktop/training_record.xlsx row 2: A2='New Employee Orientation', B2='2025-04-07 to 2025-04-11', C2='3F Training Room', D2='Liao Yan', E2=12, F2=8500, save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/training_record.xlsx'); s = df.to_string(); print('PASSED' if 'Liao Yan' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

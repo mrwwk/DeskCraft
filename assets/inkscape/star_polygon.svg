@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="800" height="600" viewBox="0 0 800 600"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Five-pointed star -->
+  <path
+     id="star1"
+     style="fill:#ffd700;stroke:#b8860b;stroke-width:2"
+     d="M 200,50 L 235,140 330,140 255,195 280,285 200,235 120,285 145,195 70,140 165,140 Z"
+     inkscape:flatsided="false"
+     sodipodi:type="star"
+     sodipodi:sides="5"
+     sodipodi:cx="200"
+     sodipodi:cy="170"
+     sodipodi:r1="120"
+     sodipodi:r2="60"
+     sodipodi:arg1="-1.5707963"
+     sodipodi:arg2="-0.9424778" />
+  <!-- Hexagon -->
+  <path
+     id="hexagon1"
+     style="fill:#9370db;stroke:#4b0082;stroke-width:2"
+     d="M 550,150 L 637,200 637,300 550,350 463,300 463,200 Z" />
+  <!-- Triangle -->
+  <path
+     id="triangle1"
+     style="fill:#20b2aa;stroke:#008080;stroke-width:2"
+     d="M 200,400 L 300,550 100,550 Z" />
+</svg>

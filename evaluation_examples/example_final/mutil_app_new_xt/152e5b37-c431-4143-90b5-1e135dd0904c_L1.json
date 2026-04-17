@@ -4,10 +4,7 @@
   "difficulty": "L1",
   "snapshot": "os",
   "instruction": "A teammate has left the project's recommended editor settings in ~/Desktop/editor_prefs.html for everyone to read. Open this file in Chrome using the file:// protocol so you can review the preferences. The page shows tabSize=4 and fontSize=15. Apply these exact values to VS Code User Settings (editor.tabSize and editor.fontSize). Chrome must still be showing the file when you are done.",
-  "source": [
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：团队把推荐编辑器参数放在本地 handoff HTML 中，要求成员边看说明页边同步到本机 VS Code 的常见入职配置流程"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

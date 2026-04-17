@@ -4,10 +4,7 @@
   "difficulty": "L2",
   "snapshot": "multi_apps",
   "instruction": "The profile builder project in ~/Desktop/jsonmerge_app/ is producing incorrect merged settings because user-specific values are being overwritten by defaults. Read ISSUE.md, open the Python dictionary methods documentation in Chrome, and then use VS Code to fix the code so the test suite passes. After the repair, create ~/Desktop/jsonmerge_app/MERGE_FIXED.txt containing exactly `merge fixed`.",
-  "source": [
-    "https://docs.python.org/3/library/stdtypes.html#dict.update",
-    "现实场景构造来源：配置合并逻辑回归时，开发者对照标准库文档修复 defaults 覆盖用户配置问题的常见 Python 维护场景"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

@@ -274,6 +274,15 @@ anips2026_latex/
 
 # Local auxiliary repo
 Research-Paper-Writing-Skills/
+optimized_gimp_commands/
 
 # Local Hugging Face upload helper with embedded token
 scripts/bash/upload_hf_qcow2.sh
+
+# IDE and AI assistant config folders
+.claude/
+.codebuddy/
+.qwen/
+
+# Podman/libpod runtime data
+libpod/

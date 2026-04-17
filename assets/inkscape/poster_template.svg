@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="595.28" height="841.89" viewBox="0 0 595.28 841.89"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Layer: Background -->
+  <g
+     inkscape:groupmode="layer"
+     id="layer_bg"
+     inkscape:label="Background"
+     style="display:inline">
+    <rect
+       id="page_bg"
+       style="fill:#1a1a2e;stroke:none"
+       width="595.28"
+       height="841.89"
+       x="0"
+       y="0" />
+    <rect
+       id="top_bar"
+       style="fill:#e94560;stroke:none"
+       width="595.28"
+       height="8"
+       x="0"
+       y="0" />
+  </g>
+  <!-- Layer: Content -->
+  <g
+     inkscape:groupmode="layer"
+     id="layer_content"
+     inkscape:label="Content"
+     style="display:inline">
+    <text
+       id="poster_title"
+       xml:space="preserve"
+       style="font-size:60px;font-family:sans-serif;font-weight:bold;fill:#ffffff;text-anchor:middle"
+       x="297.64"
+       y="150">DESIGN</text>
+    <text
+       id="poster_subtitle"
+       xml:space="preserve"
+       style="font-size:28px;font-family:sans-serif;fill:#e94560;text-anchor:middle"
+       x="297.64"
+       y="200">CONFERENCE 2024</text>
+    <line
+       id="divider1"
+       style="stroke:#0f3460;stroke-width:3"
+       x1="100"
+       y1="230"
+       x2="495"
+       y2="230" />
+    <text
+       id="info_date"
+       xml:space="preserve"
+       style="font-size:20px;font-family:sans-serif;fill:#cccccc;text-anchor:middle"
+       x="297.64"
+       y="290">March 15-17, 2024</text>
+    <text
+       id="info_location"
+       xml:space="preserve"
+       style="font-size:18px;font-family:sans-serif;fill:#999999;text-anchor:middle"
+       x="297.64"
+       y="330">Convention Center, San Francisco</text>
+    <circle
+       id="featured_circle"
+       style="fill:none;stroke:#e94560;stroke-width:3"
+       cx="297.64"
+       cy="500"
+       r="100" />
+    <text
+       id="featured_text"
+       xml:space="preserve"
+       style="font-size:24px;font-family:sans-serif;font-weight:bold;fill:#ffffff;text-anchor:middle"
+       x="297.64"
+       y="495">FEATURED</text>
+    <text
+       id="featured_name"
+       xml:space="preserve"
+       style="font-size:18px;font-family:sans-serif;fill:#e94560;text-anchor:middle"
+       x="297.64"
+       y="520">SPEAKERS</text>
+  </g>
+  <!-- Layer: Footer -->
+  <g
+     inkscape:groupmode="layer"
+     id="layer_footer"
+     inkscape:label="Footer"
+     style="display:inline">
+    <rect
+       id="bottom_bar"
+       style="fill:#0f3460;stroke:none"
+       width="595.28"
+       height="60"
+       x="0"
+       y="781.89" />
+    <text
+       id="footer_text"
+       xml:space="preserve"
+       style="font-size:14px;font-family:sans-serif;fill:#ffffff;text-anchor:middle"
+       x="297.64"
+       y="818">www.designconference.com | #DesignConf2024</text>
+  </g>
+</svg>

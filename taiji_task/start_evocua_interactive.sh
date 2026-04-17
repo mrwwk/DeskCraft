@@ -84,14 +84,15 @@ LOG_FILE="${LOG_DIR}/run_evocua_interactive_$(date +%Y%m%d_%H%M%S).log"
 echo "Logging to: ${LOG_FILE}"
 export PLAYWRIGHT_BROWSERS_PATH=/cq_1/share_300000800/user/jackwkwang/pw-browsers
 # Call the interactive task pipeline using user_base_url
+#     --test_all_meta_path evaluation_examples/example_final_interactive_all.json \
 python ${CODE_PATH}/code/OSWorld/run_multienv_evocua_interactive.py \
     --test_all_meta_path evaluation_examples/example_final_interactive_all.json \
     --test_config_base_dir evaluation_examples/example_final \
     --provider_name docker \
     --headless \
-    --run_name EvoCUA-32B-20260105-interactive \
+    --run_name EvoCUA-32B-20260105-interactive_final5 \
     --path_to_vm docker_vm_data/new_env/Ubuntu.qcow2 \
-    --num_envs 15 \
+    --num_envs 7 \
     --max_steps 100 \
     --model "EvoCUA-32B-20260105" \
     --prompt_style S2 \

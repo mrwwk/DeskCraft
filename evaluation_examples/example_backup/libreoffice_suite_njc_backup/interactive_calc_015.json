@@ -1,0 +1,110 @@
+{
+    "id": "interactive_calc_015",
+    "snapshot": "libreoffice_calc",
+    "interactive": true,
+    "scenario_type": "progressive_refinement",
+    "scenario_description": "用户先让加Profit列，确认后再让追加Average汇总行。",
+    "user_persona": {
+        "expertise_level": "intermediate",
+        "communication_style": "casual_chinese"
+    },
+    "config": [
+        {
+            "type": "download",
+            "parameters": {
+                "files": [
+                    {
+                        "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/libreoffice_calc/1e8df695-bd1b-45b3-b557-e7d599cf7597/WeeklySales.xlsx",
+                        "path": "/home/user/Desktop/WeeklySales.xlsx"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+                ]
+            }
+        },
+        {
+            "type": "launch",
+            "parameters": {
+                "command": [
+                    "libreoffice",
+                    "--norestore",
+                    "--nologo",
+                    "--calc",
+                    "/home/user/Desktop/WeeklySales.xlsx"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 12
+            }
+        },
+        {
+            "type": "execute",
+            "parameters": {
+                "command": [
+                    "bash",
+                    "-c",
+                    "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+                ]
+            }
+        },
+        {
+            "type": "sleep",
+            "parameters": {
+                "seconds": 3
+            }
+        }
+    ],
+    "phases": [
+        {
+            "phase_id": 1,
+            "instruction": "帮我加一列Profit=Sales-COGS",
+            "trigger": {
+                "type": "step_count",
+                "value": 3
+            }
+        },
+        {
+            "phase_id": 2,
+            "instruction": "Profit列加好了，再在最后加一行，第一格写'Average'，计算各数值列的均值，保存",
+            "trigger": {
+                "type": "agent_done"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_calc"
+    ],
+    "evaluator": {
+        "func": "check_include_exclude",
+        "result": {
+            "type": "vm_command_line",
+            "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/WeeklySales.xlsx'); has_profit = 'Profit' in df.columns; col0 = df.iloc[:, 0].astype(str).str.lower(); has_avg = col0.str.contains('average').any(); print('PASSED' if has_profit and has_avg else 'FAILED')\""
+        },
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "include": [
+                    "PASSED"
+                ],
+                "exclude": [
+                    "FAILED"
+                ]
+            }
+        }
+    },
+    "proxy": false,
+    "fixed_ip": false,
+    "possibility_of_env_change": "low"
+}

@@ -4,11 +4,7 @@
   "difficulty": "L3",
   "snapshot": "multi_apps",
   "instruction": "The log processing project in ~/Desktop/log_pipeline/ is being handed over to a new owner. Read HANDOFF.json to get the new owner info, VS Code preferences, and documentation URL. Then use VS Code to do all of the following: update pipeline_config.yml so the appName and ownerEmail match the handoff; fix format_alert.py so the tests pass; apply the tabSize and ruler from the handoff to VS Code User Settings; and create MIGRATION_DONE.txt containing exactly `log pipeline migrated`. Keep the docsUrl from the handoff open in Chrome while you work.",
-  "source": [
-    "https://docs.python.org/3/library/logging.html",
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：日志处理服务交接时常见的“按 handoff 迁移 YAML 配置 + 修复脚本 + 同步编辑器规范 + 写 migration 标记”完整维护流程"
-  ],
+  "source": "authors",
   "config": [
     {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/log_pipeline')\nbase.mkdir(parents=True, exist_ok=True)\njson.dump({'appName': 'Alert Pipeline', 'ownerEmail': 'alerts@example.com', 'tabSize': 2, 'ruler': 88, 'docsUrl': 'https://docs.python.org/3/library/logging.html'}, open(base / 'HANDOFF.json', 'w'), indent=2)\n(base / 'pipeline_config.yml').write_text('appName: Old App\\nownerEmail: old@example.com\\n')\n(base / 'format_alert.py').write_text(\"\"\"def format_alert(service, level):\n    return f'[{level.lower()}] {service}'\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from format_alert import format_alert\n\ndef test():\n    assert format_alert('Payments', 'CRITICAL') == 'Payments [CRITICAL]'\n\"\"\")\nPY", "shell": true}},
     {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},

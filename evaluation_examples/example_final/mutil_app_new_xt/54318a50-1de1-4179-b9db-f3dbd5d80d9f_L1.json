@@ -1,22 +1,11 @@
 {
   "id": "54318a50-1de1-4179-b9db-f3dbd5d80d9f",
-  "task_slug": "privacy_checklist_dnt_and_editor_fontsize",
+  "task_slug": "chrome_dnt_vscode_fontsize",
   "difficulty": "L1",
   "snapshot": "os",
-  "instruction": "A privacy review checklist is saved at ~/Desktop/privacy_review.html. Open that file in Chrome using the file:// URL, follow the checklist by enabling 'Do Not Track' in Chrome and setting the VS Code editor font size to 16 in User Settings, and leave the checklist open in Chrome when you are done.",
-  "source": [
-    "https://support.google.com/chrome/answer/2790761",
-    "https://code.visualstudio.com/docs/getstarted/settings",
-    "现实场景构造来源：隐私评审前先统一浏览器 Do Not Track 与共享演示字号设置的常见合规准备流程"
-  ],
+  "instruction": "In Chrome, go to Settings → Privacy and security and enable 'Do Not Track'. Then open VS Code and set the editor font size to 16 in User Settings.",
+  "source": "authors",
   "config": [
-    {
-      "type": "execute",
-      "parameters": {
-        "command": "python3 - <<'PY'\nfrom pathlib import Path\nPath('/home/user/Desktop/privacy_review.html').write_text('<!DOCTYPE html><html><body><h1>Privacy Review Checklist</h1><ol><li>Enable Chrome Do Not Track before opening partner sites.</li><li>Set VS Code editor font size to 16 for shared review sessions.</li></ol></body></html>')\nPY",
-        "shell": true
-      }
-    },
     {
       "type": "launch",
       "parameters": {
@@ -28,22 +17,13 @@
       "parameters": {
         "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
       }
-    },
-    {
-      "type": "launch",
-      "parameters": {
-        "command": ["code"]
-      }
     }
   ],
   "trajectory": "trajectories/",
   "related_apps": ["chrome", "vscode"],
   "evaluator": {
-    "func": ["is_expected_active_tab_approximate", "check_include_exclude", "check_json_settings"],
+    "func": ["check_include_exclude", "check_json_settings"],
     "result": [
-      {
-        "type": "active_tab_info"
-      },
       {
         "type": "enable_do_not_track"
       },
@@ -54,13 +34,6 @@
       }
     ],
     "expected": [
-      {
-        "type": "rule",
-        "rules": {
-          "type": "url",
-          "url": "file:///home/user/Desktop/privacy_review.html"
-        }
-      },
       {
         "type": "rule",
         "rules": {

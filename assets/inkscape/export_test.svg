@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="1024" height="768" viewBox="0 0 1024 768"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Sky -->
+  <rect
+     id="sky"
+     style="fill:#87ceeb;stroke:none"
+     width="1024"
+     height="500"
+     x="0"
+     y="0" />
+  <!-- Ground -->
+  <rect
+     id="ground"
+     style="fill:#228b22;stroke:none"
+     width="1024"
+     height="268"
+     x="0"
+     y="500" />
+  <!-- Sun -->
+  <circle
+     id="sun"
+     style="fill:#ffd700;stroke:none"
+     cx="800"
+     cy="100"
+     r="60" />
+  <!-- Cloud 1 -->
+  <g id="cloud1">
+    <ellipse style="fill:#ffffff;stroke:none" cx="200" cy="120" rx="60" ry="30" />
+    <ellipse style="fill:#ffffff;stroke:none" cx="240" cy="100" rx="50" ry="25" />
+    <ellipse style="fill:#ffffff;stroke:none" cx="260" cy="120" rx="55" ry="28" />
+  </g>
+  <!-- Cloud 2 -->
+  <g id="cloud2">
+    <ellipse style="fill:#ffffff;stroke:none" cx="500" cy="80" rx="50" ry="25" />
+    <ellipse style="fill:#ffffff;stroke:none" cx="540" cy="65" rx="45" ry="22" />
+    <ellipse style="fill:#ffffff;stroke:none" cx="555" cy="80" rx="48" ry="24" />
+  </g>
+  <!-- House -->
+  <g id="house">
+    <rect
+       id="house_body"
+       style="fill:#cd853f;stroke:#8b4513;stroke-width:2"
+       width="150"
+       height="120"
+       x="400"
+       y="380" />
+    <path
+       id="roof"
+       style="fill:#8b0000;stroke:#660000;stroke-width:2"
+       d="M 380,380 L 475,300 570,380 Z" />
+    <rect
+       id="door"
+       style="fill:#654321;stroke:#333333;stroke-width:1"
+       width="40"
+       height="60"
+       x="455"
+       y="440" />
+    <rect
+       id="window1"
+       style="fill:#add8e6;stroke:#333333;stroke-width:1"
+       width="35"
+       height="35"
+       x="410"
+       y="400" />
+    <rect
+       id="window2"
+       style="fill:#add8e6;stroke:#333333;stroke-width:1"
+       width="35"
+       height="35"
+       x="510"
+       y="400" />
+  </g>
+  <!-- Tree -->
+  <g id="tree1">
+    <rect
+       id="trunk1"
+       style="fill:#8b4513;stroke:none"
+       width="20"
+       height="80"
+       x="140"
+       y="420" />
+    <circle
+       id="foliage1"
+       style="fill:#006400;stroke:none"
+       cx="150"
+       cy="400"
+       r="60" />
+  </g>
+  <!-- Title text -->
+  <text
+     id="scene_title"
+     xml:space="preserve"
+     style="font-size:14px;font-family:sans-serif;fill:#333333"
+     x="20"
+     y="750">Scene: Countryside Landscape</text>
+</svg>

@@ -4,10 +4,7 @@
   "difficulty": "L3",
   "snapshot": "multi_apps",
   "instruction": "A portfolio site handoff is waiting in ~/Desktop/portfolio_site/. Read HANDOFF.json to get the new owner profile and the reference docs URL. Then use VS Code to update _config.yml so it matches the handoff data and repair build_contact.py so the provided tests pass. Open the docsUrl from the handoff in Chrome while you work. When all changes are complete, create MIGRATION_DONE.txt in the project folder containing exactly `portfolio migrated`.",
-  "source": [
-    "https://docs.github.com/en/pages",
-    "现实场景构造来源：作品集站点换人维护时常见的“按 handoff 更新 YAML、修联系人生成脚本、打开托管文档并写迁移标记”站点迁移流程"
-  ],
+  "source": "authors",
   "config": [
     {
       "type": "execute",

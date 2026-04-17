@@ -4,10 +4,7 @@
   "difficulty": "L2",
   "snapshot": "multi_apps",
   "instruction": "The API client in ~/Desktop/url_client/ is building broken URLs when the base URL and endpoint contain leading or trailing slashes. Read ISSUE.md, open the urllib.parse urljoin documentation in Chrome, and use VS Code to repair the implementation so the tests pass. After the fix, create ~/Desktop/url_client/FIX_NOTE.txt containing exactly `url join fixed`.",
-  "source": [
-    "https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urljoin",
-    "现实场景构造来源：后端 API 客户端在 base URL 与 endpoint 规范不一致时，开发者对照 urllib 文档修复拼接逻辑的常见维护场景"
-  ],
+  "source": "authors",
   "config": [
     {"type": "execute", "parameters": {"command": "python3 - <<'PY'\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/url_client')\nbase.mkdir(parents=True, exist_ok=True)\n(base / 'ISSUE.md').write_text('Joining https://api.example.com/v1/ with /users should produce https://api.example.com/v1/users.\\n')\n(base / 'helpers.py').write_text(\"\"\"def join_url(base, endpoint):\n    return base + endpoint\n\"\"\")\n(base / 'client.py').write_text(\"\"\"from helpers import join_url\n\ndef user_url(base):\n    return join_url(base, '/users')\n\"\"\")\n(base / 'test.py').write_text(\"\"\"from client import user_url\n\ndef test():\n    assert user_url('https://api.example.com/v1/') == 'https://api.example.com/v1/users'\n    assert user_url('https://api.example.com/v1') == 'https://api.example.com/v1/users'\n\"\"\")\nPY", "shell": true}},
     {"type": "launch", "parameters": {"command": ["google-chrome", "--remote-debugging-port=1337"]}},

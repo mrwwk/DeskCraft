@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd"
+     width="800" height="600" viewBox="0 0 800 600"
+     id="svg_root">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px" />
+  <defs id="defs1" />
+  <!-- Left circle (red) -->
+  <circle
+     id="circle_left"
+     style="fill:#ff0000;fill-opacity:0.7;stroke:#990000;stroke-width:2"
+     cx="320"
+     cy="300"
+     r="120" />
+  <!-- Right circle (blue) -->
+  <circle
+     id="circle_right"
+     style="fill:#0000ff;fill-opacity:0.7;stroke:#000099;stroke-width:2"
+     cx="480"
+     cy="300"
+     r="120" />
+</svg>
