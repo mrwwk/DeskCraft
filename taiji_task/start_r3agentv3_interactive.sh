@@ -7,26 +7,26 @@
 bash $(dirname "$0")/install_taiji_client.sh
 
 # ============ 按需修改 ============
-MODEL_NAME="YOUR_MODEL_NAME"
-RUN_NAME="r3agentv3-interactive-${MODEL_NAME}"
+MODEL_NAME="0416-model"
+RUN_NAME="r3agentv3-interactive-${MODEL_NAME}-02"
 
 PROMPT_TYPE="l2"          # 提示词类型: l1, l2, l3
 HISTORY_N=4               # 历史消息数量
 COORD="relative"          # 坐标类型: absolute, relative
 
-NUM_ENVS=5                # 并行 Docker 容器数
+NUM_ENVS=15                # 并行 Docker 容器数
 MAX_STEPS=50              # 每个任务最大步数
-TEST_ALL_META_PATH="evaluation_examples/interactive_all.json"
-TEST_CONFIG_BASE_DIR="evaluation_examples"
-
+TEST_ALL_META_PATH="evaluation_examples/example_final_interactive_gpt54_all.json"
+TEST_CONFIG_BASE_DIR="evaluation_examples/example_final" 
+# example_final_interactive_gpt54_all.json
 TEMPERATURE=0
 TOP_P=0.9
 MAX_TOKENS=32768
 
 # User Simulator 配置（用于 interactive 任务）
-USER_BASE_URL="http://29.160.43.141:8000/v1"
+USER_BASE_URL="http://28.12.129.142:8000/v1"
 USER_API_KEY="EMPTY"
-USER_MODEL="Qwen3.5-122B-A10B"
+USER_MODEL="KimiK25"
 # ==================================
 
 CODE_PATH="/cq_1/share_300000800/user/jackwkwang"
@@ -108,7 +108,7 @@ echo "Result dir:    ${RESULT_DIR}"
 python ${CODE_PATH}/code/OSWorld/run_multienv_r3agentv3.py \
     --provider_name docker \
     --headless \
-    --path_to_vm docker_vm_data/new_env/Ubuntu.qcow2 \
+    --path_to_vm /home/Ubuntu.qcow2 \
     --num_envs ${NUM_ENVS} \
     --max_steps ${MAX_STEPS} \
     --model "${MODEL_NAME}" \

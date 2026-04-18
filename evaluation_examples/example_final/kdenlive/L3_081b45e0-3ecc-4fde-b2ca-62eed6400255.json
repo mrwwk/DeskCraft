@@ -1,0 +1,68 @@
+{
+  "id": "081b45e0-3ecc-4fde-b2ca-62eed6400255",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, create a title clip with the text 'Welcome to My Video' and add it to the beginning of the timeline on track V1 (approximately 3 seconds), then import '/home/user/Videos/6533277-hd_1920_1080_24fps.mp4' and place it right after the title on the same track, create another title clip with the text 'Thank You' and place it after the video (approximately 3 seconds), add 'Dissolve' transitions between the title and video clips, save the project to '/home/user/Videos/project.kdenlive', then render the final project to '/home/user/Videos/output.mp4'.",
+  "source": "https://docs.kdenlive.org/en/exporting/render.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_render_title_video_title",
+    "result": {
+      "type": "vm_file",
+      "path": [
+        "/home/user/Videos/output.mp4",
+        "/home/user/Videos/project.kdenlive"
+      ],
+      "dest": [
+        "output.mp4",
+        "project.kdenlive"
+      ],
+      "multi": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "min_duration": 5.0,
+        "expected_codec": "h264",
+        "expected_titles": [
+          "Welcome to My Video",
+          "Thank You"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

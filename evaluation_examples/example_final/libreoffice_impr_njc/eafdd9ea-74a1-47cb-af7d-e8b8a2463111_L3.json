@@ -1,0 +1,78 @@
+{
+  "id": "eafdd9ea-74a1-47cb-af7d-e8b8a2463111",
+  "task_slug": "impress_open_the_van_gogh_presentation_and_do_all",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open the Van Gogh presentation and do all of the following: (1) Slide 1: background dark blue (#00008B), all text yellow (#FFFF00), bold, 36pt. (2) ALL slides: titles bold and italic. (3) Slide 5: body text dark red (#8B0000) and italic. (4) Slide 4: title underlined (in addition to bold+italic from step 2). (5) Slide 6: add note: \"Art historians consider Starry Night, painted during Van Gogh's time at Saint-Remy asylum in June 1889, as one of the most recognized paintings in Western culture.\" (6) Slide 8: background light gray (#D3D3D3). (7) Slide 9: body text bold and purple (#800080). Save.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/eafdd9ea-74a1-47cb-af7d-e8b8a2463111/Vincent van Gogh_ A Life of Passion and Color.pptx",
+            "path": "/home/user/Desktop/Vincent van Gogh_ A Life of Passion and Color.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Vincent van Gogh_ A Life of Passion and Color.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/eafdd9ea-74a1-47cb-af7d-e8b8a2463111",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Vincent van Gogh_ A Life of Passion and Color.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "VanGogh_L3.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Vincent van Gogh_ A Life of Passion and Color.pptx",
+      "dest": "Vincent van Gogh_ A Life of Passion and Color.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
