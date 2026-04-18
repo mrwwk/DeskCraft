@@ -7,7 +7,7 @@ bash $(dirname "$0")/install_taiji_client.sh
 
 # ============ 按需修改 ============
 MODEL_NAME="0416-model"
-RUN_NAME="r3agentv3-${MODEL_NAME}"
+RUN_NAME="r3agentv3-${MODEL_NAME}-02"
 
 PROMPT_TYPE="l2"          # 提示词类型: l1, l2, l3
 HISTORY_N=4               # 历史消息数量
@@ -18,7 +18,7 @@ NUM_ENVS=15              # 并行 Docker 容器数
 MAX_STEPS=100              # 每个任务最大步数
 TEST_ALL_META_PATH="evaluation_examples/example_final_non_interactive_gpt54_all.json"
 TEST_CONFIG_BASE_DIR="evaluation_examples/example_final"   # task JSON 根目录
-
+# /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/code/OSWorld/evaluation_examples/
 TEMPERATURE=0
 TOP_P=0.9
 MAX_TOKENS=32768
@@ -93,10 +93,10 @@ echo "History N:   ${HISTORY_N}"
 echo "Coordinate:  ${COORD}"
 echo "Result dir:  ${RESULT_DIR}"
 
-python ${CODE_PATH}/code/OSWorld/run_multienv_r3agentv3.py \
+python3 ${CODE_PATH}/code/OSWorld/run_multienv_r3agentv3.py \
     --provider_name docker \
     --headless \
-    --path_to_vm docker_vm_data/new_env/Ubuntu.qcow2 \
+    --path_to_vm /home/Ubuntu.qcow2 \
     --num_envs ${NUM_ENVS} \
     --max_steps ${MAX_STEPS} \
     --model "${MODEL_NAME}" \

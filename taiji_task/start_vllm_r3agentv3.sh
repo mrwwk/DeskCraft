@@ -5,13 +5,13 @@
 # 硬件: 8 x H20 (96GB/卡)，模型: 32B FP8 量化
 
 # ============ 按需修改 ============
-MODEL_PATH="/home/"   # 模型路径
+MODEL_PATH="/home/0416-model"   # 模型路径
 MODEL_NAME="0416-model"
 
 # 8xH20 + 32B FP8：单卡可放下（权重约 32GB << 96GB），
 # 首选纯 DP 以获得更高吞吐并避免 TP NCCL 通信开销
-TENSOR_PARALLEL_SIZE=1
-DATA_PARALLEL_SIZE=8
+TENSOR_PARALLEL_SIZE=2
+DATA_PARALLEL_SIZE=4
 PORT=8000
 
 # 显存 / KV Cache 参数（若仍 OOM，按注释顺序继续下调）
@@ -55,7 +55,6 @@ vllm serve "${MODEL_PATH}" \
     ${VLLM_DP_ARGS} \
     --port ${PORT} \
     --served-model-name "${MODEL_NAME}" \
-    --max-model-len ${MAX_MODEL_LEN} \
     --max-num-seqs ${MAX_NUM_SEQS} \
     --gpu-memory-utilization ${GPU_MEM_UTIL} \
     --swap-space 4

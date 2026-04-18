@@ -1,0 +1,78 @@
+{
+  "id": "c425a255-7bcd-4840-a1c7-042ca352d969",
+  "task_slug": "impress_open_the_tencent_2025_interim_report_and_perform",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open the Tencent 2025 Interim Report and perform these changes: (1) On slide 1, set background to navy (#003366), all text white, bold, 40pt. (2) On ALL slides, make titles bold and 32pt. (3) On slide 3, make body text italic. (4) On slide 4, add this note: \"Board recommendation: Approve the proposed final dividend of HK$4.40 per share for the fiscal year ending June 2025.\" (5) On slide 6, set background to light gray (#D3D3D3) and all text to dark blue (#00008B). Save.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/c425a255-7bcd-4840-a1c7-042ca352d969/Tencent Holdings Limited - 2025 Interim Report.pptx",
+            "path": "/home/user/Desktop/Tencent Holdings Limited - 2025 Interim Report.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Tencent Holdings Limited - 2025 Interim Report.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/c425a255-7bcd-4840-a1c7-042ca352d969",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Tencent Holdings Limited - 2025 Interim Report.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Tencent_L3.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Tencent Holdings Limited - 2025 Interim Report.pptx",
+      "dest": "Tencent Holdings Limited - 2025 Interim Report.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}
