@@ -26,6 +26,12 @@
       }
     },
     {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 5
+      }
+    },
+    {
       "type": "chrome_open_tabs",
       "parameters": {
         "urls_to_open": [
