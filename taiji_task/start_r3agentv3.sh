@@ -16,7 +16,8 @@ ADD_THOUGHT_PREFIX=""     # 需要时改为 "--add_thought_prefix"
 
 NUM_ENVS=15              # 并行 Docker 容器数
 MAX_STEPS=100              # 每个任务最大步数
-TEST_ALL_META_PATH="evaluation_examples/example_final_non_interactive_gpt54_all.json"
+TEST_ALL_META_PATH="evaluation_examples/example_final_non_interactive_all.json"
+# evaluation_examples/example_final_non_interactive_all.json
 TEST_CONFIG_BASE_DIR="evaluation_examples/example_final"   # task JSON 根目录
 # /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/code/OSWorld/evaluation_examples/
 TEMPERATURE=0

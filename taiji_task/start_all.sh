@@ -102,8 +102,8 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_evocua.py \
     --test_config_base_dir evaluation_examples/example_final \
     --headless \
     --path_to_vm docker_vm_data/new_env/Ubuntu.qcow2 \
-    --run_name EvoCUA-32B-20260105-not_interactive \
-    --num_envs 15 \
+    --run_name EvoCUA-32B-20260105-not_interactive_final \
+    --num_envs 5 \
     --max_steps 100 \
     --model "EvoCUA-32B-20260105" \
     --coordinate_type relative \
@@ -112,7 +112,7 @@ python ${CODE_PATH}/code/OSWorld/run_multienv_evocua.py \
     --resize_factor 32 \
     --temperature 0.01 \
     --max_tokens 32768 \
-    --test_all_meta_path evaluation_examples/example_final_non_interactive_gpt54_all.json 2>&1 | tee -a "${LOG_FILE}"
+    --test_all_meta_path evaluation_examples/example_final_non_interactive_all.json 2>&1 | tee -a "${LOG_FILE}"
 # /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/code/OSWorld/evaluation_examples/
 # /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/code/OSWorld/evaluation_examples/
 # /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/code/OSWorld/evaluation_examples/
