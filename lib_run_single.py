@@ -365,6 +365,91 @@ def run_single_example_opencua(agent, env, example, max_steps, instruction, args
         f.write(f"{result}\n")
     env.controller.end_recording(os.path.join(example_result_dir, "recording.mp4"))
 
+
+def run_single_example_kimi(agent, env, example, max_steps, instruction, args, example_result_dir, scores):
+    """Run a single task with KimiAgent.
+
+    KimiAgent.predict() returns a 3-tuple: (response_dict, actions, cot_dict).
+    - response_dict: the raw LLM message dict
+    - actions:       list of pyautogui code strings (or ["DONE"/"FAIL"/"WAIT"])
+    - cot_dict:      {"thought": ..., "action": ..., "code": ...}
+    """
+    runtime_logger = setup_logger(example, example_result_dir)
+
+    # Reset environment first to get fresh VM IP
+    env.reset(task_config=example)
+
+    # Reset agent state (clears history; vm_ip accepted as kwarg)
+    try:
+        agent.reset(runtime_logger, vm_ip=env.vm_ip)
+    except Exception:
+        agent.reset(vm_ip=env.vm_ip)
+
+    time.sleep(60)  # Wait for the environment to be ready
+    obs = env._get_obs()
+    done = False
+    step_idx = 0
+    env.controller.start_recording()
+    with open(os.path.join(example_result_dir, "task_instruction.jsonl"), "a") as f:
+        f.write(json.dumps({"instruction": instruction}, ensure_ascii=False))
+    while not done and step_idx < max_steps:
+        response, actions, cot = agent.predict(instruction, obs, step_idx=step_idx + 1)
+
+        for action in actions:
+            action_timestamp = datetime.datetime.now().strftime("%Y%m%d@%H%M%S%f")
+            if os.environ.get("GET_OBS_BEFORE_ACTION", "0") == "1":
+                obs = env._get_obs()
+                with open(
+                    os.path.join(
+                        example_result_dir,
+                        f"obs_before_step_{step_idx + 1}_{action_timestamp}.png"
+                    ),
+                    "wb",
+                ) as _f:
+                    _f.write(obs["screenshot"])
+            logger.info("Step %d: %s", step_idx + 1, action)
+            obs, reward, done, info = env.step(action, args.sleep_after_execution)
+
+            logger.info("Reward: %.2f", reward)
+            logger.info("Done: %s", done)
+            with open(
+                os.path.join(example_result_dir, f"step_{step_idx + 1}_{action_timestamp}.png"),
+                "wb",
+            ) as _f:
+                _f.write(obs["screenshot"])
+            with open(os.path.join(example_result_dir, "traj.jsonl"), "a", encoding="utf-8") as f:
+                f.write(
+                    json.dumps(
+                        {
+                            "step_num": step_idx + 1,
+                            "action_timestamp": action_timestamp,
+                            "action": action,
+                            "thought": cot.get("thought", ""),
+                            "natural_language_action": cot.get("action", ""),
+                            "response": response.get("content", "") if isinstance(response, dict) else str(response),
+                            "reward": reward,
+                            "done": done,
+                            "info": info,
+                            "screenshot_file": f"step_{step_idx + 1}_{action_timestamp}.png",
+                        },
+                        ensure_ascii=False,
+                    )
+                )
+                f.write("\n")
+            if done:
+                logger.info("The episode is done.")
+                break
+        step_idx += 1
+    time.sleep(20)  # Wait for the environment to settle
+    result = env.evaluate()
+    logger.info("Result: %.2f", result)
+    scores.append(result)
+    with open(os.path.join(example_result_dir, "result.txt"), "w", encoding="utf-8") as f:
+        f.write(f"{result}\n")
+    log_task_completion(example, result, example_result_dir, args)
+    env.controller.end_recording(os.path.join(example_result_dir, "recording.mp4"))
+
+
 def run_single_example_autoglm(agent, env, example, max_steps, instruction, args, example_result_dir, scores):
     runtime_logger = setup_logger(example, example_result_dir)
     try:

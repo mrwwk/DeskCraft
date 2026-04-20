@@ -219,6 +219,85 @@ def run_interactive_example_gpt54(
     _finalize_interactive_run(env, example, args, example_result_dir, scores, runtime_logger, interaction_log)
 
 
+def run_interactive_example_kimi(
+    agent,
+    env,
+    user_sim,
+    example,
+    max_steps,
+    instruction,
+    args,
+    example_result_dir,
+    scores,
+):
+    runtime_logger, obs, current_instruction, interaction_log = _start_interactive_run(
+        agent,
+        env,
+        user_sim,
+        example,
+        example_result_dir,
+    )
+
+    done = False
+    step_idx = 0
+    turn_idx = 0
+    while not done and step_idx < max_steps:
+        response, actions, info_dict = agent.predict(current_instruction, obs)
+        response_text, response_meta = _normalize_response(response)
+        turn_idx += 1
+        for action in actions:
+            if isinstance(action, str) and action.strip().upper() == "CALL_USER":
+                logger.info("Step %d: CALL_USER (skipped env.step)", step_idx + 1)
+                continue
+
+            action_timestamp = datetime.datetime.now().strftime("%Y%m%d@%H%M%S%f")
+            logger.info("Step %d: %s", step_idx + 1, action)
+            obs, reward, done, info = env.step(action, args.sleep_after_execution)
+            step_idx += 1
+
+            logger.info("Reward: %.2f", reward)
+            logger.info("Done: %s", done)
+
+            _save_step_artifacts(
+                example_result_dir,
+                step_idx,
+                action_timestamp,
+                obs,
+                {
+                    "step_num": step_idx,
+                    "action_timestamp": action_timestamp,
+                    "action": action,
+                    "response": response_text,
+                    "reward": reward,
+                    "done": done,
+                    "info": info,
+                    "phase": user_sim.current_phase_idx + 1,
+                    "screenshot_file": f"step_{step_idx}_{action_timestamp}.png",
+                },
+            )
+
+            if done:
+                logger.info("The episode is done (agent reported DONE/FAIL).")
+                break
+            if step_idx >= max_steps:
+                break
+
+        done, should_stop = _handle_user_interaction(
+            agent=agent,
+            user_sim=user_sim,
+            response_text=response_text,
+            obs=obs,
+            agent_signal=actions,
+            done=done,
+            turn_idx=turn_idx,
+            interaction_log=interaction_log,
+        )
+        if should_stop:
+            break
+
+    _finalize_interactive_run(env, example, args, example_result_dir, scores, runtime_logger, interaction_log)
+
+
 def _start_interactive_run(agent, env, user_sim, example, example_result_dir):
     runtime_logger = _setup_logger(example, example_result_dir)
 

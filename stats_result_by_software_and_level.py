@@ -31,6 +31,11 @@ SOFTWARE_CATEGORIES = (
 SOFTWARE_ALIASES = {
     "multi_app": "multi_app",
     "multi_apps": "multi_app",
+    "mutil_app": "multi_app",
+    "mutil_apps": "multi_app",
+    "libreoffice_suite": "multi_app",
+    "libreoffice_multi_njc": "multi_app",
+    "multiapp": "multi_app",
     "calc": "calc",
     "libreoffice_calc": "calc",
     "impr": "impr",
@@ -441,16 +446,63 @@ def render_task_count_by_level(summary: dict, output_dir: Path, levels: list[str
         INTERACTIVE_LEVEL: "count_interactive",
         "UNKNOWN": "count_unknown",
     }
+    colors = [PLOT_COLORS[level_color_keys[level]] for level in levels]
 
-    fig, ax = plt.subplots(figsize=(8, 5.5))
-    ax.bar(levels, counts, color=[PLOT_COLORS[level_color_keys[level]] for level in levels])
-    ax.set_ylabel("Task count")
-    ax.set_title("Overall task counts by level")
-    ax.grid(axis="y", linestyle="--", alpha=0.3)
-    add_vertical_bar_labels(ax, counts)
+    # Filter out zero-count levels
+    non_zero = [(lvl, cnt, clr) for lvl, cnt, clr in zip(levels, counts, colors) if cnt > 0]
+    if not non_zero:
+        non_zero = list(zip(levels, counts, colors))
+    labels, sizes, pie_colors = zip(*non_zero)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    wedges, texts, autotexts = ax.pie(
+        sizes,
+        labels=labels,
+        colors=pie_colors,
+        autopct=lambda pct: f"{pct:.1f}%\n({int(round(pct / 100 * sum(sizes)))})",
+        startangle=90,
+        pctdistance=0.75,
+        wedgeprops={"linewidth": 1.0, "edgecolor": "white"},
+    )
+    for autotext in autotexts:
+        autotext.set_fontsize(9)
+    ax.set_title(f"Overall task counts by level  (total={sum(sizes)})", fontsize=13)
 
     fig.tight_layout()
     plot_path = output_dir / "task_count_by_level.png"
+    fig.savefig(plot_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    return plot_path
+
+
+def render_task_count_by_software_pie(summary: dict, output_dir: Path) -> Path:
+    software_counts = [
+        (software, stats["count"])
+        for software, stats in summary["by_software"].items()
+        if stats["count"] > 0
+    ]
+    software_counts.sort(key=lambda x: x[1], reverse=True)
+    labels, sizes = zip(*software_counts) if software_counts else ([], [])
+
+    cmap = plt.get_cmap("tab20")
+    colors = [cmap(i / max(len(labels), 1)) for i in range(len(labels))]
+
+    fig, ax = plt.subplots(figsize=(9, 7))
+    wedges, texts, autotexts = ax.pie(
+        sizes,
+        labels=labels,
+        colors=colors,
+        autopct=lambda pct: f"{pct:.1f}%\n({int(round(pct / 100 * sum(sizes)))})",
+        startangle=90,
+        pctdistance=0.78,
+        wedgeprops={"linewidth": 1.0, "edgecolor": "white"},
+    )
+    for autotext in autotexts:
+        autotext.set_fontsize(8)
+    ax.set_title(f"Task counts by software  (total={sum(sizes)})", fontsize=13)
+
+    fig.tight_layout()
+    plot_path = output_dir / "task_count_by_software_pie.png"
     fig.savefig(plot_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
     return plot_path
@@ -524,6 +576,7 @@ def render_visualizations(summary: dict, output_dir: Path) -> list[Path]:
         render_dashboard(summary, output_dir, levels),
         render_task_count_by_software(summary, output_dir, levels),
         render_task_count_by_level(summary, output_dir, levels),
+        render_task_count_by_software_pie(summary, output_dir),
         render_score_distribution(summary, output_dir),
     ]
     output_paths.extend(render_score_distribution_by_software(summary, output_dir))
