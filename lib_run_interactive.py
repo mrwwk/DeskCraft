@@ -89,7 +89,10 @@ def run_interactive_example(
             done=done,
             turn_idx=turn_idx,
             interaction_log=interaction_log,
+            runtime_logger=runtime_logger,
         )
+        if not user_sim.all_phases_complete:
+            current_instruction = user_sim.current_phase.get("instruction", current_instruction)
         if should_stop:
             break
 
@@ -208,7 +211,10 @@ def run_interactive_example_gpt54(
             done=done,
             turn_idx=turn_idx,
             interaction_log=interaction_log,
+            runtime_logger=runtime_logger,
         )
+        if not user_sim.all_phases_complete:
+            current_instruction = user_sim.current_phase.get("instruction", current_instruction)
         if should_stop:
             break
 
@@ -291,7 +297,10 @@ def run_interactive_example_kimi(
             done=done,
             turn_idx=turn_idx,
             interaction_log=interaction_log,
+            runtime_logger=runtime_logger,
         )
+        if not user_sim.all_phases_complete:
+            current_instruction = user_sim.current_phase.get("instruction", current_instruction)
         if should_stop:
             break
 
@@ -360,7 +369,9 @@ def _handle_user_interaction(
     done,
     turn_idx,
     interaction_log,
+    runtime_logger=None,
 ):
+    run_logger = runtime_logger if runtime_logger is not None else logger
     screenshot_b64 = None
     if obs.get("screenshot"):
         screenshot_b64 = base64.b64encode(obs["screenshot"]).decode("utf-8")
@@ -373,7 +384,7 @@ def _handle_user_interaction(
     # If the final phase is a normal agent_done-style completion, stop once the
     # agent reports completion instead of generating a redundant closing user turn.
     if done and is_last_phase and current_trigger_type != "agent_asks":
-        logger.info("[Interactive] Final non-agent_asks phase completed, ending without extra user response.")
+        run_logger.info("[Interactive] Final non-agent_asks phase completed, ending without extra user response.")
         return done, True
 
     if not user_sim.should_intervene(turn_idx, signal_for_trigger, screenshot_b64):
@@ -391,7 +402,7 @@ def _handle_user_interaction(
         and not is_unexpected_call_user
     )
     if early_advance:
-        logger.info(
+        run_logger.info(
             "[Interactive] %s trigger: advancing phase %d -> %d before generating message.",
             current_trigger_type,
             user_sim.current_phase_idx + 1,
@@ -408,7 +419,7 @@ def _handle_user_interaction(
 
     if is_unexpected_call_user:
         if user_response["phase_complete"]:
-            logger.warning(
+            run_logger.warning(
                 "[Interactive] CALL_USER on non-agent_asks phase (trigger=%s). Overriding phase_complete from True to False.",
                 current_trigger_type,
             )
@@ -425,7 +436,7 @@ def _handle_user_interaction(
         }
     )
 
-    logger.info(
+    run_logger.info(
         "[Interactive] Phase %d | User action: %s | Message: %s",
         user_sim.current_phase_idx + 1,
         user_response["action"],
@@ -449,7 +460,7 @@ def _handle_user_interaction(
     final_phase_idx = user_sim.current_phase_idx + (1 if phase_just_completed else 0)
 
     if done and final_phase_idx < len(user_sim.phases):
-        logger.info("[Interactive] Agent reported DONE but more phases remain. Continuing with new instruction.")
+        run_logger.info("[Interactive] Agent reported DONE but more phases remain. Continuing with new instruction.")
         done = False
         # Preserve conversation history (previous_response_id) so the agent
         # retains full context of what it already did.  The new phase instruction
@@ -463,12 +474,24 @@ def _handle_user_interaction(
     # blocks automatic phase advancement is an unexpected CALL_USER.
     if hasattr(agent, "receive_user_message"):
         agent.receive_user_message(user_response["message"])
+        if hasattr(agent, "user_message_history"):
+            persistent_msgs = getattr(agent, "user_message_history", []) or []
+            run_logger.info(
+                "[Interactive] Persistent user requirements count=%d",
+                len(persistent_msgs),
+            )
+            for idx, msg in enumerate(persistent_msgs, start=1):
+                run_logger.info(
+                    "[Interactive] Persistent user requirement %d: %s",
+                    idx,
+                    str(msg).replace("\n", " ")[:300],
+                )
 
     if phase_just_completed:
         user_sim.advance_phase(current_step_idx=turn_idx)
 
     if final_phase_idx >= len(user_sim.phases):
-        logger.info("[Interactive] All phases complete, ending interaction.")
+        run_logger.info("[Interactive] All phases complete, ending interaction.")
         return done, True
 
     return done, False

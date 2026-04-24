@@ -271,6 +271,7 @@ blender_screenshots/
 
 # LaTeX project
 anips2026_latex/
+emnlp-paper/
 
 # Local auxiliary repo
 Research-Paper-Writing-Skills/
@@ -286,3 +287,6 @@ scripts/bash/upload_hf_qcow2.sh
 
 # Podman/libpod runtime data
 libpod/
+
+# Model comparison output
+comparison_results/

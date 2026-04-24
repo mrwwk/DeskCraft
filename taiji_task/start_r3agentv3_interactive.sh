@@ -8,15 +8,15 @@ bash $(dirname "$0")/install_taiji_client.sh
 
 # ============ 按需修改 ============
 MODEL_NAME="0416-model"
-RUN_NAME="r3agentv3-interactive-${MODEL_NAME}-02"
+RUN_NAME="r3agentv3-interactive-${MODEL_NAME}-05"
 
 PROMPT_TYPE="l2"          # 提示词类型: l1, l2, l3
 HISTORY_N=4               # 历史消息数量
 COORD="relative"          # 坐标类型: absolute, relative
 
-NUM_ENVS=15                # 并行 Docker 容器数
+NUM_ENVS=20                # 并行 Docker 容器数
 MAX_STEPS=100              # 每个任务最大步数
-TEST_ALL_META_PATH="evaluation_examples/example_final_interactive_gpt54_all.json"
+TEST_ALL_META_PATH="evaluation_examples/example_final_interactive_all.json"
 TEST_CONFIG_BASE_DIR="evaluation_examples/example_final" 
 # example_final_interactive_gpt54_all.json
 TEMPERATURE=0

@@ -11,7 +11,7 @@ bash $(dirname "$0")/install_taiji_client.sh
 # ============ 按需修改 ============
 VLLM_BASE_URL="${VLLM_BASE_URL:-http://28.12.129.142:8000/v1}"
 MODEL_NAME="${MODEL_NAME:-KimiK25}"
-RUN_NAME="${RUN_NAME:-kimi-k25-interactive-${MODEL_NAME}-01}"
+RUN_NAME="${RUN_NAME:-kimi-k25-interactive-${MODEL_NAME}-02}"
 
 # 采样参数
 TEMPERATURE="${TEMPERATURE:-1}"

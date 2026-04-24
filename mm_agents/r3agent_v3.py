@@ -836,6 +836,8 @@ class R3AgentV3:
         # Interactive mode state
         self.is_interactive = False
         self.pending_user_messages: List[str] = []
+        # Persistent user updates that should remain visible across steps.
+        self.user_message_history: List[str] = []
 
     def predict(self, instruction: str, obs: Dict) -> List:
         """
@@ -844,11 +846,25 @@ class R3AgentV3:
         """
         # Consume pending user messages (from interactive phase transitions or call_user replies)
         pending_user_text = ""
+        pending_messages: List[str] = []
         if self.pending_user_messages:
+            pending_messages = [str(m) for m in self.pending_user_messages]
             pending_user_text = "\n\n".join(
-                f"[User Additional Message]:\n{m}" for m in self.pending_user_messages
+                f"[User Additional Message]:\n{m}" for m in pending_messages
             )
             self.pending_user_messages = []
+        persistent_user_text = ""
+        if self.user_message_history:
+            # Avoid same-turn duplication: messages newly injected this turn should
+            # appear only in the dedicated "newly added" block.
+            history_for_persistent = list(self.user_message_history)
+            for pending_msg in pending_messages:
+                if history_for_persistent and history_for_persistent[-1] == pending_msg:
+                    history_for_persistent.pop()
+            persistent_user_text = "\n\n".join(
+                f"[Persistent User Requirement {idx + 1}]:\n{m}"
+                for idx, m in enumerate(history_for_persistent)
+            )
 
         screenshot_bytes = obs["screenshot"]
 
@@ -889,8 +905,18 @@ Please generate the next move according to the UI screenshot, instruction and pr
 
 Instruction: {instruction}
 """
+        if persistent_user_text:
+            instruction_prompt += (
+                "\n\nFollow all persistent user requirements below unless a newer "
+                "requirement explicitly supersedes an older one.\n"
+                f"{persistent_user_text}\n"
+            )
         if pending_user_text:
-            instruction_prompt += f"\n{pending_user_text}\n"
+            instruction_prompt += (
+                "\nThe following message is newly added this turn and should be "
+                "treated as highest-priority update.\n"
+                f"{pending_user_text}\n"
+            )
 
         instruction_prompt += f"""
 Previous actions:
@@ -1212,7 +1238,14 @@ Previous actions:
         """Queue a user message to be injected at the next predict() call."""
         if not message:
             return
+        message = str(message).strip()
+        if not message:
+            return
+
         self.pending_user_messages.append(message)
+        # Keep a bounded persistent history so updates remain visible in later turns.
+        self.user_message_history.append(message)
+        self.user_message_history = self.user_message_history[-10:]
 
     def clear_terminal_state(self) -> None:
         """Called when agent reports DONE/FAIL but more phases remain.
@@ -1228,6 +1261,7 @@ Previous actions:
         self.responses = []
         self.screenshots = []
         self.pending_user_messages = []
+        self.user_message_history = []
 
     def reset(self, _logger=None, *args, **kwargs):
         global logger
@@ -1246,3 +1280,4 @@ Previous actions:
         self.screenshots = []
         self.is_interactive = False
         self.pending_user_messages = []
+        self.user_message_history = []
