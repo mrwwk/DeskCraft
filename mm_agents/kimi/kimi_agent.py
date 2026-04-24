@@ -344,6 +344,8 @@ class KimiAgent:
         # Interactive mode state
         self.is_interactive = False
         self.pending_user_messages: List[str] = []
+        # Persistent user updates that should remain visible across steps.
+        self.user_message_history: List[str] = []
 
     def reset(self, _logger=None, **kwargs):
         global logger
@@ -357,6 +359,7 @@ class KimiAgent:
         self.actions = []
         self.is_interactive = False
         self.pending_user_messages = []
+        self.user_message_history = []
     
     def _scale_scroll_for_windows(self, code: str, factor: int = 50) -> str:
         """ pyautogui.scroll has a different scale on Ubuntu and Windows, multiple 'factor' when scrolling on Windows system"""
@@ -395,11 +398,25 @@ class KimiAgent:
 
         # Consume pending user messages (from interactive phase transitions or call_user replies)
         pending_user_text = ""
+        pending_messages: List[str] = []
         if self.pending_user_messages:
+            pending_messages = [str(m) for m in self.pending_user_messages]
             pending_user_text = "\n\n".join(
-                f"[User Additional Message]:\n{m}" for m in self.pending_user_messages
+                f"[User Additional Message]:\n{m}" for m in pending_messages
             )
             self.pending_user_messages = []
+        persistent_user_text = ""
+        if self.user_message_history:
+            # Avoid same-turn duplication: messages newly injected this turn should
+            # appear only in the dedicated "newly added" block.
+            history_for_persistent = list(self.user_message_history)
+            for pending_msg in pending_messages:
+                if history_for_persistent and history_for_persistent[-1] == pending_msg:
+                    history_for_persistent.pop()
+            persistent_user_text = "\n\n".join(
+                f"[Persistent User Requirement {idx + 1}]:\n{m}"
+                for idx, m in enumerate(history_for_persistent)
+            )
 
         # Build system prompt — inject call_user tool def and suffix in interactive mode
         system_prompt = self.system_prompt
@@ -412,8 +429,18 @@ class KimiAgent:
                 "content": system_prompt
             })
         instruction_prompt = INSTRUCTION_TEMPLATE.format(instruction=instruction)
+        if persistent_user_text:
+            instruction_prompt += (
+                "\n\nFollow all persistent user requirements below unless a newer "
+                "requirement explicitly supersedes an older one.\n"
+                f"{persistent_user_text}\n"
+            )
         if pending_user_text:
-            instruction_prompt += f"\n{pending_user_text}\n"
+            instruction_prompt += (
+                "\nThe following message is newly added this turn and should be "
+                "treated as highest-priority update.\n"
+                f"{pending_user_text}\n"
+            )
 
         history_step_texts = []
         for i in range(len(self.actions)):
@@ -525,7 +552,14 @@ class KimiAgent:
         """Queue a user message to be injected at the next predict() call."""
         if not message:
             return
+        message = str(message).strip()
+        if not message:
+            return
+
         self.pending_user_messages.append(message)
+        # Keep a bounded persistent history so updates remain visible in later turns.
+        self.user_message_history.append(message)
+        self.user_message_history = self.user_message_history[-10:]
 
     def clear_terminal_state(self) -> None:
         """Called when agent reports DONE/FAIL but more phases remain.
@@ -539,6 +573,7 @@ class KimiAgent:
         self.cots = []
         self.actions = []
         self.pending_user_messages = []
+        self.user_message_history = []
 
     def call_llm(self, payload, model):
         """Call the LLM API.
