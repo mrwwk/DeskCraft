@@ -15,7 +15,7 @@
       "parameters": {
         "files": [
           {
-            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/vs_code/0512bb38-d531-4acf-9e7e-0add90816068/test.vsix",
+            "local_path": "assets/vscode_new/0512bb38-d531-4acf-9e7e-0add90816068/test.vsix",
             "path": "/home/user/test.vsix"
           }
         ]
