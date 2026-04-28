@@ -98,11 +98,38 @@ class Qwen3VLAgent:
         self.responses = []
         self.screenshots = []
 
+        self.is_interactive: bool = False
+        self.pending_user_messages = []
+        self.user_message_history = []
+
     def predict(self, instruction: str, obs: Dict) -> List:
         """
         Predict the next action(s) based on the current observation.
         Returns (response, pyautogui_code).
         """
+        pending_messages = []
+        if self.pending_user_messages:
+            pending_messages = [str(m) for m in self.pending_user_messages]
+            self.pending_user_messages = []
+        pending_block = ""
+        if pending_messages:
+            pending_block = "\n\n".join(
+                f"[User Additional Message]:\n{m}" for m in pending_messages
+            )
+        persistent_block = ""
+        if self.user_message_history:
+            history_for_persistent = list(self.user_message_history)
+            for pending_msg in pending_messages:
+                if history_for_persistent and history_for_persistent[-1] == pending_msg:
+                    history_for_persistent.pop()
+            if history_for_persistent:
+                persistent_block = "\n\n".join(
+                    f"[Persistent User Requirement {idx + 1}]:\n{m}"
+                    for idx, m in enumerate(history_for_persistent)
+                )
+        extra_blocks = "\n\n".join(b for b in [persistent_block, pending_block] if b)
+        if extra_blocks:
+            instruction = f"{instruction}\n\n{extra_blocks}"
         screenshot_bytes = obs["screenshot"]
 
         image = Image.open(BytesIO(screenshot_bytes))
@@ -591,8 +618,20 @@ Previous actions:
         if not content:
             return None
         
-        # Extract reasoning content if present (for thinking models)
-        reasoning_content = getattr(msg, "reasoning_content", None) if not isinstance(msg, dict) else msg.get("reasoning_content", None)
+        # Extract reasoning content if present (for thinking models).
+        # Field name varies by backend / parser version: DeepSeek convention is
+        # `reasoning_content`, current Qwen3 uses `reasoning`.
+        reasoning_content = None
+        for _k in ("reasoning_content", "reasoning", "thinking"):
+            if isinstance(msg, dict):
+                if msg.get(_k):
+                    reasoning_content = msg[_k]
+                    break
+            else:
+                v = getattr(msg, _k, None)
+                if v:
+                    reasoning_content = v
+                    break
         
         content_text = "".join(part.get("text", "") for part in content if isinstance(part, dict) and "text" in part)
         
@@ -644,6 +683,11 @@ Previous actions:
             "messages": messages,
             "max_tokens": self.max_tokens,
         }
+        # vLLM reads enable_thinking from chat_template_kwargs; also pass top-level
+        # for older parser builds. Only emit when the agent is configured for it.
+        if self.enable_thinking:
+            data["chat_template_kwargs"] = {"enable_thinking": True}
+            data["enable_thinking"] = True
 
         for attempt in range(1, MAX_RETRY_TIMES + 1):
             logger.info(f"[OpenAI] Generating content with model: {model} (attempt {attempt}/{MAX_RETRY_TIMES})")
@@ -651,7 +695,26 @@ Previous actions:
             try:
                 response = requests.post(api_url, headers=headers, json=data, timeout=600)
                 if response.status_code == 200:
-                    return response.json()["choices"][0]["message"]["content"]
+                    resp_json = response.json()
+                    msg_obj = resp_json["choices"][0]["message"]
+                    # vLLM `--reasoning-parser qwen3` puts stripped <think> content
+                    # into a vendor-extension field. Name varies: DeepSeek uses
+                    # `reasoning_content`, current Qwen3 parser uses `reasoning`.
+                    reasoning = None
+                    for _k in ("reasoning_content", "reasoning", "thinking"):
+                        if msg_obj.get(_k):
+                            reasoning = msg_obj[_k]
+                            break
+                    if reasoning:
+                        try:
+                            logger.info(
+                                "[Qwen3VLAgent][reasoning_content len=%d]: %s",
+                                len(reasoning),
+                                reasoning[:1500],
+                            )
+                        except Exception:
+                            pass
+                    return msg_obj["content"]
                 else:
                     error_msg = f"Request failed with status code {response.status_code}: {response.text}"
                     logger.error(f"[OpenAI] {error_msg}")
@@ -741,5 +804,33 @@ Previous actions:
         self.observations = []
         self.responses = []
         self.screenshots = []
+        self.is_interactive = False
+        self.pending_user_messages = []
+        self.user_message_history = []
+
+    def set_interactive_prompt(self, enable: bool = True) -> None:
+        self.is_interactive = enable
+
+    def receive_user_message(self, message: str) -> None:
+        if not message:
+            return
+        message = str(message).strip()
+        if not message:
+            return
+        self.pending_user_messages.append(message)
+        self.user_message_history.append(message)
+        self.user_message_history = self.user_message_history[-10:]
+
+    def clear_terminal_state(self) -> None:
+        self.pending_user_messages = []
+
+    def clear_done_from_history(self) -> None:
+        self.thoughts = []
+        self.actions = []
+        self.observations = []
+        self.responses = []
+        self.screenshots = []
+        self.pending_user_messages = []
+        self.user_message_history = []
 
 

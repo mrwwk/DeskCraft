@@ -186,6 +186,10 @@ class Qwen35VLAgent:
         self.responses: List[str] = []
         self.screenshots: List[str] = []
 
+        self.is_interactive: bool = False
+        self.pending_user_messages: List[str] = []
+        self.user_message_history: List[str] = []
+
     def _wrap_tool_response(self, parts: List[Dict]) -> List[Dict]:
         return (
             [{"type": "text", "text": "<tool_response>\n"}]
@@ -216,6 +220,30 @@ class Qwen35VLAgent:
         return sanitized
 
     def predict(self, instruction: str, obs: Dict) -> Tuple[str, List[str]]:
+        pending_messages: List[str] = []
+        if self.pending_user_messages:
+            pending_messages = [str(m) for m in self.pending_user_messages]
+            self.pending_user_messages = []
+        pending_block = ""
+        if pending_messages:
+            pending_block = "\n\n".join(
+                f"[User Additional Message]:\n{m}" for m in pending_messages
+            )
+        persistent_block = ""
+        if self.user_message_history:
+            history_for_persistent = list(self.user_message_history)
+            for pending_msg in pending_messages:
+                if history_for_persistent and history_for_persistent[-1] == pending_msg:
+                    history_for_persistent.pop()
+            if history_for_persistent:
+                persistent_block = "\n\n".join(
+                    f"[Persistent User Requirement {idx + 1}]:\n{m}"
+                    for idx, m in enumerate(history_for_persistent)
+                )
+        extra_blocks = "\n\n".join(b for b in [persistent_block, pending_block] if b)
+        if extra_blocks:
+            instruction = f"{instruction}\n\n{extra_blocks}"
+
         screenshot_bytes = obs["screenshot"]
 
         original_img = Image.open(BytesIO(screenshot_bytes))
@@ -825,7 +853,46 @@ class Qwen35VLAgent:
                     top_p=payload.get("top_p", self.top_p),
                     extra_body={"enable_thinking": self.enable_thinking},
                 )
-                content = response.choices[0].message.content
+                msg = response.choices[0].message
+                content = msg.content
+                # When vLLM is launched with `--reasoning-parser qwen3`, the
+                # <think>...</think> chain is stripped from `content` and exposed
+                # via a vendor-extension field. The exact field name varies by
+                # vLLM / parser version: DeepSeek convention uses
+                # `reasoning_content`, current Qwen3 parser builds use
+                # `reasoning`. Try both, and across (a) direct attribute,
+                # (b) Pydantic model_extra, (c) full model_dump dict.
+                reasoning_keys = ("reasoning_content", "reasoning", "thinking")
+                reasoning = None
+                for _key in reasoning_keys:
+                    val = getattr(msg, _key, None)
+                    if val:
+                        reasoning = val
+                        break
+                if reasoning is None:
+                    extra = getattr(msg, "model_extra", None) or {}
+                    for _key in reasoning_keys:
+                        if extra.get(_key):
+                            reasoning = extra[_key]
+                            break
+                if reasoning is None:
+                    try:
+                        dumped = msg.model_dump() if hasattr(msg, "model_dump") else {}
+                    except Exception:
+                        dumped = {}
+                    for _key in reasoning_keys:
+                        if dumped.get(_key):
+                            reasoning = dumped[_key]
+                            break
+                if reasoning and logger:
+                    try:
+                        logger.info(
+                            "[Qwen35VLAgent][reasoning_content len=%d]: %s",
+                            len(reasoning),
+                            reasoning[:1500],
+                        )
+                    except Exception:
+                        pass
                 return self._extract_content_text(content)
             except retryable_types as exc:
                 last_err = exc
@@ -955,3 +1022,31 @@ class Qwen35VLAgent:
         self.collapsed_message_count = 0
         self.sliced_message_count = 0
         self.full_messages_history = []
+        self.is_interactive = False
+        self.pending_user_messages = []
+        self.user_message_history = []
+
+    def set_interactive_prompt(self, enable: bool = True) -> None:
+        self.is_interactive = enable
+
+    def receive_user_message(self, message: str) -> None:
+        if not message:
+            return
+        message = str(message).strip()
+        if not message:
+            return
+        self.pending_user_messages.append(message)
+        self.user_message_history.append(message)
+        self.user_message_history = self.user_message_history[-10:]
+
+    def clear_terminal_state(self) -> None:
+        self.pending_user_messages = []
+
+    def clear_done_from_history(self) -> None:
+        self.thoughts = []
+        self.actions = []
+        self.observations = []
+        self.responses = []
+        self.screenshots = []
+        self.pending_user_messages = []
+        self.user_message_history = []
