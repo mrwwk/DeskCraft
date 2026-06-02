@@ -2,6 +2,10 @@
 
 DeskCraft is a benchmark for evaluating desktop GUI agents on realistic professional workflows and human-in-the-loop collaboration. It accompanies our paper, **"DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration"**.
 
+<p align="center">
+  <img src="figures/method2.png" alt="DeskCraft benchmark overview" width="95%">
+</p>
+
 Most desktop-agent benchmarks focus on short tasks where all user requirements are given upfront. DeskCraft moves closer to how people actually work on a computer: tasks can span many steps, require specialized software, produce saved or exported artifacts, and evolve as the user clarifies, interrupts, or revises the request.
 
 At a high level, DeskCraft asks whether GUI agents can:
