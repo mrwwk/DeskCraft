@@ -1,0 +1,77 @@
+{
+  "id": "f0e1ab09-6fbd-4b2c-a67f-ebc8717462c3",
+  "task_slug": "writer_open_guidel305docx_and_do_all_1_replace_techvision",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Guide_L3_05.docx\" and do ALL: (1) Replace \"TechVision Inc.\" with \"InnovateTech Corp.\" (2) Center title, set to 24pt bold. (3) Make all section headings bold and dark green (#006400). (4) Set all body text to 11pt. (5) Italic the body text under \"Week 4: Integration\". (6) Add at end: \"Questions? Contact your HR representative or email onboarding@innovatetech.com\"",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/f0e1ab09-6fbd-4b2c-a67f-ebc8717462c3/Guide_L3_05.docx",
+            "path": "/home/user/Desktop/Guide_L3_05.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Guide_L3_05.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/f0e1ab09-6fbd-4b2c-a67f-ebc8717462c3",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Guide_L3_05.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Guide_L3_05_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Guide_L3_05.docx",
+      "dest": "Guide_L3_05.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

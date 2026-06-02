@@ -1,0 +1,108 @@
+{
+  "id": "a1b00024-0024-4000-8000-000000000024",
+  "snapshot": "audacity",
+  "instruction": "The background noise is a bit heavy. Open /home/user/Documents/noisy_recording.wav, use 0s-0.5s as a noise sample for reduction, then amplify by +6 dB, apply fade-in to the first 2 seconds and fade-out to the last 2 seconds, export to /home/user/Documents/exports/clean_loud.wav, and save the project.",
+  "source": [
+    "https://manual.audacityteam.org/man/noise_reduction.html",
+    "https://manual.audacityteam.org/man/amplify.html",
+    "https://manual.audacityteam.org/man/fade_and_crossfade.html"
+  ],
+  "difficulty": "L3",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/noisy_recording.wav",
+            "path": "/home/user/Documents/noisy_recording.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/noisy_recording.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_duration",
+      "check_audio_fade_in",
+      "check_audio_fade_out",
+      "check_audio_rms_level"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/clean_loud.wav",
+        "dest": "clean_loud.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/clean_loud.wav",
+        "dest": "clean_loud.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/clean_loud.wav",
+        "dest": "clean_loud.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/clean_loud.wav",
+        "dest": "clean_loud.wav"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 14.0,
+          "tolerance": 0.5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "fade_duration": 2.0,
+          "num_windows": 5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "fade_duration": 2.0,
+          "num_windows": 5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "min_rms_db": -20.0,
+          "max_rms_db": -3.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

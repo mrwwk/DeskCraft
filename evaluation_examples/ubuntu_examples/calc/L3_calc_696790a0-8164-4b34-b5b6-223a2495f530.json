@@ -1,0 +1,107 @@
+{
+  "id": "696790a0-8164-4b34-b5b6-223a2495f530",
+  "task_slug": "calc_open_qtrcomprehensivel305xlsx_and_do_all_1_add_columns",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"QtrComprehensive_L3_05.xlsx\" and do ALL: (1) Add columns: \"Annual Revenue\" (J), \"Annual Cost\" (K), \"Annual Profit\" (L) = Revenue - Cost, \"Profit Margin %\" (M) = Profit/Revenue*100 (1 decimal). (2) Add a \"Total\" row (row 7) summing all columns (for Margin %, compute from the totals). (3) Sort data rows (not Total) by Annual Profit descending. (4) Bold header row. (5) Create \"QoQ_Growth\" sheet: Department, Q1-Q2 Growth %, Q2-Q3 Growth %, Q3-Q4 Growth % (all Revenue-based, 1 decimal). Dept order matches sorted data. (6) Freeze header row on Q1-Q4 sheet.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/696790a0-8164-4b34-b5b6-223a2495f530/QtrComprehensive_L3_05.xlsx",
+            "path": "/home/user/Desktop/QtrComprehensive_L3_05.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/QtrComprehensive_L3_05.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/696790a0-8164-4b34-b5b6-223a2495f530",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "QtrComprehensive_L3_05.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "QtrComprehensive_L3_05_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/QtrComprehensive_L3_05.xlsx",
+      "dest": "QtrComprehensive_L3_05.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_name"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNQ1-Q4",
+          "sheet_idx1": "ENQ1-Q4"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNQoQ_Growth",
+          "sheet_idx1": "ENQoQ_Growth"
+        },
+        {
+          "type": "freeze",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": [
+            "font_bold"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

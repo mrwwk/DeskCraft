@@ -1,0 +1,65 @@
+{
+  "id": "c5e9f0a1-2b34-4acd-d890-1e2f3a4b5c6d",
+  "task_slug": "firewall_rules",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Configure a complete firewall policy using UFW (Uncomplicated Firewall). (1) Reset UFW to defaults and enable it. (2) Set the default incoming policy to deny and default outgoing policy to allow. (3) Allow incoming SSH (port 22/tcp). (4) Allow incoming HTTP (port 80/tcp). (5) Allow incoming HTTPS (port 443/tcp). (6) Deny incoming traffic on port 3306/tcp (MySQL). (7) Add a source-based allow rule for subnet 10.0.0.0/24 to any port. (8) Enable UFW logging at medium level. (9) Create /etc/ufw/firewall_report.txt containing exactly these lines: 'ssh=allowed', 'http=allowed', 'https=allowed', 'mysql=denied', 'subnet_10=allowed', 'default_in=deny', 'default_out=allow'.",
+  "source": "外部参考来源：Ubuntu manpage - ufw(8) (https://manpages.ubuntu.com/manpages/jammy/en/man8/ufw.8.html)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'ufw --force reset; ufw --force disable; rm -f /etc/ufw/firewall_report.txt'",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_firewall_rules",
+    "result": {
+      "type": "vm_command_line",
+      "command": "ufw_active='false'; ufw status | grep -qi 'Status: active' && ufw_active='true'; ssh_ok='false'; ufw status | grep -q '22/tcp.*ALLOW' && ssh_ok='true'; http_ok='false'; ufw status | grep -q '80/tcp.*ALLOW' && http_ok='true'; https_ok='false'; ufw status | grep -q '443/tcp.*ALLOW' && https_ok='true'; mysql_deny='false'; ufw status | grep -q '3306/tcp.*DENY' && mysql_deny='true'; subnet_ok='false'; ufw status | grep -q '10.0.0.0/24' && subnet_ok='true'; default_deny='false'; ufw status verbose | grep -q 'Default: deny (incoming)' && default_deny='true'; default_allow_out='false'; ufw status verbose | grep -q 'allow (outgoing)' && default_allow_out='true'; logging_ok='false'; ufw status verbose | grep -qi 'Logging: on (medium)' && logging_ok='true'; report_ok='false'; expected_report=$(printf 'ssh=allowed\nhttp=allowed\nhttps=allowed\nmysql=denied\nsubnet_10=allowed\ndefault_in=deny\ndefault_out=allow\n'); actual_report=$(cat /etc/ufw/firewall_report.txt 2>/dev/null); [ \"$actual_report\" = \"$expected_report\" ] && report_ok='true'; echo \"ufw_active=$ufw_active\"; echo \"ssh_ok=$ssh_ok\"; echo \"http_ok=$http_ok\"; echo \"https_ok=$https_ok\"; echo \"mysql_deny=$mysql_deny\"; echo \"subnet_ok=$subnet_ok\"; echo \"default_deny=$default_deny\"; echo \"default_allow_out=$default_allow_out\"; echo \"logging_ok=$logging_ok\"; echo \"report_ok=$report_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "ufw_active": "true",
+          "ssh_ok": "true",
+          "http_ok": "true",
+          "https_ok": "true",
+          "mysql_deny": "true",
+          "subnet_ok": "true",
+          "default_deny": "true",
+          "default_allow_out": "true",
+          "logging_ok": "true",
+          "report_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "high"
+}

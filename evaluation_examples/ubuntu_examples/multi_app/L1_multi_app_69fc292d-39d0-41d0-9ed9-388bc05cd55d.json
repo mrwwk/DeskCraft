@@ -1,0 +1,64 @@
+{
+  "id": "69fc292d-39d0-41d0-9ed9-388bc05cd55d",
+  "task_slug": "chrome_bookmark_python_docs_file",
+  "difficulty": "L1",
+  "snapshot": "os",
+  "instruction": "The Python 3 documentation is already open in Chrome. Please bookmark this page to your bookmarks bar for easy access. Also create ~/Desktop/dev_links.txt containing the URL https://docs.python.org/3/ on the first line.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["google-chrome", "--remote-debugging-port=1337"]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://docs.python.org/3/"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["chrome", "os"],
+  "evaluator": {
+    "func": ["check_bookmark_contains_url", "check_include_exclude"],
+    "result": [
+      {
+        "type": "bookmarks"
+      },
+      {
+        "type": "vm_command_line",
+        "command": "cat /home/user/Desktop/dev_links.txt",
+        "shell": true
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "url_pattern": "docs.python.org/3"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "include": ["docs.python.org"],
+          "exclude": []
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": true,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

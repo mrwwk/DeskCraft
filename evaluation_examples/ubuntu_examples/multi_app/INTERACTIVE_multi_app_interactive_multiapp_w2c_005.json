@@ -1,0 +1,80 @@
+{
+  "id": "interactive_multiapp_w2c_005",
+  "instruction": "Help me enter the new employee information into the roster",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Onboarding Notice\\nName: Su Chenxi\\nEmployee ID: EMP20250316\\nDepartment: Product Dept\\nPosition: Product Manager\\nDirect Supervisor: Zhang Hua\\nStart Date: 2025-03-16\\nProbation Period: 3 months\\nSalary Level: P6' > /home/user/Desktop/employee_onboard.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"import openpyxl; wb = openpyxl.Workbook(); ws = wb.active; ws['A1'] = 'Employee ID'; ws['B1'] = 'Name'; ws['C1'] = 'Department'; ws['D1'] = 'Position'; ws['E1'] = 'Supervisor'; ws['F1'] = 'Start Date'; ws['G1'] = 'Level'; wb.save('/home/user/Desktop/employee_roster.xlsx')\""
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me enter the new employee information into the roster",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Fill the onboarding information from /home/user/Desktop/employee_onboard.txt into /home/user/Desktop/employee_roster.xlsx row 2: A2='EMP20250316', B2='Su Chenxi', C2='Product Dept', D2='Product Manager', E2='Zhang Hua', F2='2025-03-16', G2='P6', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/employee_roster.xlsx'); s = df.to_string(); print('PASSED' if 'EMP20250316' in s else 'FAILED')\""
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASSED"
+        ],
+        "exclude": [
+          "FAILED"
+        ]
+      }
+    }
+  },
+  "difficulty": "L3"
+}

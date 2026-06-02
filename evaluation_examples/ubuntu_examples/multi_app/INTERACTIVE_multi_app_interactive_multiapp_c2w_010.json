@@ -1,0 +1,78 @@
+{
+  "id": "interactive_multiapp_c2w_010",
+  "instruction": "Help me record the sales channel performance",
+  "source": "interactive",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "python3 -c \"\nimport openpyxl\nwb = openpyxl.Workbook()\nws = wb.active\nws['A1'] = 'Channel'\nws['B1'] = 'Visits'\nws['C1'] = 'Conversion Rate(%)'\nws['D1'] = 'Sales(10K CNY)'\nws['A2'] = 'Website'\nws['B2'] = 12500\nws['C2'] = 2.8\nws['D2'] = 35.0\nws['A3'] = 'Mini Program'\nws['B3'] = 8800\nws['C3'] = 5.2\nws['D3'] = 45.8\nws['A4'] = 'APP'\nws['B4'] = 6200\nws['C4'] = 6.1\nws['D4'] = 37.8\nws['A5'] = 'Third-party Platform'\nws['B5'] = 25000\nws['C5'] = 1.9\nws['D5'] = 47.5\nwb.save('/home/user/Desktop/sales_channels.xlsx')\n\""
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf '' > /home/user/Desktop/channel_report.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "interactive": true,
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me record the sales channel performance",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Find the channel with the highest conversion rate from /home/user/Desktop/sales_channels.xlsx, append to /home/user/Desktop/channel_report.txt: 'Highest Conversion Rate Channel: APP (6.1%)', save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/channel_report.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Highest Conversion Rate Channel: APP (6.1%)"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "difficulty": "L2"
+}

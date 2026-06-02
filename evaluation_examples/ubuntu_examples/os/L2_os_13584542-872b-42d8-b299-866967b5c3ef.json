@@ -1,0 +1,67 @@
+{
+  "id": "13584542-872b-42d8-b299-866967b5c3ef",
+  "task_slug": "terminal_size_persist",
+  "difficulty": "L2",
+  "snapshot": "os",
+  "instruction": "Configure terminal size to be persistent with 140 columns and 46 rows. Also create a backup of ~/.bashrc as ~/.bashrc.osworld.bak before applying changes. The setting must take effect in a newly opened terminal automatically.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cp ~/.bashrc ~/.bashrc.osworld.seed.bak >/dev/null 2>&1 || true; sed -i '/stty rows 46 cols 140/d' ~/.bashrc 2>/dev/null || true; rm -f ~/.bashrc.osworld.bak",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 1
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; time.sleep(0.5); pyautogui.hotkey('ctrl','alt','t'); time.sleep(0.6); pyautogui.write('stty size'); time.sleep(0.3); pyautogui.press('enter')"
+          ]
+        }
+      }
+    ],
+    "func": "check_os_terminal_size",
+    "result": {
+      "type": "vm_command_line",
+      "command": "backup_ok='false'; [ -f ~/.bashrc.osworld.bak ] && backup_ok='true'; count=$(grep -c 'stty rows 46 cols 140' ~/.bashrc 2>/dev/null || echo 0); bashrc_ok='false'; [ \"$count\" -eq 1 ] && bashrc_ok='true'; size=$(stty size 2>/dev/null || echo '0 0'); size_ok='false'; echo \"$size\" | grep -q '46 140' && size_ok='true'; echo \"backup_ok=$backup_ok\"; echo \"bashrc_ok=$bashrc_ok\"; echo \"size_ok=$size_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "rows": "46",
+        "cols": "140"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

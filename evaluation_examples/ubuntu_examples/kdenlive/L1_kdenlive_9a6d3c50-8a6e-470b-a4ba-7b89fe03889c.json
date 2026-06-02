@@ -1,0 +1,65 @@
+{
+  "id": "9a6d3c50-8a6e-470b-a4ba-7b89fe03889c",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, import two video files '/home/user/Videos/6533277-hd_1920_1080_24fps.mp4' and '/home/user/Videos/15368811_1920_1080_30fps.mp4' into the project bin, then delete '15368811_1920_1080_30fps.mp4' from the bin, and save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/project_and_asset_management/project_bin/clips.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          },
+          {
+            "local_path": "assets/kdenlive/15368811_1920_1080_30fps.mp4",
+            "path": "/home/user/Videos/15368811_1920_1080_30fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_kdenlive_bin_content",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Videos/project.kdenlive",
+      "dest": "project.kdenlive"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_present": [
+          "6533277-hd_1920_1080_24fps.mp4"
+        ],
+        "expected_absent": [
+          "15368811_1920_1080_30fps.mp4"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

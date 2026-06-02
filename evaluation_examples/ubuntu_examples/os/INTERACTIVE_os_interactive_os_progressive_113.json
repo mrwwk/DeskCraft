@@ -1,0 +1,81 @@
+{
+  "id": "interactive_os_progressive_113",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户要把笔记本调整成适合会议展示但又不失安全性的状态，先后补充电源策略、锁屏策略和审计文件要求。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "gsettings set org.gnome.settings-daemon.plugins.power idle-dim true; gsettings set org.gnome.desktop.session idle-delay 300; gsettings set org.gnome.desktop.screensaver lock-enabled false; gsettings set org.gnome.desktop.screensaver lock-delay 60; rm -f /home/user/Desktop/presentation_security.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5)"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "我要去做展示，先把系统在空闲时不要自动变暗。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "再把自动息屏也关掉，也就是 idle delay 设成 0。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "但是安全性还是要保留：把 screen lock 打开，并且 blank 以后立刻锁定，也就是 lock delay 设成 0。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 4,
+      "instruction": "最后在桌面写一个 presentation_security.txt，依次写这四行：idle-dim=false、idle-delay=0、lock-enabled=true、lock-delay=0。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "dim=$(gsettings get org.gnome.settings-daemon.plugins.power idle-dim 2>/dev/null | tr -d '[:space:]'); idle=$(gsettings get org.gnome.desktop.session idle-delay 2>/dev/null | grep -oE '[0-9]+' | head -1); locke=$(gsettings get org.gnome.desktop.screensaver lock-enabled 2>/dev/null | tr -d '[:space:]'); lockd=$(gsettings get org.gnome.desktop.screensaver lock-delay 2>/dev/null | grep -oE '[0-9]+' | head -1); expected=$(printf 'idle-dim=false\nidle-delay=0\nlock-enabled=true\nlock-delay=0'); actual=$(cat /home/user/Desktop/presentation_security.txt 2>/dev/null); if [ \"$dim\" = \"false\" ] && [ \"$idle\" = \"0\" ] && [ \"$locke\" = \"true\" ] && [ \"$lockd\" = \"0\" ] && [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

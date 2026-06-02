@@ -1,0 +1,62 @@
+{
+  "id": "b4d8e9f0-1a23-4fbc-c789-0d1e2f3a4b5c",
+  "task_slug": "systemd_custom_service",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Create a complete custom systemd service that runs a health-check script on a timer. (1) Write /usr/local/bin/healthcheck.sh — it should append the line 'health_ok <current UTC datetime>' to /var/log/healthcheck.log and exit 0. Make the script executable. (2) Create /etc/systemd/system/healthcheck.service — Type=oneshot, ExecStart=/usr/local/bin/healthcheck.sh, Description='System Health Check'. (3) Create /etc/systemd/system/healthcheck.timer — OnCalendar=*:0/10 (every 10 minutes), Persistent=true, Unit=healthcheck.service, Description='Health Check Timer'. (4) Reload systemd daemon, enable and start the timer. (5) Manually run the service once so that /var/log/healthcheck.log contains at least one 'health_ok' line. (6) Create /etc/healthcheck.conf with content 'enabled=true\ninterval=10m'.",
+  "source": "外部参考来源：Ubuntu manpage - systemctl(1) (https://manpages.ubuntu.com/manpages/jammy/en/man1/systemctl.1.html)；Ubuntu manpage - systemd.service(5) (https://manpages.ubuntu.com/manpages/jammy/en/man5/systemd.service.5.html)；Ubuntu manpage - systemd.timer(5) (https://manpages.ubuntu.com/manpages/jammy/en/man5/systemd.timer.5.html)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "echo {CLIENT_PASSWORD} | sudo -S bash -c 'systemctl stop healthcheck.timer 2>/dev/null; systemctl disable healthcheck.timer 2>/dev/null; rm -f /etc/systemd/system/healthcheck.service /etc/systemd/system/healthcheck.timer /usr/local/bin/healthcheck.sh /var/log/healthcheck.log /etc/healthcheck.conf; systemctl daemon-reload'",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; time.sleep(0.5); pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl', 'alt', 't'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_systemd_custom_service",
+    "result": {
+      "type": "vm_command_line",
+      "command": "script_ok='false'; [ -x /usr/local/bin/healthcheck.sh ] && grep -q 'health_ok' /usr/local/bin/healthcheck.sh && script_ok='true'; svc_ok='false'; [ -f /etc/systemd/system/healthcheck.service ] && grep -q 'Type=oneshot' /etc/systemd/system/healthcheck.service && grep -q 'ExecStart=/usr/local/bin/healthcheck.sh' /etc/systemd/system/healthcheck.service && svc_ok='true'; timer_ok='false'; [ -f /etc/systemd/system/healthcheck.timer ] && grep -q 'OnCalendar' /etc/systemd/system/healthcheck.timer && grep -qi 'Persistent=true' /etc/systemd/system/healthcheck.timer && timer_ok='true'; timer_active='false'; systemctl is-active healthcheck.timer >/dev/null 2>&1 && timer_active='true'; timer_enabled='false'; systemctl is-enabled healthcheck.timer >/dev/null 2>&1 && timer_enabled='true'; log_ok='false'; [ -f /var/log/healthcheck.log ] && grep -q 'health_ok' /var/log/healthcheck.log && log_ok='true'; conf_ok='false'; [ -f /etc/healthcheck.conf ] && grep -q 'enabled=true' /etc/healthcheck.conf && grep -q 'interval=10m' /etc/healthcheck.conf && conf_ok='true'; echo \"script_ok=$script_ok\"; echo \"svc_ok=$svc_ok\"; echo \"timer_ok=$timer_ok\"; echo \"timer_active=$timer_active\"; echo \"timer_enabled=$timer_enabled\"; echo \"log_ok=$log_ok\"; echo \"conf_ok=$conf_ok\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "script_ok": "true",
+          "svc_ok": "true",
+          "timer_ok": "true",
+          "timer_active": "true",
+          "timer_enabled": "true",
+          "log_ok": "true",
+          "conf_ok": "true"
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "medium"
+}

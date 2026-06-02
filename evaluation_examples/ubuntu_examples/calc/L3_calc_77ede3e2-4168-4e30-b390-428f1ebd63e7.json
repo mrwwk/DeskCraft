@@ -1,0 +1,112 @@
+{
+  "id": "77ede3e2-4168-4e30-b390-428f1ebd63e7",
+  "task_slug": "calc_open_empbudgetl307xlsx_and_do_all_1_add_salary",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Open \"EmpBudget_L3_07.xlsx\" and do ALL: (1) Add \"Salary Band\" (H): \"Senior\" if Salary >= 100000, \"Mid\" if >= 75000, \"Junior\" otherwise. (2) Sort by Performance descending, then Salary descending. (3) Bold header row. (4) Create \"BandSummary\" sheet: Salary Band, Count, Avg Salary (2 dec), Avg Performance (2 dec). Order: Senior, Mid, Junior. (5) Create \"LowPerformers\" sheet: Name, Department, Performance, Salary Band for employees with Performance < 3.5. (6) Freeze header row on Employees sheet.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/77ede3e2-4168-4e30-b390-428f1ebd63e7/EmpBudget_L3_07.xlsx",
+            "path": "/home/user/Desktop/EmpBudget_L3_07.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/EmpBudget_L3_07.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/77ede3e2-4168-4e30-b390-428f1ebd63e7",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "EmpBudget_L3_07.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "EmpBudget_L3_07_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/EmpBudget_L3_07.xlsx",
+      "dest": "EmpBudget_L3_07.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_name"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNEmployees",
+          "sheet_idx1": "ENEmployees"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNBandSummary",
+          "sheet_idx1": "ENBandSummary"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": "RNLowPerformers",
+          "sheet_idx1": "ENLowPerformers"
+        },
+        {
+          "type": "freeze",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "style",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0",
+          "props": [
+            "font_bold"
+          ]
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

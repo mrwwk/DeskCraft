@@ -1,0 +1,131 @@
+{
+  "id": "a1b00050-0050-4000-8000-000000000050",
+  "snapshot": "audacity",
+  "instruction": "I want this long audio organized into a deliverable version that is still easy to revise later. Open long_test.wav, delete two unnecessary sections, add 5 seconds of silence at the end, apply fade-in to the first 3 seconds and fade-out to the last 3 seconds, add labels Begin, Gap, and Silence, then export WAV and save the project as .aup3.",
+  "source": "https://manual.audacityteam.org/man/tutorial_editing_an_existing_file.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/long_test.wav",
+            "path": "/home/user/Documents/long_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/long_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_duration",
+      "check_audio_fade_in",
+      "check_audio_fade_out",
+      "check_audio_silence_at",
+      "check_aup3_labels"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/extended_edit.wav",
+        "dest": "extended_edit.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/extended_edit.wav",
+        "dest": "extended_edit.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/extended_edit.wav",
+        "dest": "extended_edit.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/extended_edit.wav",
+        "dest": "extended_edit.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/extended.aup3",
+        "dest": "extended.aup3"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 50.0,
+          "tolerance": 1.5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "fade_duration": 3.0,
+          "num_windows": 5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "fade_duration": 3.0,
+          "num_windows": 5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "start_time": 45.0,
+          "end_time": 49.0,
+          "max_rms_db": -40
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_labels": [
+            {
+              "time": 0.0,
+              "text": "Begin"
+            },
+            {
+              "time": 15.0,
+              "text": "Gap"
+            },
+            {
+              "time": 45.0,
+              "text": "Silence"
+            }
+          ],
+          "time_tolerance": 2.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

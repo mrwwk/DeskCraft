@@ -1,0 +1,67 @@
+{
+  "id": "interactive_os_requirement_change_112",
+  "snapshot": "os",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "用户先让 Agent 对值班日志做粗略筛选，随后改变要求，只保留真正需要升级处理的高优先级故障服务，并按新的规则生成报告。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "from pathlib import Path; base=Path('/home/user/Desktop/log_audit'); (base/'archive').mkdir(parents=True, exist_ok=True); (base/'current').mkdir(parents=True, exist_ok=True); (base/'report').mkdir(parents=True, exist_ok=True); (base/'current'/'app.log').write_text('2026-03-10 service=api level=ERROR status=503\\n2026-03-10 service=worker level=ERROR status=404\\n2026-03-10 service=billing level=CRITICAL status=500\\n', encoding='utf-8'); (base/'current'/'more.log').write_text('2026-03-10 service=api level=CRITICAL status=502\\n2026-03-10 service=search level=ERROR status=502\\n', encoding='utf-8'); (base/'archive'/'old.log').write_text('2026-02-01 service=legacy level=CRITICAL status=503\\n', encoding='utf-8'); p=base/'report'/'failing_services.txt'; p.unlink() if p.exists() else None"
+        ]
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先帮我把 ~/Desktop/log_audit/current 里出现过的 service 名称粗略汇总一下，暂时不用区分严重程度。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "我改一下标准：只统计 level 是 ERROR 或 CRITICAL 且 status 大于等于 500 的 service，而且 archive 目录下的日志要忽略。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "把最终结果按字母序去重后，每行一个 service，保存到 ~/Desktop/log_audit/report/failing_services.txt。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "expected=$(printf 'api\nbilling\nsearch'); actual=$(cat /home/user/Desktop/log_audit/report/failing_services.txt 2>/dev/null); if [ \"$actual\" = \"$expected\" ]; then echo PASS; else echo FAIL; fi",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

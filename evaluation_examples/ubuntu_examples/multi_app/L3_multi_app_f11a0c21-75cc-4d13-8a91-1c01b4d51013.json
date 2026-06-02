@@ -1,0 +1,82 @@
+{
+  "id": "f11a0c21-75cc-4d13-8a91-1c01b4d51013",
+  "task_slug": "reference_to_ops_dashboard",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Local materials are available in Chrome at file:///home/user/Desktop/reference_ops_dashboard_brief.html and file:///home/user/Desktop/reference_ops_dashboard_ref.html. Additional data and the icon asset are dropped in /home/user/Desktop/reference_ops_drop. Use the OS to move the dropped files into your project, then use VS Code to build /home/user/Desktop/reference_ops_dashboard. Create index.html, styles.css, app.js, and manifest.json. Load data.json with fetch(), render section#hero, div#filter-bar with exactly 3 buttons, section#metric-grid, canvas#opsChart, and aside#detail-drawer. Use the local assets/ops-wave.svg in the hero or chart area. Manifest must set project to reference-ops-dashboard, theme to midnight-wave, dataSource to data.json, and previewPort to 8133. Start a local preview server and finish with Chrome open at http://127.0.0.1:8133/index.html.",
+  "source": "https://www.frontendmentor.io/challenges/time-tracking-dashboard-UIQ7167Jw | https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch | https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial",
+  "config": [
+    { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "rm -rf /home/user/Desktop/reference_ops_dashboard /home/user/Desktop/reference_ops_drop && mkdir -p /home/user/Desktop/reference_ops_dashboard /home/user/Desktop/reference_ops_drop"] } },
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          { "local_path": "assets/ui_gen/l3_reference_ops_dashboard/brief.html", "path": "/home/user/Desktop/reference_ops_dashboard_brief.html" },
+          { "local_path": "assets/ui_gen/l3_reference_ops_dashboard/reference.html", "path": "/home/user/Desktop/reference_ops_dashboard_ref.html" },
+          { "local_path": "assets/ui_gen/l3_reference_ops_dashboard/data.json", "path": "/home/user/Desktop/reference_ops_drop/data.json" },
+          { "local_path": "assets/ui_gen/l3_reference_ops_dashboard/assets/ops-wave.svg", "path": "/home/user/Desktop/reference_ops_drop/ops-wave.svg" }
+        ]
+      }
+    },
+    { "type": "launch", "parameters": { "command": ["google-chrome", "--remote-debugging-port=1337"] } },
+    { "type": "launch", "parameters": { "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"] } },
+    { "type": "chrome_open_tabs", "parameters": { "urls_to_open": ["file:///home/user/Desktop/reference_ops_dashboard_ref.html", "file:///home/user/Desktop/reference_ops_dashboard_brief.html"] } },
+    { "type": "launch", "parameters": { "command": ["code", "/home/user/Desktop/reference_ops_dashboard"] } },
+    { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": ["os", "vscode", "chrome"],
+  "evaluator": {
+    "postconfig": [
+      { "type": "activate_window", "parameters": { "window_name": "Visual Studio Code" } },
+      { "type": "sleep", "parameters": { "seconds": 0.5 } },
+      { "type": "execute", "parameters": { "command": ["python", "-c", "import pyautogui, time; pyautogui.hotkey('ctrl','s'); time.sleep(0.5)"] } },
+      { "type": "execute", "parameters": { "command": ["/bin/bash", "-c", "cd /home/user/Desktop/reference_ops_dashboard && zip -qr /home/user/Desktop/reference_ops_dashboard_bundle.zip index.html styles.css app.js manifest.json data.json assets"] } }
+    ],
+    "func": ["is_expected_active_tab_approximate", "check_ui_previewable_generative_bundle"],
+    "conj": "and",
+    "result": [
+      { "type": "active_tab_info" },
+      { "type": "vm_file", "path": "/home/user/Desktop/reference_ops_dashboard_bundle.zip", "dest": "reference_ops_dashboard_bundle.zip" }
+    ],
+    "expected": [
+      { "type": "rule", "rules": { "type": "url", "url": "http://127.0.0.1:8133/index.html" } },
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": ["index.html", "styles.css", "app.js", "manifest.json", "data.json", "assets/ops-wave.svg"],
+          "expected_manifest": {
+            "project": "reference-ops-dashboard",
+            "theme": "midnight-wave",
+            "dataSource": "data.json",
+            "previewPort": 8133
+          },
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "section#hero" },
+              { "type": "selector_exists", "selector": "div#filter-bar" },
+              { "type": "selector_count", "selector": "div#filter-bar button", "count": 3 },
+              { "type": "selector_exists", "selector": "section#metric-grid" },
+              { "type": "selector_exists", "selector": "canvas#opsChart" },
+              { "type": "selector_exists", "selector": "aside#detail-drawer" }
+            ]
+          },
+          "required_file_patterns": {
+            "app.js": [
+              "fetch\\(['\"]data\\.json['\"]",
+              "getContext\\(['\"]2d['\"]\\)",
+              "addEventListener\\(['\"]click['\"]"
+            ]
+          },
+          "local_asset_links": {
+            "index.html": ["assets/ops-wave.svg"]
+          },
+          "forbid_remote_image_urls": true
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

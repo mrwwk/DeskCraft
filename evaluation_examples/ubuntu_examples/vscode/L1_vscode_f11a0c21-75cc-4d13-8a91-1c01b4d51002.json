@@ -1,0 +1,142 @@
+{
+  "id": "f11a0c21-75cc-4d13-8a91-1c01b4d51002",
+  "task_slug": "newsletter_inline_validation",
+  "difficulty": "L1",
+  "snapshot": "vscode",
+  "instruction": "Create a newsletter signup project in VS Code at /home/user/Desktop/newsletter_inline_validation. Create index.html, styles.css, and app.js. Build a page with main#app, form#newsletter-form, input#email, p#email-hint, p#error-message, div#success-message, and button#submit-button. Keep the error message and success message in the DOM. In app.js, add submit validation that prevents default submission, shows an error state when the email is empty or invalid, and shows the success message when the email is valid. Save all files.",
+  "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation | https://www.w3.org/WAI/tutorials/forms/validation/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "mkdir -p /home/user/Desktop/newsletter_inline_validation"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/newsletter_inline_validation"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/newsletter_inline_validation && zip -qr /home/user/Desktop/newsletter_inline_validation_bundle.zip index.html styles.css app.js"
+          ]
+        }
+      }
+    ],
+    "func": [
+      "check_ui_bundle_required_files",
+      "check_ui_bundle_required_patterns",
+      "check_ui_bundle_html_checks"
+    ],
+    "conj": "and",
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "required_files": [
+            "index.html",
+            "styles.css",
+            "app.js"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_patterns": {
+            "app.js": [
+              "addEventListener\\(['\"]submit['\"]",
+              "preventDefault\\(",
+              "(classList|setAttribute)",
+              "success-message"
+            ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "html_checks": {
+            "index.html": [
+              { "type": "selector_exists", "selector": "main#app" },
+              { "type": "selector_exists", "selector": "form#newsletter-form" },
+              { "type": "selector_exists", "selector": "input#email" },
+              { "type": "selector_exists", "selector": "p#email-hint" },
+              { "type": "selector_exists", "selector": "p#error-message" },
+              { "type": "selector_exists", "selector": "div#success-message" },
+              { "type": "selector_text_contains", "selector": "button#submit-button", "text": "Subscribe" }
+            ]
+          }
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/newsletter_inline_validation_bundle.zip",
+        "dest": "newsletter_inline_validation_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/newsletter_inline_validation_bundle.zip",
+        "dest": "newsletter_inline_validation_bundle.zip"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/newsletter_inline_validation_bundle.zip",
+        "dest": "newsletter_inline_validation_bundle.zip"
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

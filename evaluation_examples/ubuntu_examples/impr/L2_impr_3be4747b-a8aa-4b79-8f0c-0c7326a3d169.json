@@ -1,0 +1,80 @@
+{
+  "id": "3be4747b-a8aa-4b79-8f0c-0c7326a3d169",
+  "task_slug": "impress_in_game_theorypptx_1_on_slide_4_change",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_impress",
+  "instruction": "In \"Game Theory.pptx\": (1) On slide 4, change all body text to italic and dark blue (#00008B). (2) On slide 9, find the Pricing Game table and change the second row to: \"Firm A: Lower Prices\", \"(4, 4)\", \"(9, 2)\".",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/3be4747b-a8aa-4b79-8f0c-0c7326a3d169/Game Theory.pptx",
+            "path": "/home/user/Desktop/Game Theory.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Game Theory.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/3be4747b-a8aa-4b79-8f0c-0c7326a3d169",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Game Theory.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "GameTheory_L2.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Game Theory.pptx",
+      "dest": "Game Theory.pptx"
+    },
+    "options": {
+      "examine_shape": false
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

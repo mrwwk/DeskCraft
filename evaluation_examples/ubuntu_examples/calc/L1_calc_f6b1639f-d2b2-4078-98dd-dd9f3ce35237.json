@@ -1,0 +1,91 @@
+{
+  "id": "f6b1639f-d2b2-4078-98dd-dd9f3ce35237",
+  "task_slug": "calc_help_me_freeze_the_first_row_on_this",
+  "difficulty": "L1",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Help me freeze the first row on this sheet to keep the headers always visible when scrolling.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/f6b1639f-d2b2-4078-98dd-dd9f3ce35237/Inventory_Freeze_Row.xlsx",
+            "path": "/home/user/Inventory_Freeze_Row.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Inventory_Freeze_Row.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/f6b1639f-d2b2-4078-98dd-dd9f3ce35237",
+  "related_apps": [
+    "libreoffice calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Inventory_Freeze_Row.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Inventory_Freeze_Row_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Inventory_Freeze_Row.xlsx",
+      "dest": "Inventory_Freeze_Row.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "freeze",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        },
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

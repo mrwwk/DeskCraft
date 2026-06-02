@@ -1,0 +1,83 @@
+{
+  "id": "interactive_vscode_interruption_110",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "用户一开始让 Agent 起草内部事故报告，但在编辑过程中突然改成面向客户的说明，要求 Agent 丢弃中间草稿并完成新的文档。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/vscode_customer_update_110 && mkdir -p /home/user/Desktop/vscode_customer_update_110"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/vscode_customer_update_110"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先在当前项目里起草一个 incident_report.md，写标题 Incident Report，并加一条项目符号 API latency spike。",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "先别写事故报告了，改成给客户的说明。请删除 incident_report.md（如果已经建了），新建 customer_update.md，第一行写 # Customer Update，第二行写 We identified elevated API latency and are monitoring recovery.。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后再补一个二级标题 ## Next Update，并在下面写 Tomorrow 10:00 AM UTC。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "exact_match",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; report=Path('/home/user/Desktop/vscode_customer_update_110/incident_report.md'); update=Path('/home/user/Desktop/vscode_customer_update_110/customer_update.md'); expected='# Customer Update\\nWe identified elevated API latency and are monitoring recovery.\\n## Next Update\\nTomorrow 10:00 AM UTC\\n'; ok=(not report.exists()) and update.exists() and update.read_text(encoding='utf-8')==expected; print('PASS' if ok else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "PASS\n"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

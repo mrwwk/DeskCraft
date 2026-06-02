@@ -4,10 +4,6 @@ This directory contains all necessary assets and tools for Audacity-related OSWo
 
 ## Directory Structure
 - audio/: 20 WAV audio files for testing
-- projects/: Project utilities and analysis tools
-
-## Quick Start
-Test audio analysis: python3 assets/audacity/projects/audio_analysis.py assets/audacity/audio/sample.wav
 
 ## Audio Files Overview
 - Basic Tasks (L1): sample.wav, test.wav, speech.wav, edit_test.wav, duplicate_test.wav, delete_test.wav

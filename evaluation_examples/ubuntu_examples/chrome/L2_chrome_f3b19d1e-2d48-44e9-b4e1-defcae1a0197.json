@@ -1,0 +1,80 @@
+{
+  "id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+  "task_slug": "ticketek_delivery_faq_safe",
+  "difficulty": "L2",
+  "snapshot": "chrome",
+  "instruction": "On Ticketek, locate the FAQ page about ticket delivery, keep that FAQ tab open, and enable Safe Browsing protection.",
+  "source": "https://help.ticketek.com.au/hc/en-us/articles/360001880488-Ticket-Delivery-FAQs",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://premier.ticketek.com.au/"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "is_expected_active_tab",
+      "exact_match"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "enable_safe_browsing"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "type": "url",
+          "url": "https://help.ticketek.com.au/hc/en-us/articles/360001880488-Ticket-Delivery-FAQs"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

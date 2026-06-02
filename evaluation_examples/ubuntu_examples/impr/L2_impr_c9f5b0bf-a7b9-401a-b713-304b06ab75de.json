@@ -1,0 +1,78 @@
+{
+  "id": "c9f5b0bf-a7b9-401a-b713-304b06ab75de",
+  "task_slug": "impress_in_worksummarytemplateenglishpptx_1_on_slide_2_centeralign_body",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_impress",
+  "instruction": "In \"work_summary_template_english.pptx\": (1) On slide 2, center-align body text and make it italic. (2) Set ALL slides background to navy blue (#003366).",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/c9f5b0bf-a7b9-401a-b713-304b06ab75de/work_summary_template_english.pptx",
+            "path": "/home/user/Desktop/work_summary_template_english.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/work_summary_template_english.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/c9f5b0bf-a7b9-401a-b713-304b06ab75de",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "work_summary_template_english.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "WorkSummary_L2.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/work_summary_template_english.pptx",
+      "dest": "work_summary_template_english.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,109 @@
+{
+  "id": "interactive_audacity_ambiguous_001",
+  "snapshot": "audacity",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "The user starts with a vague interview-audio request and expects the agent to ask clarifying questions before carrying out precise edits and saving the project.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/interview_raw.wav",
+            "path": "/home/user/Documents/interview_raw.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/interview_raw.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "This interview does not sound professional. Please improve it for me.",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "I mean: do noise reduction first, delete the first 0-1.5 seconds, apply fade-out to the last 3 seconds, and export to /home/user/Documents/exports/interview_clean.wav.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Also save the Audacity project as /home/user/Documents/interview_clean.aup3.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_interactive_audacity_ia03",
+      "check_aup3_project_valid"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/interview_clean.wav",
+        "dest": "interview_clean.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/interview_clean.aup3",
+        "dest": "interview_clean.aup3"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 10.5,
+          "duration_tolerance": 1.0,
+          "fade_duration": 3.0,
+          "num_windows": 5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "min_track_count": 1,
+          "min_wave_tracks": 1
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "模糊需求需澄清的采访音频处理（“做专业点”→澄清后执行）"
+}

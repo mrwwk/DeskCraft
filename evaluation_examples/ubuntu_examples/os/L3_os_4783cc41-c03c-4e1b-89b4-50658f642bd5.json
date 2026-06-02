@@ -1,0 +1,63 @@
+{
+  "id": "4783cc41-c03c-4e1b-89b4-50658f642bd5",
+  "task_slug": "copy_dir_hierarchy",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "Copy only the directory hierarchy from /home/user/Desktop/source_tree to /home/user/Desktop/target_tree_hard recursively. Exclude any directory named tmp or .git and exclude any path under cache/. Do not copy any regular files. After finishing, create /home/user/Desktop/target_tree_hard/manifest_dirs.txt containing all copied relative directory paths, one per line, sorted alphabetically.",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf /home/user/Desktop/source_tree /home/user/Desktop/target_tree_hard; mkdir -p /home/user/Desktop/source_tree/projectA/src /home/user/Desktop/source_tree/projectA/tmp/a /home/user/Desktop/source_tree/projectA/.git/hooks /home/user/Desktop/source_tree/projectB/docs/api /home/user/Desktop/source_tree/projectB/cache/x /home/user/Desktop/source_tree/projectC/empty/sub; touch /home/user/Desktop/source_tree/projectA/src/main.py /home/user/Desktop/source_tree/projectB/docs/readme.md /home/user/Desktop/source_tree/projectC/empty/sub/keep.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui, time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5); pyautogui.hotkey('ctrl','alt','t'); time.sleep(0.5)"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Terminal"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_dir_hierarchy",
+    "result": {
+      "type": "vm_command_line",
+      "command": "base=/home/user/Desktop/target_tree_hard; projectA_src='false'; [ -d \"$base/projectA/src\" ] && projectA_src='true'; projectB_api='false'; [ -d \"$base/projectB/docs/api\" ] && projectB_api='true'; projectC_sub='false'; [ -d \"$base/projectC/empty/sub\" ] && projectC_sub='true'; no_tmp='false'; [ ! -d \"$base/projectA/tmp\" ] && no_tmp='true'; no_git='false'; [ ! -d \"$base/projectA/.git\" ] && no_git='true'; no_cache='false'; [ ! -d \"$base/projectB/cache\" ] && no_cache='true'; files_count=$(find \"$base\" -type f ! -name manifest_dirs.txt | wc -l); no_files='false'; [ \"$files_count\" = '0' ] && no_files='true'; expected=$(printf 'projectA\\nprojectA/src\\nprojectB\\nprojectB/docs\\nprojectB/docs/api\\nprojectC\\nprojectC/empty\\nprojectC/empty/sub\\n'); actual=$(cat \"$base/manifest_dirs.txt\" 2>/dev/null); manifest_match='false'; [ \"$actual\" = \"$expected\" ] && manifest_match='true'; echo \"projectA_src=$projectA_src\"; echo \"projectB_api=$projectB_api\"; echo \"projectC_sub=$projectC_sub\"; echo \"no_tmp=$no_tmp\"; echo \"no_git=$no_git\"; echo \"no_cache=$no_cache\"; echo \"no_files=$no_files\"; echo \"manifest_match=$manifest_match\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "checks": {
+          "projectA_src": "true",
+          "projectB_api": "true",
+          "projectC_sub": "true",
+          "no_tmp": "true",
+          "no_git": "true",
+          "no_cache": "true",
+          "no_files": "true"
+        },
+        "manifest_match": "true"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

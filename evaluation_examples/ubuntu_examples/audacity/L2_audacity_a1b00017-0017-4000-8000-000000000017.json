@@ -1,0 +1,75 @@
+{
+  "id": "a1b00017-0017-4000-8000-000000000017",
+  "snapshot": "audacity",
+  "instruction": "I want to mark the structure before further editing. Open /home/user/Documents/label_test.wav in Audacity, add a label track, and place labels Intro, Verse, Chorus, and Outro at 0.0s, 8.0s, 16.0s, and 24.0s, then save as /home/user/Documents/labeled.aup3.",
+  "source": "https://manual.audacityteam.org/man/label_tracks.html",
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/audacity/audio/label_test.wav",
+            "path": "/home/user/Documents/label_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/label_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_aup3_labels",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/labeled.aup3",
+      "dest": "labeled.aup3"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected_labels": [
+          {
+            "time": 0.0,
+            "text": "Intro"
+          },
+          {
+            "time": 8.0,
+            "text": "Verse"
+          },
+          {
+            "time": 16.0,
+            "text": "Chorus"
+          },
+          {
+            "time": 24.0,
+            "text": "Outro"
+          }
+        ],
+        "time_tolerance": 1.0
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

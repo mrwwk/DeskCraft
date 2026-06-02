@@ -1,0 +1,65 @@
+{
+  "id": "fd01151d-b729-47eb-a515-88064c768c13",
+  "snapshot": "inkscape",
+  "instruction": "Open /home/user/Documents/logo_design.svg in Inkscape. Resize the document to 800x800 pixels (File > Document Properties). Add a horizontal guide at position 400 (the vertical center of the document). Save the file.",
+  "source": "https://inkscape-manuals.readthedocs.io/en/latest/search.html?q=scale+document+size+guide",
+  "difficulty": "L2",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/inkscape/logo_design.svg",
+            "path": "/home/user/Documents/logo_design.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/logo_design.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_inkscape_l2_scale_guide",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/logo_design.svg",
+      "dest": "logo_design.svg"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "doc_check": {
+          "expected_width": "800",
+          "expected_height": "800"
+        },
+        "guide_check": {
+          "guide_orientation": "horizontal",
+          "guide_position": 400,
+          "tolerance": 5
+        }
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

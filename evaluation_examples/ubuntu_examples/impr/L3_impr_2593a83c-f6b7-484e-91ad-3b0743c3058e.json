@@ -1,0 +1,78 @@
+{
+  "id": "2593a83c-f6b7-484e-91ad-3b0743c3058e",
+  "task_slug": "impress_open_worksummarytemplateenglishpptx_and_apply_all_changes_1_slide",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_impress",
+  "instruction": "Open \"work_summary_template_english.pptx\" and apply all changes: (1) Slide 1: title bold, 48pt, underlined. Background navy (#003366), text white. (2) ALL slides: background navy (#003366). (3) Slide 2: body text center-aligned and italic. (4) ALL slides: titles bold and white (#FFFFFF). (5) Slide 4: body text bold, underlined, yellow (#FFFF00). (6) Slide 5: add note: \"Next steps: Finalize annual targets, distribute responsibility matrix to team leads, and set up monthly progress review cadence.\" (7) Slide 7: body text italic and teal (#008080). Save.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_impr_njc/2593a83c-f6b7-484e-91ad-3b0743c3058e/work_summary_template_english.pptx",
+            "path": "/home/user/Desktop/work_summary_template_english.pptx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/work_summary_template_english.pptx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/2593a83c-f6b7-484e-91ad-3b0743c3058e",
+  "related_apps": [
+    "libreoffice_impress"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "work_summary_template_english.pptx - LibreOffice Impress",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_pptx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "WorkSummary_L3.pptx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/work_summary_template_english.pptx",
+      "dest": "work_summary_template_english.pptx"
+    },
+    "options": null
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

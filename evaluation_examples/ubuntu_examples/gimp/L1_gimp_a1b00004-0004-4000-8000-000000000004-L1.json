@@ -1,0 +1,104 @@
+{
+  "id": "a1b00004-0004-4000-8000-000000000004-L1",
+  "snapshot": "gimp",
+  "instruction": "Please scale the current image down to 50% while keeping the aspect ratio.",
+  "source": "https://docs.gimp.org/2.10/en/gimp-image-scale.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/gimp_task/photos/architecture_247431.jpg",
+            "path": "/home/user/Desktop/architecture_247431.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "gimp",
+          "/home/user/Desktop/architecture_247431.jpg"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "gimp"
+  ],
+  "evaluator": {
+    "func": "check_b148e375_resize_50_percent",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/architecture_247431.jpg",
+      "dest": "architecture_247431.jpg"
+    },
+    "expected": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/architecture_half.png",
+      "dest": "architecture_half.png"
+    },
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "GNU Image Manipulation Program"
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey([\"ctrl\", \"a\"]); pyautogui.write(\"architecture_half.png\"); pyautogui.press([\"enter\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 2
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python3",
+            "-c",
+            "import pyautogui; pyautogui.press([\"enter\"])"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 5
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

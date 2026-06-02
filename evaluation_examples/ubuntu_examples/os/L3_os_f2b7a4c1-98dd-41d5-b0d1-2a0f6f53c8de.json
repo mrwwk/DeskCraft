@@ -1,0 +1,62 @@
+{
+  "id": "f2b7a4c1-98dd-41d5-b0d1-2a0f6f53c8de",
+  "task_slug": "recent_txt_manifest",
+  "difficulty": "L3",
+  "snapshot": "os",
+  "instruction": "In ~/Desktop/release_bundle, create ~/Desktop/release_bundle/output/recent_txt_manifest.csv with every .txt file modified within the last 10 days, excluding any file under a tmp directory. Each line must be formatted as relative_path,line_count and sorted by line_count (descending), then relative_path (ascending).",
+  "source": "外部参考来源：Canonical tutorial - Command line for beginners (https://ubuntu.com/tutorials/command-line-for-beginners)",
+  "trajectory": "trajectories/",
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "rm -rf ~/Desktop/release_bundle && mkdir -p ~/Desktop/release_bundle/docs ~/Desktop/release_bundle/notes ~/Desktop/release_bundle/module/x ~/Desktop/release_bundle/module/tmp ~/Desktop/release_bundle/old ~/Desktop/release_bundle/output",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "cat > ~/Desktop/release_bundle/docs/a.txt <<'EOF'\nalpha\nbeta\ngamma\nEOF\ncat > ~/Desktop/release_bundle/docs/b.txt <<'EOF'\nsolo\nEOF\ncat > ~/Desktop/release_bundle/notes/c.txt <<'EOF'\nline1\nline2\nline3\nEOF\ncat > ~/Desktop/release_bundle/module/x/info.txt <<'EOF'\n1\n2\n3\n4\n5\nEOF\ncat > ~/Desktop/release_bundle/module/tmp/skip.txt <<'EOF'\nshould\nbe\nexcluded\nEOF\ncat > ~/Desktop/release_bundle/old/legacy.txt <<'EOF'\nlegacy\nline\nold\nfile\nEOF\ncat > ~/Desktop/release_bundle/module/x/readme.md <<'EOF'\nnot a txt file\nEOF",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": "touch -d '2 days ago' ~/Desktop/release_bundle/docs/a.txt ~/Desktop/release_bundle/docs/b.txt ~/Desktop/release_bundle/notes/c.txt ~/Desktop/release_bundle/module/x/info.txt ~/Desktop/release_bundle/module/tmp/skip.txt && touch -d '20 days ago' ~/Desktop/release_bundle/old/legacy.txt",
+        "shell": true
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; pyautogui.click({SCREEN_WIDTH_HALF}, {SCREEN_HEIGHT_HALF}); time.sleep(0.5);"
+        ]
+      }
+    }
+  ],
+  "related_apps": [
+    "os"
+  ],
+  "evaluator": {
+    "func": "check_os_recent_manifest",
+    "result": {
+      "type": "vm_command_line",
+      "command": "[ -f ~/Desktop/release_bundle/output/recent_txt_manifest.csv ] && cat ~/Desktop/release_bundle/output/recent_txt_manifest.csv || echo '__MISSING__'",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": "module/x/info.txt,5\ndocs/a.txt,3\nnotes/c.txt,3\ndocs/b.txt,1"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

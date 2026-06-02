@@ -1,0 +1,142 @@
+{
+  "id": "e42d53eb-2f25-4938-9432-6ba77efca8e6",
+  "snapshot": "blender",
+  "instruction": "Open the Blender project /home/user/Documents/scene.blend. This is a kitchen table scene with TableTop, legs, Plate, Cup, and Floor. Do the following: (1) Create a material for \"TableTop\" with the wood texture /home/user/Documents/texture_wood.jpg as Base Color. (2) Create a material for \"Plate\" with white color (R=0.9, G=0.9, B=0.9) and Roughness 0.1. (3) Create a material for \"Cup\" with blue color (R=0.1, G=0.2, B=0.8) and Metallic 0.3. (4) Create a material for \"Floor\" using /home/user/Documents/texture_tiles.jpg as Base Color. (5) Set the Light energy to 800W. (6) Switch to Cycles with 128 samples and render to /home/user/Documents/kitchen_render.png at 1920×1080. Then save the project file.",
+  "source": "现实场景构造来源：家居视觉稿制作中的“厨房静帧场景材质、灯光与出图”工作流",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blender/kitchen_table.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/blender/check_material.py",
+            "path": "/tmp/check_material.py"
+          },
+          {
+            "local_path": "assets/blender/check_object.py",
+            "path": "/tmp/check_object.py"
+          },
+          {
+            "local_path": "assets/blender/check_render.py",
+            "path": "/tmp/check_render.py"
+          },
+          {
+            "local_path": "assets/blender/texture_wood.jpg",
+            "path": "/home/user/Documents/texture_wood.jpg"
+          },
+          {
+            "local_path": "assets/blender/texture_tiles.jpg",
+            "path": "/home/user/Documents/texture_tiles.jpg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_blender_multi_material_scene",
+      "check_blender_light_energy",
+      "check_blender_render_output"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_material.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_command_line",
+        "command": "/snap/bin/blender --background /home/user/Documents/scene.blend --python /tmp/check_object.py 2>&1 | grep '^RESULT:' | sed 's/^RESULT://'",
+        "shell": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/kitchen_render.png",
+        "dest": "kitchen_render.png"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "materials": [
+            {
+              "object_name": "TableTop",
+              "has_texture": "texture_wood.jpg"
+            },
+            {
+              "object_name": "Plate",
+              "expected_color": [
+                0.9,
+                0.9,
+                0.9,
+                1.0
+              ],
+              "roughness": 0.1
+            },
+            {
+              "object_name": "Cup",
+              "expected_color": [
+                0.1,
+                0.2,
+                0.8,
+                1.0
+              ],
+              "metallic": 0.3
+            },
+            {
+              "object_name": "Floor",
+              "has_texture": "texture_tiles.jpg"
+            }
+          ],
+          "tolerance": 0.05
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "light_name": "Light",
+          "energy": 800.0,
+          "tolerance": 50
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "width": 1920,
+          "height": 1080,
+          "format": "PNG"
+        }
+      }
+    ],
+    "conj": "and"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

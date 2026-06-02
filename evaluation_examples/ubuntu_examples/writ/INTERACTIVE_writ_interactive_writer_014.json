@@ -1,0 +1,108 @@
+{
+  "id": "interactive_writer_014",
+  "snapshot": "libreoffice_writer",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "The user first provides the meeting time for the agent to fill in, then provides the meeting location.",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "printf 'Meeting Notice\n\nIssued: July 5, 2025\n\nTo All Relevant Personnel:\n\nThe 2025 Q3 Planning Meeting will be held soon. Please attend on time.\n\nMeeting Topic: Q3 Goal Breakdown and Action Plan\nMeeting Time:\nMeeting Location:\nChair: General Manager Chen Gang\n\nAgenda:\n1. Q2 Work Summary\n2. Q3 Goals Presentation\n3. Departmental Action Plan Presentations\n\nAdministrative Department\n' > /home/user/Desktop/meeting_notice.txt"
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--writer",
+          "/home/user/Desktop/meeting_notice.txt"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Help me fill in the meeting time: August 15, 2025 at 9:00 AM",
+      "trigger": {
+        "type": "step_count",
+        "value": 3
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "Now add the meeting location: Main Conference Hall, 1st Floor, then save",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "cat /home/user/Desktop/meeting_notice.txt"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "Main Conference Hall, 1st Floor"
+        ],
+        "exclude": []
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

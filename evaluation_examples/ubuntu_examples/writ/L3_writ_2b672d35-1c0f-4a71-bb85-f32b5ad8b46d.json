@@ -1,0 +1,77 @@
+{
+  "id": "2b672d35-1c0f-4a71-bb85-f32b5ad8b46d",
+  "task_slug": "writer_open_reportl306docx_and_do_all_1_center_title",
+  "difficulty": "L3",
+  "snapshot": "libreoffice_writer",
+  "instruction": "Open \"Report_L3_06.docx\" and do ALL: (1) Center title, set to 22pt, bold, dark blue (#003366). (2) Make all section headings bold and underlined. (3) Set all body text to Calibri 11pt. (4) Make the paragraph starting with \"For 2026\" both bold and italic. (5) Add \"--- End of Report ---\" as the last paragraph.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_writ_njc/2b672d35-1c0f-4a71-bb85-f32b5ad8b46d/Report_L3_06.docx",
+            "path": "/home/user/Desktop/Report_L3_06.docx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Desktop/Report_L3_06.docx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/2b672d35-1c0f-4a71-bb85-f32b5ad8b46d",
+  "related_apps": [
+    "libreoffice_writer"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Report_L3_06.docx - LibreOffice Writer",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_docx_files",
+    "expected": {
+      "type": "cache_file",
+      "path": "Report_L3_06_gold.docx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/Report_L3_06.docx",
+      "dest": "Report_L3_06.docx"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

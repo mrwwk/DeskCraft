@@ -1,0 +1,86 @@
+{
+  "id": "27fdf845-4947-48cf-a282-8163a3941abf",
+  "task_slug": "calc_check_the_names_in_the_customer_names_with",
+  "difficulty": "L2",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Check the names in the \"Customer Names with Duplicates\" column and put the unique ones in the \"Unique Customers\" column. Keep the original order of first occurrences. Finish the work and don't touch irrelevant regions, even if they are blank.",
+  "source": "authors",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/libreoffice_calc_njc/27fdf845-4947-48cf-a282-8163a3941abf/Customer_Deduplicate.xlsx",
+            "path": "/home/user/Customer_Deduplicate.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Customer_Deduplicate.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/27fdf845-4947-48cf-a282-8163a3941abf",
+  "related_apps": [
+    "libreoffice calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Customer_Deduplicate.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey(\"ctrl\",\"s\"); time.sleep(1.5); pyautogui.press(\"return\"); time.sleep(0.5);"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": {
+      "type": "cache_file",
+      "path": "Customer_Deduplicate_gold.xlsx"
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Customer_Deduplicate.xlsx",
+      "dest": "Customer_Deduplicate.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "sheet_data",
+          "sheet_idx0": 0,
+          "sheet_idx1": "EI0"
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

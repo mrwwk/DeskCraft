@@ -1,0 +1,116 @@
+{
+  "id": "interactive_kdenlive_interruption_001",
+  "snapshot": "kdenlive",
+  "interactive": true,
+  "scenario_type": "interruption",
+  "scenario_description": "While building a livestream recap picture-in-picture edit, the user interrupts with late platform specs that require layout and export changes.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/kdenlive/15368811_1920_1080_30fps.mp4",
+            "path": "/home/user/Videos/15368811_1920_1080_30fps.mp4"
+          },
+          {
+            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Set up a PiP draft: place /home/user/Videos/15368811_1920_1080_30fps.mp4 on V1 as the main view and place /home/user/Videos/6533277-hd_1920_1080_24fps.mp4 on V2 as overlay.",
+      "trigger": {
+        "type": "step_count",
+        "value": 2
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "New platform request: move overlay to top-left, render at 1280x720 to /home/user/Videos/pip_720.mp4, and save project to /home/user/Videos/pip_720.kdenlive.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_kdenlive_render_pip",
+      "check_kdenlive_render_custom_resolution"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": [
+          "/home/user/Videos/pip_720.mp4",
+          "/home/user/Videos/pip_720.kdenlive"
+        ],
+        "dest": [
+          "pip_720.mp4",
+          "pip_720.kdenlive"
+        ],
+        "multi": true
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/pip_720.mp4",
+        "dest": "pip_720_for_resolution.mp4"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "min_duration": 1.0,
+          "expected_codec": "h264",
+          "main_file": "15368811_1920_1080_30fps.mp4",
+          "overlay_file": "6533277-hd_1920_1080_24fps.mp4",
+          "require_transform": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "min_duration": 1.0,
+          "expected_codec": "h264",
+          "expected_width": 1280,
+          "expected_height": 720
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "kdenlive_interactive;source_type=platform_change_request;source_ref=<id_or_url>;evidence=mid_process_interruption"
+}
