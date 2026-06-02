@@ -1,4 +1,4 @@
-# DeskCraft
+# 🖥️ DeskCraft
 
 DeskCraft is a benchmark for evaluating desktop GUI agents on realistic professional workflows and human-in-the-loop collaboration. It accompanies our paper, **"DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration"**.
 
@@ -10,25 +10,25 @@ At a high level, DeskCraft asks whether GUI agents can:
 - move from simple operations to longer delivery-style tasks;
 - collaborate with users across multiple turns instead of treating the initial instruction as final.
 
-## Highlights
+## ✨ Highlights
 
-- **538 executable desktop tasks**, including 386 standard tasks and 152 interactive tasks.
-- **Professional workflow coverage** across office software, browsers, development tools, creative design tools, multimedia editing, 3D creation, OS operations, and multi-app workflows.
-- **Human-in-the-loop task evolution** through deterministic phase triggers such as `agent_done`, `agent_asks`, and `step_count`.
-- **Execution-based verification** using programmatic evaluators over final desktop state, project files, exported artifacts, browser state, media metadata, and structured documents.
-- **Multiple agent runners** for UI-TARS, EvoCUA, Qwen-VL, Claude, Kimi, OpenAI CUA, AutoGLM, AGI, and other agents.
+- 📦 **538 executable desktop tasks**, including 386 standard tasks and 152 interactive tasks.
+- 🧰 **Professional workflow coverage** across office software, browsers, development tools, creative design tools, multimedia editing, 3D creation, OS operations, and multi-app workflows.
+- 🤝 **Human-in-the-loop task evolution** through deterministic phase triggers such as `agent_done`, `agent_asks`, and `step_count`.
+- ✅ **Execution-based verification** using programmatic evaluators over final desktop state, project files, exported artifacts, browser state, media metadata, and structured documents.
+- 🚀 **Multiple agent runners** for UI-TARS, EvoCUA, Qwen-VL, Claude, Kimi, OpenAI CUA, AutoGLM, AGI, and other agents.
 
-## Task Coverage
+## 🧭 Task Coverage
 
 DeskCraft covers 11 applications plus a multi-application workflow category:
 
-- LibreOffice Writer, Calc, and Impress
-- Chrome
-- VS Code
-- GIMP and Inkscape
-- Kdenlive, Audacity, and Blender
-- OS-level operations
-- Multi-app workflows
+- 📝 LibreOffice Writer, Calc, and Impress
+- 🌐 Chrome
+- 💻 VS Code
+- 🎨 GIMP and Inkscape
+- 🎬 Kdenlive, Audacity, and Blender
+- ⚙️ OS-level operations
+- 🔀 Multi-app workflows
 
 The benchmark contains:
 
@@ -37,7 +37,7 @@ The benchmark contains:
 - 538 tasks in total
 - 279 curated asset files across 19 file formats, including `.jpg`, `.png`, `.svg`, `.docx`, `.pptx`, `.xlsx`, `.blend`, `.wav`, `.mp4`, `.html`, `.js`, and `.json`
 
-## Interaction Protocol
+## 🤝 Interaction Protocol
 
 Interactive tasks are represented as a reproducible sequence of user phases. Each phase contains a user message and a trigger condition. When the trigger fires, the user simulator injects the next message into the agent session.
 
@@ -49,7 +49,7 @@ The core triggers are:
 
 The implementation also supports additional trigger types such as `agent_idle` and `llm_judge`. For a deeper walkthrough of interactive task construction and user simulation, see `README_INTERACTIVE.md`.
 
-## Repository Layout
+## 📁 Repository Layout
 
 ```text
 desktopworld/
@@ -73,7 +73,7 @@ desktopworld/
 `-- utils/                           # Helper utilities
 ```
 
-## Installation
+## 🛠️ Installation
 
 We recommend Python 3.10 or newer. If you use `pyproject.toml`, note that it currently declares Python 3.12; the core project code follows the OSWorld/desktop-env Python 3.10+ convention.
 
@@ -93,7 +93,7 @@ If you only need the desktop environment package in editable mode:
 pip install -e .
 ```
 
-## Environment Setup
+## 🌍 Environment Setup
 
 DeskCraft runs tasks inside real virtual desktops. The project supports Docker, VMware, VirtualBox, AWS, Azure, and related providers inherited from OSWorld.
 
@@ -115,7 +115,7 @@ For provider-specific setup, please refer to the guides under `desktop_env/provi
 - `desktop_env/providers/docker/DOCKER_GUIDELINE.md`
 - `desktop_env/providers/aws/AWS_GUIDELINE.md`
 
-## Quick Start
+## ⚡ Quick Start
 
 Run a small smoke test first to make sure the virtual desktop can start, reset, execute a basic pyautogui action, and close cleanly:
 
@@ -127,7 +127,7 @@ python quickstart.py \
 
 If everything is configured correctly, the script will reset the example environment, perform a right-click action, and close the VM/container.
 
-## Run Standard Tasks
+## 🧪 Run Standard Tasks
 
 Standard tasks use a single user instruction and are evaluated from the final desktop state. The task index is `evaluation_examples/standard_task.json`, and the task JSON files live under `evaluation_examples/ubuntu_examples/<domain>/`.
 
@@ -149,7 +149,7 @@ python runners/run_multienv_interactive.py \
 
 Some runners still keep older OSWorld defaults such as `evaluation_examples/test_all.json` and `evaluation_examples/examples/<domain>/`. For DeskCraft tasks, please pass the index and base directory explicitly as shown above, or use a runner that supports the `evaluation_examples/ubuntu_examples/<domain>/` layout.
 
-## Run Interactive Tasks
+## 💬 Run Interactive Tasks
 
 Interactive evaluation adds a user simulator to the normal desktop rollout. The simulator uses a separate LLM service to produce user messages when a phase trigger fires.
 
@@ -177,7 +177,7 @@ python runners/run_multienv_evocua_interactive.py \
 
 For task JSON fields, phase design, trigger behavior, `call_user` handling, and interaction logs, please see `README_INTERACTIVE.md`.
 
-## Evaluation Design
+## ✅ Evaluation Design
 
 DeskCraft uses execution-based verification rather than subjective manual scoring. Each task JSON describes:
 
@@ -189,7 +189,7 @@ DeskCraft uses execution-based verification rather than subjective manual scorin
 
 Evaluators are designed around native artifacts. For example, SVG tasks inspect XML structure, office tasks read document formats, Audacity tasks analyze audio signals and project files, Kdenlive tasks inspect project XML and rendered media metadata, Blender tasks query the scene graph through `bpy`, and system/development tasks verify files, configs, commands, browser state, or tests.
 
-## Add New Tasks
+## 🧩 Add New Tasks
 
 When adding new DeskCraft tasks, we recommend following the same construction principle used in the benchmark: keep the task realistic, but make the final state programmatically verifiable.
 
@@ -203,7 +203,7 @@ When adding new DeskCraft tasks, we recommend following the same construction pr
 8. Add the task ID to `standard_task.json` or `interactive_task.json`.
 9. Test the task with a small task index before running a full benchmark job.
 
-## Citation
+## 📚 Citation
 
 Thanks for your interest in DeskCraft. If you find the benchmark or code useful, we would be grateful if you cite our paper:
 
