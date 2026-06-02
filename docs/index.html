@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration. 538 executable desktop tasks across 11 applications.">
+  <title>DeskCraft — Desktop Agent Benchmark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="container">
+      <a class="nav-brand" href="#">DeskCraft</a>
+      <ul class="nav-links">
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#protocol">Interaction</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#citation">Citation</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <span class="hero-badge">Desktop GUI Agent Benchmark · 2026</span>
+      <h1>DeskCraft</h1>
+      <p class="subtitle">
+        Benchmarking Desktop Agents on Professional Workflows and
+        Human-in-the-Loop Collaboration
+      </p>
+
+      <p class="authors">
+        Wenkai Wang<span class="equal">*</span>,
+        Tao Xiong<span class="equal">*</span>,
+        Jingchen Ni<span class="equal">*</span>,
+        Yunpeng Bao<span class="equal">*</span>,
+        Xiyun Li,
+        Tianqi Liu,
+        Hongcan Guo,
+        Zilong Huang,
+        Shengyu Zhang<span class="equal">†</span>
+      </p>
+      <p class="affiliations">
+        <sup>1</sup>Zhejiang University &nbsp;·&nbsp;
+        <sup>2</sup>Tsinghua University &nbsp;·&nbsp;
+        <sup>3</sup>Tencent &nbsp;·&nbsp;
+        <sup>4</sup>The University of Hong Kong
+        <br>
+        <span style="font-size:0.82rem;">*Equal contribution &nbsp;·&nbsp; †Corresponding author</span>
+      </p>
+
+      <div class="btn-row">
+        <a class="btn btn-primary" href="https://github.com/mrwwk/DeskCraft/raw/main/main.pdf" target="_blank" rel="noopener">
+          📄 Paper (PDF)
+        </a>
+        <a class="btn btn-secondary" href="https://github.com/mrwwk/DeskCraft" target="_blank" rel="noopener">
+          💻 Code &amp; Data
+        </a>
+        <a class="btn btn-secondary" href="https://github.com/mrwwk/DeskCraft#readme" target="_blank" rel="noopener">
+          📖 Documentation
+        </a>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="value">538</div>
+          <div class="label">Executable Tasks</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">11</div>
+          <div class="label">Applications</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">18</div>
+          <div class="label">Evaluated Agents</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">279</div>
+          <div class="label">Curated Assets</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="abstract">
+    <div class="container">
+      <h2 class="section-title">Abstract</h2>
+      <p class="abstract-text">
+        Real-world professional desktop workflows in specialized creative and engineering software
+        unfold over long horizons and often require human-in-the-loop coordination, where agents
+        proactively seek necessary information and users provide additional instructions,
+        clarifications, feedback, or corrections as the task progresses. Yet existing desktop GUI
+        benchmarks mostly reduce this setting to short, simplified tasks with all user instructions
+        provided upfront. To address this issue, we introduce <strong>DeskCraft</strong>, a desktop GUI
+        benchmark targeting long horizon creative and engineering workflows and proactive
+        human-agent collaboration. DeskCraft organizes tasks into a multilevel difficulty taxonomy,
+        with long horizon tasks requiring over 50 execution steps, and covers professional creative
+        software across design, video, audio, and 3D creation. Furthermore, DeskCraft formalizes
+        human-agent collaboration into an interaction protocol covering <em>mid-turn</em> and
+        <em>post-turn</em> exchanges. We evaluate 18 proprietary and open source agents on 538 tasks
+        and find that GPT-5.4 reaches <strong>31.6%</strong> on standard tasks and
+        <strong>27.6%</strong> on interactive tasks. Further analyses reveal persistent failures in
+        long horizon workflow delivery and proactive clarification.
+      </p>
+    </div>
+  </section>
+
+  <section id="overview">
+    <div class="container">
+      <h2 class="section-title">Benchmark Overview</h2>
+      <p class="section-desc">
+        DeskCraft combines a three-level difficulty taxonomy, a composable human-in-the-loop
+        protocol, and broad coverage of professional desktop software.
+      </p>
+
+      <div class="figure-card">
+        <img src="assets/method2.png" alt="DeskCraft benchmark overview: difficulty taxonomy, interaction protocol, and application coverage">
+        <p class="figure-caption">
+          <strong>Figure 1.</strong> Overview of DeskCraft.
+          <em>Left:</em> 386 standard tasks stratified into L1 atomic, L2 compositional, and L3 long
+          horizon levels.
+          <em>Middle:</em> 152 interactive tasks driven by three composable triggers.
+          <em>Right:</em> 11 applications across 5 domains, including professional software such as
+          Blender and Kdenlive.
+        </p>
+      </div>
+
+      <div class="feature-grid" style="margin-top: 2rem;">
+        <div class="feature-card">
+          <div class="icon">📊</div>
+          <h3>L1 / L2 / L3 Taxonomy</h3>
+          <p>
+            Tasks progress from atomic GUI operations (L1) to compositional multi-step actions (L2)
+            and long-horizon delivery workflows distilled from real professional scenarios (L3).
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🤝</div>
+          <h3>Human-in-the-Loop Protocol</h3>
+          <p>
+            Interactive tasks evolve through deterministic phase triggers — agent clarification,
+            user interruption, and post-completion feedback — enabling reproducible collaboration.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">✅</div>
+          <h3>Execution-Based Verification</h3>
+          <p>
+            Programmatic evaluators inspect final desktop state, project files, exported artifacts,
+            browser state, media metadata, and structured documents — no subjective manual scoring.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="protocol">
+    <div class="container">
+      <h2 class="section-title">Interaction Protocol</h2>
+      <p class="section-desc">
+        Real desktop work evolves as execution proceeds. DeskCraft models collaboration as an
+        executable phase protocol with three composable trigger types.
+      </p>
+
+      <div class="protocol-grid">
+        <div class="protocol-card">
+          <span class="tag tag-mid">Mid-turn</span>
+          <h3><code>agent_ask</code></h3>
+          <p>
+            Fires when the agent emits <code>ASK</code> to solicit clarification under uncertainty.
+            Typical scenarios: ambiguity resolution, information requests, risky operation approval.
+          </p>
+        </div>
+        <div class="protocol-card">
+          <span class="tag tag-mid">Mid-turn</span>
+          <h3><code>step_count</code></h3>
+          <p>
+            Fires after a predetermined number of execution steps while the agent is still working.
+            Typical scenarios: user interruption, goal shift, constraint addition.
+          </p>
+        </div>
+        <div class="protocol-card">
+          <span class="tag tag-post">Post-turn</span>
+          <h3><code>agent_done</code></h3>
+          <p>
+            Fires when the agent emits <code>DONE</code>, allowing the user to verify deliverables
+            and issue follow-up instructions. Typical scenarios: feedback, correction, progressive
+            refinement, extension.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="coverage">
+    <div class="container">
+      <h2 class="section-title">Application Coverage</h2>
+      <p class="section-desc">
+        11 applications across 5 domains — from office suites to professional creative and
+        engineering software that demands finer spatial precision and deeper domain knowledge.
+      </p>
+
+      <div class="app-grid">
+        <div class="domain-card">
+          <h4>Office Suite</h4>
+          <div class="apps">LibreOffice Writer, Calc, Impress</div>
+          <span class="count">6 verifiers</span>
+        </div>
+        <div class="domain-card">
+          <h4>Browser</h4>
+          <div class="apps">Chrome</div>
+          <span class="count">14 verifiers</span>
+        </div>
+        <div class="domain-card">
+          <h4>Development</h4>
+          <div class="apps">VS Code, UI Generation</div>
+          <span class="count">45 verifiers</span>
+        </div>
+        <div class="domain-card">
+          <h4>Creative Design</h4>
+          <div class="apps">GIMP, Inkscape</div>
+          <span class="count">63 verifiers</span>
+        </div>
+        <div class="domain-card">
+          <h4>Multimedia &amp; 3D</h4>
+          <div class="apps">Kdenlive, Audacity, Blender</div>
+          <span class="count">98 verifiers</span>
+        </div>
+      </div>
+
+      <p class="table-note" style="margin-top: 1.5rem;">
+        Plus OS-level operations and multi-app cross-application workflows.
+        Task split: 386 standard + 152 interactive = 538 total.
+      </p>
+    </div>
+  </section>
+
+  <section id="results">
+    <div class="container">
+      <h2 class="section-title">Main Results</h2>
+      <p class="section-desc">
+        We evaluate 18 proprietary and open-source agents. Even the strongest models remain far
+        from reliable on professional desktop workflows.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Standard (386)</th>
+              <th>Interactive (152)</th>
+              <th>Best Domain (Std.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>GPT-5.4</strong></td>
+              <td class="runner">31.6%</td>
+              <td class="best">27.6%</td>
+              <td>Writer 50.0%</td>
+            </tr>
+            <tr>
+              <td><strong>Kimi-K2.6</strong></td>
+              <td class="best">33.8%</td>
+              <td class="runner">25.7%</td>
+              <td>Blender 67.6%</td>
+            </tr>
+            <tr>
+              <td><strong>Kimi-K2.5</strong></td>
+              <td>20.3%</td>
+              <td>24.0%</td>
+              <td>Writer 33.3%</td>
+            </tr>
+            <tr>
+              <td>Qwen3.5-35B-A3B</td>
+              <td>11.1%</td>
+              <td>12.4%</td>
+              <td>Multi-app 17.9%</td>
+            </tr>
+            <tr>
+              <td>Qwen3.5-397B-A17B</td>
+              <td>12.9%</td>
+              <td>11.7%</td>
+              <td>OS 26.7%</td>
+            </tr>
+            <tr>
+              <td>EvoCUA-32B</td>
+              <td>11.4%</td>
+              <td>0.7%</td>
+              <td>Chrome 24.2%</td>
+            </tr>
+            <tr>
+              <td>OpenCUA-32B</td>
+              <td>9.6%</td>
+              <td>0.0%</td>
+              <td>VS Code 16.7%</td>
+            </tr>
+            <tr>
+              <td>UI-TARS-1.5-7B</td>
+              <td>3.1%</td>
+              <td>0.0%</td>
+              <td>VS Code 10.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">
+        Task-level success rate (SR, %). <strong>Bold</strong> = best per column; dotted underline = runner-up.
+        Full per-application results are in the paper.
+      </p>
+
+      <h3 class="section-title" style="font-size:1.35rem; margin-top:3rem;">Benchmark Comparison</h3>
+      <p class="section-desc" style="margin-bottom:1.5rem;">
+        DeskCraft is the first desktop benchmark to jointly support long horizon professional
+        workflows, a human-in-the-loop protocol, and structured difficulty levels.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Benchmark</th>
+              <th>Domain</th>
+              <th>#Tasks</th>
+              <th>LH Focus</th>
+              <th>User Int.</th>
+              <th>Diff. Lvls.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>OSWorld</td><td>Desktop (Ubuntu)</td><td>369</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td>WAA</td><td>Desktop (Windows)</td><td>154</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td>macOSWorld</td><td>Desktop (macOS)</td><td>202</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td>WorldGUI</td><td>Desktop (Windows)</td><td>611</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+            <tr><td>MobileWorld</td><td>Mobile</td><td>201</td><td class="check">✓</td><td class="check">✓</td><td class="cross">✗</td></tr>
+            <tr><td>τ-bench</td><td>API + User</td><td>165</td><td class="cross">✗</td><td class="check">✓</td><td class="cross">✗</td></tr>
+            <tr><td><strong>DeskCraft (Ours)</strong></td><td><strong>Desktop (Ubuntu)</strong></td><td><strong>538</strong></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="getting-started">
+    <div class="container">
+      <h2 class="section-title">Getting Started</h2>
+      <p class="section-desc">
+        DeskCraft runs inside real virtual desktops (Docker, VMware, AWS, etc.) inherited from the
+        OSWorld / desktop-env framework.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>1. Install</h3>
+          <p style="font-family:monospace; font-size:0.82rem; background:#f1f5f9; padding:0.75rem; border-radius:8px; margin-top:0.5rem;">
+            pip install -r requirements.txt<br>
+            python -m playwright install
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>2. Smoke Test</h3>
+          <p style="font-family:monospace; font-size:0.82rem; background:#f1f5f9; padding:0.75rem; border-radius:8px; margin-top:0.5rem;">
+            python quickstart.py \<br>
+            &nbsp;&nbsp;--provider_name docker --headless
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>3. Run Evaluation</h3>
+          <p style="font-family:monospace; font-size:0.82rem; background:#f1f5f9; padding:0.75rem; border-radius:8px; margin-top:0.5rem;">
+            python runners/run_multienv_*.py \<br>
+            &nbsp;&nbsp;--domain gimp --num_envs 3
+          </p>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top: 2rem;">
+        <a class="btn btn-primary" href="https://github.com/mrwwk/DeskCraft" target="_blank" rel="noopener">
+          View Full Documentation on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="citation">
+    <div class="container">
+      <h2 class="section-title">Citation</h2>
+      <p class="section-desc">If you find DeskCraft useful, please cite our paper.</p>
+
+      <div class="citation-box">
+        <button class="copy-btn" id="copy-btn">Copy</button>
+        <pre id="bibtex">@misc{deskcraft2026,
+  title   = {DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration},
+  author  = {Wang, Wenkai and Xiong, Tao and Ni, Jingchen and Bao, Yunpeng and Li, Xiyun and Liu, Tianqi and Guo, Hongcan and Huang, Zilong and Zhang, Shengyu},
+  year    = {2026},
+  note    = {Benchmark for professional desktop workflows and human-in-the-loop collaboration}
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>
+        DeskCraft builds on the
+        <a href="https://github.com/xlang-ai/OSWorld" target="_blank" rel="noopener">OSWorld</a>
+        / desktop-env execution framework.
+      </p>
+      <p style="margin-top:0.5rem;">© 2026 DeskCraft Team</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
