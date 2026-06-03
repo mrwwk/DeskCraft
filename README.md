@@ -1,6 +1,13 @@
 # 🖥️ DeskCraft
 
-DeskCraft is a benchmark for evaluating desktop GUI agents on realistic professional workflows and human-in-the-loop collaboration. It accompanies our paper, **"DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration"**.
+DeskCraft is a benchmark for evaluating desktop GUI agents on realistic professional workflows and human-in-the-loop collaboration. It accompanies our paper, **["DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration"](https://arxiv.org/abs/2606.03103)**.
+
+<p align="center">
+  <a href="https://arxiv.org/pdf/2606.03103"><img src="https://img.shields.io/badge/Paper-arXiv%20PDF-red" alt="Paper"></a>
+  <a href="https://arxiv.org/abs/2606.03103"><img src="https://img.shields.io/badge/arXiv-2606.03103-b31b1b" alt="arXiv"></a>
+  <a href="https://github.com/mrwwk/DeskCraft"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
+  <a href="https://mrwwk.github.io/DeskCraft/"><img src="https://img.shields.io/badge/Website-Project%20Page-blue" alt="Website"></a>
+</p>
 
 <p align="center">
   <img src="figures/method2.png" alt="DeskCraft benchmark overview" width="95%">
@@ -212,11 +219,14 @@ When adding new DeskCraft tasks, we recommend following the same construction pr
 Thanks for your interest in DeskCraft. If you find the benchmark or code useful, we would be grateful if you cite our paper:
 
 ```bibtex
-@misc{deskcraft2026,
-  title = {DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration},
-  author = {Wang, Wenkai and Xiong, Tao and Ni, Jingchen and Bao, Yunpeng and Li, Xiyun and Liu, Tianqi and Guo, Hongcan and Huang, Zilong and Zhang, Shengyu},
-  year = {2026},
-  note = {Benchmark for professional desktop workflows and human-in-the-loop collaboration}
+@article{wang2026deskcraft,
+  title   = {{DeskCraft}: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration},
+  author  = {Wang, Wenkai and Xiong, Tao and Ni, Jingchen and Bao, Yunpeng and Li, Xiyun and Liu, Tianqi and Guo, Hongcan and Huang, Zilong and Zhang, Shengyu},
+  journal = {arXiv preprint arXiv:2606.03103},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2606.03103},
+  eprint  = {2606.03103},
+  archivePrefix = {arXiv}
 }
 ```
 
