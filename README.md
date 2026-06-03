@@ -68,7 +68,6 @@ desktopworld/
 |-- README_INTERACTIVE.md            # Interactive evaluation guide
 |-- requirements.txt                 # Python dependencies
 |-- quickstart.py                    # Environment smoke test
-|-- calc_success_rate.py             # Utility for scanning result.txt files
 |-- lib_run_single.py                # Standard task execution loop
 |-- lib_run_interactive.py           # Interactive task execution loop
 |-- desktop_env/                     # Desktop environment, providers, evaluators, getters
