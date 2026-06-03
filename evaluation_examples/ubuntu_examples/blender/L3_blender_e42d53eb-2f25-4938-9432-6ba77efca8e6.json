@@ -9,27 +9,27 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/kitchen_table.blend",
+            "local_path": "assets/blend/kitchen_table.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           },
           {
-            "local_path": "assets/blender/texture_wood.jpg",
+            "local_path": "assets/jpg/texture_wood.jpg",
             "path": "/home/user/Documents/texture_wood.jpg"
           },
           {
-            "local_path": "assets/blender/texture_tiles.jpg",
+            "local_path": "assets/jpg/texture_tiles.jpg",
             "path": "/home/user/Documents/texture_tiles.jpg"
           }
         ]

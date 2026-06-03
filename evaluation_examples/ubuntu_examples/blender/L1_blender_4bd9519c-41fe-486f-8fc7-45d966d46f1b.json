@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/text_scene.blend",
+            "local_path": "assets/blend/text_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_text.py",
+            "local_path": "assets/py/check_text.py",
             "path": "/tmp/check_text.py"
           }
         ]

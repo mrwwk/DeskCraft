@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/27fdf845-4947-48cf-a282-8163a3941abf/Customer_Deduplicate.xlsx",
+            "local_path": "assets/xlsx/Customer_Deduplicate.xlsx",
             "path": "/home/user/Customer_Deduplicate.xlsx"
           }
         ]

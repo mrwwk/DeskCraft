@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/logo_design.svg",
+            "local_path": "assets/svg/logo_design.svg",
             "path": "/home/user/Documents/logo_design.svg"
           }
         ]

@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/6a92d8ed-3ec6-4540-aa82-bb635d57a79d/InvAnalysis_L3_03.xlsx",
+            "local_path": "assets/xlsx/InvAnalysis_L3_03.xlsx",
             "path": "/home/user/Desktop/InvAnalysis_L3_03.xlsx"
           }
         ]

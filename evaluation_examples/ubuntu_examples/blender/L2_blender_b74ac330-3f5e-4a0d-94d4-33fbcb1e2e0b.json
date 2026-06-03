@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/multi_light_scene.blend",
+            "local_path": "assets/blend/multi_light_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           }
         ]

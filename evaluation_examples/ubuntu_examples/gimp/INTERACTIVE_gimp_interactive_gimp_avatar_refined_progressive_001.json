@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/photos/portrait_woman_774909.jpg",
+            "local_path": "assets/jpg/portrait_woman_774909.jpg",
             "path": "/home/user/Desktop/portrait_woman_774909.jpg"
           }
         ]
@@ -68,7 +68,12 @@
     "result": {
       "type": "vm_file",
       "multi": true,
-      "gives": [0, 1, 2, 3],
+      "gives": [
+        0,
+        1,
+        2,
+        3
+      ],
       "path": [
         "/home/user/Desktop/avatar_refined.png",
         "/home/user/Desktop/avatar_refined.jpg",
@@ -92,7 +97,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"
+          ]
         }
       },
       {
@@ -104,7 +113,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('avatar_refined.png'); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('avatar_refined.png'); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -116,7 +129,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -128,7 +145,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"
+          ]
         }
       },
       {
@@ -140,7 +161,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('avatar_refined.jpg'); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('avatar_refined.jpg'); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -152,7 +177,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -164,7 +193,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"
+          ]
         }
       },
       {
@@ -176,7 +209,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('avatar_refined.xcf'); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('avatar_refined.xcf'); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -188,7 +225,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
         }
       },
       {

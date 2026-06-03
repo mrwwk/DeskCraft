@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/interview_raw.wav",
+            "local_path": "assets/wav/interview_raw.wav",
             "path": "/home/user/Documents/interview_raw.wav"
           }
         ]

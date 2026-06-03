@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/2364b616-c254-40d2-ac46-29b63af72326/InvRestock_L3_08.xlsx",
+            "local_path": "assets/xlsx/InvRestock_L3_08.xlsx",
             "path": "/home/user/Desktop/InvRestock_L3_08.xlsx"
           }
         ]

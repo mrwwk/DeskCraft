@@ -10,11 +10,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/short_test.wav",
+            "local_path": "assets/wav/short_test.wav",
             "path": "/home/user/Documents/short_test.wav"
           },
           {
-            "local_path": "assets/audacity/audio/test.wav",
+            "local_path": "assets/wav/test.wav",
             "path": "/home/user/Documents/test.wav"
           }
         ]

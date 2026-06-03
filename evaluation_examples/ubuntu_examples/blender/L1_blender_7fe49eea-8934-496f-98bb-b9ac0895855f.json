@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/camera_views.blend",
+            "local_path": "assets/blend/camera_views.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           }
         ]

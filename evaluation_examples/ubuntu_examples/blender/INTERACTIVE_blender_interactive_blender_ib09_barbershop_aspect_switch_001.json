@@ -15,23 +15,23 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/BarberShopChair_01_1k.blend",
+            "local_path": "assets/blend/BarberShopChair_01_1k.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/textures/BarberShopChair_01_diff_1k.jpg",
+            "local_path": "assets/jpg/BarberShopChair_01_diff_1k.jpg",
             "path": "/home/user/Documents/textures/BarberShopChair_01_diff_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/textures/BarberShopChair_01_nor_gl_1k.jpg",
+            "local_path": "assets/jpg/BarberShopChair_01_nor_gl_1k.jpg",
             "path": "/home/user/Documents/textures/BarberShopChair_01_nor_gl_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/polyhaven_barbershop_chair_01/textures/BarberShopChair_01_arm_1k.jpg",
+            "local_path": "assets/jpg/BarberShopChair_01_arm_1k.jpg",
             "path": "/home/user/Documents/textures/BarberShopChair_01_arm_1k.jpg"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           }
         ]

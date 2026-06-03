@@ -15,31 +15,31 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/external/polyhaven_armchair_01/ArmChair_01_1k.blend",
+            "local_path": "assets/blend/ArmChair_01_1k.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/external/polyhaven_armchair_01/textures/Armchair_01_diff_1k.jpg",
+            "local_path": "assets/jpg/Armchair_01_diff_1k.jpg",
             "path": "/home/user/Documents/textures/Armchair_01_diff_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/polyhaven_armchair_01/textures/Armchair_01_nor_gl_1k.jpg",
+            "local_path": "assets/jpg/Armchair_01_nor_gl_1k.jpg",
             "path": "/home/user/Documents/textures/Armchair_01_nor_gl_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/polyhaven_armchair_01/textures/Armchair_01_arm_1k.jpg",
+            "local_path": "assets/jpg/Armchair_01_arm_1k.jpg",
             "path": "/home/user/Documents/textures/Armchair_01_arm_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/hdri/hdri_aerodynamics_workshop_1k.exr",
+            "local_path": "assets/exr/hdri_aerodynamics_workshop_1k.exr",
             "path": "/home/user/Documents/hdri_aerodynamics_workshop_1k.exr"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           },
           {
-            "local_path": "assets/blender/check_world.py",
+            "local_path": "assets/py/check_world.py",
             "path": "/tmp/check_world.py"
           }
         ]

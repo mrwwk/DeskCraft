@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/label_test.wav",
+            "local_path": "assets/wav/label_test.wav",
             "path": "/home/user/Documents/label_test.wav"
           }
         ]

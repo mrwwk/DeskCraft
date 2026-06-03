@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/f7c9725b-9f02-4131-a007-68de65161a3c/Region_SalesVsTarget_Chart.xlsx",
+            "local_path": "assets/xlsx/Region_SalesVsTarget_Chart.xlsx",
             "path": "/home/user/Region_SalesVsTarget_Chart.xlsx"
           }
         ]

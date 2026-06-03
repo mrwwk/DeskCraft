@@ -9,31 +9,31 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/uv_unwrapped_cube.blend",
+            "local_path": "assets/blend/uv_unwrapped_cube.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           },
           {
-            "local_path": "assets/blender/check_world.py",
+            "local_path": "assets/py/check_world.py",
             "path": "/tmp/check_world.py"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           },
           {
-            "local_path": "assets/blender/texture_wood.jpg",
+            "local_path": "assets/jpg/texture_wood.jpg",
             "path": "/home/user/Documents/texture_wood.jpg"
           },
           {
-            "local_path": "assets/blender/normal_wood.jpg",
+            "local_path": "assets/jpg/normal_wood.jpg",
             "path": "/home/user/Documents/normal_wood.jpg"
           },
           {
-            "local_path": "assets/blender/hdri_studio.exr",
+            "local_path": "assets/exr/hdri_studio.exr",
             "path": "/home/user/Documents/hdri_studio.exr"
           }
         ]

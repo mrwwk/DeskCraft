@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/cube_with_subsurf.blend",
+            "local_path": "assets/blend/cube_with_subsurf.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_mesh.py",
+            "local_path": "assets/py/check_mesh.py",
             "path": "/tmp/check_mesh.py"
           }
         ]

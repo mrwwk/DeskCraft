@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/graphic/wikimedia_transparency_demo.png",
+            "local_path": "assets/png/wikimedia_transparency_demo.png",
             "path": "/home/user/Desktop/wikimedia_transparency_demo.png"
           },
           {
-            "local_path": "assets/gimp_task/graphic/pattern_asfalt_light.png",
+            "local_path": "assets/png/pattern_asfalt_light.png",
             "path": "/home/user/Desktop/pattern_asfalt_light.png"
           },
           {
-            "local_path": "assets/gimp_task/graphic/icon_camera.svg",
+            "local_path": "assets/svg/icon_camera.svg",
             "path": "/home/user/Desktop/icon_camera.svg"
           }
         ]

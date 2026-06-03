@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/default_cube.blend",
+            "local_path": "assets/blend/default_cube.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           }
         ]

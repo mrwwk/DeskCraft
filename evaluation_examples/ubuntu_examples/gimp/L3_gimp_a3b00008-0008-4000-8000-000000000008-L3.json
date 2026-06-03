@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/photos/pet_dog_1108099_alt.jpg",
+            "local_path": "assets/jpg/pet_dog_1108099_alt.jpg",
             "path": "/home/user/Desktop/pet_dog_1108099_alt.jpg"
           },
           {
-            "local_path": "assets/gimp_task/texture/texture_wood_172289.jpg",
+            "local_path": "assets/jpg/texture_wood_172289.jpg",
             "path": "/home/user/Desktop/texture_wood_172289.jpg"
           }
         ]

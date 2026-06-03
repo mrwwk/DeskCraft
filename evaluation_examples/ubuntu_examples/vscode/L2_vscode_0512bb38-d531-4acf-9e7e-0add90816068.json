@@ -15,7 +15,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/vscode_new/0512bb38-d531-4acf-9e7e-0add90816068/test.vsix",
+            "local_path": "assets/vsix/test.vsix",
             "path": "/home/user/test.vsix"
           }
         ]
@@ -41,7 +41,10 @@
     "vscode"
   ],
   "evaluator": {
-    "func": ["is_extension_installed", "check_json_settings"],
+    "func": [
+      "is_extension_installed",
+      "check_json_settings"
+    ],
     "result": [
       {
         "type": "vm_command_line",

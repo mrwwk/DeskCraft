@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/photos/beach_people_1481105.jpg",
+            "local_path": "assets/jpg/beach_people_1481105.jpg",
             "path": "/home/user/Desktop/beach_people_1481105.jpg"
           },
           {
-            "local_path": "assets/gimp_task/texture/texture_paper_723311.jpg",
+            "local_path": "assets/jpg/texture_paper_723311.jpg",
             "path": "/home/user/Desktop/texture_paper_723311.jpg"
           }
         ]

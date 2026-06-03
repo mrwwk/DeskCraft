@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/photos/landscape_mountain_1108099.jpg",
+            "local_path": "assets/jpg/landscape_mountain_1108099.jpg",
             "path": "/home/user/Desktop/landscape_mountain_1108099.jpg"
           },
           {
-            "local_path": "assets/gimp_task/graphic/icon_home.svg",
+            "local_path": "assets/svg/icon_home.svg",
             "path": "/home/user/Desktop/icon_home.svg"
           }
         ]

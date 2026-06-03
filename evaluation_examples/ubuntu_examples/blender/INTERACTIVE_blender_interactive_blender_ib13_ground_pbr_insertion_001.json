@@ -15,27 +15,27 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/simple_scene.blend",
+            "local_path": "assets/blend/simple_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/external/textures/texture_coast_sand_rocks_02_diff_1k.jpg",
+            "local_path": "assets/jpg/texture_coast_sand_rocks_02_diff_1k.jpg",
             "path": "/home/user/Documents/texture_coast_sand_rocks_02_diff_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/textures/texture_coast_sand_rocks_02_nor_gl_1k.jpg",
+            "local_path": "assets/jpg/texture_coast_sand_rocks_02_nor_gl_1k.jpg",
             "path": "/home/user/Documents/texture_coast_sand_rocks_02_nor_gl_1k.jpg"
           },
           {
-            "local_path": "assets/blender/external/textures/texture_coast_sand_rocks_02_rough_1k.jpg",
+            "local_path": "assets/jpg/texture_coast_sand_rocks_02_rough_1k.jpg",
             "path": "/home/user/Documents/texture_coast_sand_rocks_02_rough_1k.jpg"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           }
         ]

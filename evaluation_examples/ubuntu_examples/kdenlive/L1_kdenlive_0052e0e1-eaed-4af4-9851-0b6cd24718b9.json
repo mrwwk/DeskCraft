@@ -9,7 +9,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/kdenlive/mixkit-classic-alarm-995.wav",
+            "local_path": "assets/wav/mixkit-classic-alarm-995.wav",
             "path": "/home/user/Music/mixkit-classic-alarm-995.wav"
           }
         ]

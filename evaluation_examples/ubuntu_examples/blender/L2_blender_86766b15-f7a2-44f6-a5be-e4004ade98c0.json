@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/uv_unwrapped_cube.blend",
+            "local_path": "assets/blend/uv_unwrapped_cube.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           },
           {
-            "local_path": "assets/blender/texture_wood.jpg",
+            "local_path": "assets/jpg/texture_wood.jpg",
             "path": "/home/user/Documents/texture_wood.jpg"
           }
         ]

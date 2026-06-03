@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/fb0f694e-fc10-46f9-9fcd-169630844996/Staff_Records_Reorder.xlsx",
+            "local_path": "assets/xlsx/Staff_Records_Reorder.xlsx",
             "path": "/home/user/Staff_Records_Reorder.xlsx"
           }
         ]

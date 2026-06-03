@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/dfb46a6b-3f2d-4e4a-b4ef-20997ea21563/SalesAnalysis_L3_01.xlsx",
+            "local_path": "assets/xlsx/SalesAnalysis_L3_01.xlsx",
             "path": "/home/user/Desktop/SalesAnalysis_L3_01.xlsx"
           }
         ]

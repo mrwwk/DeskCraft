@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/poster_template.svg",
+            "local_path": "assets/svg/poster_template.svg",
             "path": "/home/user/Documents/poster_template.svg"
           }
         ]

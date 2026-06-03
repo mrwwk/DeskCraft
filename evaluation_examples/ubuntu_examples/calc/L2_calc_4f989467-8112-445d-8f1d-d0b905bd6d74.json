@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/4f989467-8112-445d-8f1d-d0b905bd6d74/EmpStats_L2_07.xlsx",
+            "local_path": "assets/xlsx/EmpStats_L2_07.xlsx",
             "path": "/home/user/Desktop/EmpStats_L2_07.xlsx"
           }
         ]

@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/speech.wav",
+            "local_path": "assets/wav/speech.wav",
             "path": "/home/user/Documents/speech.wav"
           }
         ]

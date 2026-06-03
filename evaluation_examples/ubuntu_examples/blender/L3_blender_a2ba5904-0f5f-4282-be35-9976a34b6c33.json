@@ -9,43 +9,43 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/uv_unwrapped_cube.blend",
+            "local_path": "assets/blend/uv_unwrapped_cube.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_modifier.py",
+            "local_path": "assets/py/check_modifier.py",
             "path": "/tmp/check_modifier.py"
           },
           {
-            "local_path": "assets/blender/check_mesh.py",
+            "local_path": "assets/py/check_mesh.py",
             "path": "/tmp/check_mesh.py"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           },
           {
-            "local_path": "assets/blender/check_world.py",
+            "local_path": "assets/py/check_world.py",
             "path": "/tmp/check_world.py"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           },
           {
-            "local_path": "assets/blender/texture_metal.jpg",
+            "local_path": "assets/jpg/texture_metal.jpg",
             "path": "/home/user/Documents/texture_metal.jpg"
           },
           {
-            "local_path": "assets/blender/roughness_metal.jpg",
+            "local_path": "assets/jpg/roughness_metal.jpg",
             "path": "/home/user/Documents/roughness_metal.jpg"
           },
           {
-            "local_path": "assets/blender/hdri_studio.exr",
+            "local_path": "assets/exr/hdri_studio.exr",
             "path": "/home/user/Documents/hdri_studio.exr"
           }
         ]

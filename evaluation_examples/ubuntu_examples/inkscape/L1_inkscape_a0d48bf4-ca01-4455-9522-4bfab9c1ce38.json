@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/star_polygon.svg",
+            "local_path": "assets/svg/star_polygon.svg",
             "path": "/home/user/Documents/star_polygon.svg"
           }
         ]
