@@ -6,6 +6,7 @@ DeskCraft is a benchmark for evaluating desktop GUI agents on realistic professi
   <a href="https://arxiv.org/abs/2606.03103"><img src="https://img.shields.io/badge/arXiv-2606.03103-b31b1b" alt="arXiv"></a>
   <a href="https://github.com/mrwwk/DeskCraft"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
   <a href="https://mrwwk.github.io/DeskCraft/"><img src="https://img.shields.io/badge/Website-Project%20Page-blue" alt="Website"></a>
+  <a href="https://huggingface.co/Wenkaiwang/ubuntu-qcow2"><img src="https://img.shields.io/badge/VM%20Image-Hugging%20Face-yellow" alt="VM Image"></a>
 </p>
 
 <p align="center">
@@ -62,7 +63,6 @@ The implementation also supports additional trigger types such as `agent_idle` a
 
 ```text
 desktopworld/
-|-- main.pdf                         # DeskCraft paper
 |-- README.md                        # Project overview
 |-- README_INTERACTIVE.md            # Interactive evaluation guide
 |-- requirements.txt                 # Python dependencies
@@ -104,6 +104,15 @@ pip install -e .
 ## 🌍 Environment Setup
 
 DeskCraft runs tasks inside real virtual desktops. The project supports Docker, VMware, VirtualBox, AWS, Azure, and related providers inherited from OSWorld.
+
+### VM Image
+
+The Ubuntu desktop VM image (`Ubuntu.qcow2`, ~25 GB) is hosted on Hugging Face:
+
+- **Repository:** [Wenkaiwang/ubuntu-qcow2](https://huggingface.co/Wenkaiwang/ubuntu-qcow2/tree/main)
+- **Direct file:** [Ubuntu.qcow2](https://huggingface.co/Wenkaiwang/ubuntu-qcow2/blob/main/Ubuntu.qcow2)
+
+Download the image before starting Docker or other provider-based evaluation. For provider-specific import and setup steps, see the guides below.
 
 Common environment variables:
 
