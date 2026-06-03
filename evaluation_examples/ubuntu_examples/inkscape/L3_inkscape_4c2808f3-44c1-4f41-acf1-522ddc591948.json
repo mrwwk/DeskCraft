@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/complex_path.svg",
+            "local_path": "assets/svg/complex_path.svg",
             "path": "/home/user/Documents/complex_path.svg"
           }
         ]

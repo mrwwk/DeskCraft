@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/zorder_shapes.svg",
+            "local_path": "assets/svg/zorder_shapes.svg",
             "path": "/home/user/Documents/zorder_shapes.svg"
           }
         ]

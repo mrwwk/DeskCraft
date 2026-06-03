@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "local_path": "assets/mp4/6533277-hd_1920_1080_24fps.mp4",
             "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
           },
           {
-            "local_path": "assets/kdenlive/mixkit-fast-rocket-whoosh-1714.wav",
+            "local_path": "assets/wav/mixkit-fast-rocket-whoosh-1714.wav",
             "path": "/home/user/Music/mixkit-fast-rocket-whoosh-1714.wav"
           }
         ]

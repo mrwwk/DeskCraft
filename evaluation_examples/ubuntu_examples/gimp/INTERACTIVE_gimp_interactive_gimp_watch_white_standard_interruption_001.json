@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/products/product_watch_190819.jpg",
+            "local_path": "assets/jpg/product_watch_190819.jpg",
             "path": "/home/user/Desktop/product_watch_190819.jpg"
           }
         ]
@@ -69,7 +69,11 @@
     "result": {
       "type": "vm_file",
       "multi": true,
-      "gives": [0, 1, 2],
+      "gives": [
+        0,
+        1,
+        2
+      ],
       "path": [
         "/home/user/Desktop/watch_white_standard.jpg",
         "/home/user/Desktop/watch_white_standard.xcf",

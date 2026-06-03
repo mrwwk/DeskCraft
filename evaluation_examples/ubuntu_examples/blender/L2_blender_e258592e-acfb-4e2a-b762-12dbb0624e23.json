@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/cube_sphere_boolean.blend",
+            "local_path": "assets/blend/cube_sphere_boolean.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_modifier.py",
+            "local_path": "assets/py/check_modifier.py",
             "path": "/tmp/check_modifier.py"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           }
         ]

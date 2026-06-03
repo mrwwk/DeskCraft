@@ -9,19 +9,19 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/hierarchy_scene.blend",
+            "local_path": "assets/blend/hierarchy_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           },
           {
-            "local_path": "assets/blender/check_collection.py",
+            "local_path": "assets/py/check_collection.py",
             "path": "/tmp/check_collection.py"
           },
           {
-            "local_path": "assets/blender/check_constraints.py",
+            "local_path": "assets/py/check_constraints.py",
             "path": "/tmp/check_constraints.py"
           }
         ]

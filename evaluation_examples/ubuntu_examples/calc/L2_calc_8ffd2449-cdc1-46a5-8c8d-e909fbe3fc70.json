@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/8ffd2449-cdc1-46a5-8c8d-e909fbe3fc70/ProjStatus_L2_09.xlsx",
+            "local_path": "assets/xlsx/ProjStatus_L2_09.xlsx",
             "path": "/home/user/Desktop/ProjStatus_L2_09.xlsx"
           }
         ]

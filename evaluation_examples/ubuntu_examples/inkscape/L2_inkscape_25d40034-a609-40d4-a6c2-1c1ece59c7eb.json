@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/overlapping_circles.svg",
+            "local_path": "assets/svg/overlapping_circles.svg",
             "path": "/home/user/Documents/overlapping_circles.svg"
           }
         ]

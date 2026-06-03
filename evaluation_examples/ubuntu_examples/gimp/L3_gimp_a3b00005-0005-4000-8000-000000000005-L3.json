@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/products/product_perfume_965989.jpg",
+            "local_path": "assets/jpg/product_perfume_965989.jpg",
             "path": "/home/user/Desktop/product_perfume_965989.jpg"
           },
           {
-            "local_path": "assets/gimp_task/texture/texture_concrete_129733.jpg",
+            "local_path": "assets/jpg/texture_concrete_129733.jpg",
             "path": "/home/user/Desktop/texture_concrete_129733.jpg"
           },
           {
-            "local_path": "assets/gimp_task/texture/texture_metal_220182.jpg",
+            "local_path": "assets/jpg/texture_metal_220182.jpg",
             "path": "/home/user/Desktop/texture_metal_220182.jpg"
           }
         ]

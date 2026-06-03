@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/infographic_report.svg",
+            "local_path": "assets/svg/infographic_report.svg",
             "path": "/home/user/Documents/infographic_report.svg"
           }
         ]

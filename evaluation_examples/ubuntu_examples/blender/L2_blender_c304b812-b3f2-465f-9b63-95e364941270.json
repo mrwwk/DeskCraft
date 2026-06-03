@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/monkey_scene.blend",
+            "local_path": "assets/blend/monkey_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           },
           {
-            "local_path": "assets/blender/check_mesh.py",
+            "local_path": "assets/py/check_mesh.py",
             "path": "/tmp/check_mesh.py"
           }
         ]

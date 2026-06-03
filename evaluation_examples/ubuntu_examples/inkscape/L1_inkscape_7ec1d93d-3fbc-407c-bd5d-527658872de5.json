@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/text_hello.svg",
+            "local_path": "assets/svg/text_hello.svg",
             "path": "/home/user/Documents/text_hello.svg"
           }
         ]

@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/simple_rect_circle.svg",
+            "local_path": "assets/svg/simple_rect_circle.svg",
             "path": "/home/user/Documents/simple_rect_circle.svg"
           }
         ]

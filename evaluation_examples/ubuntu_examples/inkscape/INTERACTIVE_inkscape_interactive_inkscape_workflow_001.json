@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/inkscape/three_layers.svg",
+            "local_path": "assets/svg/three_layers.svg",
             "path": "/home/user/Documents/three_layers.svg"
           }
         ]

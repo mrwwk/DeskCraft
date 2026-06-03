@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/fade_test.wav",
+            "local_path": "assets/wav/fade_test.wav",
             "path": "/home/user/Documents/fade_test.wav"
           }
         ]

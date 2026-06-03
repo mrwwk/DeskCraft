@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/photos/street_city_466685.jpg",
+            "local_path": "assets/jpg/street_city_466685.jpg",
             "path": "/home/user/Desktop/street_city_466685.jpg"
           }
         ]
@@ -69,7 +69,11 @@
     "result": {
       "type": "vm_file",
       "multi": true,
-      "gives": [0, 1, 2],
+      "gives": [
+        0,
+        1,
+        2
+      ],
       "path": [
         "/home/user/Desktop/city_night_run_cover.jpg",
         "/home/user/Desktop/city_night_run_cover.xcf",
@@ -91,7 +95,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 'e')"
+          ]
         }
       },
       {
@@ -103,7 +111,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('city_night_run_cover.jpg'); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('city_night_run_cover.jpg'); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -115,7 +127,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -127,7 +143,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('shift', 'ctrl', 's')"
+          ]
         }
       },
       {
@@ -139,7 +159,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('city_night_run_cover.xcf'); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.hotkey('ctrl', 'a'); pyautogui.write('city_night_run_cover.xcf'); pyautogui.press('enter')"
+          ]
         }
       },
       {
@@ -151,7 +175,11 @@
       {
         "type": "execute",
         "parameters": {
-          "command": ["python3", "-c", "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"]
+          "command": [
+            "python3",
+            "-c",
+            "import time, pyautogui; time.sleep(1); pyautogui.press('enter')"
+          ]
         }
       },
       {

@@ -9,11 +9,11 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/kdenlive/6533277-hd_1920_1080_24fps.mp4",
+            "local_path": "assets/mp4/6533277-hd_1920_1080_24fps.mp4",
             "path": "/home/user/Videos/6533277-hd_1920_1080_24fps.mp4"
           },
           {
-            "local_path": "assets/kdenlive/14307439_1920_1080_60fps.mp4",
+            "local_path": "assets/mp4/14307439_1920_1080_60fps.mp4",
             "path": "/home/user/Videos/14307439_1920_1080_60fps.mp4"
           }
         ]

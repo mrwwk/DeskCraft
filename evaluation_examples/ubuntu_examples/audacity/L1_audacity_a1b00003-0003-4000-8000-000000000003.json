@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/delete_test.wav",
+            "local_path": "assets/wav/delete_test.wav",
             "path": "/home/user/Documents/delete_test.wav"
           }
         ]

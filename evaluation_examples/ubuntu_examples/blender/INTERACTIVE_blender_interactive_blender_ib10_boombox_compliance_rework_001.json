@@ -15,15 +15,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/empty_scene.blend",
+            "local_path": "assets/blend/empty_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/external/model_boombox.glb",
+            "local_path": "assets/glb/model_boombox.glb",
             "path": "/home/user/Documents/model_boombox.glb"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           }
         ]

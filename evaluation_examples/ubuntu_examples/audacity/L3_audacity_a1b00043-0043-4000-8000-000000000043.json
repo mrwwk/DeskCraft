@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/vocals.wav",
+            "local_path": "assets/wav/vocals.wav",
             "path": "/home/user/Documents/vocals.wav"
           },
           {
-            "local_path": "assets/audacity/audio/drums.wav",
+            "local_path": "assets/wav/drums.wav",
             "path": "/home/user/Documents/drums.wav"
           },
           {
-            "local_path": "assets/audacity/audio/bass.wav",
+            "local_path": "assets/wav/bass.wav",
             "path": "/home/user/Documents/bass.wav"
           }
         ]

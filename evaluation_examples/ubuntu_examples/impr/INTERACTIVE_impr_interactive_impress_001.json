@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_impr_njc/pptx_shared/work_summary_template_english.pptx",
+            "local_path": "assets/pptx/libreoffice_impr_njc_pptx_shared_work_summary_template_english.pptx",
             "path": "/home/user/Desktop/work_summary_template_english.pptx"
           }
         ]

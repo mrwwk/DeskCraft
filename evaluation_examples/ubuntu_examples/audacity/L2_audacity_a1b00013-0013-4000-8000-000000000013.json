@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/duplicate_test.wav",
+            "local_path": "assets/wav/duplicate_test.wav",
             "path": "/home/user/Documents/duplicate_test.wav"
           }
         ]

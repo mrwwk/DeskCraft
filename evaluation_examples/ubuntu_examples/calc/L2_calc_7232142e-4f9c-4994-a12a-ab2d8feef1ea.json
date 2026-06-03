@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/7232142e-4f9c-4994-a12a-ab2d8feef1ea/QtrAnnual_L2_10.xlsx",
+            "local_path": "assets/xlsx/QtrAnnual_L2_10.xlsx",
             "path": "/home/user/Desktop/QtrAnnual_L2_10.xlsx"
           }
         ]

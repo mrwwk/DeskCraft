@@ -15,23 +15,23 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/empty_scene.blend",
+            "local_path": "assets/blend/empty_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/external/model_waterbottle.glb",
+            "local_path": "assets/glb/model_waterbottle.glb",
             "path": "/home/user/Documents/model_waterbottle.glb"
           },
           {
-            "local_path": "assets/blender/external/hdri_kloppenheim_06_puresky_1k.exr",
+            "local_path": "assets/exr/hdri_kloppenheim_06_puresky_1k.exr",
             "path": "/home/user/Documents/hdri_kloppenheim_06_puresky_1k.exr"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           },
           {
-            "local_path": "assets/blender/check_world.py",
+            "local_path": "assets/py/check_world.py",
             "path": "/tmp/check_world.py"
           }
         ]

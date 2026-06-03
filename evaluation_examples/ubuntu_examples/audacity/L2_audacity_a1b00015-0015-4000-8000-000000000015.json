@@ -10,7 +10,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/noisy_recording.wav",
+            "local_path": "assets/wav/noisy_recording.wav",
             "path": "/home/user/Documents/noisy_recording.wav"
           }
         ]

@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_calc_njc/f6b1639f-d2b2-4078-98dd-dd9f3ce35237/Inventory_Freeze_Row.xlsx",
+            "local_path": "assets/xlsx/Inventory_Freeze_Row.xlsx",
             "path": "/home/user/Inventory_Freeze_Row.xlsx"
           }
         ]

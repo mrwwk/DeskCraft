@@ -14,7 +14,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/audacity/audio/long_test.wav",
+            "local_path": "assets/wav/long_test.wav",
             "path": "/home/user/Documents/long_test.wav"
           }
         ]

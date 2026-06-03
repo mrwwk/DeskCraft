@@ -9,23 +9,23 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/blender/empty_scene.blend",
+            "local_path": "assets/blend/empty_scene.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {
-            "local_path": "assets/blender/check_object.py",
+            "local_path": "assets/py/check_object.py",
             "path": "/tmp/check_object.py"
           },
           {
-            "local_path": "assets/blender/check_material.py",
+            "local_path": "assets/py/check_material.py",
             "path": "/tmp/check_material.py"
           },
           {
-            "local_path": "assets/blender/check_animation.py",
+            "local_path": "assets/py/check_animation.py",
             "path": "/tmp/check_animation.py"
           },
           {
-            "local_path": "assets/blender/check_render.py",
+            "local_path": "assets/py/check_render.py",
             "path": "/tmp/check_render.py"
           }
         ]

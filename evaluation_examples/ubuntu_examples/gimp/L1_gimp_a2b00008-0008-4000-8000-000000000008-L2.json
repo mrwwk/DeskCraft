@@ -9,15 +9,15 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/gimp_task/photos/street_city_466685.jpg",
+            "local_path": "assets/jpg/street_city_466685.jpg",
             "path": "/home/user/Desktop/street_city_466685.jpg"
           },
           {
-            "local_path": "assets/gimp_task/texture/texture_paper_723311.jpg",
+            "local_path": "assets/jpg/texture_paper_723311.jpg",
             "path": "/home/user/Desktop/texture_paper_723311.jpg"
           },
           {
-            "local_path": "assets/gimp_task/graphic/icon_search.svg",
+            "local_path": "assets/svg/icon_search.svg",
             "path": "/home/user/Desktop/icon_search.svg"
           }
         ]

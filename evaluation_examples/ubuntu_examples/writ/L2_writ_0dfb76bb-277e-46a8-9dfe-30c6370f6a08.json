@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "assets/libreoffice_writ_njc/0dfb76bb-277e-46a8-9dfe-30c6370f6a08/RemotePolicy_L2_12.docx",
+            "local_path": "assets/docx/RemotePolicy_L2_12.docx",
             "path": "/home/user/Desktop/RemotePolicy_L2_12.docx"
           }
         ]
