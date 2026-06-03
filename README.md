@@ -26,7 +26,6 @@ At a high level, DeskCraft asks whether GUI agents can:
 - 🧰 **Professional workflow coverage** across office software, browsers, development tools, creative design tools, multimedia editing, 3D creation, OS operations, and multi-app workflows.
 - 🤝 **Human-in-the-loop task evolution** through deterministic phase triggers such as `agent_done`, `agent_asks`, and `step_count`.
 - ✅ **Execution-based verification** using programmatic evaluators over final desktop state, project files, exported artifacts, browser state, media metadata, and structured documents.
-- 🚀 **Multiple agent runners** for UI-TARS, EvoCUA, Qwen-VL, Claude, Kimi, OpenAI CUA, AutoGLM, AGI, and other agents.
 
 ## 🧭 Task Coverage
 
