@@ -3,7 +3,6 @@
 DeskCraft is a benchmark for evaluating desktop GUI agents on realistic professional workflows and human-in-the-loop collaboration. It accompanies our paper, **["DeskCraft: Benchmarking Desktop Agents on Professional Workflows and Human-in-the-Loop Collaboration"](https://arxiv.org/abs/2606.03103)**.
 
 <p align="center">
-  <a href="https://arxiv.org/pdf/2606.03103"><img src="https://img.shields.io/badge/Paper-arXiv%20PDF-red" alt="Paper"></a>
   <a href="https://arxiv.org/abs/2606.03103"><img src="https://img.shields.io/badge/arXiv-2606.03103-b31b1b" alt="arXiv"></a>
   <a href="https://github.com/mrwwk/DeskCraft"><img src="https://img.shields.io/badge/Code-GitHub-black" alt="Code"></a>
   <a href="https://mrwwk.github.io/DeskCraft/"><img src="https://img.shields.io/badge/Website-Project%20Page-blue" alt="Website"></a>
