@@ -132,6 +132,58 @@ For provider-specific setup, please refer to the guides under `desktop_env/provi
 - `desktop_env/providers/docker/DOCKER_GUIDELINE.md`
 - `desktop_env/providers/aws/AWS_GUIDELINE.md`
 
+### Cache Files
+
+The `cache/` directory contains pre-downloaded evaluation resources (~317 MB) required for running tasks. These files are cached to avoid repeated downloads during evaluation.
+
+**Option 1: Download from Hugging Face (Recommended)**
+
+The cache files are hosted on Hugging Face Datasets:
+
+- **Repository:** [Wenkaiwang/deskcraft_cache](https://huggingface.co/datasets/Wenkaiwang/deskcraft_cache)
+
+Download using `huggingface_hub`:
+
+```python
+from huggingface_hub import snapshot_download
+
+# Download to the project root directory
+snapshot_download(
+    repo_id="Wenkaiwang/deskcraft_cache",
+    repo_type="dataset",
+    local_dir="./cache",
+    local_dir_use_symlinks=False  # Important: download actual files, not symlinks
+)
+```
+
+Or using the command line:
+
+```bash
+huggingface-cli download \
+  --repo-type dataset \
+  Wenkaiwang/deskcraft_cache \
+  --local-dir ./cache \
+  --local-dir-use-symlinks False
+```
+
+**Option 2: Run without cache (Auto-download)**
+
+If the `cache/` directory is not present, the evaluation framework will automatically download required files during task setup. However, this requires internet access inside the VM and may slow down the initial setup.
+
+**Verify cache installation:**
+
+```bash
+ls -la cache/ | head -20
+# Should show UUID-named directories
+
+du -sh cache/
+# Should show approximately 317M
+```
+
+**Note:** The `cache/` directory is included in `.gitignore` by default to avoid committing large binary files to the Git repository.
+
+
+
 ## ⚡ Quick Start
 
 Run a small smoke test first to make sure the virtual desktop can start, reset, execute a basic pyautogui action, and close cleanly:
