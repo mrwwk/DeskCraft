@@ -230,7 +230,7 @@ results/
 
 dataimpulse_proxy_config.json
 
-## reference and draft and debug
+## Reference and draft and debug
 reference/
 draft/
 manual_examine.py
@@ -289,3 +289,75 @@ libpod/
 
 # Model comparison output
 comparison_results/
+
+# Backup files
+evaluation_examples/examples_per_task.backup_*/
+
+# Recursively ignore all __pycache__ directories
+**/__pycache__/
+
+# System and temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# IDE configurations
+.idea/
+
+# Python packaging and distribution
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Test coverage
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# Virtual environment
+venv/
+env/
+.venv
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# PID files
+*.pid
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Lock files
+package-lock.json
+yarn.lock
+Pipfile.lock
+
+# Task execution data
+taiji_task/
+
+# Temporary files and archives (generated during development)
+cache.tar.gz
+*.tar.gz
+*.tar
+*.zip
+
+# Temporary scripts and development files
+add_*.md
+update_*.py
+upload_*.py
+*_temp.*
+*_tmp.*
+temp_*
+tmp_*
+
+# README backup
+README.md.backup
+FINAL_SUMMARY.md
