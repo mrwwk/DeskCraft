@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_bae4f243-6af5-47ce-9eaf-a6b94c465319./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 渲染任务中的各项渲染设置是否达到预期要求。它通过读取外部检查脚本 check_render.py 输出的 JSON 数据，将其与评测规则 rule 中指定的期望值进行逐项精确比对。核心检查对象包括渲染引擎 engine、水平分辨率 resolution_x、垂直分辨率 resolution_y、帧率 fps、采样数 samples、图像格式 image_format 以及活动相机 active_camera。评测采用“全部满足”的严格逻辑：只要 rule 中列出的任一字段与 JSON 实际值不相等，即判定失败并返回 0.0；仅当所有指定字段均完全匹配，才返回 1.0。若 JSON 输出为空、解析失败或发生异常，同样直接判定为失败。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "该函数接收 command_output（来自 check_render.py 的 JSON 字符串输出）和 rule（包含期望渲染设置的字典）作为输入。首先调用辅助函数 _parse_blender_output 将 command_output 解析为 Python 字典；若解析结果为 None（空输出或 JSON 解析失败），直接返回 0.0。随后，函数通过内置的 checks 映射表，对 rule 中实际出现的每一个键（支持 engine、resolution_x、resolution_y、fps、samples、image_format、active_camera）分别执行严格相等比较，将解析结果中的字段值与 rule 中的期望值对比。一旦发现任何字段不匹配，立即记录警告日志并返回 0.0；若 rule 中所有指定字段均匹配成功，则返回 1.0。整个过程中若抛出异常，也会捕获并返回 0.0。判定逻辑为二元制：全部满足得 1.0，任一失败或异常得 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 20,
+        "description": "该函数负责将 Blender 检查脚本输出的原始字符串 command_output 解析为结构化字典。它首先检查输入是否为空或仅包含空白字符，若是则记录错误并返回 None；否则尝试使用 json.loads 对去除首尾空白后的内容进行 JSON 反序列化。若遇到 json.JSONDecodeError 或 ValueError，则记录错误日志及原始输出内容（debug 级别），并返回 None。该函数是主评测逻辑的数据预处理入口，为 check_blender_render_settings 提供标准化的解析结果，屏蔽空输出和非法 JSON 导致的后续比较错误。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:07:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_bae4f243-6af5-47ce-9eaf-a6b94c465319./evaluator_function_labels.json"
+}

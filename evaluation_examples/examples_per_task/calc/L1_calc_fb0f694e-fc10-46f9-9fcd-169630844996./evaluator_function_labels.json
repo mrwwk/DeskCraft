@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L1_calc_fb0f694e-fc10-46f9-9fcd-169630844996./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_csv",
+      "lineno": 185
+    },
+    {
+      "name": "compare_table",
+      "lineno": 240
+    },
+    {
+      "name": "compare_conference_city_in_order",
+      "lineno": 762
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_sheet_idx",
+      "lineno": 45
+    },
+    {
+      "name": "_load_sheet",
+      "lineno": 95
+    },
+    {
+      "name": "_safe_read_file",
+      "lineno": 127
+    },
+    {
+      "name": "compare_csv",
+      "lineno": 185
+    },
+    {
+      "name": "compare_table",
+      "lineno": 240
+    },
+    {
+      "name": "_normalize_city_string",
+      "lineno": 750
+    },
+    {
+      "name": "compare_conference_city_in_order",
+      "lineno": 762
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证桌面办公场景中的表格处理任务结果，核心检查对象是CSV或Excel（xlsx）文件的内容、结构及格式属性。它通过将结果文件与期望文件（或预设规则）进行多维度比较来判定任务完成度：对于CSV，采用文本行级精确或宽松匹配；对于Excel，支持工作表名称、单元格数据（精确数值或打印文本）、模糊文本匹配、图表、迷你图、样式（含条件格式）、冻结窗格、缩放比例、数据验证、行列属性、筛选器、数据透视表及特定单元格属性等十余种检查维度。所有检查项默认采用“全部满足”的与逻辑联合判定，任一规则失败即整体返回0.0，全部通过返回1.0。此外，针对特定业务场景（如会议城市列表），还提供按顺序的容忍性字符串包含匹配。",
+    "main_functions": [
+      {
+        "name": "compare_csv",
+        "lineno": 185,
+        "description": "接收result（结果CSV文件路径）、expected（期望CSV文件路径或路径列表）及options。首先调用_safe_read_file读取结果文件；若expected为单一路径则包装为列表。依次遍历每个期望文件并同样读取，根据options进行预处理：strict为False时对每行执行strip去除首尾空白，ignore_case为True时将每行转为小写。将处理后的结果行列表与期望行列表进行完全相等比较，任一期望文件匹配成功即返回1.0；若全部不匹配或结果文件不存在/读取失败，则返回0.0。"
+      },
+      {
+        "name": "compare_table",
+        "lineno": 240,
+        "description": "接收result（结果xlsx路径）、expected（期望xlsx路径，可为None）和options（必须含rules列表）。使用openpyxl和pandas加载双方工作簿，遍历options[\"rules\"]按type字段分发检查：1) sheet_name：比较双方sheet名称列表是否完全一致；2) sheet_data：通过pandas读取指定sheet，按precision（默认4位小数）四舍五入后比较DataFrame.equals；3) sheet_print：将sheet转为CSV行列表，可选ignore_case后比较列表相等；4) sheet_fuzzy：对指定range内每个单元格读取值后，依次执行normalization替换、trim_leadings/trim_trailings裁剪、ignore_chars字符过滤、ignore_case转小写，再按type（includes/included_by/fuzzy_match/exact_match）比较，其中fuzzy_match使用rapidfuzz.ratio，默认阈值85，所有range与规则须同时满足；5) sparkline/chart/style/freeze/zoom/data_validation/row_props/col_props/filter/pivot_table/check_cell：分别调用load_xxx或_read_cell_style等辅助函数读取对应属性，与期望做相等比较或规则匹配（zoom与check_cell使用_match_value_to_rule）。所有规则采用逻辑与（passes = passes and metric），任一规则失败立即中断，最终返回1.0或0.0。"
+      },
+      {
+        "name": "compare_conference_city_in_order",
+        "lineno": 762,
+        "description": "接收actual_city_list_path（结果xlsx路径）和expected_city（字典，键\"expected\"为期望城市列表）。打开结果文件的active sheet，读取C2:C22区域获得实际城市列表。按索引顺序遍历实际与期望城市：对每个实际值调用_normalize_city_string进行归一化（去重音、去标点、转小写）；期望项可为字符串或字符串列表（多候选），将候选同样归一化后，检查是否存在非空候选被包含于实际归一化字符串中。若任一位置顺序不匹配，记录日志并返回0.0；全部顺序匹配成功返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_sheet_idx",
+        "lineno": 37,
+        "description": "解析sheet索引以确定应从result还是expected工作簿中读取哪个sheet。支持纯整数（按result索引）、\"RI\"前缀（按result索引）、\"RN\"前缀（直接使用result的sheet名）、\"EI\"前缀（按expected索引）、\"EN\"前缀（直接使用expected的sheet名）。返回(book, index)元组，供_load_sheet使用。"
+      },
+      {
+        "name": "_load_sheet",
+        "lineno": 82,
+        "description": "根据book类型加载指定sheet并返回统一对象：若book为str（路径），尝试读取同名衍生CSV文件（{book}-{index}.csv），返回行列表；若为pd.ExcelFile，返回pandas DataFrame；若为openpyxl Workbook，返回Worksheet对象。加载失败返回None。被compare_table中各类sheet级检查复用。"
+      },
+      {
+        "name": "_safe_read_file",
+        "lineno": 112,
+        "description": "安全读取文本文件，按优先级依次尝试utf-8、utf-8-sig、latin-1、windows-1252、gbk、cp1251、iso-8859-1编码；全部失败时以utf-8 with errors='replace'作为最后手段。返回去除换行符的行列表。被compare_csv及_load_sheet（CSV分支）调用。"
+      },
+      {
+        "name": "_normalize_city_string",
+        "lineno": 744,
+        "description": "对输入值进行城市名称归一化：转为字符串后使用NFKD规范化并去除组合重音符号，将非字母数字字符替换为空格，整体转小写并去除首尾空白。用于compare_conference_city_in_order，以实现容忍大小写、标点和重音符号的顺序包含匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:22:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L1_calc_fb0f694e-fc10-46f9-9fcd-169630844996./evaluator_function_labels.json"
+}

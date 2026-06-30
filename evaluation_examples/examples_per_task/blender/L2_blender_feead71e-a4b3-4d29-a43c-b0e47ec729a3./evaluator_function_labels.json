@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_feead71e-a4b3-4d29-a43c-b0e47ec729a3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_text_styling",
+      "lineno": 40
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_text_styling",
+      "lineno": 40
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中指定文本对象（text object）的样式配置是否符合预期。它通过读取外部检查脚本（如check_text.py）输出的JSON数据，定位指定名称的文本对象，并对其body（文本内容）、size（尺寸）、extrude（挤出厚度）、bevel_depth（倒角深度）、align_x（水平对齐方式）等属性进行逐项核查。其中字符串类属性采用精确匹配，数值类属性采用容差范围内的近似匹配。只有当所有在rule中指定的属性全部满足对应条件时，才判定任务完成并返回1.0；若解析失败、对象不存在或任一属性不匹配，则立即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_blender_text_styling",
+        "lineno": 40,
+        "description": "该函数接收来自Blender检查脚本的command_output（JSON字符串）和包含预期规则的rule字典。首先调用_parse_blender_output将命令输出解析为JSON对象；若解析失败或结果为空则直接返回0.0。接着通过rule.get(\"object_name\")获取目标对象名称，并从解析结果中提取该对象的文本数据；若对象不存在则返回0.0。随后按顺序执行以下检查：若rule中包含\"body\"，则要求text_data[\"body\"]与rule[\"body\"]精确相等；若rule中包含\"size\"、\"extrude\"或\"bevel_depth\"，则调用_check_tolerance进行数值容差比较，容差值取自rule.get(\"tolerance\", 0.05)；若rule中包含\"align_x\"，则要求精确匹配。以上所有检查必须全部通过才返回1.0，任一检查失败立即返回0.0。若执行过程中发生异常，也返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "负责将Blender检查脚本输出的原始字符串解析为Python字典。它先检查command_output是否为空或仅包含空白字符，若为空则记录错误并返回None；否则尝试使用json.loads进行解析。若遇到JSONDecodeError或ValueError，则记录错误及原始输出内容，并返回None。该函数是主评测逻辑的数据入口，为后续所有属性检查提供结构化数据。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 28,
+        "description": "用于判断实际数值是否在预期数值的容差范围内。它接收actual（实际值）、expected（预期值）和tol（容差值）三个参数，首先检查actual和expected是否均为非None，然后计算两者差值的绝对值是否小于等于tol，返回布尔结果。该函数主要服务于主函数中对size、extrude、bevel_depth等浮点属性的近似匹配检查。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:13:24",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_feead71e-a4b3-4d29-a43c-b0e47ec729a3./evaluator_function_labels.json"
+}

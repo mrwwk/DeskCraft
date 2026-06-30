@@ -1,0 +1,79 @@
+{
+  "id": "480bcfea-d68f-4aaa-a0a9-2589ef319381",
+  "task_slug": "disable_refresh_ui_flags",
+  "difficulty": "L1",
+  "snapshot": "chrome",
+  "instruction": "Disable Chrome's 2023 refresh UI flags (both 'PDF Chrome Refresh 2023' and 'Chrome Refresh Themed Realbox') and confirm the changes are applied.",
+  "source": "https://developer.chrome.com/docs/web-platform/chrome-flags",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "pkill",
+            "chrome"
+          ]
+        }
+      },
+      {
+        "type": "launch",
+        "parameters": {
+          "command": [
+            "google-chrome",
+            "--remote-debugging-port=1337"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 3
+        }
+      }
+    ],
+    "func": "check_enabled_experiments",
+    "file": "evaluator.py",
+    "result": {
+      "type": "enabled_experiments"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "type": "disabled_names",
+        "names": [
+          "pdf-cr23",
+          "ntp-realbox-cr23-theming"
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

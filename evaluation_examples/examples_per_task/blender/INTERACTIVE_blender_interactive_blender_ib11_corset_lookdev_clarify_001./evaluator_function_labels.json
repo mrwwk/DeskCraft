@@ -1,0 +1,78 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib11_corset_lookdev_clarify_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 114
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 158
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 37
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 114
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 158
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 交互任务在「渲染设置—环境光照—输出图像」全链路中的最终状态与产物。核心检查对象包括：由 check_render.py 与 check_world.py 脚本输出的 JSON 配置数据、本地磁盘上的渲染图像文件，以及通用文本输出。具体验证维度涵盖：渲染引擎、分辨率、帧率、采样数、图像格式、活动相机等参数是否被精确设置；World 环境节点是否启用了 HDRI 且文件名符合预期；最终渲染图像文件的物理尺寸与格式是否正确。此外，evaluator 还提供了一套通用的字符串包含/排除检查器。评分逻辑为「逐项精确匹配、一票否决」：各主函数针对 rule 中声明的条件逐一比对，任一条件不满足即返回 0.0，全部满足才返回 1.0。其中图像格式检查支持不区分大小写及 JPG/JPEG 别名容错；HDRI 文件名检查支持「期望文件名为实际文件名的子串」或完全相等两种通过形态。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 50,
+        "description": "接收来自 check_render.py 的 command_output（JSON 字符串）以及 rule 字典。首先调用辅助函数 _parse_blender_output 将命令输出解析为 Python 字典；若解析失败或输出为空，直接返回 0.0。随后对 rule 中可能出现的键进行逐项精确相等检查，支持的检查键包括：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。遍历这些键时，若 rule 声明了某键且实际值与期望值不相等，则记录警告并立即返回 0.0；仅当 rule 中声明的所有键均与实际值完全匹配时，才返回 1.0。函数外层有异常捕获，任何异常均返回 0.0。"
+      },
+      {
+        "name": "check_blender_world_hdri",
+        "lineno": 85,
+        "description": "接收来自 check_world.py 的 command_output（JSON 字符串）以及 rule 字典。首先调用 _parse_blender_output 解析 JSON；解析失败返回 0.0。接着检查解析结果中的 has_hdri 字段，若 World 环境未启用 HDRI，则记录警告并返回 0.0。然后从 rule 中提取期望的 hdri_filename，与实际结果中的 hdri_filename 进行比对：通过条件为「实际文件名等于期望文件名」或「期望文件名被包含在实际文件名中」（子串匹配）。满足任一条件返回 1.0，否则记录不匹配警告并返回 0.0。异常捕获返回 0.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 114,
+        "description": "接收渲染输出文件的本地路径 file_path 和 rule 字典。首先检查文件是否存在，不存在则返回 0.0。尝试使用 PIL.Image 打开图像并读取尺寸：若 rule 中声明了 width 或 height，要求与实际图像尺寸（img.size）精确相等，任一不匹配即返回 0.0。若 rule 中声明了 format，则将期望格式转大写后与 PIL 读取的 actual_fmt 比对；内部维护 fmt_map 别名表（如 JPG 映射为 JPEG），对双方均做别名转换后再比较，若仍不匹配则返回 0.0。若 PIL 未安装（ImportError），退化为仅检查文件是否存在，存在返回 1.0，否则返回 0.0。其他异常亦返回 0.0。所有检查通过返回 1.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 158,
+        "description": "通用文本内容检查函数，接收 result 字符串与 rules 字典。从 rules 中提取 include 列表（默认空列表）与 exclude 列表（默认空列表）。判定逻辑为：result 不得为 None；且 result 必须同时包含所有 include 字符串（子串匹配）；且 result 必须不包含任何 exclude 字符串。上述三个条件全部满足时返回 1.0，任一不满足（result 为 None、缺失某 include 或包含某 exclude）则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 37,
+        "description": "Blender 脚本 JSON 输出的前置解析器，服务于 check_blender_render_settings 与 check_blender_world_hdri。接收原始 command_output 字符串，先判空：若输出为 None、空字符串或仅含空白字符，则记录错误并返回 None。否则尝试调用 json.loads 解析为 Python 对象并返回。若抛出 JSONDecodeError 或 ValueError，则记录错误及原始输出片段，返回 None。该函数返回值直接决定主检查函数是否继续比对：返回 None 时主函数直接判 0 分。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:05:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib11_corset_lookdev_clarify_001./evaluator_function_labels.json"
+}

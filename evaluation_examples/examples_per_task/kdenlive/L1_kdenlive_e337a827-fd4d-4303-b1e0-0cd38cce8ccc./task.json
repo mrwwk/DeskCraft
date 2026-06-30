@@ -1,0 +1,76 @@
+{
+  "id": "e337a827-fd4d-4303-b1e0-0cd38cce8ccc",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, the video file '/home/user/Videos/15368811_1920_1080_30fps.mp4' has been imported into the project bin, use 'Extract Frame' or the clip monitor to take a snapshot and save it to '/home/user/Videos/', then save the project to '/home/user/Videos/project.kdenlive'.",
+  "source": "https://docs.kdenlive.org/en/user_interface/monitors/clip_monitor.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/mp4/15368811_1920_1080_30fps.mp4",
+            "path": "/home/user/Videos/15368811_1920_1080_30fps.mp4"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive",
+          "/home/user/Videos/15368811_1920_1080_30fps.mp4"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "postconfig": [],
+    "conj": "and",
+    "func": [
+      "check_kdenlive_snapshot_exists",
+      "check_kdenlive_file_exists"
+    ],
+    "result": [
+      {
+        "type": "vm_command_line",
+        "command": "ls /home/user/Videos/*.png 2>/dev/null | wc -l"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/project.kdenlive",
+        "dest": "project.kdenlive"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "min_count": 1
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "valid_xml": true
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L1"
+}

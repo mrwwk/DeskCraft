@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00003-0003-4000-8000-000000000003-L1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_8ea73f6f_resize_1920x1080",
+      "lineno": 18
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_8ea73f6f_resize_1920x1080",
+      "lineno": 18
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Agent是否成功完成“将图像调整为1920x1080像素”这一任务。它直接对Agent产出的图像文件（result_path）进行结果判定，核心检查分为两步：第一，输出图像的宽高必须严格等于1920x1080像素，不允许任何偏差；第二，若提供了原始源图像（expected_path），则要求输出图像的内容结构被保留——具体做法是将源图像通过BICUBIC插值重采样到1920x1080后，与输出图像在RGB空间下计算SSIM（结构相似性指数），SSIM值必须达到或超过指定阈值（默认0.85）。只有当尺寸检查通过，且在有源图时SSIM检查也通过，evaluator才判定任务成功并返回1.0；任一检查失败或发生异常均返回0.0。若未提供源图像，则仅执行尺寸检查，通过即视为成功。",
+    "main_functions": [
+      {
+        "name": "check_8ea73f6f_resize_1920x1080",
+        "lineno": 18,
+        "description": "该主函数接收result_path（Agent在VM中输出的图像文件路径）、expected_path（VM中的原始源图像路径，用于内容比对）以及options（可选字典，可包含ssim_threshold浮点阈值，默认0.85）。其测试逻辑按以下步骤执行：1. 前置存在性检查：若result_path为None或对应文件不存在，直接返回0.0。2. 严格尺寸检查：使用PIL.Image.open打开结果图，读取其size属性，必须严格等于1920x1080像素；若实际宽高任一不符，记录日志并返回0.0。3. 内容结构保留检查（仅在expected_path非None且文件存在时执行）：使用PIL打开源图，并将结果图与源图均转换为RGB模式以消除模式差异；将源图使用Image.Resampling.BICUBIC算法重采样到1920x1080作为比对基准；将两图转为numpy数组后，调用skimage.metrics.structural_similarity（即ssim）计算结构相似度，其中win_size根据图像最小维度自适应——若最小维度小于7，则取不大于该维度的最大奇数（若计算后小于1则判定失败返回0.0），否则固定为7；为兼容不同版本skimage，先尝试使用channel_axis=2参数，若抛出TypeError则回退到multichannel=True；随后从options获取ssim_threshold（默认0.85），若SSIM值小于该阈值，记录日志并返回0.0。若expected_path为None或文件不存在，则跳过本步骤。4. 最终判定：尺寸检查与内容结构检查为“全部满足”的串联关系；当两者均通过（或无源图时仅尺寸通过），返回1.0表示成功。任何环节失败或捕获到未预期异常，均返回0.0。函数内部直接调用PIL.Image.open、Image.convert、Image.resize、numpy.array及ssim等第三方库接口，文件内无其他自定义辅助函数。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:54:17",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00003-0003-4000-8000-000000000003-L1./evaluator_function_labels.json"
+}

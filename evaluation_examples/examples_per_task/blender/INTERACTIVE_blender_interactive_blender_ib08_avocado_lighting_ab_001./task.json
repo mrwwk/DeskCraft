@@ -1,0 +1,127 @@
+{
+  "id": "interactive_blender_ib08_avocado_lighting_ab_001",
+  "snapshot": "blender",
+  "interactive": true,
+  "scenario_type": "requirement_change",
+  "scenario_description": "食品广告 A/B 光照对比：先自然光 A 版，再中途切换棚感光做 B 版。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "source": "blender_interactive;source_type=marketing_change_request;source_ref=<id_or_url>;evidence=lighting_style_switch",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blend/empty_scene.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/glb/model_avocado.glb",
+            "path": "/home/user/Documents/model_avocado.glb"
+          },
+          {
+            "local_path": "assets/exr/hdri_kloppenheim_06_puresky_1k.exr",
+            "path": "/home/user/Documents/hdri_kloppenheim_06_puresky_1k.exr"
+          },
+          {
+            "local_path": "assets/exr/hdri_aerodynamics_workshop_1k.exr",
+            "path": "/home/user/Documents/hdri_aerodynamics_workshop_1k.exr"
+          },
+          {
+            "local_path": "assets/py/check_render.py",
+            "path": "/tmp/check_render.py"
+          },
+          {
+            "local_path": "assets/py/check_world.py",
+            "path": "/tmp/check_world.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先导入 /home/user/Documents/model_avocado.glb，用 /home/user/Documents/hdri_kloppenheim_06_puresky_1k.exr 做 A 版，渲染 /home/user/Documents/avocado_a.png（1600x1600）。",
+      "trigger": {
+        "type": "step_count",
+        "value": 4
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "中途改需求：把光照改成 /home/user/Documents/hdri_aerodynamics_workshop_1k.exr，做 B 版 /home/user/Documents/avocado_b.png（1600x1600），并保存 /home/user/Documents/ib08_delivery.blend。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "func": [
+      "check_blender_render_output",
+      "check_image_has_content"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/avocado_a.png",
+        "dest": "avocado_a.png"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/avocado_a.png",
+        "dest": "avocado_a.png"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "width": 1600,
+          "height": 1600,
+          "format": "PNG"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {}
+      }
+    ],
+    "options": [
+      {},
+      {
+        "min_std": 15.0,
+        "min_unique_colors": 100
+      }
+    ]
+  },
+  "_task_config_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/results/replay_full/kimi-replay-full/pyautogui/screenshot/Kimi-K2.6/blender/INTERACTIVE_blender_interactive_blender_ib08_avocado_lighting_ab_001/revise_task/task.json",
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

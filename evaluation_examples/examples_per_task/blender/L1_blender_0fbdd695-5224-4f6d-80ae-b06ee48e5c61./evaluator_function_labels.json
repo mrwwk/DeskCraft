@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_0fbdd695-5224-4f6d-80ae-b06ee48e5c61./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_object_renamed",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_object_renamed",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender任务中对象重命名操作是否成功完成。它通过读取Blender检查脚本（check_object.py）输出的JSON数据，获取当前场景中的对象名称列表，然后核对两个核心条件：第一，目标新名称（expected_name）必须出现在对象列表中；第二，如果提供了旧名称（old_name），则该旧名称必须已从对象列表中移除。只有当新名称存在且旧名称（若指定）不存在时，才判定重命名任务成功并返回1.0分；任何条件不满足或数据解析失败均返回0.0分。整个评测逻辑属于严格的二元判定，不涉及加权、累计或部分打分。",
+    "main_functions": [
+      {
+        "name": "check_blender_object_renamed",
+        "lineno": 33,
+        "description": "该函数接收来自check_object.py的JSON字符串输出（command_output）以及包含重命名规则的rule字典。首先调用辅助函数 `_parse_blender_output` 将原始命令输出解析为Python字典；若解析失败则直接返回0.0。接着从rule中提取 `expected_name`（期望的新对象名）和 `old_name`（原对象名，可选），并从解析结果的字典键 `object_names` 中获取当前所有对象名称列表。然后执行组合条件检查：必须同时满足（1）`expected_name` 存在于 `object_names` 列表中，且（2）`old_name` 未提供或已不在 `object_names` 列表中。若两个条件同时满足，返回1.0表示重命名成功；若任一条件不满足，则记录包含当前名称列表的警告日志并返回0.0；若执行过程中发生任何异常，则记录错误日志并返回0.0。该函数采用严格的二元打分机制，无中间分数。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 20,
+        "description": "该辅助函数负责将Blender检查脚本输出的原始字符串（command_output）解析为JSON对象。它会先检查输入是否为空或仅包含空白字符，若为空则记录错误并返回None；随后尝试使用 `json.loads` 对去除首尾空白后的输出进行解析。如果解析过程中触发 `json.JSONDecodeError` 或 `ValueError`，则记录错误日志及原始输出内容（debug级别），并返回None。该函数是主评测函数的数据预处理入口，仅负责解析与容错，不执行任何业务规则判断；解析成功时返回包含 `object_names` 等字段的字典，解析失败会导致主评测函数直接判定为失败。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:05:28",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_0fbdd695-5224-4f6d-80ae-b06ee48e5c61./evaluator_function_labels.json"
+}

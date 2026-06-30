@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_2888b4e6-5b47-4b57-8bf5-c73827890774./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器相关任务（任务ID：L2_chrome_2888b4e6-5b47-4b57-8bf5-c73827890774）的完成状态，核心检查对象是浏览器当前激活标签页的URL或某个字符串结果。它通过两种独立指标进行判定：一是使用正则表达式列表对URL进行模式匹配（要求所有正则模式均能在URL中找到对应匹配），二是对结果进行严格的精确相等比较。每个指标独立返回1.0（完全满足）或0.0（不满足），不存在加权累计、部分得分或近似容差逻辑，判定思路为“全有或全无”的二元评分机制。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "该函数接收result（通常为activate_tab_info或get_active_url_from_accessTree的返回值）和rules（包含expected字段，其值为正则模式列表）作为输入。首先检查result是否为空，若为空直接返回0.0；接着从result中提取URL——若result为字符串则直接使用，若为字典则提取'url'字段，若格式非法也返回0.0；然后从rules['expected']获取正则模式列表，并逐个使用re.search在提取出的URL中搜索。遍历过程中只要有一个pattern未能匹配成功，立即返回0.0；仅当所有pattern全部匹配成功时才返回1.0。该逻辑要求URL必须同时满足所有正则约束，属于严格的组合匹配判定。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 82,
+        "description": "该函数接收result和rules（包含expected字段）作为输入。首先从rules中取出expect值，并将result与expect打印输出；随后通过Python的==运算符进行严格相等比较。若两者完全一致则返回1.0，否则返回0.0。该函数不做任何类型转换、近似匹配、模糊比较或容差处理，属于最严格的精确相等判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:44:51",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_2888b4e6-5b47-4b57-8bf5-c73827890774./evaluator_function_labels.json"
+}

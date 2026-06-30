@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00015-0015-4000-8000-000000000015./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 104
+    },
+    {
+      "name": "check_audio_rms_level",
+      "lineno": 125
+    },
+    {
+      "name": "check_aup_project_exists",
+      "lineno": 147
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 24
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 42
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 76
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 87
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 104
+    },
+    {
+      "name": "check_audio_rms_level",
+      "lineno": 125
+    },
+    {
+      "name": "check_aup_project_exists",
+      "lineno": 147
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证OSWorld环境中Audacity任务的执行结果，核心围绕两类产物展开检查：一是导出的WAV音频文件，二是Audacity项目文件。对于WAV文件，evaluator会原子化地检查音频时长是否落在指定容差范围内，以及单声道RMS电平（dB）是否处于指定区间；对于项目文件，evaluator会检查文件存在性、最小文件大小，并验证其是否为有效的.aup（XML格式，Audacity 2.x）或.aup3（SQLite格式，Audacity 3.x）。每个主函数均为独立判定，采用硬阈值方式：条件满足返回1.0，不满足或异常返回0.0，不存在加权或累计逻辑。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 104,
+        "description": "检查指定路径WAV音频文件的播放时长。首先验证file_path是否存在；若不存在则返回0.0。随后调用_read_wav_info读取WAV元数据，获取实际duration。从rule字典中提取expected_duration（预期时长，必填）和tolerance（容差秒数，默认0.5）。计算实际时长与预期时长的绝对差值，若abs(actual - expected) <= tolerance则返回1.0，否则返回0.0。过程中任何异常均捕获并返回0.0。"
+      },
+      {
+        "name": "check_audio_rms_level",
+        "lineno": 125,
+        "description": "检查指定路径WAV音频文件的单声道RMS电平是否处于指定dB范围内。首先验证file_path是否存在；若不存在则返回0.0。随后调用_get_mono_samples将音频转换为单声道样本列表并获取采样率；再调用_rms_db计算RMS分贝值。从rule字典中提取min_rms_db和max_rms_db作为上下界。若min_rms_db <= rms <= max_rms_db则返回1.0，否则返回0.0。过程中任何异常均捕获并返回0.0。"
+      },
+      {
+        "name": "check_aup_project_exists",
+        "lineno": 147,
+        "description": "检查指定路径的Audacity项目文件是否存在且格式有效，支持.aup（XML，Audacity 2.x）与.aup3（SQLite，Audacity 3.x）两种格式。首先验证file_path是否存在；随后获取实际文件大小，并与rule中的min_file_size（默认100字节）比较，若小于阈值则返回0.0。接着先尝试以sqlite3连接该文件，查询sqlite_master中是否存在名为'project'或'autosave'的表，若存在则判定为有效.aup3并返回1.0；若SQLite尝试失败，则回退到以xml.etree.ElementTree解析XML，若成功获取root则判定为有效.aup并返回1.0。若两种格式均无法解析，则返回0.0。过程中任何异常均捕获并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 22,
+        "description": "使用标准库wave模块打开WAV文件，提取channels、sample_rate、n_frames、sampwidth，并计算duration（n_frames / sample_rate）。返回包含上述字段的字典。该函数为check_audio_duration和_get_mono_samples提供音频基础元数据读取能力。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 35,
+        "description": "读取WAV文件的全部原始帧数据，根据sampwidth（1/2/3/4字节）分别使用struct.unpack或int.from_bytes将无符号/有符号整数解码为[-1.0, 1.0]范围的浮点样本列表；多声道时样本按交错（interleaved）顺序排列。该函数为_get_mono_samples提供标准化后的音频样本数据。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 64,
+        "description": "接收浮点样本列表，计算均方根（RMS）并转换为分贝值：20.0 * math.log10(rms)。若样本为空或rms小于1e-10，则返回-100.0 dB。该函数是check_audio_rms_level中音频电平检查的核心计算函数。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 75,
+        "description": "依次调用_read_wav_info和_read_wav_samples读取WAV文件；若声道数大于1，则将交错样本按帧取平均转换为单声道样本；最终返回单声道样本列表与sample_rate。该函数为check_audio_rms_level提供单声道样本数据，确保RMS计算基于单声道信号。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 20:53:36",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00015-0015-4000-8000-000000000015./evaluator_function_labels.json"
+}

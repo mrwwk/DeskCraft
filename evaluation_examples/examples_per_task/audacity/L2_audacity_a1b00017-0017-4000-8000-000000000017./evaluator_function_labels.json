@@ -1,0 +1,57 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00017-0017-4000-8000-000000000017./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_aup3_labels",
+      "lineno": 95
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_open_aup3",
+      "lineno": 23
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 29
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 49
+    },
+    {
+      "name": "check_aup3_labels",
+      "lineno": 95
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 音频编辑软件的 .aup3 项目文件中是否包含符合预期的时间标签（label）。其核心检查对象是项目内所有标签轨道（labeltrack）中的标签数据，包括标签的时间点与文本内容。评测时，evaluator 将 .aup3 文件作为 SQLite 数据库打开，提取并解析其中的项目 XML，遍历所有轨道以收集实际存在的标签列表。随后，它将实际标签与 rule 参数中给定的 expected_labels 进行逐一比对：时间上允许在指定容差范围内（默认 1.0 秒）的近似匹配，文本上采用不区分大小写的双向子串包含匹配（即预期文本与实际文本互相包含即可）。判定逻辑为“全部满足”制——只有当实际标签数量不少于预期数量，且每个预期标签都能在实际标签中找到唯一对应匹配时，才返回 1.0 表示成功；若数量不足、任一标签未找到匹配或发生异常，则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_aup3_labels",
+        "lineno": 95,
+        "description": "该函数接收 file_path（待检测的 .aup3 文件路径）和 rule（字典，必须包含 expected_labels 列表，可选 time_tolerance，默认值为 1.0）。执行步骤如下：1）检查文件是否存在，不存在直接返回 0.0；2）调用 _parse_aup3_tracks 解析项目中的所有轨道信息；3）遍历轨道列表，收集 type 为 \"label\" 的轨道中的 labels 字段，汇总为 all_labels；4）进行数量门槛检查：若 all_labels 长度小于 expected_labels 长度，记录日志并返回 0.0；5）使用双重循环进行一对一匹配：外层遍历每个预期标签 exp，内层在未匹配的实际标签中查找；匹配条件为 abs(actual[\"time\"] - exp[\"time\"]) <= time_tol，且文本满足 exp[\"text\"].strip().lower() 与 actual[\"text\"].strip().lower() 的互相子串包含关系；每个实际标签仅能被匹配一次（通过 matched 集合记录已匹配索引）；6）若某个预期标签找不到匹配，立即记录日志并返回 0.0；若全部预期标签均匹配成功，记录日志并返回 1.0。整个过程中任何异常都会被捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_open_aup3",
+        "lineno": 23,
+        "description": "接收 file_path，调用 sqlite3.connect 将 .aup3 文件作为 SQLite 数据库打开，返回数据库连接对象 conn。这是读取 Audacity 项目文件的基础封装，专供 _get_aup3_project_xml 调用，用于访问 .aup3 内部的 project 或 autosave 表。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 29,
+        "description": "接收 file_path，调用 _open_aup3 建立数据库连接后，优先执行 SQL 语句 \"SELECT doc FROM project LIMIT 1\" 获取项目 XML；若 project 表无数据，则回退到 \"SELECT doc FROM autosave LIMIT 1\"。若两表均无数据返回 None。对取出的原始内容进行 UTF-8 解码（若为 bytes 类型），返回项目 XML 字符串。该函数是提取 Audacity 项目内部 XML 的核心读取器，被 _parse_aup3_tracks 调用。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 49,
+        "description": "接收 file_path，先调用 _get_aup3_project_xml 获取项目 XML 字符串；若为空则返回空列表。使用 xml.etree.ElementTree 解析 XML，并处理命名空间（从 root.tag 提取命名空间前缀）。遍历根元素下的所有子元素，根据标签名识别两类轨道：对于 \"wavetrack\"/\"WaveTrack\"，提取 name、gain、mute、solo、pan 属性，构造 type 为 \"wave\" 的轨道字典；对于 \"labeltrack\"/\"LabelTrack\"，遍历其下的 \"label\"/\"Label\" 子元素，提取时间属性 t（回退 t0）、t1（回退 t），以及从外层轨道元素 elem 获取的 title（回退 text）作为标签文本，构造 labels 列表后组装为 type 为 \"label\" 的轨道字典。最终返回包含所有轨道信息的列表，供 check_aup3_labels 使用以获取实际标签数据。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 20:53:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00017-0017-4000-8000-000000000017./evaluator_function_labels.json"
+}

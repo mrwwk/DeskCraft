@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_019./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_calc_invoice_sum",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_calc_invoice_sum",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator验证用户生成的Invoices.xlsx文件是否正确地完成了发票汇总任务。验证采用“全部满足则通过，任一失败即零分”的判定逻辑。核心要求包括：工作簿中必须存在Sheet2；Sheet2必须包含可识别的'Total Amount'列（列名大小写不敏感）以及'Invoice No.'列（列名同时包含'invoice'和'no'）；Sheet2中必须包含所有预期的唯一发票号码（与expected参数或options中的expected_invoice_numbers进行字符串集合比对，必须完全一致）；最关键的是，Sheet2中每张发票的Total Amount必须等于Sheet1中该发票号对应的所有Sales记录的总和。金额比较采用绝对误差容差（默认1.0），全部条件满足返回1.0，任一条件失败立即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_calc_invoice_sum",
+        "lineno": 7,
+        "description": "该函数接收result_path（Invoices.xlsx的本地路径）、expected（可选字典，可包含键expected_invoice_numbers）和options（可选关键字参数，可包含tolerance）。执行流程如下：1）检查result_path是否存在，尝试导入pandas并用pd.ExcelFile打开工作簿，若Sheet2不存在直接返回0.0；2）读取Sheet1和Sheet2，在Sheet2中通过str(c).strip().lower()后匹配'total amount'定位总金额列，通过同时包含'invoice'和'no'定位发票号列，任一列缺失返回0.0；3）若提供了expected_invoice_numbers（先从expected字典获取，否则从options获取），将Sheet2中的发票号经dropna后转为字符串集合（优先str(int(v))，失败则str(v).strip()），与预期集合进行严格比对，不一致返回0.0；4）在Sheet1中同样定位'Invoice No.'列和完全匹配'sales'的Sales列，使用groupby按发票号分组求和，构建{invoice_number: total_sales}字典；5）遍历Sheet2每一行，将每张发票的Total Amount与Sheet1计算出的对应总和进行浮点比较，容差通过options.get('tolerance', 1.0)获取，默认值为1.0，若任一发票缺失、Total Amount为空或绝对差值超出容差，立即返回0.0；全部通过则返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:20:48",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_019./evaluator_function_labels.json"
+}

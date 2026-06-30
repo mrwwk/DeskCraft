@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_c1fa57f3-c3db-4596-8f09-020701085416./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 65
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 65
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器任务完成状态，核心检查两大对象：一是当前激活标签页的URL是否满足预期正则模式（要求所有模式全部匹配），二是Chrome书签结构是否符合预期（包括书签栏文件夹名称、书签栏网站URL，以及特定“Liked Authors”文件夹内的网站URL）。判定逻辑采用严格的二元打分制（返回1.0或0.0），无中间分数。URL检查通过正则表达式搜索（re.search）验证；书签检查通过集合相等性比较验证，其中“Liked Authors”场景支持规则内多组可选URL的笛卡尔积组合匹配，只要实际URL集合与任一组合完全一致即算通过。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 33,
+        "description": "接收result（当前标签页信息，可以是字符串URL或包含'url'键的字典）和rules（包含'expected'键的字典，其值为正则模式列表）。首先校验result非空且能提取出有效URL字符串；然后遍历rules['expected']中的每一个正则pattern，使用re.search在提取到的URL中逐一搜索。判定依据为：所有pattern都必须匹配成功，若任一pattern不匹配或输入格式无效，则返回0.0；全部通过则返回1.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 65,
+        "description": "接收bookmarks（Chrome书签数据结构，包含'bookmark_bar'等层级）和rule（包含'type'字段的字典）。首先检查bookmarks是否为空，空则返回0.0。随后根据rule['type']分三支处理：（1）'bookmark_bar_folders_names'：提取bookmark_bar下所有type为'folder'的书签名称，与rule['names']做集合相等比较，完全一致返回1.0；（2）'bookmark_bar_websites_urls'：提取bookmark_bar下所有type为'url'的书签链接，与rule['urls']做集合相等比较，完全一致返回1.0；（3）'liked_authors_websites_urls'：先查找bookmark_bar下名为'Liked Authors'且type为'folder'的文件夹，不存在则返回0.0；存在则提取其下所有type为'url'的链接。对rule['urls']中的每个元素，若为字符串则转为单元素列表，再通过itertools.product生成所有可能的笛卡尔积组合，检查是否有任一组合与实际URL集合完全相等，有则返回1.0，否则返回0.0。若rule['type']不属于上述三种，抛出TypeError。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:48:10",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_c1fa57f3-c3db-4596-8f09-020701085416./evaluator_function_labels.json"
+}

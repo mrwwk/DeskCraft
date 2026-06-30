@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_4bd9519c-41fe-486f-8fc7-45d966d46f1b./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_text_content",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_text_content",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中指定名称的文本对象（Text Object）其文本内容是否与预期字符串完全一致。它依赖外部检查脚本（如check_text.py或check_object.py）运行后输出的JSON结果，通过解析该输出定位目标对象，并严格比对body或text_body字段的值。整个评测采用二元打分机制：仅当对象存在且文本内容精确匹配预期值时返回1.0，若JSON解析失败、对象缺失、字段不匹配或内容不一致，均返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_blender_text_content",
+        "lineno": 41,
+        "description": "该函数接收外部检查脚本输出的JSON字符串（command_output）以及包含object_name和expected_text的rule字典，验证Blender文本对象内容。执行步骤如下：首先调用_parse_blender_output将命令输出解析为Python字典，若解析失败或输出为空则直接返回0.0；接着从rule中提取目标对象名称和预期文本；然后尝试两种数据格式定位对象：第一种是直接以obj_name为键从解析结果中取值（对应check_text.py的输出格式），第二种是调用_find_object在result[\"objects\"]列表中按精确名称查找（对应check_object.py的输出格式）；最后比较获取到的对象数据中body字段或text_body字段是否与expected_text精确相等，若相等则返回1.0，否则记录警告并返回0.0。整个判定逻辑为严格的精确匹配，不存在近似或阈值容错。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "该函数负责将Blender检查脚本打印到标准输出的原始字符串解析为JSON对象。它会先检查输入是否为空或仅含空白字符，若是则记录错误并返回None；否则尝试对去除首尾空白后的内容执行json.loads。若遇到JSONDecodeError或ValueError，则记录错误及原始输出内容并返回None。该函数是主评测流程的数据预处理入口，所有依赖JSON输出的检查均需先经过此解析步骤。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 28,
+        "description": "该函数用于在check_object.py风格的输出结构中按对象名称精确查找目标。它接收解析后的结果字典和待查找的名称字符串，遍历result[\"objects\"]列表，逐一比对每个对象字典中的name键是否与传入的name参数完全相等，返回匹配到的第一个对象字典；若遍历结束未找到则返回None。该函数主要服务于需要兼容check_object.py输出格式的主检查逻辑，提供按名称检索对象的能力。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:06:20",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_4bd9519c-41fe-486f-8fc7-45d966d46f1b./evaluator_function_labels.json"
+}

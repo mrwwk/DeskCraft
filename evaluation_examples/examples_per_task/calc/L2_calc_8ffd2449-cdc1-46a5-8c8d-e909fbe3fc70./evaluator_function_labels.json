@@ -1,0 +1,184 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L2_calc_8ffd2449-cdc1-46a5-8c8d-e909fbe3fc70./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_table",
+      "lineno": 198
+    },
+    {
+      "name": "load_sparklines",
+      "lineno": 729
+    },
+    {
+      "name": "load_charts",
+      "lineno": 767
+    },
+    {
+      "name": "load_pivot_tables",
+      "lineno": 856
+    },
+    {
+      "name": "read_cell_value",
+      "lineno": 946
+    },
+    {
+      "name": "load_xlsx_styles",
+      "lineno": 1107
+    },
+    {
+      "name": "load_rows_or_cols",
+      "lineno": 1246
+    },
+    {
+      "name": "load_filters",
+      "lineno": 1277
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_sheet_idx",
+      "lineno": 60
+    },
+    {
+      "name": "_load_sheet",
+      "lineno": 109
+    },
+    {
+      "name": "_safe_read_file",
+      "lineno": 140
+    },
+    {
+      "name": "compare_table",
+      "lineno": 198
+    },
+    {
+      "name": "load_sparklines",
+      "lineno": 729
+    },
+    {
+      "name": "load_charts",
+      "lineno": 767
+    },
+    {
+      "name": "load_pivot_tables",
+      "lineno": 856
+    },
+    {
+      "name": "read_cell_value",
+      "lineno": 946
+    },
+    {
+      "name": "_read_cell_style",
+      "lineno": 1015
+    },
+    {
+      "name": "_process_xlsx_cf_operator",
+      "lineno": 1060
+    },
+    {
+      "name": "load_xlsx_styles",
+      "lineno": 1107
+    },
+    {
+      "name": "load_rows_or_cols",
+      "lineno": 1246
+    },
+    {
+      "name": "load_filters",
+      "lineno": 1277
+    },
+    {
+      "name": "_multicellrange_containsby",
+      "lineno": 1335
+    },
+    {
+      "name": "_match_value_to_rule",
+      "lineno": 1339
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证用户生成的 Excel 结果文件（.xlsx）是否满足任务要求。它以结果文件路径 result 为必传输入，以预期文件路径 expected 为可选参照，通过 options[\"rules\"] 中定义的一条或多条顺序规则，对电子表格的多维度属性进行逐项检查。检查维度涵盖：工作表名称一致性、单元格内部数值/打印文本的精确或模糊匹配、迷你图（sparkline）定义、图表属性、单元格样式与条件格式、冻结窗格、缩放比例、数据验证规则、行列属性、自动筛选与排序状态、数据透视表结构，以及特定单元格的值或样式属性。所有规则采用“顺序执行、全部满足”的严格与逻辑：只要任意一条规则判定失败，立即返回 0.0 分；仅当所有规则全部通过时，才返回 1.0 分。",
+    "main_functions": [
+      {
+        "name": "compare_table",
+        "lineno": 198,
+        "description": "接收 result（结果 xlsx 文件路径）、expected（预期 xlsx 文件路径）和 options（含 rules 列表）。首先用 openpyxl 和 pandas 加载 result 工作簿，若 expected 非空则同样加载。随后按顺序遍历 rules，根据每条规则的 type 字段分发到不同检查分支：sheet_name 直接比较双方工作表名称列表是否完全相等；sheet_data 用 pandas 读取指定工作表并按 precision（默认 4 位小数）四舍五入后做 DataFrame.equals 精确比较；sheet_print 将工作表导出为 CSV 行文本后逐行比较，支持 ignore_case 转为小写后比较；sheet_fuzzy 对指定单元格范围逐格进行文本预处理（去除 ignore_chars、trim_leadings、trim_trailings、normalization 替换、ignore_case 小写转换）后，按 includes/included_by/fuzzy_match（默认阈值 85）/exact_match 判定；sparkline、chart、style、freeze、filter、pivot_table 分别调用 load_sparklines、load_charts、load_xlsx_styles、直接比较 freeze_panes、load_filters、load_pivot_tables 后做字典相等比较；zoom 和 data_validation 读取工作表属性后通过 _match_value_to_rule 判定；row_props 和 col_props 调用 load_rows_or_cols 比较行列维度属性；check_cell 对单个单元格读取其值（read_cell_value）或样式（_read_cell_style）后逐项用 _match_value_to_rule 匹配规则。所有规则结果做逻辑与（passes = passes and metric），中途一旦失败即返回 0.0，全部通过返回 1.0。"
+      },
+      {
+        "name": "load_sparklines",
+        "lineno": 729,
+        "description": "接收 xlsx_file（文件路径字符串）和 sheet_name。直接以 zip 方式打开 xlsx，解析 xl/workbook.xml 获取 sheetId，再解析对应 xl/worksheets/sheet{sheetId}.xml，用 CSS 选择器提取 x14:sparkline 节点。将每个迷你图的 sqref（单元格坐标）和 f（公式/数据范围）组成字典返回。若文件损坏或解析失败返回空字典。通常被 compare_table 的 sparkline 规则调用，用于比较双方迷你图定义是否完全一致。"
+      },
+      {
+        "name": "load_charts",
+        "lineno": 767,
+        "description": "接收已打开的 openpyxl Workbook 对象和 sheet_name，以及 options（含 chart_props 列表）。从工作表 worksheet._charts 中提取所有图表，对每个图表拼接其 series 的 value 和 category 数据源引用字符串作为唯一键。依据 chart_props 中指定的字段（title、legend、anchor、width、height、type、direction、xtitle、ytitle、ztitle）提取对应属性，组装成以 series 字符串为键、属性字典为值的字典返回。若工作表不存在返回空字典。被 compare_table 的 chart 规则调用，通过字典相等比较判定图表属性是否一致。"
+      },
+      {
+        "name": "load_pivot_tables",
+        "lineno": 856,
+        "description": "接收 Workbook 和 sheet_name，以及 options（含 pivot_props）。从 worksheet._pivots 读取数据透视表定义，处理 pivotFields 的选中状态，计算 cache source 的数据范围并去除左右空字段偏移，生成 source 标识字符串。根据 pivot_props 提取 name、show_total、show_empty_row、show_empty_col、show_headers、location、selection、filter_fields、col_fields、row_fields、data_fields 等属性。其中 selection 在不含 \"ordered\" 时会被转换为集合去重。返回以 source 为键的字典。被 compare_table 的 pivot_table 规则调用，通过字典相等比较判定透视表结构是否一致。"
+      },
+      {
+        "name": "read_cell_value",
+        "lineno": 946,
+        "description": "接收 xlsx_file（文件路径）、sheet_name 和 coordinate（如 \"E3\"）。不加载整个工作簿，而是直接以 zip 打开 xlsx，读取 xl/sharedStrings.xml 建立共享字符串表，读取 xl/workbook.xml 映射 sheetName 到 sheetId，再定位 xl/worksheets/sheet{sheetId}.xml 中用 CSS 选择器查找对应坐标单元格。根据单元格类型 @t（n=数字、s=共享字符串、str=字符串、inlineStr=内联字符串、e=错误）返回相应 Python 值。若文件不存在、损坏、工作表或单元格未找到，返回 None。被 sheet_fuzzy、check_cell、load_xlsx_styles 等调用，用于精确读取单元格原始值。"
+      },
+      {
+        "name": "load_xlsx_styles",
+        "lineno": 1107,
+        "description": "接收 Workbook、sheet_name、book_name（原始文件名，用于条件格式公式求值）和 options（含 props 样式属性列表）。首先遍历工作表所有单元格，用 _read_cell_style 收集每个单元格的指定样式，形成 {坐标: [样式值列表]}。然后处理条件格式（conditional_formatting）：对每个条件格式规则，用 formulas.Parser 解析公式，提取绝对引用并调用 read_cell_value 获取参数值；根据规则类型（expression、cellIs 等）构建判定函数；遍历规则范围内的每个单元格，若满足条件且值非空，则将该单元格的样式按差异样式（r.dxf）重新读取并覆盖写入结果字典。被 compare_table 的 style 规则调用，通过字典相等比较判定样式与条件格式是否一致。"
+      },
+      {
+        "name": "load_rows_or_cols",
+        "lineno": 1246,
+        "description": "接收 Workbook、sheet_name 和 options（含 obj：\"row\" 或 \"column\"，以及 props 列表）。通过 worksheet.row_dimensions 或 column_dimensions 遍历所有行/列维度对象，按 props 提取对应属性（如 hidden、height、width 等），返回 {行号/列号: {属性: 值}} 的字典。若工作表不存在返回空字典。被 compare_table 的 row_props 和 col_props 规则调用，通过字典相等比较判定行列属性是否一致。"
+      },
+      {
+        "name": "load_filters",
+        "lineno": 1277,
+        "description": "接收 Workbook 和 sheet_name。读取 worksheet.auto_filter，提取 ref（筛选范围）、filterColumn（列ID、隐藏按钮、显示按钮、筛选值集合、自定义筛选条件等，按 col_id 排序）以及 sortState（排序方向、是否区分大小写、排序方法、范围、排序条件列表）。组装成字典返回。若工作表不存在返回空字典。被 compare_table 的 filter 规则调用，通过字典相等比较判定筛选与排序设置是否一致。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_sheet_idx",
+        "lineno": 48,
+        "description": "解析 sheet_idx 参数（整数或字符串）。字符串前缀决定数据来源：\"RI\"/\"RN\" 表示从 result 工作簿按索引或名称取值；\"EI\"/\"EN\" 表示从 expected 工作簿按索引或名称取值。返回 (book, index) 元组，供 _load_sheet 或 compare_table 内部构造的 parse_idx 闭包使用，实现统一的工作表定位逻辑。"
+      },
+      {
+        "name": "_load_sheet",
+        "lineno": 88,
+        "description": "根据 book 类型分发加载：若 book 为 str（文件路径），尝试读取同名衍生 CSV 文件（{文件名}-{工作表名}.csv）并返回行列表；若为 pd.ExcelFile，返回 DataFrame；若为 openpyxl Workbook，返回 Worksheet 对象。加载失败返回 None。被 compare_table 的 sheet_data、sheet_print、freeze、zoom、data_validation、check_cell 等规则调用，作为统一的工作表加载入口。"
+      },
+      {
+        "name": "_safe_read_file",
+        "lineno": 120,
+        "description": "安全读取文本文件，依次尝试 utf-8、utf-8-sig、latin-1、windows-1252、gbk、cp1251、iso-8859-1 编码；全部失败时以 utf-8 errors=\"replace\" 读取。返回文件行列表。被 _load_sheet 的 CSV 分支调用，用于兼容不同编码的文本输出比较。"
+      },
+      {
+        "name": "_read_cell_style",
+        "lineno": 1015,
+        "description": "读取单个单元格（或 MergedCell）的指定样式属性。支持 number_format（仅当单元格为数值类型时）、font_name/family/color/bold/italic/underline/size、fill_type、bgcolor/fgcolor、hyperlink、merge 等。若传入 diff_style（DifferentialStyle），优先读取差异样式而非单元格本体样式。空单元格通常返回 None。被 load_xlsx_styles 和 compare_table 的 check_cell 规则调用。"
+      },
+      {
+        "name": "_process_xlsx_cf_operator",
+        "lineno": 1065,
+        "description": "实现条件格式中 cellIs 类型的比较操作符：lessThanOrEqual、lessThan、equal、greaterThanOrEqual、notEqual、greaterThan、between、notBetween。将单元格值与 ref 列表中的阈值比较，返回布尔值。类型不匹配或 ref 不足时捕获异常并返回 False。被 load_xlsx_styles 在处理条件格式时调用。"
+      },
+      {
+        "name": "_multicellrange_containsby",
+        "lineno": 1320,
+        "description": "判断 subset_candidate 的所有单元格范围是否都包含在 superset_candidate 中，返回布尔值。被 _match_value_to_rule 的 spreadsheet_range 规则调用，用于校验单元格范围的双重包含关系。"
+      },
+      {
+        "name": "_match_value_to_rule",
+        "lineno": 1325,
+        "description": "通用值匹配引擎，被 zoom、data_validation、check_cell 等检查复用。支持：正则匹配（method 以 \"re\" 开头，可带 re. 标志位）、比较操作（eq/ne/le/lt/ge/gt）、近似相等（approx:THRESHOLD，计算绝对差）、区间判断（range.te 等形式，左/右开闭）、电子表格范围包含（spreadsheet_range）、字符串列表/集合相等（str_list_eq/str_set_eq）。若 method 未识别则抛出 NotImplementedError。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:24:27",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L2_calc_8ffd2449-cdc1-46a5-8c8d-e909fbe3fc70./evaluator_function_labels.json"
+}

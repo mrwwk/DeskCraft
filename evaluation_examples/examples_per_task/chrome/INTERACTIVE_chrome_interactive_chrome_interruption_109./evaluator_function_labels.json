@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_109./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_tabs",
+      "lineno": 14
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 37
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_tabs",
+      "lineno": 14
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 37
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证任务执行后 Chrome 浏览器的标签页状态，包含两个独立且均为二元打分（0 或 1）的判定维度：一是检查浏览器中打开的所有标签页 URL 集合是否与预期完全一致，二是检查当前处于焦点状态的活动标签页 URL 是否与预期一致。核心检查对象为标签页的 url 字段字符串。对于全部标签页检查，通过提取 open_tabs 中的 url 组成实际列表，与 rule['urls'] 中的期望列表进行比对；对于活动标签页检查，则直接比对单条期望 URL 与实际 URL。比较过程均依赖外部工具函数 compare_urls 执行 URL 级别的匹配。特别地，活动标签检查包含针对 active_url_from_accessTree 获取器缺陷的容错规则：当实际 URL 被错误报告为 'https:///' 前缀的本地文件路径时，会自动将其归一化为 'file:///' 后再进行比较。两个指标各自独立返回分数，不存在加权累计或联合判定逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_tabs",
+        "lineno": 14,
+        "description": "检查 Chrome 当前打开的全部标签页 URL 集合是否与预期一致。输入参数 open_tabs 为当前打开标签页的列表（每个元素为含 url 字段的字典），rule 为匹配规则字典。执行步骤：1) 若 open_tabs 为空，直接返回 0；2) 读取 rule['type']，当前仅支持 'url' 类型；3) 提取 rule['urls'] 作为期望 URL 列表，遍历 open_tabs 提取每个标签页的 'url' 字段组成实际 URL 列表；4) 调用辅助函数 are_lists_equal，并以 compare_urls 作为元素比较函数，对期望列表和实际列表进行匹配；5) 若列表不匹配，记录 error 日志并返回 0，若匹配则返回 1。判定依据是两组 URL 在 compare_urls 意义下完全对应。"
+      },
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 37,
+        "description": "检查 Chrome 当前的活动标签页 URL 是否与预期一致，并包含针对获取器协议错误的容错修复。输入参数 active_tab_info 为当前活动标签页信息（字典或字符串），rule 为匹配规则字典。执行步骤：1) 若 active_tab_info 为空，直接返回 0；2) 读取 rule['type']，当前仅支持 'url' 类型；3) 从 rule['url'] 获取期望 URL；若 active_tab_info 为字典则取 'url' 键值，否则直接使用该值作为实际 URL；4) 容错修复：若实际 URL 以 'https:///' 开头（针对 active_url_from_accessTree 获取器将本地文件路径误报为 https 协议的已知问题），将其替换为 'file:///'；5) 调用 compare_urls 比较期望 URL 与修复后的实际 URL，匹配返回 1，否则返回 0。判定依据是单条 URL 经协议归一化后是否与预期一致。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:37:10",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_109./evaluator_function_labels.json"
+}

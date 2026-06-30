@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00004-0004-4000-8000-000000000004./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 任务最终导出的音频文件是否满足指定的时长要求。核心检查对象是目标 WAV 音频文件的总播放时长（duration）。评测逻辑为：读取任务产出的音频文件，提取其实际时长，并与规则中给定的 expected_duration 进行绝对误差比较，误差需落在 tolerance（默认 0.5 秒）范围内。若文件存在、解析成功且时长偏差在容差内，则判定任务通过并返回 1.0；若文件缺失、解析失败或时长偏差超出容差，则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 41,
+        "description": "该函数接收音频文件路径 file_path 和规则字典 rule。首先检查 file_path 对应的文件是否存在于磁盘，若不存在则记录错误日志并直接返回 0.0。随后调用 _read_wav_info 读取 WAV 文件信息，获取实际时长 actual。接着从 rule 中提取 expected_duration 作为期望时长，并提取 tolerance 作为容差阈值（若 rule 中未提供则默认使用 0.5）。最终计算 actual 与 expected_duration 的绝对差值，若差值小于等于 tolerance，则返回 1.0；若超出容差或在读取/计算过程中发生任何异常，则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 24,
+        "description": "该函数接收一个 WAV 文件路径，使用 Python 标准库 wave 模块以只读模式打开文件，提取并返回包含以下字段的字典：channels（声道数）、sample_rate（采样率）、n_frames（总采样帧数）、sampwidth（采样宽度）以及 duration（由 n_frames / sample_rate 计算得出的总时长）。该函数为 check_audio_duration 提供底层音频元数据读取服务，同时承担文件可解析性验证职责：若文件损坏或非标准 WAV 格式，wave.open 将抛出异常并由主函数捕获后判为失败。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 20:47:37",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00004-0004-4000-8000-000000000004./evaluator_function_labels.json"
+}

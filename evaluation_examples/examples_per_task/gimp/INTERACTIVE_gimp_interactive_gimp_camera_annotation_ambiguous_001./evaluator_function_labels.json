@@ -1,0 +1,79 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_camera_annotation_ambiguous_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_file_exists",
+      "lineno": 36
+    },
+    {
+      "name": "check_interactive_gimp_camera_annotation_complete",
+      "lineno": 124
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_edge_density",
+      "lineno": 28
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 36
+    },
+    {
+      "name": "_check_valid_image",
+      "lineno": 45
+    },
+    {
+      "name": "_check_image_has_text_like_content",
+      "lineno": 60
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 116
+    },
+    {
+      "name": "check_interactive_gimp_camera_annotation_complete",
+      "lineno": 124
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测代理在仅收到模糊指令\"帮我做一张相机说明图\"后，是否成功产出了包含可见标注内容的相机说明图。它不验证具体的标注文字、XCF图层结构、图像尺寸或标注数量，而是围绕最终输出图像进行三项核心验证：文件是否真实存在、能否被PIL正常打开、以及图像内容是否通过4×4网格的边缘密度分析检测出类文本的标注痕迹。评测采用严格的\"全部满足\"二进制逻辑：从result_paths中优先选取PNG路径、备选JPG路径作为检查目标，依次执行三项检查，全部通过才得1.0分，任一失败即得0.0分。",
+    "main_functions": [
+      {
+        "name": "check_file_exists",
+        "lineno": 36,
+        "description": "接收file_path字符串作为检查对象。首先排除None输入，然后调用os.path.isfile()判断该路径在文件系统中是否真实存在。返回1表示文件存在，0表示不存在。该函数被check_interactive_gimp_camera_annotation_complete用于第一步文件存在性验证，是后续图像内容检查的前提。"
+      },
+      {
+        "name": "check_interactive_gimp_camera_annotation_complete",
+        "lineno": 124,
+        "description": "接收result_paths列表（期望格式为[png_path, xcf_path, jpg_path]）、expected占位参数（框架兼容性保留，未实际使用）以及**options可选阈值参数。执行步骤如下：1）先校验result_paths是否为长度不少于3的列表，否则直接返回0.0；2）按\"优先PNG(result_paths[0])、备选JPG(result_paths[2])\"的策略选定output_path，若两者皆为None则返回0.0；3）依次调用check_file_exists检查文件存在性、_check_valid_image检查PIL可打开性、_check_image_has_text_like_content检查类文本标注内容，收集三个二进制得分；4）将得分列表传入_all_binary_checks_pass进行聚合判定。判定依据为\"全部满足\"逻辑：仅当三项得分全部≥1.0时返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_edge_density",
+        "lineno": 28,
+        "description": "接收灰度图像的numpy数组gray_array和edge_threshold（默认40.0）。分别计算图像在水平轴(axis=1)和垂直轴(axis=0)的梯度绝对值，将两者相加得到边缘强度图，最后返回边缘强度超过阈值的像素所占比例（即边缘密度）。该函数被_check_image_has_text_like_content复用，用于量化每个网格区域的边缘特征，以识别类文本标注产生的高对比度细边缘。"
+      },
+      {
+        "name": "_check_valid_image",
+        "lineno": 45,
+        "description": "接收image_path路径作为检查对象。先判断路径是否为None或文件不存在；若存在则使用PIL的Image.open()打开图像并调用verify()验证文件完整性。返回1表示该文件是能被PIL正常打开的合法图像，0表示文件缺失或打开/验证失败。服务主函数第二步的图像有效性检查。"
+      },
+      {
+        "name": "_check_image_has_text_like_content",
+        "lineno": 60,
+        "description": "接收image_path和**options可选参数，其中min_text_regions默认3、edge_threshold默认45.0、min_edge_density默认0.01。检查步骤为：将图像转为灰度图后划分为4×4网格，对每个面积不小于100像素的单元格调用_edge_density计算边缘密度；统计边缘密度≥min_edge_density的单元格数量。判定依据为：若达标单元格数≥min_text_regions则返回1，否则返回0。该函数通过检测高对比度细边缘来推断图像中是否存在类似文字标注的内容，服务主函数第三步。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 116,
+        "description": "接收scores列表作为输入。先过滤掉None值并将剩余项转为float；若过滤后列表为空则返回0.0。判定依据为严格的\"全部满足\"逻辑：仅当所有分数均≥1.0时返回1.0，任一分数低于1.0即返回0.0。该函数是主函数的最终聚合器，负责将多项二进制检查结果汇总为最终的0.0或1.0得分。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:51:33",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_camera_annotation_ambiguous_001./evaluator_function_labels.json"
+}

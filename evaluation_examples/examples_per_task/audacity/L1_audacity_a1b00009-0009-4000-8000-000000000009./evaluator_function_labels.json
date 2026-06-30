@@ -1,0 +1,79 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00009-0009-4000-8000-000000000009./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 120
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 137
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 22
+    },
+    {
+      "name": "_open_aup3",
+      "lineno": 44
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 50
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 70
+    },
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 120
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 137
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 音频编辑任务的完成结果，采用两种独立的检查路径：第一，对导出的 WAV 音频文件，使用标准库 wave 模块读取其采样率（sample_rate），与 rule 中指定的 expected_sr 进行精确相等比较，完全匹配得 1.0，否则 0.0；第二，对 Audacity 原生 .aup3 项目文件，将其作为 SQLite 数据库打开，先从 project 表读取项目 XML（若不存在则回退到 autosave 表），解析 XML 中的轨道结构，统计总轨道数、波形轨道（wavetrack/WaveTrack）数和标签轨道（labeltrack/LabelTrack）数，再与 rule 中设定的 min_track_count（默认 1）、min_wave_tracks（默认 0）、min_label_tracks（默认 0）三个阈值进行下限比较，全部满足得 1.0，任一不满足则 0.0。两个主函数各自独立执行，均采用硬二分打分（0.0 或 1.0），不存在加权或累计逻辑。",
+    "main_functions": [
+      {
+        "name": "check_audio_sample_rate",
+        "lineno": 120,
+        "description": "该函数接收 file_path 和 rule 作为输入，验证指定 WAV 音频文件的采样率是否符合预期。首先检查文件是否存在，不存在直接返回 0.0；存在则调用 _read_wav_info 读取 WAV 基本信息，从返回字典中提取 sample_rate 字段作为实际值；再从 rule 字典中取出 expected_sr 并转为整数作为期望值；最后对实际值与期望值进行精确相等判断，相等返回 1.0，不相等返回 0.0。整个逻辑包裹在 try-except 中，任何异常均捕获并返回 0.0。"
+      },
+      {
+        "name": "check_aup3_project_valid",
+        "lineno": 137,
+        "description": "该函数接收 file_path 和 rule 作为输入，验证 .aup3 项目文件的有效性和轨道数量是否达标。首先检查文件是否存在，不存在返回 0.0；存在则调用 _parse_aup3_tracks 解析项目 XML 获取轨道列表，若解析结果为空列表（即无任何轨道）直接返回 0.0。随后统计总轨道数 total、波形轨道数 wave_count（type 为 \"wave\"）和标签轨道数 label_count（type 为 \"label\"）。从 rule 中提取三个阈值：min_track_count（默认 1）、min_wave_tracks（默认 0）、min_label_tracks（默认 0）。依次判断 total 是否小于 min_track_count、wave_count 是否小于 min_wave_tracks、label_count 是否小于 min_label_tracks，任一条件成立即返回 0.0；全部通过则返回 1.0。整个逻辑包裹在 try-except 中，任何异常均捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 22,
+        "description": "使用 Python 标准库 wave 模块打开指定 WAV 文件（二进制只读模式），提取通道数 channels、采样率 sample_rate、总帧数 n_frames、采样宽度 sampwidth，并计算时长 duration（n_frames / sample_rate）。将这些信息以字典形式返回，供 check_audio_sample_rate 获取实际采样率使用。"
+      },
+      {
+        "name": "_open_aup3",
+        "lineno": 44,
+        "description": "使用 sqlite3.connect 将 .aup3 文件作为 SQLite 数据库打开，返回数据库连接对象 conn。这是后续所有 .aup3 文件读取操作的基础封装，被 _get_aup3_project_xml 调用。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 50,
+        "description": "负责从 .aup3 文件中提取项目 XML 字符串。先调用 _open_aup3 建立连接，然后执行 SQL 查询 \"SELECT doc FROM project LIMIT 1\" 获取 project 表的 doc 字段；若未查到记录，则回退查询 autosave 表的 doc 字段。若仍未查到返回 None。对查到的内容进行 bytes 到 utf-8 的解码（如需要），最终返回 XML 字符串。该函数被 _parse_aup3_tracks 调用。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 70,
+        "description": "解析 .aup3 项目 XML 并返回轨道信息列表。先调用 _get_aup3_project_xml 获取 XML 字符串，若为 None 则返回空列表。使用 xml.etree.ElementTree.fromstring 解析 XML，处理可能的命名空间前缀。遍历根元素下的所有子元素，根据标签名（去命名空间后）识别两种轨道：wavetrack/WaveTrack 被归类为 wave 类型，提取 name、gain、mute、solo、pan 字段；labeltrack/LabelTrack 被归类为 label 类型，提取 name，并进一步遍历其下的 label/Label 子元素，提取每个标签的 time（优先取属性 t，其次 t0）、t1（优先取属性 t1，其次 t）、text（优先取属性 title，其次 text）。最终返回包含所有轨道字典的列表，供 check_aup3_project_valid 进行数量统计。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 20:49:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00009-0009-4000-8000-000000000009./evaluator_function_labels.json"
+}

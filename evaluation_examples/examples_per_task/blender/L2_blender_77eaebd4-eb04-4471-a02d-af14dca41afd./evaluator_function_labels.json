@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_77eaebd4-eb04-4471-a02d-af14dca41afd./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_particle_params",
+      "lineno": 40
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_particle_params",
+      "lineno": 40
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 任务中指定物体的粒子系统参数是否符合预期。它读取外部检查脚本 check_particles.py 输出的 JSON 文本（command_output），并结合包含期望参数与匹配规则的 rule 字典进行判定。核心检查对象是 rule 中 object_name 所指定物体的第一个粒子系统，针对 count、lifetime、frame_start、frame_end、normal_factor 等数值字段逐一比对。比较方式采用容差近似匹配（默认容差 1.0），即实际值与期望值的绝对差不超过设定阈值即视为相等。判定逻辑为“全部满足”的二元打分：所有被 rule 要求的参数都必须通过容差检查，才返回 1.0（成功）；若 JSON 解析失败、找不到粒子系统、或任一参数超出容差，则立即返回 0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "check_blender_particle_params",
+        "lineno": 40,
+        "description": "该函数接收 command_output（来自 check_particles.py 的 JSON 字符串）和 rule（字典，包含 object_name、可选的 tolerance 以及待验证的粒子参数如 count、lifetime、frame_start、frame_end、normal_factor）作为输入。执行步骤如下：1. 调用 _parse_blender_output 将 command_output 解析为 JSON 对象；若解析失败或为空，直接返回 0.0。2. 从 rule 中读取 object_name（默认空字符串）和 tolerance（默认 1.0）。3. 在解析结果中查找 object_name 对应的粒子系统列表；若列表为空，记录警告并返回 0.0。4. 仅取该物体的第一个粒子系统（particles[0]）作为检查目标。5. 遍历预定义参数列表 [\"count\", \"lifetime\", \"frame_start\", \"frame_end\", \"normal_factor\"]；对于每个存在于 rule 中的参数，从粒子系统提取实际值，并与 rule 中的期望值一起传入 _check_tolerance 进行容差比较。6. 若任一参数未通过容差检查，立即记录警告并返回 0.0。7. 若所有要求参数均通过检查，返回 1.0。整个判定逻辑为“全部满足”式，任一环节出错或参数不匹配即判定失败。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 17,
+        "description": "该函数负责将外部 Blender 检查脚本输出的原始文本解析为 JSON 对象。它先检查输入是否为空或仅包含空白字符，若是则记录错误并返回 None；否则尝试使用 json.loads 进行解析。若遇到 JSONDecodeError 或 ValueError，会记录错误日志并输出原始内容调试信息，最终返回 None。该解析器是主评测函数获取粒子系统数据的前置步骤，解析失败将直接导致评测返回 0.0。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 30,
+        "description": "这是一个通用数值容差比较器。它接收 actual（实际值）、expected（期望值）和 tol（容差阈值）三个参数。首先对 actual 或 expected 为 None 的情况进行保护性返回 False；随后将两者转为浮点数，计算绝对差值，判断是否小于等于 tol。该函数被主函数用于对粒子系统的各个数值参数进行近似匹配，是实现“容差范围内视为相等”这一规则的核心工具。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:09:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_77eaebd4-eb04-4471-a02d-af14dca41afd./evaluator_function_labels.json"
+}

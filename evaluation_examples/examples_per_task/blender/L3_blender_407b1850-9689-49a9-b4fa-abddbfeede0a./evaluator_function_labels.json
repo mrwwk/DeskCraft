@@ -1,0 +1,87 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_407b1850-9689-49a9-b4fa-abddbfeede0a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_parent_child",
+      "lineno": 41
+    },
+    {
+      "name": "check_blender_collection_members",
+      "lineno": 100
+    },
+    {
+      "name": "check_blender_constraints_multi",
+      "lineno": 136
+    },
+    {
+      "name": "check_blender_hierarchy",
+      "lineno": 175
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_parent_child",
+      "lineno": 41
+    },
+    {
+      "name": "check_blender_collection_members",
+      "lineno": 100
+    },
+    {
+      "name": "check_blender_constraints_multi",
+      "lineno": 136
+    },
+    {
+      "name": "check_blender_hierarchy",
+      "lineno": 175
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 总体用于验证 Blender 3D 场景在任务执行后的状态是否符合预期。它通过读取外部 Blender 检查脚本（如 check_object.py、check_collection.py、check_constraints.py）输出的 JSON 数据，对场景中的对象父子层级、集合成员归属以及对象约束条件进行精确检查。核心比较方式是基于字段精确匹配和集合包含关系：父子关系要求 parent 字段精确对应且 children 列表包含所有预期成员；集合成员要求指定集合的 objects 列表包含所有预期对象；约束条件要求 type、target、track_axis、up_axis 等关键属性逐一精确相等。判定逻辑采用二元分数制（1.0 表示完全成功，0.0 表示失败），各检查函数内部要求所有子条件全部满足，任一子条件不满足即直接返回 0.0。数据解析失败或异常也统一视为失败。",
+    "main_functions": [
+      {
+        "name": "check_blender_parent_child",
+        "lineno": 41,
+        "description": "接收来自 check_object.py 的 JSON 字符串 command_output 和规则字典 rule。首先调用 _parse_blender_output 解析 JSON，解析失败返回 0.0。该函数按三种模式依次检查：1）若 rule 包含 parent 与 expected_children，则通过 _find_object 定位父对象，检查其 children 列表是否包含所有预期子对象（集合包含关系），父对象不存在或子对象缺失均返回 0.0；2）若包含 parent_map，则逐对验证子对象的 parent 字段是否精确等于预期父对象，若包含 not_parent，则验证子对象的 parent 字段不等于指定错误父对象，任一违反返回 0.0；3）若 parent_has_children 为真，则遍历所有对象，检查是否存在 children 数量大于等于 min_children_count（默认 1）的对象，不存在则返回 0.0。所有检查通过返回 1.0，异常返回 0.0。"
+      },
+      {
+        "name": "check_blender_collection_members",
+        "lineno": 100,
+        "description": "接收来自 check_collection.py 的 JSON 字符串 command_output 和规则字典 rule。首先调用 _parse_blender_output 解析 JSON，失败返回 0.0。提取 collection_name 与 expected_members 集合后，先遍历 result[\"collections\"] 列表，按 name 精确匹配目标集合，并检查 expected_members 是否为该集合 objects 列表的子集，满足则返回 1.0，不满足则记录缺失成员并返回 0.0。若在 collections 中未找到目标集合，则退而检查 result[\"object_collections\"]：对每个预期成员，验证其所属集合列表是否包含 collection_name，任一成员不在该集合中即返回 0.0。全部通过返回 1.0，异常返回 0.0。"
+      },
+      {
+        "name": "check_blender_constraints_multi",
+        "lineno": 136,
+        "description": "接收来自 check_constraints.py 的 JSON 字符串 command_output 和规则字典 rule。首先调用 _parse_blender_output 解析 JSON，失败返回 0.0。遍历 rule[\"constraints\"] 中的每个预期约束项，针对其 object_name 在 result 中取出该对象的约束列表。在列表中查找同时满足以下条件的约束：type 必须精确匹配；若规则指定了 target、track_axis 或 up_axis，则对应字段也必须精确相等。只要有一个预期约束在对应对象上找不到匹配项，即记录警告并返回 0.0。所有约束均匹配成功则返回 1.0，异常返回 0.0。"
+      },
+      {
+        "name": "check_blender_hierarchy",
+        "lineno": 175,
+        "description": "接收来自 check_object.py 的 JSON 字符串 command_output 和规则字典 rule。该函数是 check_blender_parent_child 的薄封装，直接将参数原样转发给 check_blender_parent_child 并返回其结果。因此实际检查逻辑与 check_blender_parent_child 完全一致，用于验证 parent_map 与 not_parent 等对象层级父子关系，返回 1.0 或 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "接收 Blender 检查脚本输出的原始字符串 command_output。先检查输出是否为空或仅含空白字符，若是则记录错误并返回 None。随后对去空后的字符串执行 json.loads，返回解析后的 Python 对象（通常为字典或列表）。若触发 JSONDecodeError 或 ValueError，则记录错误及原始输出片段，并返回 None。该函数是所有主函数的入口预处理步骤，为后续字段级检查提供结构化数据。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 28,
+        "description": "接收 _parse_blender_output 返回的 result 字典和目标对象名称 name。遍历 result.get(\"objects\", []) 列表，逐个比较 obj.get(\"name\") 与 name 是否精确相等，返回首个匹配到的对象字典；若遍历结束未找到，则返回 None。该函数主要服务于 check_blender_parent_child，用于在场景对象列表中按名称精确定位目标对象。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:14:28",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_407b1850-9689-49a9-b4fa-abddbfeede0a./evaluator_function_labels.json"
+}

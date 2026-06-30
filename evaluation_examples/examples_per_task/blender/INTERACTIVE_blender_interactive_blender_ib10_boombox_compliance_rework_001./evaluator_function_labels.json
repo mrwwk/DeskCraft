@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib10_boombox_compliance_rework_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_output",
+      "lineno": 14
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_blender_render_output",
+      "lineno": 14
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender渲染任务最终产出的静态图像文件是否满足既定交付标准。核心检查对象是本地下载的渲染输出文件（预期为PNG格式），验证维度包括：文件是否真实存在于磁盘、图像像素尺寸是否严格为1920×1080、以及文件编码格式是否为PNG。评估采用‘全满足’判定策略：存在性、宽度、高度、格式四项检查必须全部通过，函数才返回1.0（成功）；任一维度不符即立即返回0.0（失败）。若运行环境中缺少PIL库，evaluator会降级为仅执行文件存在性检查，文件存在则返回1.0，否则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_output",
+        "lineno": 14,
+        "description": "该函数接收file_path（渲染输出文件的本地路径）与rule（规格字典，典型内容为{\"width\": 1920, \"height\": 1080, \"format\": \"PNG\"}）作为输入，依次执行以下检查：1）判断file_path是否为None，并调用os.path.exists()确认文件是否真实存在，若不存在则记录error并直接返回0.0；2）尝试导入PIL.Image，使用Image.open(file_path)加载图像并读取img.size得到实际宽高actual_width与actual_height；3）若rule中包含width键，将actual_width与rule[\"width\"]做严格相等比较，不匹配则记录warning并返回0.0；4）若rule中包含height键，将actual_height与rule[\"height\"]做严格相等比较，不匹配则返回0.0；5）若rule中包含format键，先将预期格式rule[\"format\"]与实际格式img.format均转为大写进行比对，若直接不等，则通过fmt_map别名映射表（如JPG映射为JPEG）进行二次规范化比对，仍不一致则记录warning并返回0.0；6）若以上检查全部通过，返回1.0。异常分支：若触发ImportError（PIL不可用），降级为仅检查file_path是否存在，存在返回1.0，否则返回0.0；其他Exception统一捕获，记录error后返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:04:02",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib10_boombox_compliance_rework_001./evaluator_function_labels.json"
+}

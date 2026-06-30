@@ -1,0 +1,57 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_aa43e3af-d5ad-4366-b3e1-e61c74a5a5a9./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 50
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 40
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 50
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 场景中对象材质的 PBR 参数是否符合预期。它读取 Blender 检查脚本（check_material.py）输出的 JSON 数据，在指定对象（或按名称子串匹配、或全局搜索）的材质列表中，查找是否存在至少一个材质，其名称、基础颜色（base_color）、金属度（metallic）、粗糙度（roughness）同时满足 rule 中指定的条件。所有被指定的属性必须在给定的 tolerance 容差范围内同时匹配；一旦找到满足条件的材质即判定成功并返回 1.0，否则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_blender_material_pbr",
+        "lineno": 50,
+        "description": "接收 command_output（来自 check_material.py 的 JSON 字符串）和 rule 字典。首先调用 _parse_blender_output 将命令输出解析为 JSON 对象。接着根据 rule 中的对象选择条件构建候选材质列表：若存在 object_name 则精确匹配该对象；否则若存在 object_name_contains 或 name_contains 则收集名称包含该子串的所有对象；若均无则全局遍历所有对象（忽略以 '_' 开头的键）。对每个候选对象，获取其材质列表（若不为列表则自动包装为列表）。遍历每个材质时，依次执行以下检查：若 rule 指定了 material_name，则要求材质 name 字段精确等于该值；若指定了 expected_color，则调用 _check_vector_tolerance 比较材质的 base_color 与预期颜色；若指定了 metallic，则调用 _check_tolerance 比较材质的 metallic 值；若指定了 roughness，则调用 _check_tolerance 比较材质的 roughness 值。所有在 rule 中声明的检查项必须全部通过，才视为该材质匹配成功并立即返回 1.0。若遍历完所有候选材质均无匹配，返回 0.0。默认 tolerance 为 0.05。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "解析 Blender 检查脚本输出的 JSON 字符串。先去除首尾空白，再调用 json.loads 转换为 Python 对象。若输出为空、仅含空白或 JSON 解析失败，则记录错误日志并返回 None。该函数为主函数提供结构化的材质检查数据。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 27,
+        "description": "对两个标量值 actual 与 expected 进行容差比较。若任一值为 None 则返回 False；否则计算两者差的绝对值，判断是否小于等于 tol。该函数被主函数用于比较 metallic 和 roughness 等单浮点参数，返回布尔值。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 33,
+        "description": "对两个向量 actual 与 expected 进行逐分量容差比较。若任一向量为空或长度不一致则返回 False；否则逐对计算分量差的绝对值，要求所有分量均小于等于 tol。该函数被主函数用于比较 base_color（如 RGBA 四维数组）等向量型参数，返回布尔值。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:11:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_aa43e3af-d5ad-4366-b3e1-e61c74a5a5a9./evaluator_function_labels.json"
+}

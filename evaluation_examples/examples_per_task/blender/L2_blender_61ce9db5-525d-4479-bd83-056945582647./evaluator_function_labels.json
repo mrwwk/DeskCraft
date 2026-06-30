@@ -1,0 +1,83 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_61ce9db5-525d-4479-bd83-056945582647./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 58
+    },
+    {
+      "name": "check_blender_animation_range",
+      "lineno": 171
+    },
+    {
+      "name": "check_blender_frame_range",
+      "lineno": 205
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 24
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 37
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 44
+    },
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 58
+    },
+    {
+      "name": "check_blender_animation_range",
+      "lineno": 171
+    },
+    {
+      "name": "check_blender_frame_range",
+      "lineno": 205
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 动画任务中关键帧与帧范围的配置正确性。它通过执行 Blender 后台命令（`--background --python`）运行 Python 检查脚本，从标准输出中提取以 `RESULT:` 为前缀的 JSON 数据作为评测输入。核心检查对象分为两类：一是指定物体的动画关键帧（包括关键帧总数、location 类型曲线存在性、特定帧位是否有关键帧，以及关键帧位置坐标值）；二是场景动画的帧范围（`frame_start` 与 `frame_end`）。比较方式上，关键帧位置采用分量级容差匹配（默认容差 `0.01`），帧号匹配采用绝对差小于 `0.001` 的浮点比较，帧范围则采用严格相等比较。评测逻辑为“全部满足才通过”：各主函数内部按顺序执行多项分支检查，任一条件不满足立即返回 `0.0`，全部通过返回 `1.0`。不同指标之间由不同主函数独立判定，无加权累计。",
+    "main_functions": [
+      {
+        "name": "check_blender_animation_keyframes",
+        "lineno": 58,
+        "description": "接收 Blender 检查脚本输出的 JSON 字符串 `result_str` 与预期规则字典 `expected`，验证指定物体的动画关键帧是否符合要求。执行步骤如下：首先调用 `_parse_blender_output` 将 JSON 字符串解析为字典；接着按 `object_name` 提取对应物体的动画数据，若缺失则失败。随后依次进行四项分支检查（均满足才通过）：(1) 若 `expected` 含 `min_keyframe_count`，比较实际关键帧总数是否大于等于该值；(2) 若 `expected` 中 `has_location_keys` 为真，遍历所有关键帧通道，检查是否存在通道名包含 `\"location\"` 的关键帧；(3) 若 `expected` 含 `expected_keyframe_frames`，对每个预期帧，在所有含 `\"location\"` 的通道中查找是否存在帧号差小于 `0.001` 的关键帧；(4) 若 `expected` 含 `expected_keyframes`，对每个预期帧，依次从 `location[0]`、`location[1]`、`location[2]` 三个通道中提取对应帧的值，组装成实际位置向量，再调用 `_check_vector_tolerance` 与预期 `location` 进行分量级容差比较（容差默认 `0.01`）。以上任一检查失败即记录警告并返回 `0.0`，全部通过返回 `1.0`。"
+      },
+      {
+        "name": "check_blender_animation_range",
+        "lineno": 171,
+        "description": "接收 Blender 检查脚本输出的 JSON 字符串 `result_str` 与预期规则字典 `expected`，验证场景动画的帧范围设置。首先调用 `_parse_blender_output` 解析 JSON。然后按顺序检查：若 `expected` 包含 `frame_start`，要求解析结果中的 `frame_start` 字段与预期值严格相等；若 `expected` 包含 `frame_end`，要求解析结果中的 `frame_end` 字段与预期值严格相等。任一字段不匹配即记录警告并返回 `0.0`，全部匹配返回 `1.0`。"
+      },
+      {
+        "name": "check_blender_frame_range",
+        "lineno": 205,
+        "description": "该函数是 `check_blender_animation_range` 的薄封装别名。接收相同的 `result_str`、`expected` 与 `**options`，直接原样转发给 `check_blender_animation_range` 执行。其评测逻辑与后者完全一致：验证场景动画的 `frame_start` 和/或 `frame_end` 是否与预期严格相等，满足则返回 `1.0`，否则返回 `0.0`。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 24,
+        "description": "负责将 Blender 后台命令输出的原始文本解析为 Python 字典。对输入字符串去除首尾空白后使用 `json.loads` 进行解析；若输出为空或解析失败（`JSONDecodeError`、`ValueError`），则记录错误日志并返回 `None`。该函数是主函数的数据入口，为后续所有字段比较提供结构化数据。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 36,
+        "description": "标量容差比较器。接收 `actual`、`expected` 与 `tol`，在两者均非 `None` 的前提下，判断 `abs(float(actual) - float(expected)) <= float(tol)` 是否成立，成立返回 `True`，否则返回 `False`。该函数在当前 evaluator 的主函数调用链中未被直接调用，属于通用辅助工具。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 42,
+        "description": "向量级容差比较器。接收两个向量 `actual` 与 `expected` 及容差 `tol`，首先检查两者长度是否一致且均非空，然后逐分量计算绝对差是否均小于等于 `tol`，返回布尔值。该函数被 `check_blender_animation_keyframes` 调用，用于比较关键帧的三维位置坐标（`location`）是否在允许误差范围内。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:09:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_61ce9db5-525d-4479-bd83-056945582647./evaluator_function_labels.json"
+}

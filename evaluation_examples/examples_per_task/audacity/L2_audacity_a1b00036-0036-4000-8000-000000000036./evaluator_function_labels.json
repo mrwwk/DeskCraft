@@ -1,0 +1,88 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00036-0036-4000-8000-000000000036./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 108
+    },
+    {
+      "name": "check_audio_has_content_at",
+      "lineno": 129
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "_extract_time_range",
+      "lineno": 99
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 108
+    },
+    {
+      "name": "check_audio_has_content_at",
+      "lineno": 129
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 任务最终导出的 WAV 音频文件是否满足两项独立指标：一是音频总时长必须落在以 expected_duration 为中心、给定 tolerance 为半径的区间内；二是在指定的 [start_time, end_time] 时间段内，音频必须存在有效内容，其响度（以 RMS 分贝计）不得低于 min_rms_db 阈值。Evaluator 不依赖 Audacity 工程文件或界面状态，而是直接读取最终输出的 WAV 二进制数据，通过标准库 wave 模块解析头信息，并通过 struct/int.from_bytes 将采样数据归一化到 [-1.0, 1.0] 后计算 RMS。两个主函数各自独立打分，分别返回 1.0（达标）或 0.0（不达标），属于按指标独立判定式逻辑。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 108,
+        "description": "检查对象为目标路径上的 WAV 音频文件总时长。执行步骤如下：1) 先判断 file_path 是否存在，若不存在直接返回 0.0；2) 调用 _read_wav_info 读取 WAV 头信息，获取实际时长 actual；3) 从 rule 字典中提取 expected_duration（必需）与 tolerance（可选，默认 0.5 秒）；4) 计算 |actual - expected|，若绝对差小于等于 tolerance 则判定成功，返回 1.0，否则返回 0.0；5) 任何异常（如文件损坏、读取失败）均捕获并返回 0.0。判定依据是数值绝对差是否在容忍区间内。"
+      },
+      {
+        "name": "check_audio_has_content_at",
+        "lineno": 129,
+        "description": "检查对象为目标 WAV 文件在指定时间区间内是否存在足够响度的音频内容。执行步骤如下：1) 判断 file_path 是否存在，不存在则返回 0.0；2) 调用 _get_mono_samples 将音频转换为单声道采样序列并获取采样率 sr；3) 从 rule 中提取 start_time、end_time 与 min_rms_db（可选，默认 -30 dB）；4) 调用 _extract_time_range 按采样率换算索引，截取对应时间区间的样本子列表；5) 若截取结果为空，返回 0.0；6) 调用 _rms_db 计算该区间的 RMS 分贝值；7) 若 rms >= min_rms_db 则返回 1.0，否则返回 0.0；8) 异常时返回 0.0。判定依据是区域响度是否达到阈值。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 20,
+        "description": "使用标准库 wave.open 以只读模式打开 WAV 文件，解析并返回包含 channels、sample_rate、n_frames、sampwidth、duration 的字典。duration 由 n_frames / sample_rate 计算得出。该函数是时长检查与后续样本读取的基础，直接服务于 check_audio_duration 的时长获取，也被 _get_mono_samples 复用以取得采样率与通道数。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 35,
+        "description": "使用 wave 模块读取 WAV 全部原始帧数据，根据 sampwidth（1/2/3/4 字节）分别通过 struct.unpack 或 int.from_bytes 将原始字节解析为有符号/无符号整型，再归一化到 [-1.0, 1.0] 的浮点列表。多通道时返回交错采样（interleaved）序列。该函数是音频内容分析的底层数据读取器，被 _get_mono_samples 调用以提供原始采样值。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 65,
+        "description": "接收一个浮点样本列表，计算其均方根（RMS）并转换为分贝值：20 * log10(rms)。若样本为空或 RMS 小于 1e-10，则返回 -100.0。该函数是响度计算的核心比较器，被 check_audio_has_content_at 调用以量化指定区间的音频能量，并与阈值比较。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 75,
+        "description": "先调用 _read_wav_info 与 _read_wav_samples 读取完整音频数据；若通道数大于 1，则对交错样本按帧取平均，生成单声道（mono）样本列表，同时返回采样率。该函数将多通道音频统一为单声道，确保后续 _extract_time_range 与 _rms_db 的响度检查不受通道数量影响，服务于 check_audio_has_content_at。"
+      },
+      {
+        "name": "_extract_time_range",
+        "lineno": 88,
+        "description": "根据传入的采样率 sr，将 start_time 与 end_time（单位：秒）转换为样本索引 start_idx 与 end_idx，并对索引做边界裁剪（clamp 到 [0, len(samples)]），最后返回该区间内的样本子列表。该函数用于从完整音频中精确切出待检查的时间段，供 check_audio_has_content_at 进行局部响度分析。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 20:55:39",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00036-0036-4000-8000-000000000036./evaluator_function_labels.json"
+}

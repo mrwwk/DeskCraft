@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_86766b15-f7a2-44f6-a5be-e4004ade98c0./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_texture_assigned",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_texture_assigned",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中指定对象的材质是否被正确分配了指定的图像纹理，并且该纹理已连接到正确的材质输入接口（如Base Color）。它通过读取Blender检查脚本（check_material.py）输出的JSON数据，定位指定对象名下的材质列表，在其中检索图像纹理节点的filename字段是否与预期一致，同时验证该纹理节点的connected_to是否包含预期的输入接口名称。若找到完全匹配的记录则判定成功（返回1.0），否则判定失败（返回0.0）。检查逻辑包含对Base Color直接连接的向后兼容快速路径，也支持对任意输入接口的精确连接检查，属于“任一满足即成功”的单点判定模式。",
+    "main_functions": [
+      {
+        "name": "check_blender_texture_assigned",
+        "lineno": 33,
+        "description": "该函数接收command_output（Blender检查脚本输出的JSON字符串）和rule（包含object_name、texture_filename、input_name的字典）作为输入。首先调用_parse_blender_output将命令输出解析为JSON对象，若解析失败则直接返回0.0。接着从解析结果中获取指定object_name对应的材质列表obj_mats。遍历每个材质时，先执行向后兼容的快速路径：若input_name为None或\"Base Color\"，且材质顶层字段texture_filename与预期文件名一致，则直接返回1.0。若快速路径未命中，则遍历该材质的image_textures列表，对每个纹理节点检查其filename是否与texture_filename一致；若不一致则跳过。若rule中指定了input_name，则进一步检查该纹理节点的connected_to字段（若为字符串则自动转为列表），确认其中是否包含预期的输入接口名；若不包含则跳过。当文件名和连接目标均满足条件时，返回1.0。若遍历完所有材质和纹理节点均未找到匹配项，则记录警告日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 19,
+        "description": "该函数负责将Blender检查脚本的原始命令行输出解析为Python字典。它首先检查command_output是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试使用json.loads对输出内容进行解析并返回解析后的字典。如果解析过程中触发json.JSONDecodeError或ValueError，则记录错误日志及原始输出内容，并返回None。该函数是主评测函数的数据预处理入口，为后续的纹理分配与连接检查提供结构化的JSON数据。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:10:52",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_86766b15-f7a2-44f6-a5be-e4004ade98c0./evaluator_function_labels.json"
+}

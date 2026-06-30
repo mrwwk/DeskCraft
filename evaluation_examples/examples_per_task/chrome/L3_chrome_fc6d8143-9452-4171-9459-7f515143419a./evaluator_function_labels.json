@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_fc6d8143-9452-4171-9459-7f515143419a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 46
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 46
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator服务于任务 L3_chrome_fc6d8143-9452-4171-9459-7f515143419a，核心目标是判定模型产出的结果（result）是否满足配置规则（rules）。它提供两种互补的评测路径：exact_match 对简单标量或字符串执行严格相等判定；check_direct_json_object 则针对 JSON 结构化对象进行深度字段级检查，支持字符串预处理（去空白、单引号转双引号、JSON 解析）、失败标记拦截（__EVALUATION_FAILED__）、严格键值比对（可忽略列表顺序）以及包含性匹配（期望列表元素存在于结果中，或期望字符串作为子串被包含）。两种函数均采用二元打分机制，全部条件满足时返回 1.0，任何字段不符、解析失败、异常或命中失败标记即返回 0.0，不存在部分得分或加权累计。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收实际结果 result 与规则字典 rules，从 rules 中提取键 expected 作为预期值，随后使用 == 运算符直接比较 result 与 expect。检查步骤为：1）提取 rules[\"expected\"]；2）直接比对 result 与 expect；3）若完全相等则返回 1.0，否则返回 0.0。判定依据是严格精确匹配，无近似容错、无阈值、无类型转换，仅依赖 Python 的 == 语义。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 46,
+        "description": "该函数用于对 JSON 对象进行结构化字段检查，接收 result（可为 JSON 字符串或已解析对象）与 rules。检查步骤如下：1）预处理 result：若为字符串则先 strip() 去空白，再将所有单引号替换为双引号，然后用 json.loads 解析为 Python 对象；若 result 为 None，直接返回 0.0。2）失败标记拦截：遍历 rules[\"expected\"] 的键值对，若发现任意值为 \"__EVALUATION_FAILED__\"，立即返回 0.0。3）读取 rules 中的 expect_in_result 标志（默认 False），分两种模式执行：\n- 严格匹配模式（expect_in_result=False）：遍历预期 JSON 的每个键，取出 expected_value 与 result 中对应键的 actual_value；若 rules 中设置 ignore_list_order 为 True，则对预期列表和实际列表均调用 sorted 排序后比较，否则直接比较。任一键不匹配即返回 0.0，全部通过返回 1.0。\n- 包含匹配模式（expect_in_result=True）：遍历预期 JSON 的每个键；若预期值是列表，则检查 result 对应键的值——当该值为列表时，判断列表中是否包含预期列表中的任意一个元素（存在性检查），当该值为字符串时，判断是否与预期列表中任意一个元素精确相等；若预期值是字符串，则检查 result 对应键的值是否包含该预期字符串（子串包含检查，使用 in 操作符）；若预期值为其他类型，返回 0.0。任一键不满足即返回 0.0，全部满足返回 1.0。\n4）异常处理：上述任何步骤若抛出异常，均被捕获并返回 0.0。判定依据为全部子检查通过得 1.0，任何不符、解析失败或异常即得 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:50:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_fc6d8143-9452-4171-9459-7f515143419a./evaluator_function_labels.json"
+}

@@ -1,0 +1,165 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_avatar_refined_progressive_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 184
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 211
+    },
+    {
+      "name": "check_l2_avatar_refined_complete",
+      "lineno": 249
+    },
+    {
+      "name": "check_interactive_gimp_avatar_refined_complete",
+      "lineno": 272
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "_compute_sharpness_score",
+      "lineno": 176
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 184
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 211
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 241
+    },
+    {
+      "name": "check_l2_avatar_refined_complete",
+      "lineno": 249
+    },
+    {
+      "name": "check_interactive_gimp_avatar_refined_complete",
+      "lineno": 272
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP交互式头像精修导出任务是否完整完成。核心要求是：用户必须基于源图像生成三种格式的产物——一张1024×1024像素的PNG图像、一张1024×1024像素且文件大小不超过256000字节的JPEG图像、以及一个保留编辑信息的XCF源文件。评测逻辑采用严格的“全或无”模式：对PNG/JPG/XCF的文件存在性、格式正确性、图像尺寸、JPG文件大小上限进行逐项检查；同时通过像素统计对比，验证JPEG最终输出相比原始源图在对比度上至少提升5%、在清晰度（基于梯度方差）上至少提升1.5%。全部10项二元检查必须同时返回1，最终才能得1.0分，任一失败即整体判为0.0分。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "接收一个PIL.Image.Image对象，将其转换为'L'（灰度）模式后，利用ImageStat.Stat计算像素值的标准差，并将该标准差作为图像对比度数值返回。该函数为check_contrast_increase提供核心的对比度量度。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "接收image_path、expected_width、expected_height（可选，默认为None）和tolerance（默认5像素）。先判断文件是否存在，再用PIL打开图像获取宽高。若expected_height为None，仅判断宽度与expected_width的绝对差是否不超过tolerance；若expected_height不为None，则宽高都必须满足容差要求。全部满足返回1，否则返回0。该函数被用于验证PNG和JPG输出是否为1024×1024。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 67,
+        "description": "接收image_path，判断文件是否存在后，用PIL.Image.open读取图像，检查其format属性是否严格等于'PNG'。是则返回1，否则返回0。用于验证PNG产物的格式正确性。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 92,
+        "description": "接收src_path（源图路径）、tgt_path（目标图路径）和min_increase_percent（默认10.0）。先检查两文件是否存在，再分别打开并调用calculate_contrast计算对比度。若源图对比度为0则直接返回0；否则计算百分比提升值((tgt_contrast - src_contrast) / src_contrast) * 100，要求该值大于等于min_increase_percent才返回1，否则返回0。在主评测流程中，该阈值被显式设为5.0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 133,
+        "description": "接收file_path，使用os.path.isfile判断文件是否真实存在。存在返回1，不存在或路径为None返回0。用于验证PNG、JPG、XCF三类产物的存在性。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 151,
+        "description": "接收image_path，判断文件是否存在后，用PIL.Image.open读取图像，检查其format属性是否严格等于'JPEG'。是则返回1，否则返回0。用于验证JPG产物的格式正确性。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 184,
+        "description": "接收image_path和rule字典（可包含min_size和max_size，单位字节，默认最小0、最大10^18）。先判断文件是否存在，再获取实际文件大小，检查其是否在[min_size, max_size]闭区间内。满足返回1，否则返回0。在主评测流程中，该函数被用于限制JPG文件大小不得超过256000字节。"
+      },
+      {
+        "name": "check_sharpness_increase",
+        "lineno": 211,
+        "description": "接收src_path、tgt_path和min_increase_percent（默认5.0）。先检查两文件是否存在，再分别打开图像并调用_compute_sharpness_score计算清晰度分数。若源图清晰度小于等于1e-9则返回0；否则计算百分比提升值(tgt_sharp - src_sharp) * 100.0 / src_sharp，要求大于等于min_increase_percent才返回1，否则返回0。在主评测流程中，该阈值被显式设为1.5。"
+      },
+      {
+        "name": "check_l2_avatar_refined_complete",
+        "lineno": 249,
+        "description": "组合评测主函数，接收result_paths列表，要求必须为列表且长度不少于4。依次解包前四项为png_path、jpg_path、xcf_path、src_path。随后按顺序执行10项二元检查：1) PNG文件存在；2) PNG格式正确；3) PNG尺寸1024×1024（容差5）；4) JPG文件存在；5) JPG格式正确；6) JPG尺寸1024×1024（容差5）；7) JPG文件大小不超过256000字节；8) JPG相对源图对比度提升≥5.0%；9) JPG相对源图清晰度提升≥1.5%；10) XCF文件存在。将10个0/1结果收集为scores列表，调用_all_binary_checks_pass。仅当所有检查项均返回1时，最终返回1.0；任一失败即返回0.0。"
+      },
+      {
+        "name": "check_interactive_gimp_avatar_refined_complete",
+        "lineno": 272,
+        "description": "交互式任务的包装器函数，直接透传result_paths参数给check_l2_avatar_refined_complete，自身不做任何额外处理，返回值与原函数完全一致。用于适配交互式评测入口。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_compute_sharpness_score",
+        "lineno": 175,
+        "description": "接收一个PIL.Image.Image对象，先转为灰度图并转为numpy.float32数组，然后分别沿x轴（axis=1）和y轴（axis=0）计算梯度，求梯度幅值（sqrt(gx^2 + gy^2)），最后返回梯度幅值的方差（np.var）作为清晰度量化分数。该分数被check_sharpness_increase用于比较源图与目标图的清晰度差异。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 237,
+        "description": "接收scores列表，过滤掉None值并将剩余项转为float。若列表为空则返回0.0；否则仅当所有值都大于等于1.0时返回1.0，任一值低于1.0则返回0.0。该函数实现了严格的“全部满足”逻辑，是check_l2_avatar_refined_complete判定最终成败的总闸。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:50:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_avatar_refined_progressive_001./evaluator_function_labels.json"
+}

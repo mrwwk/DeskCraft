@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_ae78f875-5b98-4907-bbb5-9c737fc68c03./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 13
+    },
+    {
+      "name": "exact_match",
+      "lineno": 51
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 13
+    },
+    {
+      "name": "exact_match",
+      "lineno": 51
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator服务于任务google_search_pdf_dnt，核心目标是验证两个独立状态：第一，浏览器当前活动标签页是否打开了符合预期查询参数的Google搜索结果页，通过对URL进行多正则模式匹配来确认；第二，Chrome浏览器的Safe Browsing（安全浏览）保护功能是否处于预期启用状态，通过与预期值进行大小写不敏感的精确字符串比对来确认。两个主函数各自独立返回0.0（失败）或1.0（成功），代码中未明确体现多个指标之间的最终联合判定方式（如是否需全部满足或加权累计）。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 13,
+        "description": "接收active_tab_info getter的输出（字符串URL或含'url'键的字典）以及包含\"expected\"键的规则字典。首先判空，若result为假值直接返回0.0；接着提取URL字符串，若格式非法（非字符串且非含'url'字典）也返回0.0；然后从rules[\"expected\"]获取正则表达式列表，使用re.search逐个检查是否全部在URL中匹配；但凡有任一模式不匹配即返回0.0，仅当所有模式均匹配时才返回1.0。该函数要求URL必须同时满足全部正则约束，属于\"全部满足\"的硬匹配逻辑。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 51,
+        "description": "接收enable_safe_browsing getter的输出（通常为\"true\"/\"false\"等字符串）及包含\"expected\"键的规则字典。若result为None直接返回0.0；否则将result与rules[\"expected\"]均转为字符串、去除首尾空白并转为小写，进行大小写不敏感的精确比较；两者一致返回1.0，否则返回0.0。该函数用于验证Chrome安全浏览设置的启用状态是否与预期完全一致。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:47:45",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_ae78f875-5b98-4907-bbb5-9c737fc68c03./evaluator_function_labels.json"
+}

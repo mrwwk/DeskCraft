@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_interruption_002./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator旨在通过精确子串匹配的方式，对VM命令行输出的文本结果进行二元判定，以验证任务是否达成预期状态。它要求输出字符串必须同时满足正向包含规则（包含所有指定的include子串模式）和负向排除规则（不包含任何指定的exclude子串模式）。核心检查对象是VM命令返回的文本内容（如'PASSED'或'FAILED'等状态标记），主要比较方式为逐个子串的精确存在性检查，采用\"全部满足得1分、任一不满足得0分\"的严格判定逻辑。当命令输出为None时直接判定失败。根据代码注释，典型场景用于判断VM命令是否因满足全部业务条件（如备份存在、指定列存在、数据降序排列等）而输出成功标记。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 7,
+        "description": "该函数以result字符串（通常为VM命令行输出文本）和rules字典为检查对象。其执行步骤为：第一步，若result为None则直接返回0.0；第二步，从rules字典中分别获取键为\"include\"和\"exclude\"的字符串列表，若不存在则默认为空列表；第三步，检查result是否同时包含include列表中的每一个子串，且同时不包含exclude列表中的任何一个子串；最终判定依据为：上述两项条件全部满足时返回1.0，任一条件不满足则返回0.0。函数执行过程中会将result与rules打印至标准输出用于调试。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:21:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_interruption_002./evaluator_function_labels.json"
+}

@@ -1,0 +1,65 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_14351984-fa91-4683-be08-bf639bcfddc6./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_animation_extended",
+      "lineno": 68
+    },
+    {
+      "name": "check_blender_fps",
+      "lineno": 101
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_animation_extended",
+      "lineno": 68
+    },
+    {
+      "name": "check_blender_fps",
+      "lineno": 101
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender任务的完成状态，核心思路是通过解析Blender检查脚本（如check_render.py、check_animation.py）输出的JSON字符串，对渲染设置和动画属性进行逐项精确比对。验证采用严格的\"全部满足\"逻辑：针对rule中指定的每一个检查字段，必须完全匹配或通过阈值检验，任一条件失败即返回0.0，全部通过才返回1.0。主要检查对象分为两类：一是渲染参数（包括渲染引擎、分辨率、帧率、采样数、图像格式、活动相机），二是动画扩展情况（指定物体的关键帧数量是否达到下限、时间线最大帧是否达到要求）。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "该函数接收command_output（来自check_render.py的JSON字符串）和rule字典作为输入。首先调用_parse_blender_output将JSON字符串解析为Python对象；若解析失败直接返回0.0。随后对rule中可能出现的以下字段进行逐项精确相等检查：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。检查方式为从解析结果中获取对应键值，与rule中的期望值使用==比较。若rule中指定了某字段但实际值不相等，立即记录警告并返回0.0。只有当rule中所有指定字段全部匹配成功时，才返回1.0。"
+      },
+      {
+        "name": "check_blender_animation_extended",
+        "lineno": 68,
+        "description": "该函数接收command_output（来自check_animation.py的JSON字符串）和rule字典作为输入。首先调用_parse_blender_output解析JSON；若解析失败返回0.0。接着从rule中获取object_name，并在解析结果中查找该名称对应的动画数据对象。若rule中包含min_keyframe_count，则检查该对象的keyframe_count是否大于等于此阈值；若rule中包含max_frame，则检查该对象frame_range列表的第二个元素（最大帧）是否大于等于此阈值。任一条件不满足即返回0.0，全部满足返回1.0。"
+      },
+      {
+        "name": "check_blender_fps",
+        "lineno": 101,
+        "description": "该函数是check_blender_render_settings的薄封装，接收相同的command_output和rule参数。它直接将调用转发给check_blender_render_settings，自身不做额外逻辑。其用途是专门用于仅验证fps这一项渲染设置，判定依据完全由被封装的函数决定。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 18,
+        "description": "该辅助函数负责统一解析Blender检查脚本输出的命令行文本。它接收command_output字符串，先判断是否为空或仅含空白字符，若是则记录错误并返回None；否则尝试使用json.loads将去除首尾空白后的内容解析为Python对象。若遇到JSONDecodeError或ValueError，记录错误及原始输出并返回None。解析成功则返回对应的字典或列表。该函数被check_blender_render_settings、check_blender_animation_extended等主函数复用，作为前置数据解析器。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:08:13",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_14351984-fa91-4683-be08-bf639bcfddc6./evaluator_function_labels.json"
+}

@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_82bc8d6a-36eb-4d2d-8801-ef714fb1e55a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_flight_search",
+      "lineno": 9
+    },
+    {
+      "name": "check_do_not_track",
+      "lineno": 81
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_flight_search",
+      "lineno": 9
+    },
+    {
+      "name": "check_do_not_track",
+      "lineno": 81
+    },
+    {
+      "name": "_recursive_search_dnt",
+      "lineno": 150
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证两类 Chrome 浏览器相关任务是否完成：第一类是验证代理是否成功访问了 Qatar Airways 航班搜索结果页，通过读取 Chrome History SQLite 数据库，检查历史记录中是否存在同时包含所有指定 URL 片段（以及可选日期片段）的地址；第二类是验证 Chrome 的 \"Do Not Track\" 隐私选项是否被启用，通过解析 Chrome Preferences JSON 文件，在多层嵌套配置中查找 DNT 相关的真值标志。两个任务各自独立判定，均以二元方式返回 1.0（满足条件）或 0.0（不满足），不存在联合打分或加权逻辑。",
+    "main_functions": [
+      {
+        "name": "check_flight_search",
+        "lineno": 9,
+        "description": "检查对象是 Chrome History SQLite 数据库文件（由 vm_file getter 捕获）。首先校验 result_path 非 None 且文件存在，否则直接返回 0.0。从 rules 中提取 url_contains（字符串列表，必须全部满足）和可选的 date_contains。接着连接 SQLite 数据库，执行 SELECT url FROM urls 获取全部历史 URL。遍历每条 URL 时，先将 URL 转小写，逐一检查是否包含所有 url_contains 中的模式（不区分大小写）；若 date_contains 非空，还需在原始 URL（区分大小写）中检查是否包含 date_contains。只要存在任意一条 URL 同时通过上述全部条件，即返回 1.0；若遍历结束无匹配，返回 0.0。过程中捕获 sqlite3.OperationalError 及其他异常，均返回 0.0。"
+      },
+      {
+        "name": "check_do_not_track",
+        "lineno": 81,
+        "description": "检查对象是 Chrome Preferences JSON 文件（由 vm_file getter 捕获）。首先校验 result_path 非 None 且文件存在，否则返回 0.0。读取并解析 JSON 后，通过三种递进方式判定 Do Not Track 是否启用，任一方式命中即视为成功：方式一，检查 prefs['profile']['enable_do_not_track'] 是否为 True（旧版 Chrome）；方式二，检查 prefs['profile']['content_settings']['exceptions']['do_not_track'] 下是否存在任意条目的 setting 值为 1 或字符串 '1'（新版 Chrome）；方式三，调用辅助函数 _recursive_search_dnt 对整个 JSON 树进行递归兜底搜索。若三种方式均未命中，返回 0.0。代码中虽然接收了 rules 参数，但未在函数体内读取或使用该参数，实际判定不依赖 rules。过程中捕获 JSONDecodeError 及其他异常，均返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_recursive_search_dnt",
+        "lineno": 155,
+        "description": "这是一个递归搜索辅助函数，服务于 check_do_not_track 的第三种兜底判定逻辑。它接收一个可能嵌套的字典或列表对象 obj，以及当前深度 depth（默认 0，上限 12 层）。递归遍历过程中，若发现任意键名包含 'do_not_track'（不区分大小写），且对应值为 True、整数 1 或字符串 'true'（不区分大小写），则立即返回 True；否则继续深入字典值或列表元素。若超出最大深度或遍历完毕仍未命中，返回 False。该函数用于兼容 DNT 配置存放在非标准或未知嵌套路径的 Chrome 版本。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:49:41",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_82bc8d6a-36eb-4d2d-8801-ef714fb1e55a./evaluator_function_labels.json"
+}

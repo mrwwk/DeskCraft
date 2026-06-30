@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_003./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 服务于交互式计算器任务（INTERACTIVE_calc_interactive_calc_003），其验证目标是一个结果字符串是否满足严格的内容包含与排除规则。核心检查对象是程序返回或捕获的结果文本（result），主要比较方式为字符串子串匹配：要求结果必须同时包含规则中指定的所有 include 字符串，且必须完全不包含任何 exclude 字符串。成功判定采用二元打分机制，只有当全部 include 条件满足且全部 exclude 条件满足时，才返回 1.0（完全成功）；若 result 为 None，或缺少某个必须包含的内容，或出现了某个必须排除的内容，则返回 0.0（完全失败）。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收一个结果字符串 result 和一个规则字典 rules 作为输入。首先检查 result 是否为 None，若为 None 则直接返回 0.0。随后从 rules 中提取 include 列表（默认空列表）和 exclude 列表（默认空列表）。接着执行两项串行检查：第一，使用 all(r in result for r in include) 验证 result 是否包含 include 列表中的每一个字符串；第二，使用 all(r not in result for r in exclude) 验证 result 是否不包含 exclude 列表中的任何一个字符串。只有当上述两项检查同时通过时，函数返回 1.0 表示成功；只要任一检查失败，则返回 0.0 表示失败。函数内部还会通过 print 输出 result 和 rules 的内容用于调试。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:19:00",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_003./evaluator_function_labels.json"
+}

@@ -1,0 +1,122 @@
+{
+  "id": "interactive_calc_error_correction_001",
+  "snapshot": "libreoffice_calc",
+  "interactive": true,
+  "scenario_type": "error_correction",
+  "scenario_description": "User asks to sort by a column, but the instruction is ambiguous. After agent sorts by the wrong column, user clarifies the correct one.",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_english"
+  },
+  "config": [
+    {
+      "type": "download",
+      "parameters": {
+        "files": [
+          {
+            "url": "https://huggingface.co/datasets/xlangai/ubuntu_osworld_file_cache/resolve/main/libreoffice_calc/0326d92d-d218-48a8-9ca1-981cd6d064c7/SalesRep.xlsx",
+            "path": "/home/user/Desktop/SalesRep.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null; DISPLAY=:1 gsettings set org.gnome.desktop.session idle-delay 0 2>/dev/null; DISPLAY=:1 xset s off 2>/dev/null; DISPLAY=:1 xset -dpms 2>/dev/null; true"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "libreoffice",
+          "--norestore",
+          "--nologo",
+          "--calc",
+          "/home/user/Desktop/SalesRep.xlsx"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 12
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-c",
+          "DISPLAY=:1 xdotool key Escape 2>/dev/null; sleep 0.3; DISPLAY=:1 xdotool search --class 'soffice' windowfocus windowraise 2>/dev/null || DISPLAY=:1 wmctrl -xa 'soffice.Soffice' 2>/dev/null || true"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "Sort the data by the highest numbers",
+      "trigger": {
+        "type": "step_count",
+        "value": 5
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "No, that's the wrong column! I meant sort by the March column specifically, from highest to lowest. Please undo what you did and redo it correctly.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "Good, now also add a Total row at the bottom with SUM for each column, and save.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "func": "check_calc_sort_and_total",
+    "file": "evaluator.py",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/SalesRep.xlsx",
+      "dest": "SalesRep.xlsx"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "total_row": 12,
+        "total_label": "total",
+        "sort_column": 4,
+        "sort_direction": "descending",
+        "sum_columns": [2, 3, 4, 5, 6, 7],
+        "data_start_row": 2,
+        "data_end_row": 11,
+        "tolerance": 0.01
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

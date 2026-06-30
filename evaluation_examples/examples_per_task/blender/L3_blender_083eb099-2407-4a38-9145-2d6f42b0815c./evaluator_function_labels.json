@@ -1,0 +1,122 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_083eb099-2407-4a38-9145-2d6f42b0815c./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_object_deleted",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 76
+    },
+    {
+      "name": "check_blender_applied_modifier",
+      "lineno": 160
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 200
+    },
+    {
+      "name": "check_blender_mesh_modified",
+      "lineno": 238
+    },
+    {
+      "name": "check_blender_modifier_bevel",
+      "lineno": 248
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 40
+    },
+    {
+      "name": "check_blender_object_deleted",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 76
+    },
+    {
+      "name": "check_blender_applied_modifier",
+      "lineno": 160
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 200
+    },
+    {
+      "name": "check_blender_mesh_modified",
+      "lineno": 238
+    },
+    {
+      "name": "check_blender_modifier_bevel",
+      "lineno": 248
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 Blender 3D 场景编辑任务的完成状态。它通过读取并解析外部 Blender 检查脚本（如 check_object.py、check_material.py、check_mesh.py、check_modifier.py）输出的 JSON 数据，对场景中的对象删除状态、材质 PBR 参数（名称、基础颜色、金属度、粗糙度）、网格修改器应用情况（顶点数变化、修改器类型消失）、平滑着色设置以及特定修改器（如倒角）的参数进行逐项检查。核心比较方式包括：精确字符串匹配、子串匹配、单浮点容差比较（_check_tolerance）和向量逐分量容差比较（_check_vector_tolerance）。所有主函数均采用二元评分机制：只要被检查对象满足 rule 中声明的全部条件即返回 1.0（成功），任一必要条件不满足或数据缺失即返回 0.0（失败）。标注人员应关注各检查项对应的 JSON 来源脚本、对象定位方式（精确/子串/全局）以及容差阈值。",
+    "main_functions": [
+      {
+        "name": "check_blender_object_deleted",
+        "lineno": 50,
+        "description": "接收来自 check_object.py 的 JSON 输出字符串 command_output 与 rule 字典。首先调用 _parse_blender_output 将原始输出解析为字典；然后从 rule 中取 deleted_object 字段作为应被删除的对象名；从解析结果中取 object_names 列表。判定逻辑为：若该对象名不在 object_names 列表中，说明对象已删除，返回 1.0；若对象仍在列表中，返回 0.0。解析失败或发生异常时同样返回 0.0。"
+      },
+      {
+        "name": "check_blender_material_pbr",
+        "lineno": 76,
+        "description": "接收来自 check_material.py 的 JSON 输出字符串 command_output 与 rule 字典。首先调用 _parse_blender_output 解析 JSON。接着按以下优先级构建候选对象材质列表：1) 若 rule 提供 object_name，精确匹配该键对应的材质数据；2) 否则若提供 object_name_contains 或 name_contains，遍历结果中所有非下划线开头的键，收集对象名包含该子串的项；3) 若两者皆无，则全局遍历所有非下划线开头的对象材质。随后遍历每个候选对象的材质列表（单材质会被包装为列表），对每个材质依次检查：若 rule 指定 material_name，要求 mat[\"name\"] 精确相等；若指定 expected_color，调用 _check_vector_tolerance 比较 mat[\"base_color\"] 与预期颜色的四分量在容差 tol 内（默认 0.05）；若指定 metallic，调用 _check_tolerance 比较金属度；若指定 roughness，调用 _check_tolerance 比较粗糙度。判定逻辑为：任一候选对象的任一材质同时满足 rule 中所有指定条件，即返回 1.0；若遍历完无匹配，返回 0.0。解析失败或异常也返回 0.0。"
+      },
+      {
+        "name": "check_blender_applied_modifier",
+        "lineno": 160,
+        "description": "接收来自 check_mesh.py 的 JSON 输出字符串 command_output 与 rule 字典。首先调用 _parse_blender_output 解析 JSON，再按 rule[\"object_name\"] 提取对应 mesh_info。若 rule 指定 min_vertices，检查 mesh_info[\"vertex_count\"] 是否大于等于该阈值，不满足则返回 0.0。若 rule 指定 no_modifier_type，检查 mesh_info[\"modifier_types\"] 列表：若该字段缺失返回 0.0；若列表中仍包含该禁止的修改器类型，说明修改器未应用，返回 0.0。若 rule 中指定的所有条件（如有）全部通过，返回 1.0。解析失败或异常返回 0.0。"
+      },
+      {
+        "name": "check_blender_smooth_shading",
+        "lineno": 200,
+        "description": "接收来自 check_mesh.py 的 JSON 输出字符串 command_output 与 rule 字典。首先调用 _parse_blender_output 解析 JSON。支持两种对象定位方式：1) 若 rule 提供 object_name，直接取 result 中对应键的 mesh_info，检查其 has_smooth 字段是否等于 rule[\"has_smooth\"]（默认 True），匹配返回 1.0，否则返回 0.0；2) 若提供 object_name_contains，遍历 result 中所有键，对键名包含该子串且值为字典的项，检查其 mesh_info[\"has_smooth\"] 是否等于预期，任一匹配成功即返回 1.0，遍历结束未找到则返回 0.0。解析失败或异常返回 0.0。"
+      },
+      {
+        "name": "check_blender_mesh_modified",
+        "lineno": 238,
+        "description": "该函数是 check_blender_applied_modifier 的薄封装（别名）。接收 command_output 与 rule 后，直接原样透传给 check_blender_applied_modifier 执行。其测试逻辑与后者完全一致，用于验证网格是否已被修改，例如顶点数增加或特定修改器已应用并消失。"
+      },
+      {
+        "name": "check_blender_modifier_bevel",
+        "lineno": 248,
+        "description": "接收来自 check_modifier.py 的 JSON 输出字符串 command_output 与 rule 字典。首先调用 _parse_blender_output 解析 JSON，再按 rule[\"object_name\"] 取该对象的修改器列表。遍历列表，查找 type 等于 rule[\"modifier_type\"]（默认 \"BEVEL\"）的修改器。若 rule 指定 width，调用 _check_tolerance 比较 mod[\"width\"] 与预期值是否在容差 tol 内（默认 0.01）；若指定 segments，要求 mod[\"segments\"] 与预期值精确相等。判定逻辑为：任一修改器同时满足所有指定条件即返回 1.0；遍历完无匹配返回 0.0。解析失败或异常返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 18,
+        "description": "接收 Blender 检查脚本输出的原始字符串 command_output。先去除首尾空白，再使用 json.loads 将其解析为 Python 字典或列表。若输出为空字符串、仅含空白、或无法解析为合法 JSON，则记录错误日志并返回 None。该函数被所有主函数用作前置解析步骤，为后续字段提取提供结构化数据。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 30,
+        "description": "接收 actual、expected、tol 三个参数。若 actual 或 expected 为 None，直接返回 False；否则将三者转为浮点数，判断绝对误差 |actual - expected| 是否小于等于 tol。返回布尔值。该函数用于单浮点数值的近似相等判断，例如 metallic、roughness、bevel width 等标量字段的容差比较。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 36,
+        "description": "接收 actual、expected、tol 三个参数，其中 actual 与 expected 为可迭代序列（如颜色向量）。若任一序列为空或两者长度不一致，返回 False；否则逐分量计算 |float(a) - float(e)| <= float(tol)，要求所有分量同时满足才返回 True。该函数用于多元浮点数组的近似相等判断，例如 base_color 的四分量 RGBA 容差比较。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:14:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_083eb099-2407-4a38-9145-2d6f42b0815c./evaluator_function_labels.json"
+}

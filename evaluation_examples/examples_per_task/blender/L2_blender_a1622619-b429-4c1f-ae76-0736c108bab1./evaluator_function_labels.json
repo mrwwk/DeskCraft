@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_a1622619-b429-4c1f-ae76-0736c108bab1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_applied_modifier",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 73
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_applied_modifier",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 73
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 3D 建模任务的操作结果。它通过读取并解析 Blender 检查脚本（如 check_mesh.py）输出的 JSON 数据，对指定 3D 对象的网格状态进行逐项核查。核心检查对象包括：对象顶点数是否达到应用修改器后的预期阈值、目标修改器类型是否已从对象上消失、以及对象是否启用了平滑着色。评测采用二元打分机制（1.0 表示通过，0.0 表示失败），要求被测对象在对应规则下的所有指定条件必须同时满足，任一条件不满足或关键数据缺失即判定为失败。",
+    "main_functions": [
+      {
+        "name": "check_blender_applied_modifier",
+        "lineno": 33,
+        "description": "该函数接收来自 check_mesh.py 的 JSON 输出字符串（command_output）以及一条规则字典（rule）。首先调用 _parse_blender_output 将 JSON 字符串解析为 Python 字典；随后根据 rule 中的 object_name 字段提取对应对象的 mesh_info。接着执行两项顺序检查：第一，若 rule 包含 min_vertices，则验证 mesh_info 中的 vertex_count 是否大于或等于该阈值；第二，若 rule 包含 no_modifier_type，则验证 mesh_info 中的 modifier_types 列表不再包含该禁止类型。以上两项检查（及数据存在性检查）必须全部通过，函数才返回 1.0；若解析失败、对象缺失、顶点数不足或禁止的修改器类型仍然存在，则立即返回 0.0。"
+      },
+      {
+        "name": "check_blender_smooth_shading",
+        "lineno": 73,
+        "description": "该函数接收来自 check_mesh.py 的 JSON 输出字符串（command_output）以及规则字典（rule）。首先调用 _parse_blender_output 完成 JSON 解析。然后分两种模式匹配目标对象：若 rule 提供了 object_name，则精确查找该名称对应的对象，并读取其 mesh_info 中的 has_smooth 布尔值；若 rule 提供了 object_name_contains，则遍历结果字典中所有键，寻找名称包含指定子字符串且值为字典类型的对象。最后将取到的 has_smooth 值与 rule 中的 has_smooth 预期值（默认为 True）进行相等比较。比较一致则返回 1.0，未找到匹配对象或 has_smooth 不符合预期则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 20,
+        "description": "该辅助函数负责将 Blender 检查脚本输出的原始字符串解析为 JSON 对象。它先检查输入是否为空或仅包含空白字符，若是则记录错误并返回 None；随后尝试调用 json.loads 进行解析。若遇到 JSONDecodeError 或 ValueError，则记录错误日志及原始输出内容，并返回 None。解析成功时返回对应的 Python 字典。该函数是 command_output 的通用预处理器，为 check_blender_applied_modifier 和 check_blender_smooth_shading 提供标准化的解析结果，主函数依赖其返回值是否为 None 来决定是否继续后续检查。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:11:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_a1622619-b429-4c1f-ae76-0736c108bab1./evaluator_function_labels.json"
+}

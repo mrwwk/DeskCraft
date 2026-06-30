@@ -1,0 +1,65 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_105./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 47
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 78
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 100
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_local_file_url",
+      "lineno": 26
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 47
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 78
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 100
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器在任务执行完成后的最终状态是否符合预期，核心检查对象分为三个独立维度：当前活动标签页的URL、所有打开标签页的URL集合、以及书签栏中的文件夹名称或网站URL集合。检查流程上，针对活动标签页和打开标签页，会先通过_normalize_local_file_url对本地文件URL的协议前缀进行归一化（修正active_url_from_accessTree获取器将file:///误报为https:///的已知缺陷），再使用compare_urls完成URL级比较；针对书签栏，则按rule类型分别提取bookmark_bar下children的folder名称集合或url类型项的URL集合，与预期集合做精确比对。三个主函数各自独立返回0.0或1.0的分数，任一维度检查失败即该维度得0分，整体不存在加权累计或组合判定逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 47,
+        "description": "接收active_tab_info（由active_url_from_accessTree结果获取器返回的字典或纯URL字符串）以及rule（预期规则字典）作为输入。首先检查active_tab_info是否为空，若空则直接返回0.0。随后读取rule[\"type\"]，当前仅支持\"url\"类型。在\"url\"分支中，对rule[\"url\"]和实际获取到的URL（若active_tab_info为字典则取其\"url\"键的值，否则将其整体转为字符串）分别调用_normalize_local_file_url进行协议前缀归一化，再使用compare_urls比较预期URL与实际URL。若compare_urls判定相等则返回1.0，否则返回0.0；若rule[\"type\"]为未知类型，同样返回0.0。"
+      },
+      {
+        "name": "is_expected_tabs",
+        "lineno": 78,
+        "description": "接收open_tabs（当前Chrome所有打开标签页的列表，每个元素为包含\"url\"键的字典）和rule（预期规则字典）作为输入。首先检查open_tabs是否为空，若空则返回0.0。读取rule[\"type\"]，当前仅支持\"url\"类型。从open_tabs中提取每个标签页的\"url\"值组成actual_urls列表，然后调用are_lists_equal，并以compare_urls作为元素级比较函数，对rule[\"urls\"]与actual_urls进行列表级比较。若列表比较通过则返回1.0；若不通过则记录错误日志并返回0.0；若rule[\"type\"]为未知类型，也返回0.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 100,
+        "description": "接收bookmarks（Chrome书签数据结构，要求包含bookmark_bar.children层级）和rule（预期规则字典）作为输入。首先检查bookmarks是否为空，若空则返回0.0。根据rule[\"type\"]分两支处理：若类型为\"bookmark_bar_folders_names\"，则遍历bookmarks[\"bookmark_bar\"][\"children\"]中type为\"folder\"的项，收集其\"name\"字段形成列表，转换为集合后与rule[\"names\"]的集合进行相等比较，相等返回1.0否则返回0.0；若类型为\"bookmark_bar_websites_urls\"，则筛选type为\"url\"的项，收集其\"url\"字段形成列表，转换为集合后与rule[\"urls\"]的集合比较，相等返回1.0否则返回0.0；若类型不支持则抛出TypeError。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_local_file_url",
+        "lineno": 33,
+        "description": "对本地文件URL的协议前缀进行归一化修正。由于active_url_from_accessTree获取器存在已知缺陷，会将本地文件路径误报为以\"https:///\"开头（例如https:///home/user/...），该函数检测此错误前缀并将其替换为正确的\"file:///\"。若输入为空字符串或None则原样返回，若无需修正也直接返回原URL。该函数主要被is_expected_active_tab调用，用于在调用compare_urls前对预期URL和实际URL进行预处理，避免因获取器层面的协议误报导致比较失败。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:35:47",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_105./evaluator_function_labels.json"
+}
