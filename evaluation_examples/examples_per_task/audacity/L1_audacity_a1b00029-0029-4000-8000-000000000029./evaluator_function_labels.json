@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00029-0029-4000-8000-000000000029./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_properties",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "check_audio_properties",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务最终生成的WAV音频文件是否满足一组指定的音频属性要求。核心检查对象是WAV文件的元数据与基础物理属性，包括音频时长、采样率（sample_rate）和声道数（channels）。它首先确认目标文件存在，然后读取WAV头信息，采用“容差近似匹配”方式核对时长（默认容差0.5秒），采用“精确相等”方式核对采样率和声道数（若rule中指定）。成功判定采用严格的联合逻辑：只有当文件存在、且所有被指定的检查项全部通过时，才返回1.0表示成功；若文件缺失、任一属性不匹配或处理过程中发生异常，则立即返回0.0表示失败。",
+    "main_functions": [
+      {
+        "name": "check_audio_properties",
+        "lineno": 41,
+        "description": "该函数接收 file_path（待检测的WAV文件路径）和 rule（包含预期音频属性的字典）作为输入。执行流程如下：首先检查 file_path 对应的文件是否存在，若不存在则直接返回0.0；随后调用辅助函数 _read_wav_info 读取WAV文件的基础信息字典。接着按顺序执行属性检查：1）时长检查，将 info[\"duration\"] 与 rule[\"expected_duration\"] 比较，若绝对差值超过 rule.get(\"tolerance\", 0.5) 秒则记录日志并返回0.0；2）采样率检查（可选），若 rule 中包含键 \"expected_sr\"，则要求 info[\"sample_rate\"] 与其精确相等，否则返回0.0；3）声道数检查（可选），若 rule 中包含键 \"expected_channels\"，则要求 info[\"channels\"] 与其精确相等，否则返回0.0。当所有被指定的检查项均通过时，返回1.0；任何步骤失败或捕获到异常时，均返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 23,
+        "description": "该函数使用Python标准库 wave 模块以只读模式打开指定 file_path 的WAV文件，提取其声道数（channels）、采样率（sample_rate）、总帧数（n_frames）、采样宽度（sampwidth），并通过 n_frames / sample_rate 计算音频时长（duration）。返回包含上述字段的字典。该函数为 check_audio_properties 提供底层WAV元数据解析服务，将二进制音频文件头转换为可供后续规则比对的结构化数值。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 20:50:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00029-0029-4000-8000-000000000029./evaluator_function_labels.json"
+}

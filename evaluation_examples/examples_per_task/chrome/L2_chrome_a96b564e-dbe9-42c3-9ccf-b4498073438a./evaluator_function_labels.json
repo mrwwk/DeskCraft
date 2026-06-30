@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_a96b564e-dbe9-42c3-9ccf-b4498073438a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 72
+    },
+    {
+      "name": "exact_match",
+      "lineno": 95
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 105
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 72
+    },
+    {
+      "name": "exact_match",
+      "lineno": 95
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 105
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator是面向Chrome浏览器任务的专用评测脚本，核心目标是验证任务执行后的浏览器状态及输出结果是否符合预期。它提供两种主要验证能力：一是通过is_expected_active_tab检查Chrome当前活动标签页的URL是否匹配预期，该过程依赖compare_urls进行智能URL规范化比对，能够容忍scheme缺失、www子域名、顶级域后缀（如.com与.com.sg）及路径尾部斜杠的差异，并可配置是否忽略查询参数与锚点；二是通过exact_match对任意结果进行严格精确匹配。评测采用二元计分（1.0为通过，0.0为失败），根据任务配置调用对应主函数完成验证。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 72,
+        "description": "接收Chrome当前活动标签页信息active_tab_info（字典或字符串类型）和匹配规则rule。首先检查active_tab_info是否为空，为空则直接返回0分。随后读取rule['type']进行分支判断：当类型为'url'时，从rule中提取expected_url，从active_tab_info中提取actual_url（若active_tab_info为字典则取'url'键值，否则将其本身视为URL字符串），接着调用compare_urls(expected_url, actual_url)进行规范化比对，若返回True则得1分，否则得0分；若rule['type']为其他未知类型，则记录错误日志并返回0分。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 95,
+        "description": "接收实际结果result和包含预期值的规则字典rules。从rules中提取'expected'字段得到expect，在控制台打印result与expect的值后，对二者进行严格相等比较（==）。若完全一致则返回1.0，否则返回0。该函数不做任何类型转换、大小写忽略或近似匹配，要求结果与预期完全等同。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 105,
+        "description": "接收两个待比较URL（url1, url2）及可选参数full（默认值为True）。若任一URL为None，直接返回二者的布尔相等判断结果。否则执行多步规范化流程：首先通过内部parse_with_default_scheme函数为缺少scheme的URL自动补全'http://'前缀；然后通过内部normalize_url函数使用tldextract拆分域名，若子域名仅为'www'则剔除，并完全忽略顶级域后缀（TLD），使得如'airbnb.com'与'airbnb.com.sg'在域名层面等价；同时将根路径'/'统一置为空字符串；最后依据full参数决定是否保留URL的params、query、fragment部分（full=True时保留，否则全部置空）。最终比较两个规范化后的URL字符串是否完全一致，一致返回True，否则返回False。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:47:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_a96b564e-dbe9-42c3-9ccf-b4498073438a./evaluator_function_labels.json"
+}

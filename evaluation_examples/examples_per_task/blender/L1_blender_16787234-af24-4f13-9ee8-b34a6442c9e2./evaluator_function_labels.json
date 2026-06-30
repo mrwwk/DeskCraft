@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_16787234-af24-4f13-9ee8-b34a6442c9e2./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_object_visibility",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_object_visibility",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 场景中指定对象的视口可见性状态。它接收来自 Blender 检查脚本 check_object.py 输出的 JSON 文本，从中提取对象列表，按照规则中给定的 object_name 精确匹配目标对象，随后比对对象在视口中的隐藏/显示状态（hide_viewport 字段）。若规则通过 hide_viewport 直接指定预期隐藏状态，或借助 expected_visible 间接指定预期可见状态，只要实际状态与预期完全一致，即判定为成功并返回 1.0；若对象不存在、解析失败或状态不匹配，则返回 0.0。整个评测逻辑为单指标硬匹配，不存在加权或累计打分。",
+    "main_functions": [
+      {
+        "name": "check_blender_object_visibility",
+        "lineno": 41,
+        "description": "该函数负责校验单个 Blender 对象的视口可见性。输入包括 command_output（来自 check_object.py 的 JSON 字符串）和 rule（字典，必须包含 object_name，并包含 hide_viewport 或 expected_visible 二者之一）。执行步骤如下：1）调用 _parse_blender_output 将命令输出解析为字典，若解析失败或输出为空则直接返回 0.0；2）从 rule 中取出 object_name，调用 _find_object 在解析结果的 objects 列表中按 name 字段精确查找目标对象，若未找到则返回 0.0；3）分支判断：若 rule 中存在 hide_viewport 键，则将对象实际 hide_viewport 值与预期值做等值比较，相等返回 1.0；若 rule 中存在 expected_visible 键，则取对象实际 hide_viewport（默认为 False），判断 expected_visible 与实际隐藏状态是否相反（即 expected_visible != actual_hidden），成立返回 1.0；4）若以上分支均未命中或状态不一致，记录警告并返回 0.0。任何异常均捕获后返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "解析来自 Blender 检查脚本的标准输出字符串。首先检查输出是否为空或仅含空白，若是则记录错误并返回 None；随后尝试使用 json.loads 将输出反序列化为 Python 字典。若遇到 JSONDecodeError 或 ValueError，记录错误及原始输出内容后返回 None。该函数是主评测流程的数据入口，负责将原始命令输出转换为可供后续查找与比对的结构化数据。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 29,
+        "description": "在已解析的 Blender 检查结果中按对象名称进行精确查找。接收 result（字典，预期包含 objects 列表）和 name（目标对象名字符串）两个参数，遍历 result[\"objects\"] 中每个对象字典，匹配 obj.get(\"name\") == name 时立即返回该对象字典；若遍历结束未命中则返回 None。该函数被 check_blender_object_visibility 调用，用于定位待检测可见性的具体对象。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:06:15",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_16787234-af24-4f13-9ee8-b34a6442c9e2./evaluator_function_labels.json"
+}

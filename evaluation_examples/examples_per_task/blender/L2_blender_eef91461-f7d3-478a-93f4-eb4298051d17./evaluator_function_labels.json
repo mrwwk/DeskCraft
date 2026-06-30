@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_eef91461-f7d3-478a-93f4-eb4298051d17./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_parent_child",
+      "lineno": 41
+    },
+    {
+      "name": "check_blender_collection_members",
+      "lineno": 100
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_parent_child",
+      "lineno": 41
+    },
+    {
+      "name": "check_blender_collection_members",
+      "lineno": 100
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中的对象层级结构与集合组织关系。它通过读取外部Blender检查脚本（check_object.py与check_collection.py）输出的JSON数据，解析场景中的对象父子关系与集合成员信息，并与任务规则进行精确比对。核心检查包括：验证指定父对象是否包含预期的子对象、验证子对象的父对象是否正确（以及是否错误关联了禁止的父对象）、验证是否存在拥有足够数量子对象的对象，以及验证指定集合是否包含所有预期的成员对象。判定采用二元制（1.0表示完全满足，0.0表示不满足），要求所有检查条件精确匹配，不支持模糊或近似匹配。",
+    "main_functions": [
+      {
+        "name": "check_blender_parent_child",
+        "lineno": 41,
+        "description": "接收command_output（来自check_object.py的JSON字符串）与rule（规则字典），依次执行以下检查：首先调用_parse_blender_output将JSON文本解析为Python字典，若解析失败或输出为空则直接返回0.0。随后按顺序进入三种可选模式：模式一，若rule包含parent与expected_children键，则通过_find_object按精确名称定位父对象，若找不到返回0.0；若找到，则将该父对象的children列表转为集合，检查expected_children集合是否为其子集，若不是返回0.0，若是返回1.0。模式二，若rule包含parent_map，则遍历其中每条子对象-预期父对象映射，通过_find_object查找子对象并严格比对obj['parent']字段，任一不匹配返回0.0；若rule同时包含not_parent，则遍历其中子对象-禁止父对象映射，若子对象存在且其parent字段等于该禁止值，返回0.0。模式三，若rule中parent_has_children为真，则遍历所有对象的children列表，检查是否存在任意对象的子对象数量大于等于min_children_count（默认值为1），若存在返回1.0，否则返回0.0。若上述所有分支均通过且未触发提前返回，最终返回1.0。"
+      },
+      {
+        "name": "check_blender_collection_members",
+        "lineno": 100,
+        "description": "接收command_output（来自check_collection.py的JSON字符串）与rule（规则字典），验证指定集合是否包含所有预期成员。首先调用_parse_blender_output解析JSON，失败则返回0.0。接着提取collection_name与expected_members。检查分为两条路径：主路径遍历result['collections']列表，按name字段精确匹配目标集合；若找到该集合，将其objects列表转为集合，判断expected_members是否为actual_members的子集，若是返回1.0，若找到集合但成员缺失则直接返回0.0，不再走备用路径。备用路径仅在collections列表中完全找不到同名集合时触发：通过result['object_collections']字典反向核查，确认每个expected_member对应的所属集合列表中是否包含coll_name，任一成员缺失返回0.0，全部存在返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 17,
+        "description": "对Blender检查脚本输出的原始字符串进行预处理与JSON解析。具体行为：先检查输入是否为空或仅含空白，若是则记录错误并返回None；否则对字符串执行strip后调用json.loads转换为Python字典。若解析过程中抛出json.JSONDecodeError或ValueError，同样记录错误并返回None。该函数是主函数的数据预处理入口，为check_blender_parent_child与check_blender_collection_members提供结构化的场景数据。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 30,
+        "description": "在check_object.py输出的对象列表中按精确名称检索目标对象。具体行为：遍历result['objects']，逐一比对obj['name']与传入的name参数，返回第一个匹配的对象字典；若遍历结束未找到，返回None。该函数被check_blender_parent_child复用，用于定位需要验证的父对象或子对象，要求对象名称完全相等，不支持部分匹配或忽略大小写。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:13:18",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_eef91461-f7d3-478a-93f4-eb4298051d17./evaluator_function_labels.json"
+}

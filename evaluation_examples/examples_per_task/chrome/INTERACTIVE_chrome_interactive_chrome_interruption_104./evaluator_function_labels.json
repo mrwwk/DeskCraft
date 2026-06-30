@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_104./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 125
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 125
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 为 Chrome 浏览器相关任务提供了一组独立的二元评估指标，分别验证浏览器当前活动标签页和书签栏状态是否符合任务预期。对于活动标签页，它提取当前激活标签的 URL，并与规则中指定的预期 URL 进行多步归一化比对；对于书签栏，它支持三种检查模式：书签栏文件夹名称的精确集合匹配、书签栏网站 URL 的精确集合匹配，以及名为 \"Liked Authors\" 的特定文件夹内网站 URL 的精确集合匹配（支持预期 URL 列表的笛卡尔积组合匹配）。每个评估函数独立返回 0.0（不符合）或 1.0（符合），由上层调用者决定如何联合使用这些分数来判定任务完成度。核心比较方式以 URL 归一化等价判断和集合相等性判断为主。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收 Chrome 当前活动标签信息 active_tab_info（字典或字符串类型）以及规则字典 rule。首先判断 active_tab_info 是否为空，为空则直接返回 0.0。当 rule['type'] 为 \"url\" 时，从 active_tab_info 中提取实际 URL（若输入为字典则取 'url' 键对应的值，否则直接取本身），随后调用 compare_urls 将预期 URL（rule['url']）与实际 URL 进行归一化等价比对。若比对成功返回 1.0，否则返回 0.0。若遇到不支持的 type，则记录错误日志并返回 0.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 82,
+        "description": "接收 Chrome 书签数据 bookmarks 和规则字典 rule。若 bookmarks 为空则直接返回 0.0。根据 rule['type'] 分三支处理：1) \"bookmark_bar_folders_names\"：遍历 bookmarks['bookmark_bar']['children']，提取所有 type 为 'folder' 的子项名称构成集合，与 rule['names'] 集合进行精确相等比较，相等返回 1.0；2) \"bookmark_bar_websites_urls\"：提取书签栏中所有 type 为 'url' 的子项 URL 构成集合，与 rule['urls'] 集合进行精确相等比较；3) \"liked_authors_websites_urls\"：首先在书签栏子项中查找是否存在 name 为 \"Liked Authors\" 且 type 为 'folder' 的文件夹，不存在则返回 0.0，存在则提取该文件夹内所有 type 为 'url' 的子项 URL 列表。接着将 rule['urls'] 中每个字符串元素转换为单元素列表，使用 itertools.product 生成所有可能的 URL 组合，逐一检查是否有某个组合的集合与实际 URL 集合完全相等，若找到则返回 1.0，遍历完仍未找到则返回 0.0。若 type 不支持则抛出 TypeError。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 125,
+        "description": "通用 URL 等价性比较函数，接收 url1、url2 以及可选参数 full（默认 True）。若任一参数为 None，直接返回两者是否完全相等（仅当两者均为 None 时才为 True）。否则对两个 URL 执行多步归一化：1) 使用正则 ^[a-zA-Z][a-zA-Z0-9+\\-.]*:// 判断是否存在 scheme，若缺失则自动补全 \"http://\"；2) 使用 tldextract 提取域名并转小写，丢弃单独的 \"www\" 子域名，并忽略 TLD 后缀差异（例如 .com 与 .com.sg 均归一化为同一域名主体）；3) 若路径为 \"/\" 则置空；4) 依据 full 参数决定是否保留 params、query、fragment（True 时保留，False 时清空）。最终比较归一化后的字符串是否完全相等，返回布尔值。该函数主要被 is_expected_active_tab 调用，用于判定当前标签页 URL 是否符合预期。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:36:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_104./evaluator_function_labels.json"
+}

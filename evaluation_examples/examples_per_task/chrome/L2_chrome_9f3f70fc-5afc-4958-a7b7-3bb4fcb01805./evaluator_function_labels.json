@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_9f3f70fc-5afc-4958-a7b7-3bb4fcb01805./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 7
+    },
+    {
+      "name": "exact_match",
+      "lineno": 38
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 7
+    },
+    {
+      "name": "exact_match",
+      "lineno": 38
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测Chrome浏览器相关任务的完成状态，核心验证思路分为两类：一是检查浏览器当前活动标签页的URL是否同时满足一组预期的正则表达式模式（全部匹配才通过），二是对特定配置项或返回值进行精确字符串相等性校验（如验证enable_do_not_track是否为'true'）。两个主函数各自独立执行检查，均返回0.0或1.0的离散分数，不存在加权累计。输入数据方面，URL检查支持接收字符串URL或包含'url'字段的字典，而精确匹配会将实际值与预期值都转为字符串后比对。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 7,
+        "description": "该函数验证浏览器当前URL是否符合预期的正则模式。它接收result（可以是字符串URL或包含'url'键的字典）和rules（其中rules['expected']为正则表达式字符串列表）。执行步骤为：首先解析result，若为字符串则直接使用，若为字典则提取'url'字段，格式无效或为空时返回0.0；随后遍历rules['expected']中的每一个pattern，使用re.search在提取出的URL中依次搜索。判定依据采用'全部满足'策略：只要任一pattern匹配失败，立即返回0.0；仅当所有pattern均匹配成功时，才返回1.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 38,
+        "description": "该函数对某个结果值进行精确相等性校验。它接收result（实际返回值）和rules（其中rules['expected']为预期值）。检查流程为：先判断result是否为空，为空则返回0.0；再获取rules中的expected，若不存在也返回0.0；最后将result与expect均转换为字符串（str(result) == str(expect)）进行完全相等比较。若完全一致则返回1.0，否则返回0.0。常用于验证Chrome设置项等离散状态值。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:46:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_9f3f70fc-5afc-4958-a7b7-3bb4fcb01805./evaluator_function_labels.json"
+}

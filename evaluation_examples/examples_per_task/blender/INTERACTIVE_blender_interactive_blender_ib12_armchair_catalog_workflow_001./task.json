@@ -1,0 +1,114 @@
+{
+  "id": "interactive_blender_ib12_armchair_catalog_workflow_001",
+  "snapshot": "blender",
+  "interactive": true,
+  "scenario_type": "multi_step_workflow",
+  "scenario_description": "家居目录图分阶段交付：白底图 -> 氛围图 -> 工程归档。",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "source": "blender_interactive;source_type=catalog_pipeline;source_ref=<id_or_url>;evidence=staged_catalog_delivery",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/blend/ArmChair_01_1k.blend",
+            "path": "/home/user/Documents/scene.blend"
+          },
+          {
+            "local_path": "assets/jpg/Armchair_01_diff_1k.jpg",
+            "path": "/home/user/Documents/textures/Armchair_01_diff_1k.jpg"
+          },
+          {
+            "local_path": "assets/jpg/Armchair_01_nor_gl_1k.jpg",
+            "path": "/home/user/Documents/textures/Armchair_01_nor_gl_1k.jpg"
+          },
+          {
+            "local_path": "assets/jpg/Armchair_01_arm_1k.jpg",
+            "path": "/home/user/Documents/textures/Armchair_01_arm_1k.jpg"
+          },
+          {
+            "local_path": "assets/exr/hdri_aerodynamics_workshop_1k.exr",
+            "path": "/home/user/Documents/hdri_aerodynamics_workshop_1k.exr"
+          },
+          {
+            "local_path": "assets/py/check_render.py",
+            "path": "/tmp/check_render.py"
+          },
+          {
+            "local_path": "assets/py/check_world.py",
+            "path": "/tmp/check_world.py"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/snap/bin/blender",
+          "/home/user/Documents/scene.blend"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "先做白底目录图 /home/user/Documents/armchair_catalog.png（2000x2000）。若贴图丢失，请从 /home/user/Documents/textures/ 重新链接。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "再做氛围图 /home/user/Documents/armchair_mood.png（2000x2000），可使用 /home/user/Documents/hdri_aerodynamics_workshop_1k.exr。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后保存工程到 /home/user/Documents/armchair_delivery.blend。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "blender"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "postconfig": [],
+    "func": "check_blender_render_output",
+    "conj": "and",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/armchair_catalog.png",
+      "dest": "armchair_catalog.png"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "width": 2000,
+        "height": 2000,
+        "format": "PNG"
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_aa4c78e7-70d4-4644-bc37-469b99b7201e./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器相关任务的完成状态，核心检查两类对象：一是 Chrome 当前活动标签页是否打开预期 URL；二是桌面是否存在符合预期的快捷方式（.desktop 文件）。对于 URL 比对，采用多步规范化策略（补全 scheme、去除 www 子域名、忽略 TLD suffix、统一小写、可选地保留或丢弃参数/查询/锚点）后进行严格相等比较。对于桌面快捷方式，按 rule 类型分别检查文件内容中的 Name= 或 Exec= 字段，支持精确匹配及双向包含匹配。最终返回 0/1 或 0.0/1.0 的离散分数，任一检查通过即得满分，不通过则得零分。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收 Chrome 活动标签页信息 active_tab_info（字典或字符串）与规则 rule。首先判空，若为空直接返回 0。随后读取 rule['type']，目前仅支持 'url' 分支：从 rule 中提取 expected_url，若 active_tab_info 为字典则取其 'url' 键值作为 actual_url，若为字符串则直接视为 actual_url。最终调用 compare_urls(expected_url, actual_url) 进行比对，若返回 True 得 1 分，False 得 0 分；若 rule['type'] 为其他值则记录错误并返回 0。"
+      },
+      {
+        "name": "is_shortcut_on_desktop",
+        "lineno": 82,
+        "description": "接收桌面快捷方式字典 shortcuts（键为文件路径，值为文件文本内容）与规则 rule。根据 rule['type'] 分三支处理：1) 'name' 分支：遍历所有 shortcut_content，先精确匹配整行 'Name=' + expected_name + '\\n'；未命中则逐行提取 'Name=' 后的实际名称，依次尝试精确匹配、expected_name 被包含于 actual_name（忽略大小写）、actual_name 被包含于 expected_name（忽略大小写），任一满足即返回 1.0。2) 'exec' 分支：类似地查找 'Exec=' 行，依次尝试精确匹配、expected_exec 被包含于 actual_exec（大小写敏感）、actual_exec 被包含于 expected_exec（大小写敏感），满足即返回 1.0。3) 'url' 或 'id' 分支：抛出 TypeError 表示暂不支持。全部遍历无匹配则返回 0.0。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 173,
+        "description": "接收两个待比较 URL（url1, url2）及可选参数 full（默认 True）。若任一参数为 None，仅当两者均为 None 时返回 True。内部先通过 parse_with_default_scheme 为无 scheme 的 URL 自动补全 'http://'；再通过 normalize_url 进行规范化：使用 tldextract 提取域名并转小写、去掉仅含 'www' 的子域名、完全忽略 suffix（即 .com 与 .com.sg 视为同一 domain）、去掉仅含 '/' 的根路径、依据 full 参数决定是否保留 params/query/fragment（full=True 保留，full=False 清空）。最终比较规范化后的两字符串是否完全相等，返回布尔值。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:44:15",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_aa4c78e7-70d4-4644-bc37-469b99b7201e./evaluator_function_labels.json"
+}

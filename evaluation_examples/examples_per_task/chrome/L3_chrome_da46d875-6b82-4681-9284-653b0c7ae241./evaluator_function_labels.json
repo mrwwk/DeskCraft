@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_da46d875-6b82-4681-9284-653b0c7ae241./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测Chrome浏览器任务及通用JSON数据任务的完成状态，采用严格的二元打分机制（通过返回1.0，不通过返回0.0）。其核心验证对象分为两类：一是浏览器当前激活标签页的URL字符串，要求必须同时满足一组正则表达式约束；二是任务返回的JSON对象，要求必须符合预期的字段结构与内容。对于JSON验证，支持精确相等匹配（可配置忽略列表顺序）和包含匹配（验证result中是否包含expected指定的字段值或子串）两种模式，并在比较前自动拦截\"__EVALUATION_FAILED__\"失败标记。两个主函数均采用\"一票否决\"逻辑，任一检查项失败即返回0分，全部通过才返回满分。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "该函数接收浏览器当前状态result与规则rules，验证URL是否匹配预期正则模式。首先判断result是否为空，若为空直接返回0.0；接着从result中提取URL，若result为字符串则直接使用，若为字典则提取'url'键对应的值，格式非法也返回0.0。然后从rules[\"expected\"]获取正则模式列表，使用re.search逐一检查每个pattern是否在URL中匹配。遍历过程中只要有一个pattern未匹配成功，立即返回0.0；只有当所有pattern全部匹配成功时，才返回1.0。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 82,
+        "description": "该函数接收任务结果result与规则rules，对JSON对象进行深度验证。第一步，若result为字符串，先执行strip去除首尾空白，将所有单引号替换为双引号，再通过json.loads解析为字典；若result为None则返回0.0。第二步，检查rules[\"expected\"]中是否存在值为\"__EVALUATION_FAILED__\"的项，若存在直接返回0.0。第三步，读取rules中的expect_in_result标志（默认False）并分两支处理：若expect_in_result为False（精确匹配模式），则遍历rules[\"expected\"]的每个key，当rules中ignore_list_order为True时对列表排序后比较，否则直接比较expected_value与actual_value，任一key不匹配即返回0.0；若expect_in_result为True（包含匹配模式），则对rules[\"expected\"]每个key，若期望值为list，检查result对应值（list或str）是否包含至少一个期望元素，若期望值为str，检查result对应值是否包含该子串，类型不支持或匹配失败均返回0.0。所有key检查通过返回1.0，任何异常也返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:49:51",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_da46d875-6b82-4681-9284-653b0c7ae241./evaluator_function_labels.json"
+}

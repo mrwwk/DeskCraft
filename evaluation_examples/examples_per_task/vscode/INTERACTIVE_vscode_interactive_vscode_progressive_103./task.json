@@ -1,0 +1,88 @@
+{
+  "id": "interactive_vscode_progressive_103",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "progressive_refinement",
+  "scenario_description": "用户在一个空白项目中逐步补充会议记录文件的内容，要求 Agent 连续编辑同一个 Markdown 文件。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "bash",
+          "-lc",
+          "rm -rf /home/user/Desktop/vscode_meeting_notes && mkdir -p /home/user/Desktop/vscode_meeting_notes"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/vscode_meeting_notes"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "请在当前项目里新建一个 meeting_notes.md 文件，并写一个一级标题 Weekly Sync。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "在标题下面补两条无序列表：Review blockers 和 Plan next steps。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "最后在末尾再加一行：Reminder: send summary today.",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "func": "file_contains",
+    "file": "evaluator.py",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/vscode_meeting_notes/meeting_notes.md",
+      "dest": "meeting_notes.md"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "expected": [
+          "# Weekly Sync",
+          "- Review blockers",
+          "- Plan next steps",
+          "Reminder: send summary today."
+        ]
+      }
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

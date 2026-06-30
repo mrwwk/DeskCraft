@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_35253b65-1c19-4304-8aa4-6884b8218fc0./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器相关任务的完成状态，核心检查对象分为两类：一是浏览器当前活动标签页是否处于预期URL，二是桌面是否生成了符合指定名称或执行命令的网站快捷方式。对于URL比较，采用自定义规范化逻辑：自动补全scheme、统一小写、去除www子域、忽略顶级域后缀差异、并可选择忽略查询参数与片段。对于桌面快捷方式，直接解析.desktop风格文本中的Name与Exec行，支持精确匹配与双向子串包含匹配（不区分大小写）。三个主函数各自独立评分，均返回离散值0（失败）或1（成功），不存在加权累计或联合判定逻辑；任一具体检查由对应主函数单独完成，成功即返回1，失败返回0。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收active_tab_info（字典或字符串，表示当前Chrome活动标签页信息）和rule（匹配规则字典）。首先判空：若active_tab_info为空，直接返回0分。当rule['type']为'url'时，从active_tab_info中提取实际URL（若为字典则取'url'键值，若为字符串则直接使用），随后调用compare_urls与rule['url']进行规范化比较；若比较通过返回1，否则返回0。若遇到不支持的type则记录错误日志并返回0。"
+      },
+      {
+        "name": "is_shortcut_on_desktop",
+        "lineno": 82,
+        "description": "接收shortcuts（字典，键为桌面快捷方式文件路径，值为文件完整文本内容）和rule（匹配规则字典）。根据rule['type']分分支遍历检查：1）'name'类型：先查找文本中是否存在'Name=预期名称\\n'的精确匹配；若无，则逐行解析找到'Name='开头的行，提取实际名称后做三重判断——精确相等、预期名称被包含于实际名称（忽略大小写）、实际名称被包含于预期名称（忽略大小写），任一满足即返回1.0。2）'exec'类型：先精确匹配'Exec=预期命令\\n'；若无，则逐行提取'Exec='后的实际命令，做精确相等、预期命令被包含于实际命令、实际命令被包含于预期命令的检查，满足则返回1.0。3）'url'、'id'或其他类型：抛出TypeError。若遍历完所有快捷方式仍未匹配，返回0.0。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 173,
+        "description": "接收两个待比较URL（url1、url2）及可选参数full（默认True，表示是否保留URL的参数、查询串与片段）。若任一URL为None，直接做相等性判断。否则执行规范化比较：对无scheme的URL默认补全'http://'；使用tldextract提取域名并转小写；若子域仅为'www'则丢弃；完全忽略TLD后缀差异（如airbnb.com与airbnb.com.sg视为同域）；去除path的尾部斜杠；根据full参数决定是否保留params、query、fragment。最终比较规范化后的字符串，相等返回True，否则返回False。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:45:09",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_35253b65-1c19-4304-8aa4-6884b8218fc0./evaluator_function_labels.json"
+}

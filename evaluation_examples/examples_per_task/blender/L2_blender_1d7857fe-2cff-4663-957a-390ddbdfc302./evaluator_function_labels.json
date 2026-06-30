@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_1d7857fe-2cff-4663-957a-390ddbdfc302./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_modifier_stack",
+      "lineno": 40
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_modifier_stack",
+      "lineno": 40
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中指定对象的修改器（Modifier）堆栈配置是否符合任务要求。它通过读取外部检查脚本（check_modifier.py）输出的JSON数据，针对rule中指定的对象名称，逐一核对该对象上是否包含预期类型和预期参数的修改器。对于数值型参数（如count、width、segments等），采用容差范围内的近似匹配；对于非数值型参数，采用精确相等匹配。只有当对象上所有指定的修改器类型都存在，且每个修改器的所有指定参数都满足对应匹配规则时，才判定任务成功（返回1.0）；若缺少修改器类型、或任一参数不匹配、或JSON解析失败，则判定失败（返回0.0）。",
+    "main_functions": [
+      {
+        "name": "check_blender_modifier_stack",
+        "lineno": 40,
+        "description": "该函数接收来自check_modifier.py的JSON字符串command_output，以及包含object_name、modifiers和tolerance的rule字典。首先调用_parse_blender_output将命令输出解析为JSON对象；然后从解析结果中提取指定对象名下的修改器列表。接着遍历rule中预期的每种修改器类型（如ARRAY、BEVEL），在实际修改器列表中查找同类型的修改器：若找不到该类型，直接返回0.0；若找到，则进一步遍历该修改器的预期参数，对参数值进行分类比较——如果预期值是int或float，调用_check_tolerance进行容差比较；否则进行精确相等比较。任一参数不匹配即返回0.0并记录警告。只有当所有预期修改器类型都存在且所有参数都通过检验时，才返回1.0。异常捕获后同样返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 17,
+        "description": "负责将Blender检查脚本输出的原始字符串解析为JSON对象。首先检查输入是否为空或仅包含空白，若为空则记录错误并返回None；否则尝试执行json.loads进行解析。若遇到JSONDecodeError或ValueError，记录错误日志并输出原始内容供调试，然后返回None。该函数是主函数的数据预处理入口，决定后续检查能否基于有效的结构化数据进行。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 29,
+        "description": "用于对数值型参数进行容差范围内的近似相等判断。接收actual（实际值）、expected（预期值）和tol（容差阈值）三个参数，若任一值为None则返回False；否则将两者转为float，计算绝对差值，判断是否小于等于tol。该函数主要服务于check_blender_modifier_stack中对修改器数值参数（如width、count、segments等）的近似匹配场景，避免浮点精度或微小差异导致误判。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:09:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_1d7857fe-2cff-4663-957a-390ddbdfc302./evaluator_function_labels.json"
+}

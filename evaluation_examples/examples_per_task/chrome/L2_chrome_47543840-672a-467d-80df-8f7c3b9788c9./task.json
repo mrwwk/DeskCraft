@@ -1,0 +1,86 @@
+{
+  "id": "47543840-672a-467d-80df-8f7c3b9788c9",
+  "task_slug": "arxiv_vision_transformer_recent_safe",
+  "difficulty": "L2",
+  "snapshot": "chrome",
+  "instruction": "On arXiv, search for vision transformer in all fields, keep the results showing abstracts and sorted by announcement date newest first, and enable Chrome's Safe Browsing protection before finishing.",
+  "source": "https://arxiv.org/search/?query=vision+transformer&searchtype=all&abstracts=show&order=-announced_date_first&size=50",
+  "config": [
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
+      }
+    },
+    {
+      "type": "chrome_open_tabs",
+      "parameters": {
+        "urls_to_open": [
+          "https://arxiv.org/"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Google Chrome"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "chrome"
+  ],
+  "evaluator": {
+    "func": [
+      "check_arxiv_url_patterns",
+      "check_safe_browsing_enabled"
+    ],
+    "file": "evaluator.py",
+    "conj": "and",
+    "result": [
+      {
+        "type": "active_tab_info"
+      },
+      {
+        "type": "enable_safe_browsing"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "patterns": [
+            "arxiv\\.org/search/\\?",
+            "[?&]query=vision(\\+|%20)transformer",
+            "[?&]searchtype=all",
+            "[?&]abstracts=show",
+            "[?&]order=-announced_date_first"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected": "true"
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

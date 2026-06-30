@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b070486d-e161-459b-aa2b-ef442d973b92./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_tamiflu_side_effects",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_tamiflu_side_effects",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 验证的是一个复合任务的两个子任务是否完成，核心检查对象是任务结束时浏览器活动标签页的 URL。任务要求为：(a) 打开 Drugs.com 上关于 Tamiflu 副作用的文章；(b) 在 Chrome 中启用 Enhanced Safe Browsing 保护。由于 evaluator 只能通过 active_url_from_accessTree 获取活动标签页 URL，因此接受两种有效的最终状态：一是活动标签页为 Drugs.com 的 Tamiflu side-effects 文章（通过正则同时匹配 drugs.com、tamiflu、side-effects 或 sfx 等关键词确认）；二是活动标签页为 chrome://settings/security（表示已完成两项子任务并停留在 Chrome 安全设置页，此时 Drugs.com 页面可在后台标签页）。检查方式为将提取到的结果 URL 与 expected 参数中配置的多组正则模式进行匹配，组内模式需全部满足（AND），组间满足任一即可（OR），匹配成功返回 1.0，否则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_tamiflu_side_effects",
+        "lineno": 7,
+        "description": "该函数接收 result（字符串 URL 或含 'url' 键的字典）和 expected（字典，内含 'expected' 键对应的模式组列表）作为输入，负责提取最终活动标签页 URL 并进行多组正则匹配判定。具体检查步骤为：1) 若 result 为空，直接返回 0.0；2) 若 result 为字符串，则将其作为 result_url，若为字典则提取其中的 'url' 字段，否则因格式非法返回 0.0；3) 若 expected 为 None，或 expected 中 'expected' 对应的模式组列表为空，返回 0.0；4) 遍历模式组列表，对每个 pattern_group 进行检查：若该组为列表，则对组内每个 pattern 使用 re.search 在 result_url 上检查，要求组内全部匹配（AND 逻辑），若全部命中则立即返回 1.0；若该组为单个字符串，则使用 re.search 检查，命中即立即返回 1.0（组间 OR 逻辑）。5) 若遍历完所有模式组均未匹配，最终返回 0.0。该函数不调用其他自定义辅助函数，仅依赖 re.search 完成正则匹配。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:47:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b070486d-e161-459b-aa2b-ef442d973b92./evaluator_function_labels.json"
+}

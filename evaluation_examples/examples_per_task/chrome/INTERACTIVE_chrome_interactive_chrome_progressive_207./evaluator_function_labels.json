@@ -1,0 +1,81 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_progressive_207./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 82
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 105
+    },
+    {
+      "name": "are_lists_equal",
+      "lineno": 148
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 163
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 82
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 105
+    },
+    {
+      "name": "are_lists_equal",
+      "lineno": 148
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 163
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器在交互任务完成后的多项状态指标，核心检查对象包括：当前活动标签页、已打开的全部标签页集合、书签栏结构（文件夹名称、网站URL）以及特定书签文件夹（如\"Liked Authors\"）的内部URL集合。评测采用二元打分制（返回1.0或0.0）。对于URL类检查，evaluator并非进行原始字符串比对，而是通过compare_urls对URL实施深度规范化：自动补全缺失的scheme、去除www前缀、忽略顶级域名后缀差异（如airbnb.com与airbnb.com.sg视为等价）、统一小写，并可选择性地忽略参数与片段。对于多标签页和列表型检查，使用are_lists_equal进行无序对等性匹配。书签检查则依据rule['type']分场景采用集合相等或笛卡尔积组合匹配策略。各主函数独立执行，被调用时仅针对其对应单一指标返回是否达标。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "检查对象：Chrome当前活动标签页的信息（active_tab_info）与规则（rule）。检查步骤：1) 若active_tab_info为空，直接返回0；2) 读取rule['type']，目前仅支持\"url\"类型；3) 从rule中提取expected_url，从active_tab_info字典中提取actual_url（若active_tab_info不是字典则直接将其视为url字符串）；4) 调用compare_urls(expected_url, actual_url)进行规范化URL比对。判定依据：若URL经规范化后相等则返回1，否则返回0；若rule类型未知则记录错误并返回0。"
+      },
+      {
+        "name": "is_expected_tabs",
+        "lineno": 82,
+        "description": "检查对象：Chrome当前打开的所有标签页列表（open_tabs）与规则（rule）。检查步骤：1) 若open_tabs为空，返回0；2) 读取rule['type']，目前仅支持\"url\"类型；3) 从open_tabs中抽取每个标签页的url字段组成actual_urls列表；4) 使用are_lists_equal(expected_urls, actual_urls, compare_urls)比较期望URL列表与实际URL列表。判定依据：若两个列表长度相同且每个元素都能在另一列表中找到通过compare_urls判定为匹配的项（无顺序要求）则返回1，否则返回0；若rule类型未知则记录错误并返回0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 105,
+        "description": "检查对象：Chrome书签数据（bookmarks）与规则（rule）。检查步骤：1) 若bookmarks为空，返回0；2) 根据rule['type']分三类检查：若为\"bookmark_bar_folders_names\"，则遍历bookmarks['bookmark_bar']['children']，筛选type为'folder'的项，收集其name字段，与rule['names']做集合比对；若为\"bookmark_bar_websites_urls\"，则筛选type为'url'的项，收集其url字段，与rule['urls']做集合比对；若为\"liked_authors_websites_urls\"，则在书签栏children中查找name为'Liked Authors'且type为'folder'的文件夹，若存在则提取其内部所有type为'url'的子项url列表，并将rule['urls']中的字符串元素转为单元素列表，使用itertools.product生成所有可能的URL组合，逐一检查是否有某一组合与提取的url集合完全相等。判定依据：集合相等或存在任一组合匹配则返回1.0，否则返回0.0；若rule类型不支持则抛出TypeError。"
+      },
+      {
+        "name": "are_lists_equal",
+        "lineno": 148,
+        "description": "检查对象：两个列表list1、list2及其元素对等性。检查步骤：1) 先比较两个列表长度，不等则直接返回False；2) 对list1中的每个item1，在list2中查找是否存在item2使得comparison_func(item1, item2)为True。判定依据：当且仅当长度相同且list1中每个元素都能在list2中找到至少一个由comparison_func判定为相等的元素时返回True，否则返回False。注意该逻辑不强制一一对应（若comparison_func不是双射，可能出现多对一匹配），也不要求顺序一致。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 163,
+        "description": "检查对象：两个URL字符串url1与url2。检查步骤：1) 若任一url为None，则直接按原始值进行相等比较；2) 使用内部嵌套函数parse_with_default_scheme为无scheme的URL自动补全http://；3) 使用normalize_url进行多步规范化：通过urlparse解析，使用tldextract提取域名并转小写，丢弃单独的www子域名，忽略suffix（如.com与.com.sg被视为相同域名），将单独的路径'/'置空，scheme转小写；根据full参数（默认为True）决定是否保留params、query、fragment；4) 对规范化后的两个URL进行字符串相等比较。判定依据：规范化后的URL字符串完全一致则返回True，否则返回False。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:40:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_progressive_207./evaluator_function_labels.json"
+}

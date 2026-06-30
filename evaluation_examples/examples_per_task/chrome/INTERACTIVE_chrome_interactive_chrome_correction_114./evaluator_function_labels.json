@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_114./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 88
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 88
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator服务于INTERACTIVE_chrome_interactive_chrome_correction_114任务，用于对任务执行结果进行离散式打分判定。核心验证对象包括三类：一是Chrome浏览器当前活动标签页的URL是否正确（忽略查询参数）；二是任务返回结果是否与预期值严格相等；三是预期元素是否存在于任务返回的列表或集合中。每个主函数独立执行单一检查，成功返回1.0（或1），失败返回0.0（或0），代码中未体现多指标联合、加权累计或顺序依赖的复合判定逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 50,
+        "description": "接收Chrome活动标签页信息active_tab_info和匹配规则rule。首先判断active_tab_info是否为空，为空直接返回0。当rule['type']为'url'时，从rule取出expected_url，从active_tab_info字典中取出actual_url（若active_tab_info本身不是字典则直接将其视为actual_url）。内部定义strip_query函数，使用urlparse解析URL并去除query查询参数后，通过urlunparse重组，仅比较协议、域名和路径部分。若处理后的预期URL与实际URL一致返回1，不一致返回0。若rule['type']为其他未知类型，记录error日志并返回0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 78,
+        "description": "接收任务结果result和规则rules。从rules字典中提取键'expected'得到预期值expect，并通过print输出result与expect的值供调试。使用'=='进行严格相等比较，若result与expect完全一致则返回1.0，否则返回0.0。该函数为通用精确匹配器，不做类型转换、大小写忽略或近似匹配。"
+      },
+      {
+        "name": "is_in_list",
+        "lineno": 88,
+        "description": "接收任务结果result和规则rules。从rules中提取'expected'作为预期值expect，使用Python的'in'操作符判断expect是否存在于result中（适用于列表、元组等容器类型，若result为字符串则表现为子串检查）。若存在返回1.0，不存在返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:36:11",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_114./evaluator_function_labels.json"
+}

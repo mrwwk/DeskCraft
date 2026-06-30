@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_a68611d8-9bba-40d8-9243-903c3480ba25./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 渲染任务完成后，其渲染设置是否与预期规则完全一致。它通过解析 Blender 检查脚本（check_render.py）输出的 JSON 数据，提取当前场景的渲染引擎（engine）、水平分辨率（resolution_x）、垂直分辨率（resolution_y）、帧率（fps）、采样数（samples）、图像格式（image_format）以及活动相机（active_camera）等参数。评测逻辑采用“全部满足”的严格匹配策略：仅当 rule 中指定的所有字段都在 JSON 输出中存在且值严格相等（==）时，才判定任务成功并返回 1.0；若任一字段不匹配、JSON 解析失败或输出为空，则立即返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "该函数接收两个参数：command_output（来自 check_render.py 的 JSON 字符串）和 rule（包含期望渲染设置的字典）。首先调用辅助函数 _parse_blender_output 将原始字符串解析为 Python 字典；若解析失败或输出为空，直接返回 0.0。随后，函数内部定义了包含 7 项检查的 checks 字典，分别对应 engine、resolution_x、resolution_y、fps、samples、image_format、active_camera，每项检查均使用严格相等（==）比较 result 与 rule 中的对应值。函数遍历 checks，仅处理 rule 中实际存在的键：若发现任一字段不匹配，立即记录警告并返回 0.0；若所有存在的键均通过严格匹配，则返回 1.0。整个过程为“逻辑与”的组合判定，无近似匹配、无阈值容忍，且异常捕获后同样返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 19,
+        "description": "该辅助函数负责将 Blender 检查脚本输出的原始命令行字符串解析为结构化数据。它首先检查输入是否为空或仅包含空白字符，若是则记录错误并返回 None；否则尝试使用 json.loads 将字符串反序列化为 Python 字典。若遇到 JSONDecodeError 或 ValueError，则记录错误及原始输出内容，并返回 None。该函数是主评测函数的数据预处理入口，其返回值直接决定后续渲染设置检查能否执行。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:07:29",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_a68611d8-9bba-40d8-9243-903c3480ba25./evaluator_function_labels.json"
+}

@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_cabb3bae-cccb-41bd-9f5d-0f3a9fecd825./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 65
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 65
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器在任务执行后的两类核心状态：一是当前激活标签页的URL是否符合预期模式，二是Chrome书签结构是否满足特定配置要求。对于URL检查，evaluator从结果中提取当前页面URL，并逐一用正则表达式匹配预期模式列表，要求所有模式必须全部命中。对于书签检查，evaluator根据rule['type']分三种场景处理：验证书签栏文件夹名称集合、验证书签栏网站URL集合，或验证名为'Liked Authors'的特定文件夹内的网站URL集合；其中第三种场景支持对预期URL进行组合展开（笛卡尔积），检查实际URL集合是否与任一组合完全相等。所有检查均采用二元评分制，完全满足返回1.0，任一条件不满足即返回0.0。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 33,
+        "description": "接收result（当前标签页信息，可以是字符串URL或包含'url'键的字典）和rules（字典，其中'expected'键对应一个正则模式字符串列表）。首先判空：若result为空返回0.0。接着从result中提取URL字符串：若result为字符串则直接使用，若为字典则取result['url']，否则格式错误返回0.0。然后遍历rules['expected']中的每一个正则pattern，使用re.search检查该pattern是否在提取出的URL中被匹配。判定采用严格的全匹配逻辑：所有pattern必须全部匹配成功才返回1.0，只要有一个pattern未匹配即立即返回0.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 65,
+        "description": "接收bookmarks（Chrome书签JSON数据结构）和rule（字典，通过'type'字段指定检查场景）。首先判空：若bookmarks为空直接返回0.0。随后按rule['type']分三支处理：1) 'bookmark_bar_folders_names'：遍历bookmarks['bookmark_bar']['children']，筛选type为'folder'的节点，提取其'name'字段构成集合，与rule['names']集合进行相等比较；2) 'bookmark_bar_websites_urls'：同理筛选type为'url'的节点，提取'url'构成集合，与rule['urls']集合进行相等比较；3) 'liked_authors_websites_urls'：在bookmark_bar的children中定位name为'Liked Authors'且type为'folder'的文件夹，若不存在则返回0.0；若存在则提取其children中type为'url'的'url'字段构成实际集合；接着将rule['urls']中的字符串元素包装为单元素列表，利用itertools.product生成所有可能的组合（笛卡尔积），逐一检查是否有某个组合的集合与实际URL集合完全相等。前两支与第三支的匹配成功均返回1.0，失败返回0.0；若rule['type']为不支持的类型则抛出TypeError。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:48:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_cabb3bae-cccb-41bd-9f5d-0f3a9fecd825./evaluator_function_labels.json"
+}

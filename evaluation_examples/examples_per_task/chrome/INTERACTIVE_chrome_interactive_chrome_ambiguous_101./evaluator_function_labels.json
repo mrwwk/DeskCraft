@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_101./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 8
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 52
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 8
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 52
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器的特定状态是否达到任务预期，核心检查对象分为两类：当前活动标签页（active tab）与书签栏结构（bookmarks）。对于活动标签页，它读取当前激活标签的 URL 信息，通过提取并比对 URL 路径（忽略协议差异如 https:// 与 file://，并去除尾部斜杠）来判断是否打开了预期页面。对于书签，它读取 Chrome 书签树，针对书签栏的文件夹名称、书签栏的网址集合，以及名为 'Liked Authors' 的特定文件夹内的网址集合进行检验。比较方式以严格集合相等为主：文件夹名称要求集合完全一致；网址在经过路径归一化后要求集合完全一致；'Liked Authors' 文件夹则支持规则中给出多组候选 URL 的笛卡尔积组合，检查实际书签集合是否与任一组合完全匹配。所有判定均采用二元打分制，完全匹配返回 1.0，否则返回 0.0（或失败），任一环节缺失预期数据即视为未通过。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 8,
+        "description": "该函数接收 active_tab_info（当前活动标签信息，通常为包含 'url' 键的字典，也可能直接是 URL 字符串）与 rule（匹配规则字典）。首先判空：若 active_tab_info 为空则直接返回 0。当 rule['type'] 为 'url' 时，从 rule 中取出 expected_url，从 active_tab_info 中解析 actual_url（字典时取 'url' 键，否则视为字符串本身）；若 actual_url 缺失返回 0。随后使用局部嵌套的 get_path 对两条 URL 做归一化：通过 urlparse 提取路径部分并去除尾部斜杠，以消除协议差异（如 file:// 与 https://）带来的误判。最终若 expected_path 与 actual_path 严格相等则返回 1.0，否则返回 0.0。若遇到不支持的 match_type，则记录错误日志并返回 0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 52,
+        "description": "该函数接收 bookmarks（Chrome 书签树字典）与 rule（匹配规则字典）。若 bookmarks 为空直接返回 0。依据 rule['type'] 分三种分支检查：1) bookmark_bar_folders_names：遍历 bookmarks['bookmark_bar']['children']，筛选 type 为 'folder' 的节点，收集其 'name' 字段形成集合，与 rule['names'] 的集合做严格相等比较，匹配返回 1.0，否则 0。2) bookmark_bar_websites_urls：同样遍历书签栏子节点，筛选 type 为 'url' 的节点，对其 'url' 使用局部 get_path 提取归一化路径（去尾部斜杠），与 rule['urls'] 经同样归一化后的路径集合做严格相等比较。3) liked_authors_websites_urls：在书签栏子节点中定位 name 为 'Liked Authors' 且 type 为 'folder' 的文件夹；若不存在返回 0。若存在，收集其内部所有 type 为 'url' 的子节点的 'url' 形成实际集合。对 rule['urls'] 做预处理：将其中为字符串的元素转为单元素列表，随后使用 itertools.product 生成所有可能的 URL 组合（笛卡尔积），逐一检查是否有某个组合的集合与实际集合完全相等；若找到则返回 1.0，遍历结束未找到返回 0。若 rule['type'] 不属于上述三种，抛出 TypeError。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:34:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_101./evaluator_function_labels.json"
+}

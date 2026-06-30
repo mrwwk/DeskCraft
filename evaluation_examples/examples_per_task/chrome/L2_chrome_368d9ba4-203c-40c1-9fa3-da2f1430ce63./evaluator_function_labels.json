@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_368d9ba4-203c-40c1-9fa3-da2f1430ce63./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对 Chrome 浏览器任务进行二元打分（0.0 或 1.0）验证，包含两条独立的检查路径：一是验证浏览器当前激活标签页的 URL 是否同时满足一组预设正则表达式模式；二是验证返回的 JSON 对象内容是否与预期键值完全一致，或在包含模式下满足子串/成员存在性要求。两条路径各自采用“全部满足得 1.0，任一失败得 0.0”的刚性判定逻辑， evaluator 本身不对外部如何组合这两条路径的得分做加权或累计。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "接收浏览器状态 result（可以是字符串 URL 或包含 'url' 键的字典）以及 rules 配置。首先提取 result 中的 URL 字符串：若 result 为字符串则直接使用，若为字典则取 result['url']，若为空或格式非法直接返回 0.0。随后从 rules['expected'] 获取正则模式列表，使用 re.search 依次检查每个 pattern 是否都在 URL 中被找到。遍历过程中只要有一个 pattern 未匹配成功，立即返回 0.0；仅当所有 pattern 全部命中时才返回 1.0。判定依据为：URL 必须同时满足全部正则规则。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 82,
+        "description": "接收 result（JSON 字符串或字典）与 rules 配置，用于对 JSON 对象进行键值级验证。若 result 为字符串，会先 strip、将单引号替换为双引号，再用 json.loads 解析。若 result 为 None，或 rules['expected'] 中存在值为 '__EVALUATION_FAILED__' 的键，则直接返回 0.0。根据 rules 中的 expect_in_result 标志分两支处理：当 expect_in_result 为 False 时，对 rules['expected'] 的每个 key 进行精确相等比较；若该预期对象中存在 'ignore_list_order' 且为 True，则先将当前 key 对应的期望值和实际值的列表排序后再比较，任一不等即返回 0.0。当 expect_in_result 为 True 时进入包含匹配模式：若预期值为 list，则检查 result 对应 key（list 或 str）是否包含/等于其中任一预期元素；若预期值为 str，则检查该预期字符串是否为实际值的子串（in 操作），任一失败即返回 0.0。全部通过返回 1.0，任何异常也返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:45:27",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_368d9ba4-203c-40c1-9fa3-da2f1430ce63./evaluator_function_labels.json"
+}

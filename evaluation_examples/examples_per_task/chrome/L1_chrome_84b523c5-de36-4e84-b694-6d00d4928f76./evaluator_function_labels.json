@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_84b523c5-de36-4e84-b694-6d00d4928f76./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器相关任务的完成状态，核心检查对象分为两类：一是浏览器当前活动标签页的 URL 是否与预期一致（比对时忽略查询参数），二是通用结果是否与预期值完全相等。两种检查均采用二元打分机制：若条件满足则返回 1.0（成功），否则返回 0.0（失败）。标注人员只需关注实际输出与预期在 URL（去查询参数后）或精确值上是否一致即可判定任务是否完成。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 50,
+        "description": "该函数接收 active_tab_info（当前活动标签页信息，通常为字典或字符串）与 rule（匹配规则字典）。首先检查 active_tab_info 是否为空，为空直接返回 0.0。随后读取 rule['type']，仅当 type 为 \"url\" 时生效：从 rule 中提取 expected_url，从 active_tab_info 中提取 actual_url（若 active_tab_info 为字典则取 get('url', None)，否则直接视为 URL 字符串）。接着通过 urllib.parse.urlparse 与 urlunparse 去除双方 URL 的 query 查询参数，仅保留协议、域名及路径部分后进行字符串比对。若去除查询参数后的 URL 完全一致则返回 1，否则返回 0。若 rule['type'] 不是 \"url\"，则记录错误日志并返回 0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 78,
+        "description": "该函数接收 result（实际结果）与 rules（规则字典）。首先从 rules 中提取键 \"expected\" 对应的预期值 expect，并在标准输出打印 result 与 expect。随后对 result 与 expect 进行严格相等判断（==）。若两者完全一致则返回 1.0，否则返回 0.0。该函数不处理近似匹配或类型转换，仅做精确相等比较。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:44:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_84b523c5-de36-4e84-b694-6d00d4928f76./evaluator_function_labels.json"
+}

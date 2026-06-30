@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_011./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_sheet_backup",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_sheet_backup",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator验证名为WeeklySales.xlsx的Excel文件是否完成了正确的Sheet备份任务。核心要求是：工作簿必须同时包含Sheet1和Sheet2；Sheet2必须具有指定的三列（Week、Sales、COGS）且至少包含1行数据；Sheet1的原始数据和列结构必须保持完整无损；并且Sheet2中的数据必须是Sheet1对应列数据的子集（即备份数据不能出现原始数据中不存在的值）。所有检查项必须全部满足，evaluator才判定任务成功并返回1.0；任何一项失败即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_sheet_backup",
+        "lineno": 7,
+        "description": "该函数接收result_path（从虚拟机拉取的xlsx本地路径）、expected（包含expected_columns、expected_sheets、min_data_rows等规则的字典）以及options参数。其执行流程如下：首先检查result_path是否存在，若不存在直接返回0.0；接着尝试导入pandas，若未安装也返回0.0。然后从expected中提取预期配置，默认列名为[\"Week\", \"Sales\", \"COGS\"]，默认工作表为[\"Sheet1\", \"Sheet2\"]，默认最少数据行数为1。随后使用pd.ExcelFile打开文件，依次执行六项检查：1）遍历expected_sheets，确认所有预期工作表都存在于文件中；2）分别读取Sheet1和Sheet2为DataFrame；3）精确比对Sheet2的列名是否与expected_columns完全一致（顺序敏感）；4）检查Sheet2的数据行数是否大于等于min_data_rows；5）精确比对Sheet1的列名是否与expected_columns完全一致，并检查其数据行数是否大于等于min_data_rows；6）对每一预期列，取Sheet1和Sheet2该列的非空值构成集合，验证Sheet2的值集合是否为Sheet1值集合的子集，若Sheet2出现Sheet1中不存在的值则判定失败。以上所有检查全部通过时返回1.0，任一环节失败或发生异常时返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:20:23",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_011./evaluator_function_labels.json"
+}

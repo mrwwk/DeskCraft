@@ -1,0 +1,117 @@
+{
+  "id": "interactive_vscode_ambiguous_201",
+  "snapshot": "vscode",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "用户只模糊地要求做一个产品落地页原型，期望 Agent 先主动确认页面结构和主题，再生成一个可打包的 Generative UI 小项目。",
+  "source": "https://www.frontendmentor.io/challenges | authors",
+  "user_persona": {
+    "expertise_level": "intermediate",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "/bin/bash",
+          "-c",
+          "rm -rf /home/user/Desktop/ui_marketing_brief_201 && mkdir -p /home/user/Desktop/ui_marketing_brief_201"
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "code",
+          "/home/user/Desktop/ui_marketing_brief_201"
+        ]
+      }
+    },
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Visual Studio Code"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我先做一个看起来像 B2B 产品首屏的页面原型。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "具体一点：在 /home/user/Desktop/ui_marketing_brief_201 里创建 index.html、styles.css 和 manifest.json。页面要有 <main id=\"app\">、<section id=\"hero\" class=\"hero\">、<section id=\"proof\" class=\"proof\"> 和按钮 <button id=\"cta\">Request Demo</button>。正文里要出现标题 Orbit Analytics。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再在 proof 区里放 3 个 class=\"proof-card\" 的卡片，并在 manifest.json 里写 project=orbit-analytics, theme=midnight, version=1.1。保存所有文件。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "vscode"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Visual Studio Code"
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui, time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5)"
+          ]
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "cd /home/user/Desktop/ui_marketing_brief_201 && zip -qr /home/user/Desktop/ui_marketing_brief_201_bundle.zip . 2>/dev/null; exit 0"
+          ]
+        }
+      }
+    ],
+    "func": "check_b2b_landing_page_prototype",
+    "conj": "and",
+    "expected": {
+      "type": "rule",
+      "rules": {}
+    },
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Desktop/ui_marketing_brief_201_bundle.zip",
+      "dest": "ui_marketing_brief_201_bundle.zip"
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

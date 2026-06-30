@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_f3b19d1e-2d48-44e9-b4e1-defcae1a0197./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 16
+    },
+    {
+      "name": "exact_match",
+      "lineno": 58
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 16
+    },
+    {
+      "name": "exact_match",
+      "lineno": 58
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于 ticketek_delivery_faq_safe 任务，总体目标是验证两个相互独立的状态条件是否同时达成：第一，Chrome 浏览器当前活动标签页必须打开 Ticketek 帮助中心中关于 Ticket Delivery 的指定文章，验证方式是对活动标签页的 URL 进行正则表达式匹配（或退化为精确 URL 比对）；第二，浏览器的 Safe Browsing（安全浏览）功能必须处于启用状态，验证方式是将实际结果与预期值进行不区分大小写的字符串精确匹配，并兼容布尔真值与字符串 \"true\"/\"1\" 的等价语义。两个主函数各自独立执行检查并返回 0.0（失败）或 1.0（成功），任务层面的完成判定需要这两个检查全部通过。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 16,
+        "description": "该函数负责验证 Chrome 当前活动标签页是否为预期的 Ticketek 帮助中心文章页面。它接收 active_tab_info（活动标签页信息，可为字典或字符串）和 rule（包含匹配类型与规则的字典）作为输入。首先，若 active_tab_info 为空或 None，直接返回 0.0；接着从中提取实际 URL（字典类型取 \"url\" 键，其他类型转为字符串）。随后根据 rule 中的 \"type\" 字段分两支处理：若 match_type 为 \"url_pattern\"，则使用 re.search 将 rule[\"pattern\"] 与 actual_url 做正则匹配，匹配成功返回 1.0，否则返回 0.0；若 match_type 为 \"url\"，则先尝试从 desktop_env.evaluators.metrics.utils 导入 compare_urls 对预期 URL 与实际 URL 进行比对，若导入失败则退化为字符串精确相等比较，相等返回 1.0，否则返回 0.0；若遇到未知的 match_type，也返回 0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 58,
+        "description": "该函数负责验证 Safe Browsing 等布尔类状态是否启用。它接收 result（实际检查结果）和 rules（包含 \"expected\" 键的规则字典）作为输入。首先，若 result 为 None，直接返回 0.0。然后将 result 与 rules.get(\"expected\", \"\") 均转换为字符串并统一转小写，得到 actual_str 与 expected_str。若两者字符串相等，返回 1.0。此外，为兼容不同表示形式，若 expected_str 为 \"true\" 或 \"1\" 且 actual_str 也为 \"true\" 或 \"1\"，同样视为匹配成功并返回 1.0；其余情况均返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:49:25",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_f3b19d1e-2d48-44e9-b4e1-defcae1a0197./evaluator_function_labels.json"
+}

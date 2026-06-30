@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_workflow_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对任务产出的字符串结果进行严格的二元判定。核心检查对象是传入的result字符串，要求该字符串必须同时满足rules中定义的两类子串规则：一是必须包含\"include\"列表中的所有指定子串（缺一不可）；二是必须不包含\"exclude\"列表中的任何指定子串（出现任一即失败）。若result为None，直接判定为失败。判定方式为精确的子串存在性检查，无近似匹配、无顺序要求、无权重打分，最终通过返回1.0，不通过返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收一个字符串result和一个字典rules作为输入。首先判断result是否为None，若为None则直接返回0.0。随后从rules中获取键名为\"include\"和\"exclude\"的字符串列表，若键不存在则默认为空列表。接着执行双重遍历检查：使用all()确认result中包含include列表的每一个子串；再使用all()确认result中不包含exclude列表的任何一个子串。只有当\"全部包含\"与\"全部不包含\"同时成立时，函数返回1.0；任一条件不满足即返回0.0。本函数未调用其他辅助函数，判定逻辑为严格的精确子串匹配，不涉及文件读取、正则表达式、近似匹配或累计计分。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:21:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_workflow_001./evaluator_function_labels.json"
+}

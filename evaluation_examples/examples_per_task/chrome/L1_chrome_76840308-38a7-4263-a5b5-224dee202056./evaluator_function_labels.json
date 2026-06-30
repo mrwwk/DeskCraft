@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_76840308-38a7-4263-a5b5-224dee202056./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是针对任务 L1_chrome_76840308-38a7-4263-a5b5-224dee202056 的评分器。代码中未明确体现该任务最终需要验证的具体产物类型或页面状态（如 URL、页面标题、元素文本等）。其核心检查对象是任务返回的结果（result）与规则字典中预设的期望值（rules['expected']）之间的完全相等关系。主要比较方式采用 Python 的严格相等运算符（==）进行精确匹配。成功判定采用二元制：若 result 与 expect 完全一致，则返回 1.0 表示任务成功；否则返回 0.0 表示失败。该 evaluator 不支持部分得分、近似匹配、容错阈值、顺序无关比较或多指标联合判定，仅做严格的精确相等判定。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收任务结果 result 和规则字典 rules 作为输入。首先从 rules 中提取键为 'expected' 的预期值 expect，并通过 print 将 result 与 expect 输出到控制台。随后执行核心判定：使用 == 运算符对 result 与 expect 进行严格相等比较。若两者完全相等，则返回浮点数 1.0；否则返回 0.0。该函数不执行任何数据预处理、文件读取、类型转换、正则匹配、近似匹配或阈值判断，也不涉及多条件组合、循环检查或分支嵌套，仅为一个薄封装的精确相等比较器。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:43:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_76840308-38a7-4263-a5b5-224dee202056./evaluator_function_labels.json"
+}

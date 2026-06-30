@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_812ee9e0-c2a1-41e4-bb62-cb23ccd68dbb./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_constraints_multi",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_constraints_multi",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中多个对象的约束（constraints）配置是否完全符合任务规则。它通过解析外部Blender检查脚本（如check_constraints.py）输出的JSON数据，检查指定对象上是否存在预期类型的约束，并逐一核对约束的关键属性（包括target、track_axis、up_axis等）。只有当rule中列出的所有约束条件都在对应对象上被找到且各项属性完全匹配时，任务才被判定为成功（返回1.0）；若任一约束缺失、类型不符或属性不匹配，则立即判定失败（返回0.0）。这是一种严格的“全部满足”式（AND逻辑）判定，无近似匹配或容错阈值。",
+    "main_functions": [
+      {
+        "name": "check_blender_constraints_multi",
+        "lineno": 33,
+        "description": "该函数接收Blender检查脚本输出的原始字符串command_output，以及包含预期约束规则的rule字典。首先调用辅助函数_parse_blender_output将原始输出解析为JSON对象；若解析失败（返回None）则直接返回0.0。随后遍历rule[\"constraints\"]中的每一条预期约束，根据object_name从解析结果中提取该对象的实际约束列表。对每条实际约束，依次比对type字段，以及可选的target、track_axis、up_axis字段（仅在规则中显式包含该键时才参与比较）。只要在同个对象的约束列表中找到一条所有字段均匹配的记录，即视为该预期约束满足。所有预期约束必须全部找到匹配项，函数才返回1.0；若任一预期约束未匹配成功，则立即返回0.0并记录警告日志。整个过程采用严格的“全部满足”（AND）逻辑，无加权、累计或近似匹配机制。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 20,
+        "description": "该辅助函数负责将Blender检查脚本输出的原始字符串解析为JSON对象。它首先检查command_output是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试使用json.loads将内容解析为Python对象。若解析过程中触发JSONDecodeError或ValueError，则记录错误日志及原始输出内容（debug级别），并返回None。该函数为check_blender_constraints_multi提供数据预处理服务，是整个评测流程的输入解析入口；一旦解析失败，主函数将直接判定得分为0.0。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:10:10",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_812ee9e0-c2a1-41e4-bb62-cb23ccd68dbb./evaluator_function_labels.json"
+}

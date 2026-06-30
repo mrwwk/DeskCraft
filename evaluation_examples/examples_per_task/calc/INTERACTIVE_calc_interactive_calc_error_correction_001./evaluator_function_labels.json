@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_error_correction_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_calc_sort_and_total",
+      "lineno": 14
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_calc_sort_and_total",
+      "lineno": 14
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个LibreOffice Calc电子表格（.xlsx文件）是否完成了排序和汇总操作。具体而言，它从VM拉取结果文件后，通过openpyxl读取工作簿内容，执行三项核心检查，且三项检查必须全部通过才判定任务成功：第一，验证指定行（默认第12行）的A列单元格包含\"Total\"标签（不区分大小写）；第二，验证指定排序列（默认第4列/D列，对应March）在数据行范围内（默认第2行至第11行）的数值按指定方向（默认降序）排列，不允许出现顺序颠倒；第三，验证Total行中指定列（默认第2-7列/B-G列）的数值必须等于对应数据列的数值之和，且允许误差不超过指定容差（默认0.01）。任一检查失败即返回0.0，全部通过返回1.0。",
+    "main_functions": [
+      {
+        "name": "check_calc_sort_and_total",
+        "lineno": 14,
+        "description": "该函数接收result_path（从VM拉取的.xlsx文件本地路径）和expected（配置规则字典，可选）作为输入。首先检查文件是否存在，若不存在直接返回0.0。随后从expected中提取规则参数，未提供时使用默认值：total_row=12（Total行所在行号）、sort_column=4（排序依据列号）、sort_direction=\"descending\"（排序方向）、sum_columns=[2,3,4,5,6,7]（需要验证SUM的列号列表）、data_start_row=2（数据起始行）、data_end_row=11（数据结束行）、tolerance=0.01（求和容差）。接着尝试导入openpyxl并打开工作簿，失败则返回0.0。检查分为三步：1）读取A列total_row单元格，要求非空且文本内容（转小写后）包含\"total\"；2）遍历sort_column从data_start_row到data_end_row的每个单元格，要求全部为非空数字，并按sort_direction验证顺序——降序时要求每个值不小于后一个值，升序时要求每个值不大于后一个值，出现逆序立即返回0.0；3）对sum_columns中的每一列，先累加data_start_row到data_end_row范围内该列的数值得到预期总和，再读取total_row该列的实际值，要求两者绝对差值不超过tolerance，且所有参与计算的单元格必须为数字。所有检查通过返回1.0，任一环节失败立即返回0.0并记录warning日志。最后关闭工作簿。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:21:08",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_error_correction_001./evaluator_function_labels.json"
+}

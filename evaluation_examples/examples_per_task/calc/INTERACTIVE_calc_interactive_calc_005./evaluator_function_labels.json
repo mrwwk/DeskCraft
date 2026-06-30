@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_005./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_pivot_table",
+      "lineno": 13
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_pivot_table",
+      "lineno": 13
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个evaluator用于验证任务最终产出的Excel文件中是否包含一个按促销类型（promotion type）拆分的数据透视表。它不强制要求工作表使用特定名称（例如允许代理将其重命名为'Promotion Type Breakdown'等），而是遍历Excel文件中的所有工作表，查找是否存在同时满足以下两个条件的工作表：至少有一列的列名（不区分大小写）包含'promotion'字样，且至少有一列的列名（不区分大小写）包含'sum - revenue'字样。这两个条件分别对应数据透视表中的促销类型行字段和收入汇总数据字段。检查采用'任一工作表满足即成功'的策略，一旦找到符合条件的工作表立即返回1.0分；如果所有工作表都不满足，或文件无法打开、路径为空，则返回0.0分。",
+    "main_functions": [
+      {
+        "name": "check_pivot_table",
+        "lineno": 13,
+        "description": "该函数接收result_path参数（由vm_file getter提供的Excel文件本地路径）以及可选的**options（框架保留，未使用）。其检查步骤如下：首先判断result_path是否为None，若是则直接返回0.0；接着尝试使用pd.ExcelFile打开该Excel文件，若打开失败（如文件损坏或格式错误）则记录错误并返回0.0；然后遍历文件中的所有工作表名称，对每个工作表使用pd.read_excel读取为DataFrame，并将所有列名转换为字符串、去除首尾空白后转为小写；随后检查转换后的列名列表中是否存在包含'promotion'子串的列（标记为has_promotion），以及是否存在包含'sum - revenue'子串的列（标记为has_sum_revenue）；若同一工作表中这两个条件同时成立，则记录日志并立即返回1.0。若遍历完所有工作表均未找到同时满足两个条件的工作表（期间遇到无法读取的工作表会跳过），则记录警告并返回0.0。判定依据是'列名子串匹配'的组合条件，且为'全满足'逻辑（has_promotion与has_sum_revenue同时为真），工作表之间为'任一满足'逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 21:19:02",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_005./evaluator_function_labels.json"
+}

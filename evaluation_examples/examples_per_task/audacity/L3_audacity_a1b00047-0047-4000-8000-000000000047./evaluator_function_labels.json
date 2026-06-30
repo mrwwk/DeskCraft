@@ -1,0 +1,145 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00047-0047-4000-8000-000000000047./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 171
+    },
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 192
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 209
+    },
+    {
+      "name": "check_audio_peak_amplitude",
+      "lineno": 248
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 271
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 24
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 70
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 81
+    },
+    {
+      "name": "_open_aup3",
+      "lineno": 98
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 103
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 122
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 171
+    },
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 192
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 209
+    },
+    {
+      "name": "check_audio_peak_amplitude",
+      "lineno": 248
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 271
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于OSWorld的Audacity任务（a1b00047），对任务产出的两类文件进行独立指标检测：一是导出的WAV音频文件，二是Audacity的.aup3项目文件。对于WAV文件，它通过标准库wave模块读取音频数据，分别验证时长（与预期值比较，允许秒级容差）、采样率（精确匹配）、末尾是否包含淡出效果（通过分窗RMS能量趋势判断，允许少量相邻窗口波动）、以及峰值振幅（是否在指定的dB范围内）。对于.aup3项目文件，它通过SQLite读取项目内部的XML，解析轨道结构，验证项目可读性以及轨道总数、波形轨道数、标签轨道数是否达到rule中设定的最低要求。每个主函数都是独立的评分单元，采用二元判定机制：该函数内部所有检查条件同时满足时返回1.0（通过），任一关键条件失败或发生异常时返回0.0（不通过），由上层调用方按需组合使用。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 171,
+        "description": "接收file_path和rule字典。首先检查文件是否存在，若不存在则记录错误并返回0.0。调用_read_wav_info读取WAV基本信息，提取duration字段。从rule中读取expected_duration和可选的tolerance（默认0.5秒）。计算实际时长与预期时长的绝对差值，若abs(actual - expected) <= tolerance则返回1.0，否则返回0.0。异常时同样返回0.0。"
+      },
+      {
+        "name": "check_audio_sample_rate",
+        "lineno": 192,
+        "description": "接收file_path和rule字典。首先检查文件是否存在，若不存在则返回0.0。调用_read_wav_info读取WAV信息，提取sample_rate。从rule中读取expected_sr（预期采样率）。若实际采样率与预期采样率完全相等则返回1.0，否则返回0.0。异常时返回0.0。"
+      },
+      {
+        "name": "check_audio_fade_out",
+        "lineno": 209,
+        "description": "接收file_path和rule字典，rule中必须包含fade_duration（淡出时长，单位秒），可选num_windows（分窗数量，默认5）。检查文件存在后，调用_get_mono_samples获取单声道样本和采样率。计算淡出段样本数fade_samples = fade_dur * sr，若该值超过音频总长度则返回0.0。将音频末尾fade_samples长度的区间均分为num_windows个窗口，逐个窗口调用_rms_db计算RMS能量（dB）。判定条件为：相邻窗口间RMS下降的次数decreases >= num_windows - 2，即要求大部分相邻窗口对满足后一窗口能量低于前一窗口。满足则返回1.0，否则返回0.0。异常时返回0.0。"
+      },
+      {
+        "name": "check_audio_peak_amplitude",
+        "lineno": 248,
+        "description": "接收file_path和rule字典，rule中需包含min_peak_db和max_peak_db。检查文件存在后，调用_get_mono_samples获取单声道样本。计算所有样本绝对值的最大值peak，若peak极小（<1e-10）则记为-100.0 dB，否则通过20.0 * math.log10(peak)转换为dB得到peak_db。若peak_db落在[min_peak_db, max_peak_db]闭区间内则返回1.0，否则返回0.0。异常时返回0.0。"
+      },
+      {
+        "name": "check_aup3_project_valid",
+        "lineno": 271,
+        "description": "接收file_path和rule字典。检查文件存在后，调用_parse_aup3_tracks解析.aup3项目XML，获取轨道信息列表。若解析结果为空则返回0.0。统计总轨道数total、wave类型轨道数wave_count、label类型轨道数label_count。从rule中读取min_track_count（默认1）、min_wave_tracks（默认0）、min_label_tracks（默认0）。采用组合条件判定：只有当total >= min_track_count且wave_count >= min_wave_tracks且label_count >= min_label_tracks三个条件全部满足时才返回1.0，任一条件不满足则返回0.0。异常时返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 24,
+        "description": "使用Python标准库wave.open打开WAV文件，读取并返回基础元数据字典，包含channels（声道数）、sample_rate（采样率）、n_frames（总帧数）、duration（时长，由n_frames/sample_rate计算）、sampwidth（采样字节宽度）。被check_audio_duration、check_audio_sample_rate直接调用，也被_get_mono_samples调用。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 36,
+        "description": "使用wave模块读取WAV全部原始帧数据，根据sampwidth（支持1/2/3/4字节）分别通过struct.unpack或int.from_bytes将原始字节解析为浮点样本，并归一化到[-1.0, 1.0]范围返回列表。被_get_mono_samples调用，为后续能量和振幅分析提供原始样本数据。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 62,
+        "description": "对输入的浮点样本列表计算均方根（RMS）值并转换为分贝（dB）。若样本为空或RMS极小（<1e-10）则返回-100.0 dB。被check_audio_fade_out调用，用于计算各分窗的能量水平以判断淡出趋势。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 73,
+        "description": "调用_read_wav_info和_read_wav_samples读取指定WAV文件。若音频为多声道，则将各声道样本逐帧取算术平均，合并为单声道样本列表。返回(mono_samples, sample_rate)元组。被check_audio_fade_out和check_audio_peak_amplitude调用，为这两项检查提供统一的单声道数据。"
+      },
+      {
+        "name": "_open_aup3",
+        "lineno": 89,
+        "description": "使用sqlite3.connect将.aup3文件作为SQLite数据库连接打开并返回连接对象。被_get_aup3_project_xml调用，是访问Audacity项目内部数据的入口包装器。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 95,
+        "description": "在SQLite连接中先执行SELECT doc FROM project LIMIT 1获取项目XML；若未获取到，则回退查询autosave表。若均无所获返回None。对取到的内容进行utf-8解码（若为bytes类型），返回XML字符串。被_parse_aup3_tracks调用。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 112,
+        "description": "调用_get_aup3_project_xml获取项目XML字符串，使用xml.etree.ElementTree解析。自动处理XML命名空间（若root.tag以'{'开头则提取命名空间前缀）。遍历根元素下的直接子节点，识别标签为'wavetrack'/'WaveTrack'的波形轨道，提取name、gain、mute、solo、pan属性；识别'labeltrack'/'LabelTrack'的标签轨道，提取每个label子节点的time（优先取属性t，否则取t0）、t1、text（优先取title，否则取text）。返回包含所有轨道信息的字典列表。被check_aup3_project_valid调用以统计各类轨道数量。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:01:19",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00047-0047-4000-8000-000000000047./evaluator_function_labels.json"
+}

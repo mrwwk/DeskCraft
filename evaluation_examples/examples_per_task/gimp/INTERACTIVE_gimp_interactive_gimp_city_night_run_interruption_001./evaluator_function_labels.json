@@ -1,0 +1,213 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_city_night_run_interruption_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_saturation",
+      "lineno": 23
+    },
+    {
+      "name": "calculate_contrast",
+      "lineno": 31
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 38
+    },
+    {
+      "name": "check_saturation_increase",
+      "lineno": 75
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 116
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 157
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 175
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 236
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 263
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 341
+    },
+    {
+      "name": "check_top_title_bar_and_text",
+      "lineno": 400
+    },
+    {
+      "name": "check_l2_city_night_run_cover_complete",
+      "lineno": 462
+    },
+    {
+      "name": "check_interactive_gimp_city_night_run_complete",
+      "lineno": 498
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_saturation",
+      "lineno": 23
+    },
+    {
+      "name": "calculate_contrast",
+      "lineno": 31
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 38
+    },
+    {
+      "name": "check_saturation_increase",
+      "lineno": 75
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 116
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 157
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 175
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 200
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 229
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 236
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 263
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 341
+    },
+    {
+      "name": "check_top_title_bar_and_text",
+      "lineno": 400
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 454
+    },
+    {
+      "name": "check_l2_city_night_run_cover_complete",
+      "lineno": 462
+    },
+    {
+      "name": "check_interactive_gimp_city_night_run_complete",
+      "lineno": 498
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 GIMP 交互式任务“city night run 封面制作”的最终完成状态。它要求用户产出一张 JPEG 封面图及其对应的 GIMP 工程文件（XCF），并对两者进行严格的多维度复合检查。核心验证对象包括：1）输出文件的存在性、格式必须为 JPEG、图像尺寸须接近 1080×1440（容差 5 像素）、文件大小不得超过 716800 字节；2）视觉质量上，封面图相对原始素材的对比度和饱和度均须提升至少 10%；3）内容结构上，封面顶部须存在一条深色标题栏（通过顶部与中部亮度差及边缘密度检测），且顶部中心区域须包含文字“CITY NIGHT RUN”（通过区域边缘密度或 OCR 关键词匹配）；4）工程文件 XCF 中须包含名为 BG_City、Title_Bar、Title_Text 的三个图层（顺序不限）。所有 9 项检查为“全部必须满足”的严格与逻辑，由 _all_binary_checks_pass 聚合，任一失败即整体返回 0.0，全部通过才返回 1.0。",
+    "main_functions": [
+      {
+        "name": "calculate_saturation",
+        "lineno": 23,
+        "description": "计算单张图像的平均饱和度。使用 PIL 将图像转换为 HSV 模式，提取 S（饱和度）通道，再通过 ImageStat.Stat 计算该通道的均值。返回值为 0–255 范围内的浮点数，表示图像整体饱和度水平。该数值通常被 check_saturation_increase 用于与源图做百分比比较。"
+      },
+      {
+        "name": "calculate_contrast",
+        "lineno": 31,
+        "description": "计算单张图像的对比度。将图像转换为灰度 L 模式后，使用 ImageStat.Stat 计算像素值的标准差（stddev），并以该标准差作为对比度度量。返回值越大表示对比度越高。该数值通常被 check_contrast_increase 用于与源图做百分比比较。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 38,
+        "description": "检查指定图像文件的宽高是否符合预期。使用 PIL.Image.open 打开图像后获取 size。将实际 width 与 expected_width 比较，若 expected_height 不为 None 则同时比较 height。默认 tolerance 为 5 像素，即实际尺寸与预期差的绝对值不超过 5 即视为通过。文件不存在、路径为 None 或读取异常时返回 0，通过返回 1。"
+      },
+      {
+        "name": "check_saturation_increase",
+        "lineno": 75,
+        "description": "检查目标图像相对源图像的饱和度是否提升足够。分别用 calculate_saturation 计算 src_path 与 tgt_path 的饱和度。若源图饱和度为 0 则直接返回 0；否则按公式 ((tgt_saturation - src_saturation) / src_saturation) * 100 计算百分比增幅，要求不低于 min_increase_percent（默认 10.0）。任一文件缺失或读取异常也返回 0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 116,
+        "description": "检查目标图像相对源图像的对比度是否提升足够。分别用 calculate_contrast 计算 src_path 与 tgt_path 的对比度。若源图对比度为 0 则直接返回 0；否则按公式 ((tgt_contrast - src_contrast) / src_contrast) * 100 计算百分比增幅，要求不低于 min_increase_percent（默认 10.0）。任一文件缺失或读取异常也返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 157,
+        "description": "检查给定路径是否为普通文件。使用 os.path.isfile 判断，路径为 None 时返回 0，存在返回 1，不存在返回 0。是最基础的文件存在性检查。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 175,
+        "description": "检查图像文件是否为有效的 JPEG 格式。使用 PIL.Image.open 打开图像后，验证 img.format 是否等于 'JPEG'。文件不存在、路径为 None 或读取异常时返回 0，格式正确返回 1。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 236,
+        "description": "检查图像文件大小是否落在指定字节区间内。从 rule 字典读取 min_size（默认 0）和 max_size（默认 10**18），使用 os.path.getsize 获取实际大小，判断 size >= min_size 且 size <= max_size。文件不存在或异常时返回 0，在范围内返回 1。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 263,
+        "description": "检查 XCF 工程文件的图层结构。首先读取文件并验证文件头以 'gimp xcf' 开头。优先尝试使用 gimpformats 库解析出所有图层名称，检查是否包含 rule['layers'] 中列出的全部图层名；若 rule['ordered'] 为 True，则还要求这些图层在文件中的出现顺序与列表顺序一致（位置递增）。若 gimpformats 不可用或解析失败，回退到二进制内容字符串搜索定位每个图层名，同样支持 ordered 校验。任一图层缺失、顺序错误或文件头非法均返回 0，通过返回 1。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 341,
+        "description": "检查图像指定区域是否存在类文本图案，以及可选的 OCR 关键词。对 rule['regions'] 中的每个区域名（默认 [\"center\"]），调用 _resolve_region_bbox 裁剪出对应子图，再调用 _edge_density 计算边缘密度，要求不低于 min_edge_density（默认 0.008）。若 rule 中提供了 keywords 列表，则尝试导入 pytesseract 对整图进行 OCR，将识别结果按 re.sub(r'\\s+', ' ', ...) 归一化后转为小写，检查所有关键词是否都出现在其中；OCR 模块缺失或失败仅记录警告，不直接导致失败，但区域边缘密度不足会直接返回 0。"
+      },
+      {
+        "name": "check_top_title_bar_and_text",
+        "lineno": 400,
+        "description": "检查图像顶部是否存在标题栏及文本信号。取图像顶部高度约为 (bar_min_ratio + bar_max_ratio)/2 的区域作为标题栏（默认比例 0.12–0.22，实际高度限制在 20 到 h//2 之间），同时取图像中部等高度区域作为参照。计算两区域的平均灰度值，要求中部比顶部亮至少 min_darkness_delta（默认 10.0，即顶部更暗）；再计算顶部区域的边缘密度（_edge_density），要求不低于 min_edge_density（默认 0.01）。两项同时满足返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_l2_city_night_run_cover_complete",
+        "lineno": 462,
+        "description": "该任务的复合评测主入口。接收 result_paths 列表，要求长度至少为 3，依次取 jpg_path、xcf_path、src_path。随后顺序执行 9 项严格检查：1）check_file_exists(jpg_path) 确认输出文件存在；2）check_jpeg_format(jpg_path) 确认格式为 JPEG；3）check_image_dimensions(jpg_path, 1080, 1440) 确认尺寸；4）check_image_file_size_range(jpg_path, {\"max_size\": 716800}) 限制文件大小不超过 716800 字节；5）check_contrast_increase(src_path, jpg_path, min_increase_percent=10.0) 确认对比度提升至少 10%；6）check_saturation_increase(src_path, jpg_path, min_increase_percent=10.0) 确认饱和度提升至少 10%；7）check_top_title_bar_and_text(jpg_path, {\"bar_min_ratio\": 0.12, \"bar_max_ratio\": 0.22, \"min_darkness_delta\": 8, \"min_edge_density\": 0.008}) 检查顶部标题栏；8）check_text_in_region_keywords(jpg_path, {\"regions\": [\"top_center\"], \"keywords\": [\"CITY NIGHT RUN\"], \"min_edge_density\": 0.006}) 检查顶部中心文字；9）check_xcf_layers_structure(xcf_path, {\"layers\": [\"BG_City\", \"Title_Bar\", \"Title_Text\"], \"ordered\": False}) 检查 XCF 图层。最后调用 _all_binary_checks_pass 聚合，所有检查必须全部返回 1 才得到 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_interactive_gimp_city_night_run_complete",
+        "lineno": 498,
+        "description": "交互式任务的薄封装入口。直接调用 check_l2_city_night_run_cover_complete(result_paths) 并原样返回其结果，本身不增加任何额外判断逻辑。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 194,
+        "description": "将粗粒度区域名称解析为图像上的像素坐标边界框 (x0, y0, x1, y1)。支持 \"top_left\"、\"top_center\"、\"top_right\"、\"bottom_left\"、\"bottom_center\"、\"bottom_right\"、\"center\"、\"left\"、\"right\"、\"top\"、\"bottom\" 等预设名称，基于传入的 width 与 height 按比例划分。若传入未知名称，默认返回全图坐标 (0, 0, w, h)。主要服务于 check_text_in_region_keywords 等区域级检测。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 219,
+        "description": "计算灰度图像数组的边缘密度。对输入的 np.ndarray 灰度图，分别计算 x 轴与 y 轴的绝对梯度（np.gradient），相加得到边缘强度图，然后统计强度超过 edge_threshold（默认 40.0）的像素所占比例。返回值越高表示该区域边缘/纹理越丰富，常用于判断是否存在文字或图形。被 check_text_in_region_keywords 和 check_top_title_bar_and_text 复用。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 447,
+        "description": "二进制检查结果的严格聚合器。接收 scores 列表，过滤掉 None 后将其余项转为浮点数。只有当所有有效分数均大于等于 1.0 时才返回 1.0，否则返回 0.0。若列表为空也返回 0.0。该函数实现了“全部必须满足”的与逻辑，是 check_l2_city_night_run_cover_complete 最终判定成功或失败的关键环节。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:51:37",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_city_night_run_interruption_001./evaluator_function_labels.json"
+}
