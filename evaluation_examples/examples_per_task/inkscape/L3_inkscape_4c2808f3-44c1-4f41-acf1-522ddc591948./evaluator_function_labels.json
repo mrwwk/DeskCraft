@@ -1,0 +1,158 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_4c2808f3-44c1-4f41-acf1-522ddc591948./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 136
+    },
+    {
+      "name": "check_inkscape_object_to_path",
+      "lineno": 170
+    },
+    {
+      "name": "check_inkscape_fill_rule",
+      "lineno": 189
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 208
+    },
+    {
+      "name": "check_inkscape_complex_path_workflow",
+      "lineno": 255
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 40
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 59
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 67
+    },
+    {
+      "name": "_get_float",
+      "lineno": 75
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 86
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 95
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 136
+    },
+    {
+      "name": "check_inkscape_object_to_path",
+      "lineno": 170
+    },
+    {
+      "name": "check_inkscape_fill_rule",
+      "lineno": 189
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 208
+    },
+    {
+      "name": "check_inkscape_complex_path_workflow",
+      "lineno": 255
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape SVG编辑任务的完成结果。它通过读取并解析最终产出的SVG文件，按元素ID定位目标图形，检查其填充颜色、描边颜色与宽度、形状标签是否已转为路径、填充规则，以及是否应用了指定的滤镜原语（如feGaussianBlur、feDropShadow）。核心比较方式包括：对颜色值进行规范化（3位hex扩6位、统一小写、去除8位hex的alpha通道）后做精确匹配；对描边宽度去除单位后做浮点数值比较，默认容差为0.5；对滤镜则通过解析url(#id)引用并遍历filter定义内的子元素标签来做包含匹配。成功判定总体思路为：各单项检查返回1.0（通过）或0.0（不通过）；复杂路径工作流函数采用串联逻辑，要求配置的path_check、filter_check、stroke_check、fill_rule_check、fill_check全部同时满足，任一子项失败即整体返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 103,
+        "description": "接收svg_file_path与rule（含element_id、expected_fill）。先调用_parse_svg解析SVG文件，失败返回0.0；再调用_find_element_by_id定位元素，未找到返回0.0。接着调用_get_style_prop获取该元素的fill属性值；若元素标签为text且自身无fill，则遍历其tspan子元素尝试获取fill。随后调用_normalize_color对实际值与预期值做规范化（处理hex简写、大小写、none等）。判定逻辑为：若expected_fill为'none'，则actual_fill必须等于'none'；其他情况必须完全相等。通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_stroke",
+        "lineno": 136,
+        "description": "接收svg_file_path与rule（含element_id，可选expected_stroke、expected_stroke_width）。先调用_parse_svg与_find_element_by_id完成文件解析与元素定位，任一环节失败返回0.0。若rule包含expected_stroke：调用_normalize_color规范化预期与实际stroke值，若预期为'none'则实际必须为'none'或None，否则必须严格相等，不符即返回0.0。若rule包含expected_stroke_width：调用_get_float去除末尾单位（如px、mm）后转为浮点数，若预期或实际值为None返回0.0；读取rule中的tolerance（默认0.5），计算绝对差值，超过容差即返回0.0。所有配置项均通过则返回1.0。"
+      },
+      {
+        "name": "check_inkscape_object_to_path",
+        "lineno": 170,
+        "description": "接收svg_file_path与rule（含original_id，可选expected_tag，默认为\"path\"）。调用_parse_svg解析SVG，失败返回0.0；调用_find_element_by_id按original_id查找元素，未找到返回0.0。调用_tag_local去除命名空间后获取实际标签名，与expected_tag做字符串相等比较。相等返回1.0，否则0.0。"
+      },
+      {
+        "name": "check_inkscape_fill_rule",
+        "lineno": 189,
+        "description": "接收svg_file_path与rule（含element_id、expected_fill_rule）。调用_parse_svg与_find_element_by_id完成解析与定位，失败返回0.0。调用_get_style_prop获取fill-rule值（优先内联style，其次直接属性），将实际值与预期值均转为小写后比较。相等返回1.0，否则0.0。"
+      },
+      {
+        "name": "check_inkscape_filter",
+        "lineno": 208,
+        "description": "接收svg_file_path与rule（含element_id、expected_filter_type）。调用_parse_svg与_find_element_by_id完成解析与定位，失败返回0.0。调用_get_style_prop获取filter属性值，使用正则r'url\\(#([^)]+)\\)'提取引用的filter ID。随后在SVG根下遍历查找id匹配的filter定义元素，检查其直接子元素的本地标签名（经_tag_local处理）是否包含expected_filter_type（不区分大小写）。若该filter元素通过xlink:href或href属性链接到另一filter定义，则继续查找被链接的filter并重复上述子元素检查。任一环节找到匹配即返回1.0，遍历结束仍未找到返回0.0。"
+      },
+      {
+        "name": "check_inkscape_complex_path_workflow",
+        "lineno": 255,
+        "description": "接收svg_file_path与rule，可包含path_check、filter_check、stroke_check、fill_rule_check、fill_check五个子规则对象。按固定顺序依次调用：check_inkscape_object_to_path、check_inkscape_filter、check_inkscape_stroke、check_inkscape_fill_rule、check_inkscape_fill_color。采用串联（短路）逻辑：仅当对应子规则键存在于rule中时才执行检查；若任一被调用的检查返回值小于1.0，立即返回0.0。所有配置的子检查全部通过才返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 28,
+        "description": "将CSS样式字符串（如'fill:#ff0000;stroke:#000'）按分号分割，解析为key-value字典。主要服务于_get_style_prop，用于从元素内联style属性中提取具体样式项。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 38,
+        "description": "对颜色字符串进行规范化处理：去除空白并转小写；'none'保持为'none'；3位hex（如#f00）扩展为6位（#ff0000）；8位hex（#rrggbbaa）截取前6位以去除alpha通道。被check_inkscape_fill_color和check_inkscape_stroke调用，用于统一预期颜色与实际颜色的格式后再进行精确比较。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 52,
+        "description": "从SVG根元素开始递归遍历所有后代元素（root.iter()），匹配元素的id属性与传入的element_id。返回找到的元素或None。是所有需要按ID定位目标元素的主函数的基础依赖。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 59,
+        "description": "优先调用_parse_style解析元素的内联style属性，查找指定的样式属性名；若不存在，则回退到获取元素的直接属性（elem.get(prop)）。被fill、stroke、stroke-width、fill-rule、filter等检查复用，统一处理\"内联样式优先、直接属性次之\"的取值逻辑。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 66,
+        "description": "安全地将字符串转为浮点数，使用re.sub(r'[a-zA-Z%]+$', '', str(value).strip())去除末尾的单位字符（如px、mm、%）。转换失败或输入为None时返回default。专用于check_inkscape_stroke中的stroke-width数值提取与容差比较。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 76,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，返回(tree, root)元组；任何解析异常返回(None, None)。是所有主函数的统一入口，负责文件读取与XML解析。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 85,
+        "description": "去除XML标签中的命名空间前缀（如将'{http://www.w3.org/2000/svg}text'转为'text'）。被check_inkscape_object_to_path用于标签名比较，被check_inkscape_filter用于滤镜原语类型匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:47:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_4c2808f3-44c1-4f41-acf1-522ddc591948./evaluator_function_labels.json"
+}

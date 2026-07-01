@@ -22,27 +22,27 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender场景中指定对象的材质纹理连接配置是否符合预期。它通过解析在VM上运行的Blender检查脚本（check_material.py）输出的JSON结果，核心检查两个层面：第一，验证指定图像纹理文件（如texture_brick.jpg）是否被正确连接到Principled BSDF的指定输入接口（如Base Color、Normal等），支持直接连接和经过中间节点（Normal Map、Color Ramp等）的间接连接；第二，可选验证材质的PBR参数（metallic、roughness）是否落在预期值的容差范围内。判定逻辑为“全部满足”：所有指定的纹理连接必须全部正确，且若指定了PBR参数则至少有一个材质的对应参数在容差内匹配，全部通过返回1.0，任一失败返回0.0。",
+    "overall_validation": "该evaluator用于验证Blender场景中指定物体的材质纹理连接状态与PBR参数是否符合预期。它通过解析在VM上运行的Blender后台脚本（check_material.py）输出的JSON结果，检查指定物体的所有材质中，是否包含期望的图像纹理文件，并且这些纹理节点是否正确连接到Principled BSDF的指定输入接口（如Base Color、Normal等），支持通过中间节点（Normal Map、Color Ramp等）的间接连接。同时，若规则中指定了metallic或roughness，还会检查任意一个材质的对应参数是否在容差范围内。只有当所有纹理连接要求全部满足，且PBR参数（如有）也满足时，才判定任务成功并返回1.0，否则返回0.0。",
     "main_functions": [
       {
         "name": "check_blender_material_textures",
         "lineno": 47,
-        "description": "接收两个参数：command_output为VM上Blender检查脚本输出的JSON字符串，rule为包含object_name、textures列表及可选metallic/roughness/tolerance的字典。执行步骤如下：首先调用_parse_blender_output将JSON字符串解析为Python字典；接着通过rule[\"object_name\"]提取目标对象的材质列表。然后进入核心检查阶段：遍历rule[\"textures\"]中的每个纹理规范，对每个filename和connected_to目标，在材质的image_textures数组中逐条匹配文件名，并检查connected_to是否存在于该纹理的connected_to目标列表中（支持字符串或列表形式）；若新格式未命中，则回退到legacy格式检查mat[\"texture_filename\"]是否匹配且connected_to为None或\"Base Color\"。任一纹理未找到或连接目标不匹配即记录警告并返回0.0。纹理全部通过后，若rule中指定了metallic或roughness，则遍历所有材质，使用_check_tolerance在默认容差0.05（或rule[\"tolerance\"]）内比较实际值与预期值，任一材质同时满足所有指定的PBR参数即返回1.0；若仅指定了textures而未指定PBR参数，则直接返回1.0；其余情况返回0.0。"
+        "description": "该函数接收两个参数：command_output是VM上Blender脚本执行后输出的JSON字符串（格式如{\"Cube\": [{\"name\": \"CubeMaterial\", \"image_textures\": [...]}]}）；rule是包含期望规则的字典，可指定object_name（目标物体）、textures（纹理列表，每项含filename和connected_to）、可选的metallic/roughness数值以及tolerance容差（默认0.05）。执行流程如下：1) 调用_parse_blender_output将command_output解析为Python字典；若解析失败或为空，直接返回0.0。2) 从解析结果中提取object_name对应的材质列表obj_mats。3) 纹理连接检查（全部满足逻辑）：遍历rule[\"textures\"]中的每个纹理规范。对每个纹理，依次检查obj_mats中的每个材质：优先在新版输出格式的mat[\"image_textures\"]数组中查找filename匹配的纹理项；若找到且规则指定了connected_to，则检查该值是否出现在纹理项的connected_to列表（或字符串）中；若未找到，回退到旧版格式，检查mat[\"texture_filename\"]是否匹配且connected_to为None或\"Base Color\"。任一纹理规范在全部材质中均未找到匹配，则记录警告并立即返回0.0。4) PBR参数检查（任一材质满足逻辑）：若规则中指定了metallic或roughness，遍历材质列表，对每一个材质调用_check_tolerance分别核对metallic和roughness字段。只要存在任意一个材质同时满足所有指定的PBR参数容差要求，立即返回1.0。5) 仅纹理检查的快速路径：如果规则只包含纹理检查且未指定PBR参数，且前述纹理检查全部通过，则返回1.0。6) 若执行到末尾仍未满足成功条件，返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 18,
-        "description": "接收Blender命令行输出的原始字符串，去除空白后使用json.loads解析为Python对象。若输出为空或JSON解析失败，则记录错误日志并返回None。该函数是主评测逻辑的入口数据预处理步骤，负责将VM返回的原始文本转换为可遍历的字典结构。"
+        "lineno": 20,
+        "description": "该辅助函数负责将Blender后台脚本打印的原始命令输出解析为Python字典。它先检查输入是否为空或仅含空白字符，若是则记录错误并返回None；否则尝试使用json.loads对去空后的字符串进行解析。若遇到JSONDecodeError或ValueError，记录错误日志并附带原始输出内容（debug级别），返回None。该函数是主评测逻辑的入口数据预处理步骤，直接决定后续检查能否进行。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 29,
-        "description": "接收actual（实际值）、expected（预期值）和tol（容差）三个参数。若任一值为None则直接返回False；否则将两者转为浮点数后计算绝对差值，判断是否小于等于容差。该函数服务于PBR参数检查，为metallic和roughness提供近似相等判定，避免浮点数精度问题导致的严格匹配失败。"
+        "lineno": 33,
+        "description": "该辅助函数用于执行带容差的数值比较。接收actual（实际值）、expected（期望值）和tol（容差）三个参数。若任一参数为None则直接返回False；否则将两者转为浮点数后，判断其绝对差值是否小于等于容差值。该函数被主函数用于判断材质metallic和roughness属性是否在允许误差范围内，是PBR参数检查的核心比较器。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:13:13",
+  "created_at": "2026-07-01 14:39:52",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_e8176133-1453-4ddc-9771-248e971e3437./evaluator_function_labels.json"
 }

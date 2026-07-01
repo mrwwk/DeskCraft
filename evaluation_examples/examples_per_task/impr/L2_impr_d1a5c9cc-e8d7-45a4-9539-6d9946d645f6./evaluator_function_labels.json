@@ -1,0 +1,57 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_d1a5c9cc-e8d7-45a4-9539-6d9946d645f6./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_pptx_files",
+      "lineno": 66
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_hex_color",
+      "lineno": 8
+    },
+    {
+      "name": "_get_slide_background_color_rgb",
+      "lineno": 19
+    },
+    {
+      "name": "_find_title_shape",
+      "lineno": 37
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 66
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户生成的PPTX文件是否满足三项任务特定的格式要求，且采用\"全部满足则通过、任一失败即零分\"的严格判定策略。它不对PPTX做结构性比对（不检查形状数量、位置、尺寸、字体名、斜体/下划线/删除线、对齐、缩进、项目符号等），以避免LibreOffice往返编辑引入的差异导致假阴性。核心验证目标为：1）第3张幻灯片的标题必须整体为粗体，且字体颜色严格等于#006400；2）第3张幻灯片的演讲者备注文本中必须包含指定的目标句子（默认关于森林覆盖率与生物多样性的内容），采用子串包含匹配；3）演示文稿中每一张幻灯片的背景色必须严格等于#D3D3D3。三项检查全部通过返回1.0，任意一项检查失败立即返回0.0。",
+    "main_functions": [
+      {
+        "name": "compare_pptx_files",
+        "lineno": 66,
+        "description": "该主函数接收result_path（待测PPTX文件路径）、expected_path（本evaluator未使用）以及options配置字典，依次执行三项独立检查，全部为\"与目标值严格相等\"或\"子串包含\"的硬判定。首先，从options中读取各检查开关（examine_slide3_title_bold、examine_slide3_title_color、examine_slide3_note、examine_background_color）及对应目标值（target_title_color默认006400、target_note_text默认森林相关句子、target_background默认D3D3D3），并调用_parse_hex_color将目标颜色转为RGB元组；若颜色解析失败直接返回0.0。随后使用python-pptx打开PPTX文件。检查1（Slide 3标题）：若幻灯片总数不足3张直接失败；调用_find_title_shape定位第3张幻灯片的标题形状，若找不到也直接失败。若开启粗体检查，遍历标题text_frame下所有paragraph与run，要求每个非空文本run的font.bold必须为True，任一非粗体即返回0.0。若开启颜色检查，同样遍历所有非空run，读取run.font.color.rgb并与target_title_rgb做严格相等比较，任一不匹配即返回0.0。检查2（Slide 3演讲者备注）：若幻灯片总数不足3张直接失败；尝试读取slide3.notes_slide.notes_text_frame.text，若异常则视为空字符串；采用子串包含方式判断target_note_text.strip()是否出现在备注文本中，未出现则返回0.0。检查3（所有幻灯片背景色）：遍历每一张幻灯片，调用_get_slide_background_color_rgb获取实际背景色RGB，若无法确定或实际值不等于target_bg_rgb，立即返回0.0。仅当三项检查全部通过时，函数返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_hex_color",
+        "lineno": 8,
+        "description": "解析16进制颜色字符串（支持带或不带'#'前缀），将其转换为RGB三元组(R, G, B)。具体逻辑为：去除左侧'#'、转大写、去空白后，检查长度是否为6；随后每两位一组按16进制转为整数。若格式非法或转换失败，返回None。该函数被compare_pptx_files用于把target_title_color和target_background从字符串形式转为可比较的RGB元组。"
+      },
+      {
+        "name": "_get_slide_background_color_rgb",
+        "lineno": 19,
+        "description": "获取单张幻灯片的有效背景色RGB值。优先读取slide.background.fill：若类型为SOLID(1)且前景色fore_color.rgb存在，则直接返回；若类型为BACKGROUND(5)表示继承自母版，则追溯至slide.slide_layout.slide_master的背景填充，同样只在SOLID且rgb可读时返回。若任何环节异常或无法确定，返回None。该函数被compare_pptx_files在背景色检查环节逐张调用，用于统一提取实际背景色。"
+      },
+      {
+        "name": "_find_title_shape",
+        "lineno": 35,
+        "description": "在单张幻灯片中定位标题形状。优先使用slide.shapes.title获取官方标题占位符，若存在且含非空文本则直接返回。若失败，则回退到收集所有具有text_frame且文本非空的形状，按(top, left)升序排序后取最上方（最靠左上方）的一个作为标题。若幻灯片完全无文本形状，返回None。该函数被compare_pptx_files用于定位第3张幻灯片的标题，以进行粗体和颜色检查。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:27:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_d1a5c9cc-e8d7-45a4-9539-6d9946d645f6./evaluator_function_labels.json"
+}

@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 的核心目标是验证 Chrome 浏览器任务完成后，当前活动标签页的 URL 是否严格符合预期的一组正则表达式模式。它通过读取浏览器状态接口（如 activate_tab_info 或 get_active_url_from_accessTree）获取当前 URL，该 URL 可以是字符串，也可以是包含 'url' 字段的字典。随后， evaluator 提取出 URL 文本，对 rules['expected'] 中列出的每一个正则 pattern 依次执行 re.search 匹配。只有当所有正则模式全部在 URL 中找到匹配时，才判定成功并返回 1.0；若 result 为空、格式非法、或任一 pattern 匹配失败，则立即返回 0.0。整体采用‘全部满足’的二进制打分逻辑，不存在部分得分或加权累计。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器任务完成后，当前激活标签页的URL是否符合预期模式。核心检查对象是浏览器实际返回的URL字符串（来源为activate_tab_info或get_active_url_from_accessTree的返回值）。评测逻辑采用严格的正则表达式匹配策略：从rules字典中提取expected字段（一个正则模式列表），要求URL必须同时满足列表中的所有pattern（逻辑与/AND关系）。函数仅返回0.0或1.0两种分数，不存在中间分数、加权累计或容错阈值。若result参数格式非法（既非字符串也非包含'url'键的字典），或任一正则模式未在URL中通过re.search找到匹配，则判定失败；仅当所有模式全部命中时，才判定成功。",
     "main_functions": [
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 33,
-        "description": "该函数接收两个参数：result（浏览器状态返回值，可为字符串 URL 或包含 'url' 键的字典）和 rules（评测规则字典，其中 'expected' 键对应一个正则模式列表）。执行步骤如下：1）若 result 为空，直接返回 0.0；2）若 result 为字符串，直接将其作为 result_url，若为字典则提取 result['url']，否则记录错误日志并返回 0.0；3）遍历 rules['expected'] 中的每一个 pattern，使用 re.search 在 result_url 中搜索；4）若所有 pattern 均匹配成功，最终返回 1.0；若任一 pattern 未匹配，立即返回 0.0。该函数对 URL 格式和正则匹配实行严格的‘全通过与’判定。"
+        "description": "该函数接收result（浏览器激活标签页信息）和rules（匹配规则字典）作为输入，返回float类型的二元分数。检查步骤如下：1）URL提取与格式校验：若result为字符串则直接作为result_url；若为字典则提取'url'字段的值；其他格式记录错误日志并直接返回0.0。2）规则读取：从rules['expected']获取正则模式列表patterns。3）循环匹配：遍历patterns中的每个pattern，使用re.search在result_url中逐一进行子串正则搜索。4）判定依据：采用严格的'全部满足'（AND）逻辑——若任一pattern未匹配成功，立即返回0.0；仅当所有pattern均匹配成功时，才返回1.0。该函数不涉及文件读取、图像处理、近似匹配或顺序要求，仅做纯字符串正则校验。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:46:59",
+  "created_at": "2026-07-01 15:08:41",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_9f935cce-0a9f-435f-8007-817732bfc0a5./evaluator_function_labels.json"
 }

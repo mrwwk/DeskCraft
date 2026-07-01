@@ -1,0 +1,94 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_409f8738-31ec-406f-898f-01ed419b74b4./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 15
+    },
+    {
+      "name": "is_first_line_centered",
+      "lineno": 113
+    },
+    {
+      "name": "check_title_font_size_20pt",
+      "lineno": 132
+    },
+    {
+      "name": "check_attendees_bold",
+      "lineno": 161
+    },
+    {
+      "name": "check_action_items_italic",
+      "lineno": 203
+    },
+    {
+      "name": "check_section_headings_color",
+      "lineno": 246
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 15
+    },
+    {
+      "name": "is_first_line_centered",
+      "lineno": 113
+    },
+    {
+      "name": "check_title_font_size_20pt",
+      "lineno": 132
+    },
+    {
+      "name": "check_attendees_bold",
+      "lineno": 161
+    },
+    {
+      "name": "check_action_items_italic",
+      "lineno": 203
+    },
+    {
+      "name": "check_section_headings_color",
+      "lineno": 246
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证对DOCX文档进行内容替换与格式排版任务的完成质量。它通过6个独立指标分别检查：1）文档整体文本内容（含替换后的文本和结束标记）是否与参考文档一致，支持严格逐段比对、忽略空白/顺序/空行后的比对，以及基于rapidfuzz的整体或逐段模糊相似度计算；2）文档首段（标题）是否居中对齐；3）文档首段首个run的字号是否为20pt；4）以gold文档为基准，按段落索引对应检查参会者列表段落是否加粗；5）以gold文档为基准，按段落索引对应检查行动项段落是否斜体；6）以gold文档为基准，按段落索引对应检查章节标题段落的所有非空run是否为深蓝色（默认#003366）。每个指标独立返回0（失败）或1（成功），compare_docx_files在模糊模式下返回0到1之间的相似度分数。各指标之间无加权组合逻辑，属于分项独立判定。",
+    "main_functions": [
+      {
+        "name": "compare_docx_files",
+        "lineno": 15,
+        "description": "接收两个文件路径file1、file2及若干选项，验证两份DOCX文档的文本内容一致性。首先检查文件是否均为.docx，否则直接返回0。使用python-docx的Document加载文档，提取所有段落文本组成列表。若ignore_order为True，则对两段列表排序；若delete_empty_lines为True，则剔除空行。若content_only为True，将所有段落合并为整段文本（正则re.sub(r'\\s+', ' ', ...)压缩空白），可选ignore_case转小写后，用rapidfuzz的fuzz.ratio计算整体相似度并返回0到1之间的分数。若ignore_blanks为True，同样合并压缩空白后，在fuzzy_match为True时返回fuzz.ratio相似度分数，否则进行严格相等判断。若ignore_blanks为False，先判断段落数量是否相等，不相等则返回0；随后若fuzzy_match为True，逐段用fuzz.ratio计算平均相似度返回分数，否则逐段严格比对文本（可选ignore_case），有任何一段不等即返回0。全部通过则返回1。"
+      },
+      {
+        "name": "is_first_line_centered",
+        "lineno": 113,
+        "description": "接收一个docx_file路径，检查文档标题是否居中对齐。使用Document加载文档后，直接取doc.paragraphs[0]（首段），读取其paragraph_format.alignment属性。若该属性等于WD_PARAGRAPH_ALIGNMENT.CENTER，则返回1，否则返回0。加载失败或文件不存在也返回0。"
+      },
+      {
+        "name": "check_title_font_size_20pt",
+        "lineno": 132,
+        "description": "接收result_path路径，检查文档标题字号是否为20pt。使用Document加载文档后，依次检查doc.paragraphs是否非空、首段first_paragraph.runs是否非空、首段首个run的font.size是否为None。若font.size存在且font.size.pt等于20，则返回1，否则返回0。任何异常或路径为空均返回0。"
+      },
+      {
+        "name": "check_attendees_bold",
+        "lineno": 161,
+        "description": "接收result_path（结果文档）和expected（标准gold文档）两个路径，按段落索引对应检查参会者列表段落是否加粗。使用Document分别加载两文档后，遍历gold_doc.paragraphs，跳过text.strip()为空的段落。对每个gold段落，检查其runs中是否存在text.strip()非空且run.bold为True的run。若存在，则标记found_bold_in_gold为True，并检查result_doc.paragraphs中同索引段落是否存在；若result段落数不足，返回0。随后检查result对应段落是否也存在至少一个text.strip()非空且run.bold为True的run，若不存在则返回0。遍历结束后，若gold中未找到任何加粗段落，返回0；全部通过则返回1。"
+      },
+      {
+        "name": "check_action_items_italic",
+        "lineno": 203,
+        "description": "接收result_path和expected两个路径，按段落索引对应检查行动项段落是否斜体。逻辑与check_attendees_bold完全一致，仅将检查属性由bold替换为italic。遍历gold_doc.paragraphs，跳过空段落，找出gold中存在text.strip()非空且run.italic为True的段落，再验证result_doc同索引段落也存在至少一个text.strip()非空且run.italic为True的run。若result段落数不足、对应段落未斜体、或gold中完全无斜体段落，均返回0；全部通过返回1。"
+      },
+      {
+        "name": "check_section_headings_color",
+        "lineno": 246,
+        "description": "接收result_path、expected及options，按段落索引对应检查章节标题颜色是否为target_color（默认'003366'）。使用Document加载两文档后，遍历gold_doc.paragraphs，跳过空段落。对每个gold段落，检查其runs中是否存在font.color且font.color.rgb存在，且str(run.font.color.rgb)等于target_color的run。若存在，则标记found_target_color_in_gold为True，并检查result_doc.paragraphs同索引段落是否存在；若result段落数不足，返回0。对于result对应段落，遍历其所有runs，要求所有text.strip()非空的run都必须满足：font.color不为None、font.color.rgb不为None，且str(run.font.color.rgb)严格等于target_color；任一不满足即返回0。遍历结束后，若gold中未找到任何目标颜色段落，返回0；全部通过则返回1。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:57:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_409f8738-31ec-406f-898f-01ed419b74b4./evaluator_function_labels.json"
+}

@@ -34,37 +34,37 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender 3D编辑任务完成后，指定对象的空间变换状态与网格几何尺寸是否达到预期要求。它通过读取并解析外部Blender检查脚本（如check_object.py、check_mesh.py）输出的JSON数据，对目标对象进行量化判定：一方面检查对象的位置（location）和缩放（scale）是否已被重置到预期值，采用逐分量容差比较的方式允许近似匹配；另一方面检查对象网格的最大边界尺寸是否满足最低阈值要求。两个主检查函数均采用“全部满足即通过”的二元打分逻辑，只要任一检查项失败、目标对象缺失、JSON解析异常或发生运行时错误，均直接返回0.0；所有检查项全部通过则返回1.0。",
+    "overall_validation": "该 evaluator 用于验证 Blender 任务中特定对象的变换属性与网格尺寸是否符合预期。它通过解析外部 Blender 检查脚本（如 check_object.py、check_mesh.py）输出的 JSON 数据，对指定对象进行精确名称匹配和带容差的数值比较。核心检查分为两类：一是验证对象的变换是否已应用（位置是否重置到预期坐标、缩放是否重置到预期比例），二是验证网格边界尺寸是否满足最小维度要求。两个主函数均采用二元评分机制（1.0 表示全部检查通过，0.0 表示任一检查失败或数据异常），要求对象必须存在且各项数值指标均在指定容差或阈值范围内。",
     "main_functions": [
       {
         "name": "check_blender_transform_applied",
         "lineno": 51,
-        "description": "该函数接收来自check_object.py的JSON输出字符串command_output，以及包含评测规则的rule字典。执行步骤如下：首先调用_parse_blender_output将原始命令输出解析为JSON对象；若解析失败或输出为空，直接返回0.0。接着调用_find_object在解析结果的'objects'列表中，按精确名称匹配（rule['object_name']）查找目标对象；若未找到，返回0.0。随后进行两项必须全部通过的独立检查：若rule中包含'expected_location'，则提取对象的'location'数组，调用_check_vector_tolerance与预期位置比较，容差值优先取rule['location_tolerance']，其次取rule['tolerance']，默认值为0.1，任一维度超差即返回0.0；若rule中包含'expected_scale'，同样调用_check_vector_tolerance检查对象的'scale'数组是否在容差范围内。只有当所有存在的检查项均通过时，才返回1.0。整个执行过程中任何异常都会被捕获并返回0.0。"
+        "description": "接收来自 check_object.py 的 JSON 字符串 command_output 以及包含评测规则的 rule 字典，验证目标对象的变换是否已应用。首先调用 _parse_blender_output 解析 JSON，若解析失败直接返回 0.0。接着调用 _find_object 按精确名称 rule['object_name'] 在 result['objects'] 列表中定位目标对象；若对象不存在返回 0.0。然后读取容差 loc_tol，优先取 rule['location_tolerance']，其次取 rule['tolerance']，默认 0.1。若 rule 中包含 'expected_location'，则调用 _check_vector_tolerance 比对 obj['location'] 与预期位置向量，任一分量超出容差即返回 0.0。若 rule 中包含 'expected_scale'，则同样调用 _check_vector_tolerance 比对 obj['scale'] 与预期缩放向量，失败也返回 0.0。所有条件均满足时返回 1.0；任何异常捕获后返回 0.0。"
       },
       {
         "name": "check_blender_mesh_bounds",
         "lineno": 84,
-        "description": "该函数接收来自check_mesh.py的JSON输出字符串command_output，以及包含评测规则的rule字典。执行步骤如下：首先调用_parse_blender_output解析JSON；若解析失败，返回0.0。然后以rule['object_name']为键，直接从解析结果字典中获取对应对象的网格信息mesh_info；若该键不存在，返回0.0。若rule中包含'min_dimension'，则读取mesh_info['dimensions']数组（默认回退为[0,0,0]），计算其最大值max_dim；若max_dim小于rule['min_dimension']，记录警告并返回0.0。若通过上述检查，返回1.0。任何异常同样会被捕获并返回0.0。"
+        "description": "接收来自 check_mesh.py 的 JSON 字符串 command_output 以及 rule 字典，验证目标网格的边界尺寸是否达标。首先调用 _parse_blender_output 解析 JSON，解析失败返回 0.0。随后以 rule['object_name'] 为键直接从解析结果字典中提取 mesh_info；若该键不存在返回 0.0。若 rule 中包含 'min_dimension'，则读取 mesh_info['dimensions'] 数组并计算其最大值 max_dim。若 max_dim 小于 rule['min_dimension']，记录警告并返回 0.0。若维度检查通过或无需检查，返回 1.0；任何异常捕获后返回 0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 19,
-        "description": "接收Blender检查脚本输出的原始字符串command_output，负责将其解析为Python字典。会先判断输入是否为空或仅含空白字符，若为空则记录错误并返回None；否则尝试调用json.loads进行解析。若遇到JSONDecodeError或ValueError，记录错误日志及原始输出片段，返回None。该函数是主评测函数的入口数据预处理步骤，为后续对象查找和属性比较提供结构化数据。"
+        "lineno": 18,
+        "description": "负责将 Blender 检查脚本输出的原始字符串解析为 Python 字典。先判断输入是否为空或仅含空白，若是则记录错误并返回 None；否则对去除首尾空白后的内容执行 json.loads。若遇到 JSONDecodeError 或 ValueError，记录错误及原始输出片段，返回 None。该函数是 command_output 的统一入口，被两个主函数用于前置数据解析。"
       },
       {
         "name": "_find_object",
-        "lineno": 32,
-        "description": "在_parse_blender_output返回的结果字典中，遍历result['objects']列表，通过精确字符串匹配（obj['name'] == name）查找指定名称的3D对象。若找到则返回该对象的字典，否则返回None。该函数专门服务于check_blender_transform_applied，用于从check_object.py输出的对象列表中定位目标对象。"
+        "lineno": 31,
+        "description": "在 check_object.py 输出的解析结果中按精确名称查找对象。遍历 result.get('objects', []) 列表，逐一比对 obj.get('name') 与传入的 name 参数，命中则返回该对象字典，否则返回 None。该函数服务于 check_blender_transform_applied，用于定位待检查变换属性的目标对象，匹配方式为全字精确匹配，不支持模糊或部分匹配。"
       },
       {
         "name": "_check_vector_tolerance",
-        "lineno": 40,
-        "description": "接收实际向量actual、预期向量expected和容差tol三个参数，执行逐分量的近似相等判断。首先检查两个向量是否非空且长度一致，否则返回False；然后对每一对分量计算绝对差值abs(float(a) - float(e))，判断是否全部小于等于float(tol)。返回布尔值。该函数被check_blender_transform_applied复用，分别用于对象位置（location）和缩放（scale）的容差比较。"
+        "lineno": 39,
+        "description": "对两个数值向量进行逐分量容差比较。先检查两个向量是否非空且长度一致，否则返回 False；随后对每一对分量计算 abs(float(a) - float(e)) <= float(tol)，只有当所有分量均满足时才返回 True。该函数被 check_blender_transform_applied 复用，分别用于 location 和 scale 的近似相等判定，支持任意维度向量。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:12:55",
+  "created_at": "2026-07-01 14:39:18",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_c304b812-b3f2-465f-9b63-95e364941270./evaluator_function_labels.json"
 }

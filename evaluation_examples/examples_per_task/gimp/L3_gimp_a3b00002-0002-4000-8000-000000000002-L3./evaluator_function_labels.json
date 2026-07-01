@@ -1,0 +1,161 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00002-0002-4000-8000-000000000002-L3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 187
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 214
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 292
+    },
+    {
+      "name": "check_l3_mag_cover_complete",
+      "lineno": 359
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 151
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 180
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 187
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 214
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 292
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 351
+    },
+    {
+      "name": "check_l3_mag_cover_complete",
+      "lineno": 359
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "本 evaluator 针对 GIMP L3 级别杂志肖像封面工作流进行端到端验证。最终要求同时满足以下全部条件：1）输出文件存在一张符合 JPEG 格式的最终封面图（.jpg），其尺寸必须接近 1800×2400 像素（容差 5px），文件大小不超过 921600 字节；2）该封面图相对于原始源图的对比度必须提升至少 3%；3）封面图的特定区域（top_center、left、right、bottom_center）必须具有足够的边缘密度（≥0.007），以证明存在文字内容，且 OCR 需识别出关键词 STYLE、ISSUE、2026；4）GIMP 工程文件（.xcf）必须包含 Masthead、Coverline_1、Coverline_2、Coverline_3、Date_Issue、Portrait_Base、Color_Grade 共 7 个图层，顺序不限。评测采用严格的“全通过”聚合逻辑：7 项二进制检查必须全部返回 1，最终得分才为 1.0，任一失败即得 0.0。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "接收一个 PIL Image.Image 对象作为输入。首先将图像转换为灰度模式（'L'），然后使用 PIL.ImageStat.Stat 计算灰度图像素值的标准差（stddev[0]），并将该标准差作为图像对比度数值返回。该函数被 check_contrast_increase 调用，用于量化源图与目标图的对比度，以便后续计算对比度提升百分比。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "接收 image_path、expected_width、expected_height 与 tolerance（默认 5）。使用 PIL.Image.open 打开图像并获取宽高。若 expected_height 为 None，则仅检查宽度；否则同时检查宽度与高度。判定依据为：实际宽度与 expected_width 的绝对差不超过 tolerance，且实际高度与 expected_height 的绝对差也不超过 tolerance。若图像不存在或读取失败则返回 0，满足条件返回 1。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 67,
+        "description": "接收 src_path、tgt_path 与 min_increase_percent（默认 10.0）。依次打开源图与目标图，分别调用 calculate_contrast 获取对比度数值。若源图对比度为 0 则直接返回 0。计算对比度提升百分比：((tgt_contrast - src_contrast) / src_contrast) * 100。判定依据为：提升百分比必须大于等于 min_increase_percent。满足返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 108,
+        "description": "接收 file_path。直接调用 os.path.isfile 检查文件是否存在于文件系统中。若路径为 None 或文件不存在返回 0，存在返回 1。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 126,
+        "description": "接收 image_path。使用 PIL.Image.open 打开图像，读取 img.format 属性。判定依据为：img.format 必须严格等于字符串 'JPEG'。若文件不存在、打开失败或格式不符均返回 0，符合返回 1。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 187,
+        "description": "接收 image_path 与 rule 字典（可选键 min_size、max_size，单位字节）。使用 os.path.getsize 获取文件字节大小。判定依据为：size 必须同时满足 size >= min_size（默认 0）且 size <= max_size（默认 10**18）。满足返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 214,
+        "description": "接收 xcf_path 与 rule 字典（必须包含 layers 列表，可选 ordered 布尔值，默认 False）。首先检查文件存在且二进制头以 b'gimp xcf' 开头。优先尝试使用 gimpformats 库解析 XCF 文件，提取所有图层名称列表；若该库不可用或解析失败，则回退到二进制内容中逐层搜索图层名字节串。判定分两步：1）所有 expected_layers 必须都出现在实际图层中（或二进制内容中）；2）若 ordered 为 True，则这些图层在列表（或二进制内容）中的出现位置必须按升序排列。两步均满足返回 1，任一不满足返回 0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 292,
+        "description": "接收 image_path 与 rule 字典（可选 regions 列表、keywords 列表、min_edge_density 默认 0.008、edge_threshold 默认 40.0）。首先将图像转为灰度 numpy 数组。对每个 region_name，调用 _resolve_region_bbox 获取像素坐标并裁剪对应区域，再调用 _edge_density 计算该区域的边缘密度。判定依据一：所有指定区域的边缘密度必须大于等于 min_edge_density，否则返回 0。若 rule 中包含 keywords，则进一步尝试使用 pytesseract.image_to_string 对整图做 OCR，将识别结果按正则 r'\\s+' 归一化空格后转小写，判定依据二：所有 keyword 必须都出现在归一化文本中。若 OCR 库不可用或失败，仅记录 warning，不因此直接判失败（前提是边缘密度已通过）。两项均满足返回 1。"
+      },
+      {
+        "name": "check_l3_mag_cover_complete",
+        "lineno": 359,
+        "description": "接收 result_paths 列表，要求至少包含 3 个元素，依次视为 jpg_path、xcf_path、src_path。该函数是复合评测入口，依次执行 7 项二进制检查并收集分数：1）check_file_exists(jpg_path)；2）check_jpeg_format(jpg_path)；3）check_image_dimensions(jpg_path, 1800, 2400)；4）check_image_file_size_range(jpg_path, {\"max_size\": 921600})；5）check_text_in_region_keywords(jpg_path, {\"regions\": [\"top_center\", \"left\", \"right\", \"bottom_center\"], \"keywords\": [\"STYLE\", \"ISSUE\", \"2026\"], \"min_edge_density\": 0.007})；6）check_contrast_increase(src_path, jpg_path, 3.0)；7）check_xcf_layers_structure(xcf_path, {\"layers\": [\"Masthead\", \"Coverline_1\", \"Coverline_2\", \"Coverline_3\", \"Date_Issue\", \"Portrait_Base\", \"Color_Grade\"], \"ordered\": False})。最后调用 _all_binary_checks_pass 聚合：仅当 7 项结果全部大于等于 1 时返回 1.0，任一失败即返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 145,
+        "description": "接收图像 width、height 与 region_name 字符串。将 region_name 归一化（转小写、去空格）后映射为像素坐标元组 (x0, y0, x1, y1)。支持的预定义区域包括 top_left、top_center、top_right、bottom_left、bottom_center、bottom_right、center、left、right、top、bottom，分别对应图像的不同几何分区（如三等分、四分之一、中心等）。若 region_name 为空或不匹配，默认返回整图坐标 (0, 0, w, h)。该函数为 check_text_in_region_keywords 提供区域裁剪坐标。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 175,
+        "description": "接收灰度 numpy 数组 gray_array 与 edge_threshold（默认 40.0）。分别计算数组在 x 轴与 y 轴方向的梯度绝对值（np.gradient），将两者相加得到边缘强度图，然后统计强度大于 edge_threshold 的像素占比（mean(edges > threshold)），返回该比例作为边缘密度值。该函数被 check_text_in_region_keywords 调用，用于判断图像区域是否含有足够丰富的边缘纹理（间接推断是否存在文字）。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 350,
+        "description": "接收 scores 列表，过滤掉 None 值后转为浮点数。判定依据为：所有有效分数必须全部大于等于 1.0。若列表为空返回 0.0；若全部满足返回 1.0，否则返回 0.0。该函数被 check_l3_mag_cover_complete 用作最终聚合器，实现“全通过才成功”的严格逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:17:18",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00002-0002-4000-8000-000000000002-L3./evaluator_function_labels.json"
+}

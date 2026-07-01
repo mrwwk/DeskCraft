@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_f1d3f941-75ba-49bf-abd0-4c92163671e5./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_night_light",
+      "lineno": 20
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 7
+    },
+    {
+      "name": "check_os_night_light",
+      "lineno": 20
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统Night Light（夜间模式）的设置状态。它通过解析shell采集器输出的键值对文本，检查Night Light功能是否按预期启用、色温值是否设定正确，以及关联配置文件是否完好。核心检查对象包含三个字段：enabled（启用状态）、temperature（色温值）和file_ok（文件状态）。主要比较方式为字符串精确匹配，即将采集结果与rules参数中给定的预期值进行比对，其中enabled和temperature允许通过rules传入自定义期望值（默认值分别为\"true\"和\"3700\"），而file_ok则强制要求必须为\"true\"。判定逻辑为\"全部满足\"式：仅当三项检查同时通过时返回1.0分；任一项不匹配或处理过程中发生异常，均返回0.0分。",
+    "main_functions": [
+      {
+        "name": "check_os_night_light",
+        "lineno": 20,
+        "description": "该主函数接收两个参数：result为shell采集器输出的原始文本，rules为包含预期设置的字典。其执行流程如下：首先调用辅助函数_parse_kv将result字符串按行解析为键值对字典；随后依次进行三项严格相等检查——第一，检查解析后的enabled字段是否等于rules中指定的enabled值（若rules未提供该键，则默认期望\"true\"）；第二，检查temperature字段是否等于rules中指定的temperature值（若rules未提供该键，则默认期望\"3700\"）；第三，检查file_ok字段是否严格等于\"true\"。只有当以上三个条件全部满足时，函数才返回1.0表示任务成功；若任一条件不匹配，或在解析/比较过程中捕获到任何异常，则返回0.0表示失败。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 7,
+        "description": "该辅助函数负责将shell命令输出的原始文本转换为结构化字典。它接收一个output字符串，按换行符切分后逐行处理：跳过空行，对包含\"=\"的行以第一个\"=\"为界分割为键和值，并去除键值两侧空白字符，最终汇总为字典返回。若输入为空字符串或None，则直接返回空字典。该函数是主函数check_os_night_light的数据预处理入口，将key=value格式的shell输出转换为可供字段级精确比对的标准字典结构。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:47",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_f1d3f941-75ba-49bf-abd0-4c92163671e5./evaluator_function_labels.json"
+}

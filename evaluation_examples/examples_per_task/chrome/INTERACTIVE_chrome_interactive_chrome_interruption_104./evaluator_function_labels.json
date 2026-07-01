@@ -30,26 +30,26 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 为 Chrome 浏览器相关任务提供了一组独立的二元评估指标，分别验证浏览器当前活动标签页和书签栏状态是否符合任务预期。对于活动标签页，它提取当前激活标签的 URL，并与规则中指定的预期 URL 进行多步归一化比对；对于书签栏，它支持三种检查模式：书签栏文件夹名称的精确集合匹配、书签栏网站 URL 的精确集合匹配，以及名为 \"Liked Authors\" 的特定文件夹内网站 URL 的精确集合匹配（支持预期 URL 列表的笛卡尔积组合匹配）。每个评估函数独立返回 0.0（不符合）或 1.0（符合），由上层调用者决定如何联合使用这些分数来判定任务完成度。核心比较方式以 URL 归一化等价判断和集合相等性判断为主。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器在交互任务结束后的特定状态，主要围绕两大对象展开检查：一是当前活动标签页是否符合预期（通过URL判定），二是书签栏结构是否满足规则要求（包括文件夹命名、网站URL收藏，以及名为'Liked Authors'的特定文件夹内容）。核心比较方式依赖自定义的URL规范化比较器，该比较器会统一scheme为小写、补全默认http协议、剥离'www'子域名、忽略顶级域名后缀差异（如'.com'与'.com.sg'被视为相同域名），并可选择性地忽略查询参数、锚点和params；书签检查则采用集合相等的精确匹配策略。成功判定采用二元打分制：各检查项完全匹配时返回1.0（或True），任何不符均返回0（或False），未设置加权或累计逻辑。",
     "main_functions": [
       {
         "name": "is_expected_active_tab",
         "lineno": 59,
-        "description": "接收 Chrome 当前活动标签信息 active_tab_info（字典或字符串类型）以及规则字典 rule。首先判断 active_tab_info 是否为空，为空则直接返回 0.0。当 rule['type'] 为 \"url\" 时，从 active_tab_info 中提取实际 URL（若输入为字典则取 'url' 键对应的值，否则直接取本身），随后调用 compare_urls 将预期 URL（rule['url']）与实际 URL 进行归一化等价比对。若比对成功返回 1.0，否则返回 0.0。若遇到不支持的 type，则记录错误日志并返回 0.0。"
+        "description": "接收active_tab_info（当前标签信息，可为字典或字符串）与rule（匹配规则字典）。首先判空：若active_tab_info为空直接返回0。随后读取rule['type']，目前仅支持'url'类型：从rule中提取expected_url，从active_tab_info中提取actual_url（若active_tab_info为字典则取'url'键，否则直接视为URL字符串），然后调用compare_urls(expected_url, actual_url)进行比较。若compare_urls返回True则得1分，否则得0分。若遇到不支持的type则记录错误日志并返回0。"
       },
       {
         "name": "is_expected_bookmarks",
         "lineno": 82,
-        "description": "接收 Chrome 书签数据 bookmarks 和规则字典 rule。若 bookmarks 为空则直接返回 0.0。根据 rule['type'] 分三支处理：1) \"bookmark_bar_folders_names\"：遍历 bookmarks['bookmark_bar']['children']，提取所有 type 为 'folder' 的子项名称构成集合，与 rule['names'] 集合进行精确相等比较，相等返回 1.0；2) \"bookmark_bar_websites_urls\"：提取书签栏中所有 type 为 'url' 的子项 URL 构成集合，与 rule['urls'] 集合进行精确相等比较；3) \"liked_authors_websites_urls\"：首先在书签栏子项中查找是否存在 name 为 \"Liked Authors\" 且 type 为 'folder' 的文件夹，不存在则返回 0.0，存在则提取该文件夹内所有 type 为 'url' 的子项 URL 列表。接着将 rule['urls'] 中每个字符串元素转换为单元素列表，使用 itertools.product 生成所有可能的 URL 组合，逐一检查是否有某个组合的集合与实际 URL 集合完全相等，若找到则返回 1.0，遍历完仍未找到则返回 0.0。若 type 不支持则抛出 TypeError。"
+        "description": "接收bookmarks（Chrome书签数据结构）与rule（规则字典）。首先判空：若bookmarks为空返回0。根据rule['type']分三支处理：1) 'bookmark_bar_folders_names'：遍历bookmarks['bookmark_bar']['children']，筛选type为'folder'的项，提取所有'name'构成集合，与rule['names']的集合做相等比较，完全相等返回1.否则返回0；2) 'bookmark_bar_websites_urls'：同理筛选type为'url'的项，提取所有'url'构成集合，与rule['urls']的集合做相等比较；3) 'liked_authors_websites_urls'：在书签栏子项中查找type为'folder'且name为'Liked Authors'的文件夹，若不存在返回0；若存在则提取其下所有type为'url'的子项的'url'列表。此处rule['urls']支持灵活匹配：遍历rule['urls']，若其中某项为字符串则包装为单元素列表，随后使用itertools.product生成所有可能的URL组合，逐一检查是否有某个组合与提取的'Liked Authors' URL集合完全相等（集合相等），任一组合匹配成功即返回1.，全部失败则返回0。若rule['type']不属于上述三种则抛出TypeError。"
       },
       {
         "name": "compare_urls",
         "lineno": 125,
-        "description": "通用 URL 等价性比较函数，接收 url1、url2 以及可选参数 full（默认 True）。若任一参数为 None，直接返回两者是否完全相等（仅当两者均为 None 时才为 True）。否则对两个 URL 执行多步归一化：1) 使用正则 ^[a-zA-Z][a-zA-Z0-9+\\-.]*:// 判断是否存在 scheme，若缺失则自动补全 \"http://\"；2) 使用 tldextract 提取域名并转小写，丢弃单独的 \"www\" 子域名，并忽略 TLD 后缀差异（例如 .com 与 .com.sg 均归一化为同一域名主体）；3) 若路径为 \"/\" 则置空；4) 依据 full 参数决定是否保留 params、query、fragment（True 时保留，False 时清空）。最终比较归一化后的字符串是否完全相等，返回布尔值。该函数主要被 is_expected_active_tab 调用，用于判定当前标签页 URL 是否符合预期。"
+        "description": "接收url1、url2及可选参数full（默认为True），作为URL等价性比较器。首先处理None：若任一参数为None，仅当两者均为None时返回True。随后通过内部嵌套函数parse_with_default_scheme检查URL是否以scheme开头（正则'^[a-zA-Z][a-zA-Z0-9+\\-.]*://'），若无则前置'http://'以确保正确解析。再通过normalize_url执行多步规范化：使用urlparse解析后，将scheme转小写；使用tldextract提取netloc，若子域名仅为'www'则丢弃；完全忽略域名后缀（suffix），仅保留domain部分，因此'airbnb.com'与'airbnb.com.sg'会被视为同一域名；路径若为根目录'/'则置空；最后根据full参数决定是否保留params、query和fragment（full=True时保留，full=False时清空）。最终比较两个规范化后的URL字符串是否完全相等，相等返回True，否则返回False。该函数主要被is_expected_active_tab调用，也可用于书签URL的底层比较逻辑。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:36:57",
+  "created_at": "2026-07-01 15:00:29",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_104./evaluator_function_labels.json"
 }

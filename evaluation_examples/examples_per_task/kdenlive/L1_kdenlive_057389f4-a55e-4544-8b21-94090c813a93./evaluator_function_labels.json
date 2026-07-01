@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_057389f4-a55e-4544-8b21-94090c813a93./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_project_profile",
+      "lineno": 21
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_kdenlive_project_profile",
+      "lineno": 21
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑项目的配置文件（.kdenlive）中的项目概要（profile）设置是否符合预期。它通过解析项目XML文件，定位<profile>元素，并将rule中指定的各项参数（如画面宽度width、高度height、帧率分子frame_rate_num、帧率分母frame_rate_den，以及预览宽度preview_width、预览高度preview_height）与XML属性值进行严格的整数相等比对。其中，preview_width和preview_height在Kdenlive中实际对应<profile>元素的width和height属性。所有指定规则必须全部匹配，函数才返回1.0表示任务成功；若项目文件缺失、XML解析失败、<profile>元素不存在、或任一属性值与预期不符，则立即返回0.0表示失败。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_project_profile",
+        "lineno": 21,
+        "description": "该主函数接收project_file_path（Kdenlive项目文件路径）和rule（验证规则字典）作为输入。首先检查文件是否存在，若不存在则返回0.0。随后使用xml.etree.ElementTree解析项目XML，并通过'.//profile'递归查找<profile>元素，若未找到则返回0.0。接着遍历rule中的每一项：对于preview_width，读取profile元素的'width'属性并与预期值进行整数严格相等比较；对于preview_height，读取profile元素的'height'属性并严格比较；对于width、height、frame_rate_num、frame_rate_den，则直接读取同名属性并严格比较。任一属性缺失或任一值不匹配，函数立即记录日志并返回0.0。只有当rule中所有指定键值对全部通过严格比对后，才返回1.0。该函数不调用其他自定义辅助函数，所有逻辑内联完成。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:53:16",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_057389f4-a55e-4544-8b21-94090c813a93./evaluator_function_labels.json"
+}

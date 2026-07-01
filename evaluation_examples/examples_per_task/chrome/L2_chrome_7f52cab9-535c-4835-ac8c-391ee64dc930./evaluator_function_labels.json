@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 总体用于验证 Chrome 浏览器在任务执行后的两项核心状态：一是当前激活标签页的 URL 是否符合预期模式，二是 Chrome 书签结构是否满足指定要求。对于 URL 检查，evaluator 从页面或辅助树中提取当前 URL，要求所有预设的正则表达式均通过 re.search 匹配成功，采用“全部满足”的二值判定。对于书签检查，evaluator 依据 rule['type'] 分别校验书签栏文件夹名称集合、书签栏网站 URL 集合，或特定“Liked Authors”文件夹内的 URL 集合；其中文件夹名称和书签栏 URL 要求实际集合与预期集合完全一致，而“Liked Authors”检查则支持对预期 URL 进行笛卡尔积组合匹配，任一组合完全相等即视为通过。所有主函数均返回 0.0 或 1.0 的浮点分数，表示失败或通过，不存在部分得分或加权累计逻辑。",
+    "overall_validation": "该evaluator用于评测Chrome浏览器相关任务的完成状态，核心围绕两大对象展开验证：一是当前浏览器激活标签页的URL文本，二是Chrome书签栏的层级结构与内容。对于URL验证，函数从result中提取当前页面URL（支持字符串或含'url'键的字典），并逐一用rules['expected']中的正则表达式进行搜索匹配，要求所有pattern全部命中才视为通过。对于书签验证，依据rule['type']分为三类检查：书签栏文件夹名称的精确集合匹配、书签栏网站URL的精确集合匹配、以及特定'Liked Authors'文件夹内URL的精确集合匹配（其中预期URL支持多值组合，通过itertools.product生成笛卡尔积遍历所有可能组合与实际URL集合比对）。两个主函数均采用二元评分机制，完全满足条件返回1.0，任一条件不满足或输入异常即返回0.0，不存在部分得分或加权累计。",
     "main_functions": [
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 33,
-        "description": "该函数接收 result（通常为 activate_tab_info 或 get_active_url_from_accessTree 的返回值）和 rules（包含预期正则列表的字典）作为输入。首先判断 result 是否为空，为空则直接返回 0.0。接着从 result 中提取 URL：若 result 为字符串则直接使用，若为字典则取其 'url' 字段，否则报错返回 0.0。随后遍历 rules[\"expected\"] 中的每一个正则 pattern，使用 re.search 在提取到的 URL 中依次匹配。只要有一个 pattern 未匹配成功，立即返回 0.0；仅当所有 pattern 均匹配成功时，才返回 1.0。判定逻辑为“全部满足”式的二值打分。"
+        "description": "该函数负责验证当前浏览器标签页的URL是否符合预期正则模式。接收参数result（字符串URL或包含'url'键的字典）与rules（包含'expected'键的字典）。检查步骤为：首先判断result非空，若为空返回0.0；接着解析出URL字符串，若格式非法也返回0.0；然后从rules['expected']获取正则表达式列表，遍历每个pattern并使用re.search在URL中搜索。判定依据为：所有正则pattern必须全部匹配成功才返回1.0，只要有任一pattern未匹配或输入异常，立即返回0.0。"
       },
       {
         "name": "is_expected_bookmarks",
         "lineno": 65,
-        "description": "该函数接收 bookmarks（Chrome 书签数据结构）和 rule（包含检查类型与预期值的字典）作为输入。若 bookmarks 为空，直接返回 0.0。根据 rule['type'] 分三支处理：1) 当 type 为 \"bookmark_bar_folders_names\" 时，遍历 bookmarks['bookmark_bar']['children']，筛选出 type 为 'folder' 的书签并收集其 'name' 字段，形成集合后与 rule['names'] 集合进行相等比较，完全一致返回 1.0，否则 0.0。2) 当 type 为 \"bookmark_bar_websites_urls\" 时，同理筛选 bookmark_bar 下 type 为 'url' 的书签，收集其 'url' 字段形成集合，与 rule['urls'] 集合比较，完全一致返回 1.0，否则 0.0。3) 当 type 为 \"liked_authors_websites_urls\" 时，先在 bookmark_bar 的 children 中查找是否存在 name 为 'Liked Authors' 且 type 为 'folder' 的文件夹；若不存在返回 0.0。若存在，则提取该文件夹下所有 type 为 'url' 的子书签的 'url' 字段。随后对 rule['urls'] 进行预处理：将其中每个字符串元素转换为单元素列表，再使用 itertools.product 生成所有可能的 URL 组合。逐一检查这些组合集合是否与提取到的 'Liked Authors' URL 集合完全相等，任一组合匹配成功即返回 1.0，全部不匹配则返回 0.0。若 rule['type'] 不属于上述三种，则抛出 TypeError。"
+        "description": "该函数负责验证Chrome书签栏的结构与内容是否符合预期规则。接收参数bookmarks（书签结构字典）与rule（包含'type'键的规则字典）。检查步骤为：首先判断bookmarks非空，否则返回0.0；随后根据rule['type']分三支处理：若type为'bookmark_bar_folders_names'，提取bookmark_bar下所有type为'folder'的书签的'name'字段组成列表，与rule['names']做集合比对；若type为'bookmark_bar_websites_urls'，提取bookmark_bar下所有type为'url'的书签的'url'字段组成列表，与rule['urls']做集合比对；若type为'liked_authors_websites_urls'，先在bookmark_bar的children中查找name为'Liked Authors'且type为'folder'的文件夹，若不存在返回0.0，若存在则提取其children中所有type为'url'的'url'字段，并将rule['urls']中的字符串元素转为单元素列表，通过itertools.product生成所有组合，逐一检查是否有组合的集合与实际URL集合相等。判定依据为：前两种类型要求实际集合与预期集合完全相等（set equality）；第三种类型要求实际URL集合与笛卡尔积中某一组合完全相等。完全匹配返回1.0，否则返回0.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:46:27",
+  "created_at": "2026-07-01 15:08:35",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_7f52cab9-535c-4835-ac8c-391ee64dc930./evaluator_function_labels.json"
 }

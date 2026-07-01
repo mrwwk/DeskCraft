@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于评估将Chrome显示语言更改为法语的任务。它通过两个独立指标分别进行二元打分（各自返回0.0或1.0），以验证任务完成状态。第一个指标使用exact_match，核心检查对象是Chrome的显示语言标识，要求结果值与预期值\"fr\"进行精确相等比较；第二个指标使用check_include_exclude，核心检查对象是Chrome当前所处的页面内容，要求页面文本同时满足\"包含所有指定的特征字符串\"且\"不包含任何排除字符串\"，以此确认Chrome位于Languages设置页面。两个指标各自独立执行，不存在加权累计或组合逻辑，每个指标只要任一检查条件不满足即得0.0，全部满足即得1.0。",
+    "overall_validation": "该 evaluator 用于 `change_chrome_language_to_french` 任务，通过两个独立指标分别打分来评估任务完成度：第一，调用 `exact_match` 验证 Chrome 的显示语言是否精确等于 `\"fr\"`；第二，调用 `check_include_exclude` 验证 Chrome 当前是否位于 Languages settings 页面（通过检查页面内容是否包含指定字符串且不包含排除字符串）。两个函数均返回 `0.0` 或 `1.0` 的浮点分数。代码中未明确体现这两个指标最终是需全部满足、加权累计还是任一满足来决定任务整体成功，标注人员需结合外部配置或调用逻辑判断联合判定方式。",
     "main_functions": [
       {
         "name": "exact_match",
         "lineno": 10,
-        "description": "该函数接收result（待验证的结果值）和rules（规则字典）作为输入，用于精确匹配检查。首先判断result是否为None，若为None则直接返回0.0；随后从rules字典中提取\"expected\"字段作为期望值expect；最后通过相等运算符（==）比较result与expect。若两者完全一致则返回1.0，否则返回0.0。在本任务中，该函数被用于验证Chrome的显示语言是否被精确设置为\"fr\"，不允许任何偏差。"
+        "description": "该函数接收 `result`（待验证的实际结果）与 `rules`（规则字典）作为输入，用于执行精确相等性检查。其执行步骤为：首先判断 `result` 是否为 `None`，若为 `None` 则直接返回 `0.0`；随后从 `rules` 字典中读取键名为 `\"expected\"` 的预期值；最后使用 `==` 运算符比较 `result` 与预期值。若两者完全一致则返回 `1.0`，否则返回 `0.0`。在本任务上下文中，该函数被用于验证 Chrome 显示语言是否精确为 `\"fr\"`。该函数不调用其他辅助函数，核心逻辑为单一的严格相等判断，不存在近似匹配、正则匹配或阈值容错。"
       },
       {
         "name": "check_include_exclude",
         "lineno": 21,
-        "description": "该函数接收result（通常为页面内容或状态文本的字符串）和rules（包含include与exclude规则的字典）作为输入，用于包含/排除检查。首先判断result是否为None，若为None则直接返回0.0；随后通过rules.get(\"include\", [])获取应包含的字符串列表，通过rules.get(\"exclude\", [])获取应排除的字符串列表；接着执行双重循环检查：一是使用all(r in result for r in include)验证result是否包含include列表中的每一个字符串，二是使用all(r not in result for r in exclude)验证result是否不包含exclude列表中的任何一个字符串。只有当包含条件与排除条件同时满足时，才返回1.0；任一条件不满足则返回0.0。在本任务中，该函数被用于验证Chrome是否成功导航至Languages设置页面。"
+        "description": "该函数接收 `result`（通常为页面内容或状态文本字符串）与 `rules`（规则字典）作为输入，用于执行字符串包含与排除的组合检查。其执行步骤为：首先判断 `result` 是否为 `None`，若为 `None` 则直接返回 `0.0`；随后从 `rules` 中通过 `.get()` 安全获取键名为 `\"include\"` 的字符串列表（默认为空列表）和键名为 `\"exclude\"` 的字符串列表（默认为空列表）；接着检查 `result` 是否同时满足两个条件：包含 `include` 列表中的每一个字符串，且不包含 `exclude` 列表中的任何一个字符串。若两个条件同时满足则返回 `1.0`，否则返回 `0.0`。在本任务上下文中，该函数被用于验证 Chrome 是否处于 Languages settings 页面。该函数不调用其他辅助函数，逻辑为全包含加全排除的硬匹配，无近似匹配、顺序要求或字段解析。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:43:43",
+  "created_at": "2026-07-01 15:06:52",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_7918533b-33a3-4b6c-9ac2-f32b6d3f4034./evaluator_function_labels.json"
 }

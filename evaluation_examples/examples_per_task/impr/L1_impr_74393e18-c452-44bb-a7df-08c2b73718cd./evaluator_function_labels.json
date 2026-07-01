@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_74393e18-c452-44bb-a7df-08c2b73718cd./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_all_titles_bold_italic",
+      "lineno": 19
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_all_titles_bold_italic",
+      "lineno": 19
+    },
+    {
+      "name": "_find_title_shapes",
+      "lineno": 83
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户是否成功将PPTX演示文稿中所有幻灯片的标题文本同时设置为粗体与斜体。它直接读取保存在result_path路径下的PPTX文件，使用python-pptx库解析。核心检查对象仅限于标题占位符形状（PP_PLACEHOLDER.TITLE或PP_PLACEHOLDER.CENTER_TITLE），非标题文本、形状尺寸、背景颜色、备注页及其他无关属性均被忽略，以保证对LibreOffice重新渲染伪影和母版副作用的鲁棒性。评测采用严格的“全部满足”判定方式：逐张幻灯片、逐个标题形状、逐段逐run地检查文本格式，要求每个包含实际内容的文本run的font.bold和font.italic属性必须同时为True。若发现任一run未同时满足粗体和斜体，立即返回0.0；若整份演示文稿中未找到任何标题占位符，同样返回0.0；仅当所有标题run均通过检查时返回1.0。此外，为兼容LibreOffice生成文件可能丢失占位符元数据的情况，evaluator内置了回退到首个非空文本形状的逻辑。",
+    "main_functions": [
+      {
+        "name": "check_all_titles_bold_italic",
+        "lineno": 19,
+        "description": "该函数接收result_path（待测PPTX文件的本地路径）、expected（未使用）和**options（预留，当前未使用）作为输入。它首先通过Presentation(result_path)加载整个演示文稿，初始化found_any_title标志为False，然后逐张遍历幻灯片。对每一张幻灯片，调用_find_title_shapes(slide)获取该幻灯片上的标题形状列表。若某张幻灯片不存在标题占位符，则跳过该幻灯片（视为空虚满足）。对于每个找到的标题形状，先检查shape.has_text_frame是否存在文本框；若文本框整体文本strip后为空，则跳过（空虚满足）。随后遍历shape.text_frame.paragraphs中的每个段落，以及每个段落中的每个run。对于每个run文本strip后非空的run，依次执行两项严格检查：首先判断run.font.bold是否为True，若不是则记录日志并立即返回0.0；其次判断run.font.italic是否为True，若不是则记录日志并立即返回0.0。若某幻灯片存在标题形状，会将found_any_title置为True。全部循环结束后，若found_any_title仍为False（即整份PPT中没有任何标题形状），则记录警告并返回0.0。只有当所有幻灯片的所有标题run都同时满足bold=True和italic=True时，才返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_title_shapes",
+        "lineno": 80,
+        "description": "该辅助函数接收一个slide对象，负责识别并返回该幻灯片上应被视为标题的形状列表，供主函数决定检查范围。它首先遍历slide.shapes中的所有形状，通过hasattr判断shape.is_placeholder是否存在且为真；若成立，则读取shape.placeholder_format.type，检查其是否属于PP_PLACEHOLDER.TITLE或PP_PLACEHOLDER.CENTER_TITLE，将匹配的形状收集到title_shapes列表。若通过占位符机制找到至少一个标题形状，立即返回该列表。若未找到任何标题占位符（常见于LibreOffice生成的PPTX丢失占位符元数据的情况），则启动回退逻辑：再次遍历幻灯片上的形状，寻找第一个拥有text_frame且shape.has_text_frame为真、同时其中文本strip后非空的形状，将其包装为单元素列表返回。若两种策略均未找到目标形状，则返回空列表。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:23:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_74393e18-c452-44bb-a7df-08c2b73718cd./evaluator_function_labels.json"
+}

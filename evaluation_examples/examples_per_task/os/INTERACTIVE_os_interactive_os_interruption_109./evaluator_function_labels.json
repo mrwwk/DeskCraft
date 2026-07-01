@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_interruption_109./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定任务 INTERACTIVE_os_interactive_os_interruption_109 是否完成。其核心验证逻辑是将任务最终返回的实际结果值与配置中的预期值进行严格的一一比对。检查对象为任务产出的最终结果（result），比较方式采用 Python 语义下的精确相等判断（==），不涉及模糊匹配、阈值容忍、字段抽取、文件解析或数据预处理。若实际结果与 rules 中指定的 expected 值在类型和内容上完全一致，则判定成功并返回 1.0；任何不一致均判定为失败并返回 0.0。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收任务实际结果 result 和规则字典 rules 作为输入。执行步骤如下：1) 从 rules 中读取键名为 'expected' 的参考值；2) 将 result 与 expect 打印至标准输出；3) 使用 == 运算符对二者进行严格相等判断。若 result 与 expect 完全相等，则返回浮点数 1.0 表示成功；否则返回 0.0 表示失败。该函数要求结果与预期在值和类型上均完全一致，不支持近似匹配、顺序忽略、格式转换或多指标联合判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:31:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_interruption_109./evaluator_function_labels.json"
+}

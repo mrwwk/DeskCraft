@@ -1,0 +1,93 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_7ec1d93d-3fbc-407c-bd5d-527658872de5./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 94
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_get_float",
+      "lineno": 66
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 77
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 86
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 94
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape编辑后生成的SVG文件中，指定ID的文本元素（text元素及其内部的tspan子元素）的字体样式属性是否符合预期。它采用“全部满足”的串联判定逻辑：依次检查字体大小、字重、字体样式、字体族和填充颜色五项指标，任一指标不匹配或文件/元素缺失即返回0.0，全部通过则返回1.0。检查时会自动从tspan子元素继承样式，字体大小允许约2个数值单位的误差；字重将bold与700视为等价、normal与400/空值视为等价；字体族采用去除引号后的子串包含匹配（不区分大小写）；填充颜色经过规范化（短hex展开、大写转小写、忽略8位hex的alpha通道）后精确比较。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_text_style",
+        "lineno": 92,
+        "description": "接收svg_file_path（SVG文件路径）和rule（字典，包含element_id及可选键expected_font_size、expected_font_weight、expected_font_style、expected_font_family、expected_fill）。执行步骤如下：1）调用_parse_svg加载SVG，若解析失败返回0.0；2）调用_find_element_by_id按element_id定位目标元素，若未找到返回0.0；3）定义内部函数_get_text_style，优先通过_get_style_prop读取元素自身的指定样式属性，若为空则遍历其直接子元素，利用_tag_local筛选标签为tspan的子元素并再次通过_get_style_prop获取样式；4）按顺序执行五项串联检查，全部必须满足：font-size通过_get_float去除单位后转为浮点数，预期值与实际值绝对差大于2则失败；font-weight预期bold时实际须为bold或700，预期normal时实际须为normal、400或空值/None；font-style小写后精确相等；font-family去除两侧引号后小写，预期值须为实际值的子串；fill通过_normalize_color规范化后精确相等。任一检查失败立即返回0.0，全部通过返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 16,
+        "description": "将CSS内联样式字符串（如\"fill:#ff0000;stroke:#000\"）按分号分割为片段，再按冒号分割为键值对，去除空白后返回字典。专供_get_style_prop解析SVG元素的style属性使用。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 29,
+        "description": "规范化颜色字符串：转小写；'none'保持不变；#rgb短码展开为#rrggbb；8位十六进制#rrggbbaa截断为#rrggbb（忽略alpha通道）；其他命名颜色原样返回小写形式。供主函数在比较fill颜色前统一颜色表示，确保不同写法能够精确匹配。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 48,
+        "description": "遍历SVG根节点的所有后代元素（root.iter()），查找id属性等于传入element_id的元素并返回该元素对象，未找到返回None。供主函数定位待检查的文本元素。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 56,
+        "description": "先从元素的style属性字符串中通过_parse_style解析查找指定属性名，若不存在则回退到该属性的直接XML属性（elem.get(prop)）。供主函数及其内部函数_get_text_style读取元素上的样式值，兼容内联style和直接属性两种写法。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 64,
+        "description": "安全将可能带单位的字符串转为浮点数：使用正则re.sub(r'[a-zA-Z%]+$','')去除末尾的单位字符（如px、mm、%）后再执行float转换；若输入为None或转换失败则返回default。供主函数处理font-size的数值比较。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 75,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，成功返回(tree, root)元组；任何异常返回(None, None)。供主函数加载待测SVG文件并获取根元素。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 84,
+        "description": "处理带XML命名空间的标签名：若标签字符串中包含'}'，取右花括号后的部分作为本地标签名（如\"{http://www.w3.org/2000/svg}tspan\"转为\"tspan\"）。供主函数内部识别tspan子元素以继承文本样式。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:40:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_7ec1d93d-3fbc-407c-bd5d-527658872de5./evaluator_function_labels.json"
+}

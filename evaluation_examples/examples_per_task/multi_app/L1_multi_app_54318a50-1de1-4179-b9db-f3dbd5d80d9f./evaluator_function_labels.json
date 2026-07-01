@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_54318a50-1de1-4179-b9db-f3dbd5d80d9f./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于多应用任务（L1_multi_app_54318a50-1de1-4179-b9db-f3dbd5d80d9f）的自动化评分，核心验证思路分为两支：第一支针对程序返回的文本结果，执行\"包含-排除\"规则检查，要求输出字符串必须同时包含所有指定特征词且不得出现任何禁用词；第二支针对磁盘上的JSON配置文件，执行键值对精确比对，要求指定路径的配置文件能被正常解析，且内部必须完整包含预期的所有配置项及其准确值。两支检查各自独立运行，均采取严格的二值评分机制（通过得1.0，不通过得0.0），无中间分数、无近似匹配、无容错阈值。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "接收result字符串和rules字典作为输入。首先判断result是否为None，若为None直接返回0.0。随后从rules字典中提取include列表（必须包含的字符串）和exclude列表（必须排除的字符串）。核心检查逻辑为：使用Python的in运算符判断result是否同时包含include列表中的每一个字符串，并且不包含exclude列表中的任何一个字符串。两个条件同时满足返回1.0，任一条件不满足返回0.0。属于严格的二值判定，无近似匹配、无顺序要求、无阈值容错。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 56,
+        "description": "接收actual（字符串，表示待检查的JSON文件路径）、expected（在代码逻辑中按字典使用，内含键'expected'）和可选参数。首先判断actual是否为空，为空则返回0.0。接着尝试以只读方式打开actual路径指向的文件并用json.load解析为Python字典；若文件不存在、读取失败或JSON解析异常，捕获所有Exception并返回0.0。解析成功后，从expected['expected']获取期望的键值对字典，遍历其中每一项，检查该键是否存在于实际JSON数据中且对应的值与期望值完全相等（使用==判断）。若存在任何键缺失或值不匹配，立即返回0.0；若全部键值对均匹配成功，返回1.0。属于精确匹配，不支持部分匹配、类型隐式转换或额外字段容错。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:16:34",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_54318a50-1de1-4179-b9db-f3dbd5d80d9f./evaluator_function_labels.json"
+}

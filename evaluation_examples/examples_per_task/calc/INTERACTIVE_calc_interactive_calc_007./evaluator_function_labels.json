@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于对任务输出的字符串结果（result）执行严格的包含/排除规则校验。它接收一个待检测的结果字符串和一个规则字典（rules），其中rules通过键\"include\"指定一系列必须全部出现在结果中的子串，通过键\"exclude\"指定一系列绝不允许出现在结果中的子串。核心检查方式为纯字符串子串匹配：只有当result同时满足“包含全部include子串”且“不包含任何exclude子串”时，才判定任务成功并返回1.0；若result为None、缺失任意一个必须包含的子串、或出现了任意一个必须排除的子串，则直接判定失败并返回0.0。该逻辑为二值打分，无近似匹配、无顺序要求、无文件读取操作，仅依赖传入的字符串与规则字典完成闭环判断。",
+    "overall_validation": "该evaluator用于评测交互式计算任务INTERACTIVE_calc_interactive_calc_007的输出结果。其核心验证逻辑是：读取被测系统或用户操作产生的文本结果（result），依据配置规则检查该结果是否同时满足“必须包含所有指定内容”和“必须排除所有禁止内容”两项要求。检查方式为纯字符串包含/排除匹配，不涉及数值计算、文件解析或页面状态读取。若结果文本同时通过包含检查与排除检查，则任务得满分1.0；若任一条件不满足，或结果本身为None，则得0.0。整体属于二元打分式判定（通过/不通过）。",
     "main_functions": [
       {
         "name": "check_include_exclude",
         "lineno": 36,
-        "description": "该函数是评测闭环的主入口，接收result（待验证的字符串结果）和rules（规则字典）两个参数。检查步骤如下：1）首先判断result是否为None，若为None则直接返回0.0；2）通过print打印result与rules的内容；3）从rules中安全获取\"include\"列表与\"exclude\"列表，若键不存在则默认为空列表；4）执行组合条件判断：使用all()遍历include列表，检查result中是否包含每一个必须包含的字符串r；同时使用all()遍历exclude列表，检查result中是否不包含任何一个必须排除的字符串r；5）若“全部包含”与“全部排除”两个条件同时满足，则返回1.0表示成功，否则返回0.0表示失败。该函数为严格的二值判定，不存在部分得分、阈值或模糊匹配逻辑。"
+        "description": "该函数接收两个参数：result（待检查的字符串结果）和 rules（包含include与exclude键的字典）。执行步骤如下：1）若result为None，直接返回0.0；2）从rules中读取include列表（默认空）与exclude列表（默认空）；3）检查result是否包含include列表中的每一个字符串（要求全部满足）；4）检查result是否不包含exclude列表中的任何一个字符串（要求全部满足）；5）若上述两个条件同时成立，返回1.0，否则返回0.0。函数内部会将result与rules打印至标准输出用于调试。判定依据为严格的字符串子串包含/排除逻辑，无近似匹配、无阈值、无顺序要求。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:19:26",
+  "created_at": "2026-07-01 14:44:01",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_007./evaluator_function_labels.json"
 }

@@ -34,32 +34,32 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender交互式渲染任务（具体为barbershop场景宽高比切换任务）的最终完成状态。它通过三个独立维度进行二元判定（通过得1.0，不通过得0.0）：第一，验证Blender内部渲染设置（包括渲染引擎、分辨率、帧率、采样数、输出格式、活动相机等）是否与任务要求完全一致，这依赖于Blender检查脚本（check_render.py）输出的JSON数据；第二，验证实际渲染输出文件（如PNG/EXR图像）是否存在，并核对其图像尺寸（宽高）和文件格式是否符合预期；第三，通过通用文本包含/排除规则验证相关输出文本内容。每个主函数内部均采用“全部条件必须精确满足”的严格逻辑，任一检查项失败即整体判为0分，无加权、累计或部分得分机制。标注人员应关注：渲染参数是精确相等比较（非近似），图像尺寸和格式需与实际文件一致，文本检查需同时满足包含和排除双重要求。",
+    "overall_validation": "该评测器用于验证 Blender 交互式任务中渲染流程的正确性，核心围绕“渲染设置是否按任务要求配置”与“渲染输出产物是否符合预期规格”两大维度展开。具体而言，它通过解析 Blender 检查脚本输出的 JSON 数据，逐项比对渲染引擎、分辨率、帧率、采样数、图像格式及活动相机等关键参数；同时直接读取渲染输出的图像文件，校验文件存在性、宽高尺寸及编码格式（支持 JPG/JPEG 别名兼容）。此外，评测器还提供一个通用文本包含/排除检查器，用于判定给定字符串中是否同时满足必须包含全部指定子串且不得包含任何排除子串。所有检查均采用硬阈值判定：各项条件必须全部精确满足，任一不符即返回 0.0（失败），全部通过则返回 1.0（成功），不存在加权或部分得分机制。",
     "main_functions": [
       {
         "name": "check_blender_render_settings",
         "lineno": 50,
-        "description": "接收来自Blender检查脚本的JSON字符串command_output，以及包含期望渲染参数的规则字典rule。首先调用辅助函数_parse_blender_output将JSON字符串解析为Python字典。然后依次检查rule中指定的各个字段：engine（渲染引擎）、resolution_x（水平分辨率）、resolution_y（垂直分辨率）、fps（帧率）、samples（采样数）、image_format（图像格式）、active_camera（活动相机名称）。对每个存在于rule中的键，使用对应的lambda函数将解析结果中的实际值与rule的期望值进行精确相等比较。所有指定字段必须全部匹配；若任一字段不匹配，立即记录警告并返回0.0；全部匹配则返回1.0。若JSON解析失败或发生异常，也返回0.0。"
+        "description": "该函数接收来自 check_render.py 的 JSON 字符串 command_output 以及一个规则字典 rule，用于验证 Blender 场景中的渲染设置。首先调用辅助函数 _parse_blender_output 将命令输出解析为 Python 字典；若解析失败或输出为空，直接返回 0.0。随后，函数内置一个 checks 映射表，涵盖 engine、resolution_x、resolution_y、fps、samples、image_format、active_camera 七个字段的精确相等性校验。函数遍历 rule 中提供的每一个键，调用对应的 lambda 检查函数将解析结果中的实际值与 rule 期望值进行比对。若任一字段不匹配，立即记录警告日志并返回 0.0；仅当 rule 中所有指定字段全部匹配成功时，才返回 1.0。"
       },
       {
         "name": "check_blender_render_output",
         "lineno": 85,
-        "description": "接收渲染输出文件的路径file_path和规则字典rule。首先检查文件是否存在，若不存在则返回0.0。接着尝试使用PIL.Image打开图像文件，获取实际宽高。若rule中指定了width或height，将实际尺寸与期望值进行精确数值比较，任一不匹配即返回0.0。若rule中指定了format，将PIL读取到的图像格式（转为大写）与期望格式比较，并处理JPG与JPEG的别名映射（通过fmt_map字典）。格式不匹配则返回0.0。如果PIL未安装，则降级为仅检查文件是否存在，存在返回1.0，否则0.0。任何异常均返回0.0。全部检查通过返回1.0。"
+        "description": "该函数接收渲染输出文件路径 file_path 以及规则字典 rule，用于验证实际渲染产物。首先检查文件路径是否存在，若不存在则返回 0.0。接着尝试使用 PIL.Image 打开图像文件，获取实际宽高。若 rule 中指定了 width 或 height，将实际尺寸与期望值进行精确数值比对，任一不符即返回 0.0。若 rule 中指定了 format，则将图像实际格式（如 PNG、JPEG）与期望值进行大小写不敏感比对，并通过 fmt_map 兼容 JPG 与 JPEG 的别名差异；格式不匹配同样返回 0.0。若环境中未安装 PIL，则降级为仅校验文件是否存在，存在返回 1.0，否则 0.0。任何异常（如图像损坏）也捕获并返回 0.0。"
       },
       {
         "name": "check_include_exclude",
         "lineno": 129,
-        "description": "接收一个结果字符串result和规则字典rules。从rules中提取include列表（默认空）和exclude列表（默认空）。检查逻辑为：result必须同时包含所有include中的字符串，并且必须不包含任何exclude中的字符串。只有当包含条件和排除条件同时满足时，才返回1.0；否则返回0.0。若result为None，直接返回0.0。该函数为通用文本检查器，不特定于Blender场景。"
+        "description": "该函数是一个通用字符串内容检查器，接收待测字符串 result 与规则字典 rules。首先，若 result 为 None 直接返回 0.0。然后从 rules 中提取 include 列表（必须全部包含的子串）和 exclude 列表（必须全部排除的子串）。函数使用 Python 的 in 操作符进行精确子串匹配，要求 result 同时满足“包含所有 include 项”且“不包含任何 exclude 项”。若两项条件同时成立返回 1.0，否则返回 0.0。该函数不处理正则或模糊匹配，仅做简单的存在性/不存在性判定。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 34,
-        "description": "接收Blender命令输出的字符串command_output，负责将其解析为Python字典。具体步骤为：先检查输入是否为空或仅含空白，若是则记录错误并返回None；否则尝试使用json.loads解析去除首尾空白后的内容。若解析失败（如json.JSONDecodeError或ValueError），记录错误和原始输出调试信息，返回None。该函数是check_blender_render_settings的前置解析步骤，为渲染设置检查提供结构化数据；解析失败会导致主函数直接判定为失败（返回0.0）。"
+        "lineno": 37,
+        "description": "该辅助函数负责将 Blender 检查脚本打印的原始命令输出 command_output 解析为结构化字典。它先判断输入是否为空或仅含空白字符，若是则记录错误并返回 None；否则尝试调用 json.loads 对去除首尾空白后的内容进行解析。若遭遇 json.JSONDecodeError 或 ValueError，则记录错误日志及原始输出内容（debug 级别），并返回 None。该函数为 check_blender_render_settings 提供前置数据清洗与解析服务，其返回的字典直接决定后续渲染设置字段比对能否执行。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:04:00",
+  "created_at": "2026-07-01 14:32:48",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib09_barbershop_aspect_switch_001./evaluator_function_labels.json"
 }

@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 针对任务 INTERACTIVE_calc_interactive_calc_002 的文本输出进行二值判定。它验证最终返回的字符串 result 是否同时满足 rules 中定义的包含规则与排除规则：result 必须包含 \"include\" 列表中的所有子串，且必须不包含 \"exclude\" 列表中的任何子串。只有当 result 非 None 且两项子串检查全部通过时，才视为任务成功并返回 1.0 分；若 result 为 None、缺失任一包含项或出现任一排除项，则返回 0.0 分。核心检查对象是程序输出的文本内容，比较方式为严格的子串存在性判断，不存在部分得分、阈值容错或近似匹配。",
+    "overall_validation": "该 evaluator 服务于 INTERACTIVE_calc_interactive_calc_002 任务，总体验证目标是判断程序输出或返回的文本结果（result）是否满足预设的字符串内容规则。核心检查对象是一个字符串 result，主要比较方式为子串包含性检查：要求 result 必须同时包含 rules 中指定的所有 include 子串，并且必须完全不包含任何 exclude 子串。成功判定采用严格的二值逻辑——只有当 include 与 exclude 两类规则全部满足时才返回 1.0（成功），任一条件不满足或 result 为 None 时均返回 0.0（失败）。代码中未体现近似匹配、阈值容错、文件读取或多指标联合打分逻辑。",
     "main_functions": [
       {
         "name": "check_include_exclude",
         "lineno": 36,
-        "description": "该函数接收字符串 result 和字典 rules 作为输入，执行严格的文本内容检查。第一步，若 result 为 None，直接返回 0.0 分。第二步，从 rules 中读取 \"include\" 和 \"exclude\" 键对应的字符串列表，缺失时默认为空列表。第三步，使用 all() 遍历检查 result 是否包含 \"include\" 列表中的每一个子串。第四步，使用 all() 遍历检查 result 是否不包含 \"exclude\" 列表中的任何一个子串。第五步，仅当包含检查与排除检查同时满足时返回 1.0 分，否则返回 0.0 分。函数执行过程中会通过 print 输出 result 和 rules 的内容供调试使用。"
+        "description": "该函数接收 result（待验证的字符串结果）与 rules（字典，预期包含 include 和 exclude 两个键，对应值为字符串列表）作为输入。检查步骤如下：第一步，若 result 为 None，直接返回 0.0；第二步，从 rules 中取出 include 列表与 exclude 列表，若键不存在则默认为空列表；第三步，通过 all(r in result for r in include) 检查 result 是否包含所有必须出现的子串；第四步，通过 all(r not in result for r in exclude) 检查 result 是否不包含任何禁止出现的子串；最后，若上述两个条件同时成立，返回 1.0，否则返回 0.0。函数执行过程中会打印 result 与 rules 的内容用于调试，但代码中未调用其他自定义辅助函数。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:18:39",
+  "created_at": "2026-07-01 14:43:25",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_002./evaluator_function_labels.json"
 }

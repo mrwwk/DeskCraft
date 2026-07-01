@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_abe04a95-081b-4afa-94f6-ed059abd515a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_bookmark_contains_url",
+      "lineno": 56
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 93
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_bookmark_contains_url",
+      "lineno": 56
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 93
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对多应用任务中的三类独立指标进行离散式打分验证。第一类验证文本输出或内容字符串是否同时满足\"包含所有指定子串\"且\"不包含任何排除子串\"；第二类验证Chrome浏览器书签树中是否存在任意书签URL包含指定的子串模式；第三类验证指定JSON配置文件中是否完整包含预期的键值对设置。每项检查独立执行，互不依赖，各自返回1.0（完全满足条件）或0.0（不满足条件），最终判定以单项分数形式体现。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "接收result字符串和rules字典作为输入。首先判断result是否为None，若为None则直接返回0.0。从rules字典中提取include列表（必须包含的子串）和exclude列表（必须排除的子串），要求result字符串必须同时满足：包含include中每一个子串，且不包含exclude中任何一个子串。若全部满足则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_bookmark_contains_url",
+        "lineno": 56,
+        "description": "接收bookmarks_roots（Chrome书签JSON结构中的roots部分，通常包含bookmark_bar、other等区域）和rule字典。首先检查bookmarks_roots是否为空，以及rule中的url_pattern是否为空，若为空则返回0.0。内部定义递归辅助函数_search，对书签树进行深度优先遍历：若当前节点为字典且type字段为url，则检查其url字段是否包含指定的url_pattern子串；若匹配则返回True；否则递归遍历该节点的children列表。依次对roots下的每一个顶级区域调用_search，若任一区域中搜索成功则返回1.0，全部搜索失败则返回0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 93,
+        "description": "接收actual（结果JSON文件的路径字符串）和expected（字典类型，内部应包含名为'expected'的键）。首先判断actual是否为空，若为空返回0.0。尝试以JSON格式打开并解析actual指向的文件，若文件读取失败或解析异常则返回0.0。从expected字典中提取expect子字典，遍历其中每一对key-value，检查解析后的实际data字典中是否存在该键且值完全相等（使用Python的==判断）。若所有预期键值对均匹配则返回1.0，任一项缺失或值不匹配则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:26:33",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_abe04a95-081b-4afa-94f6-ed059abd515a./evaluator_function_labels.json"
+}

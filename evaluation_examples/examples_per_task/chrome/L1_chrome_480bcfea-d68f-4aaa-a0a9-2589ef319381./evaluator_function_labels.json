@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Chrome浏览器实验标志（experiments/flags）的启用或禁用状态是否达到任务预期。核心检查对象是浏览器当前已启用的实验标志名称列表。评测逻辑采用二元打分制：首先将原始实验标志字符串按'@'分割提取纯标志名，然后根据任务规则类型进行分支判定——对于'names'类型，要求处理后的已启用列表与预期列表完全一致（精确匹配）；对于'disabled_names'类型，要求所有指定的标志均不出现在已启用列表中。任一条件满足则返回1.0（成功），否则返回0.0（失败）。若规则类型不被支持，则抛出TypeError异常。",
+    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器实验标志（chrome://flags）的启用或禁用状态。它接收当前已启用的实验标志列表，并与任务规则进行比对，最终返回 1.0（通过）或 0.0（未通过）。支持两类任务：一是“精确匹配”任务，要求当前启用的实验名称列表与预期列表完全一致；二是“禁用检查”任务，要求指定的实验标志必须全部不在当前启用列表中。核心检查对象是经过预处理后的实验名称列表，主要比较方式为列表精确相等或成员存在性检查，成功判定依据是规则类型对应的逻辑全部满足。",
     "main_functions": [
       {
         "name": "check_enabled_experiments",
         "lineno": 6,
-        "description": "该函数接收两个参数：enabled_experiments（当前已启用的实验标志原始列表）和rule（评测规则字典）。检查步骤如下：第一步，对enabled_experiments进行预处理——若列表为空或不存在则视为空列表，否则对每个实验字符串调用split('@')[0]提取'@'前的标志名称，得到enabled_experiments_names列表。第二步，根据rule['type']进行分支判定：若type为'names'，将enabled_experiments_names与rule['names']进行列表完全相等比较，完全一致返回1.0，否则返回0.0；若type为'disabled_names'，遍历rule['names']中的每个待禁用标志名，检查其是否存在于enabled_experiments_names中，若发现任一应禁用的标志仍被启用，则通过logger.info记录该标志信息并立即返回0.0，若全部未出现则返回1.0；若type为其他未支持的值，抛出TypeError异常。该函数未调用其他辅助函数，所有比较逻辑自包含。"
+        "description": "该函数接收 enabled_experiments（当前已启用的实验标志原始列表）和 rule（评测规则字典）作为输入。首先对 enabled_experiments 进行预处理：若为空则视为空列表，否则将每个实验字符串按 '@' 分割并取首段，得到纯实验名称列表 enabled_experiments_names。随后根据 rule['type'] 分三支处理：1）若 type 为 'names'，将 enabled_experiments_names 与 rule['names'] 做精确相等比较，完全一致返回 1.0，否则返回 0.0；2）若 type 为 'disabled_names'，遍历 rule['names'] 中的每一个待禁用名称，检查其是否存在于 enabled_experiments_names 中，若任一标志仍被启用则立即返回 0.0，若全部未出现则返回 1.0；3）若 type 为其他值，抛出 TypeError。该函数以返回 1.0 表示成功，0.0 表示失败，属于打分式判定。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:43:14",
+  "created_at": "2026-07-01 15:05:59",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_480bcfea-d68f-4aaa-a0a9-2589ef319381./evaluator_function_labels.json"
 }

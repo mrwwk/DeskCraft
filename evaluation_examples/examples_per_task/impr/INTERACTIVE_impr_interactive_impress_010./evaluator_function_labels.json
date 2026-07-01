@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_010./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_pptx_text",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_pptx_text",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个.pptx演示文稿文件中的文本内容是否同时满足指定的包含规则与排除规则。它通过python-pptx库读取目标PPT文件，遍历所有幻灯片中的所有文本框，提取其中每一段文本运行的内容并拼接为完整字符串，随后进行子串级精确匹配。核心判定逻辑为：rules['include']列表中的每一个字符串都必须出现在提取的文本中，且rules['exclude']列表中的每一个字符串都必须不出现在提取的文本中。只有全部包含条件与全部排除条件同时满足时，任务才被判定为成功（返回1.0）；若任一条件不满足、文件读取失败、依赖库未安装或文件路径为None，则判定为失败（返回0.0）。",
+    "main_functions": [
+      {
+        "name": "check_pptx_text",
+        "lineno": 7,
+        "description": "该函数接收result_path（待测.pptx文件的本地文件系统路径）和rules（包含include与exclude键的字典）作为输入。执行步骤如下：1）若result_path为None，直接返回0.0；2）尝试导入python-pptx库的Presentation类，若未安装则记录错误并返回0.0；3）使用Presentation(result_path)打开PPT文件，遍历所有slide、所有含文本框的shape、所有paragraph以及所有run，提取run.text并用空格拼接成单一完整文本字符串，若读取过程异常则记录错误并返回0.0；4）从rules中获取include列表（必须存在的子串）和exclude列表（必须不存在的子串）；5）执行组合判定：只有当include中每一个子串都在提取文本中，且exclude中每一个子串都不在提取文本中时，才返回1.0；否则记录包含/排除规则与提取文本的日志信息，并返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:22:11",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_010./evaluator_function_labels.json"
+}

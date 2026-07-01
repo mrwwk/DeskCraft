@@ -1,0 +1,84 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_3cf4aa78-196b-4654-a632-7f8c0b52c8e1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "evaluate_meeting_docx",
+      "lineno": 42
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "evaluate_meeting_docx",
+      "lineno": 42
+    },
+    {
+      "name": "_check_title_formatting",
+      "lineno": 90
+    },
+    {
+      "name": "_check_attendees_centered",
+      "lineno": 125
+    },
+    {
+      "name": "_check_section_headings_bold_underline",
+      "lineno": 166
+    },
+    {
+      "name": "_check_action_items_bold",
+      "lineno": 220
+    },
+    {
+      "name": "_check_font_arial",
+      "lineno": 251
+    },
+    {
+      "name": "_check_footer_text",
+      "lineno": 285
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证智能体生成的 Meeting_L3_08.docx 会议文档是否符合 6 项格式要求。它读取 agent 输出的 .docx 文件，利用 python-docx 解析文档段落与文本 run，依次对标题格式、参会人员段落对齐、章节标题样式、行动项样式、字体类型以及末尾页脚文本进行二元检查。6 项检查各自独立，最终得分是 6 项通过率的算术平均值（0.0 到 1.0）。其中标题检查要求首段居中、18pt 且加粗；参会人员检查优先按关键词定位，未命中时回退到检查第二个非空段落是否居中；章节标题与行动项检查采用“未检测到目标段落则视为通过”的容错策略；字体检查要求不低于 90% 的文本 run 使用 Arial；页脚检查要求文档最后一个非空段落包含指定固定文本。",
+    "main_functions": [
+      {
+        "name": "evaluate_meeting_docx",
+        "lineno": 42,
+        "description": "接收参数 result_path（agent 输出的 .docx 本地路径）以及未使用的 expected 与 options。首先判断 result_path 是否为空，为空则返回 0.0；随后尝试以 Document(result_path) 打开文档，失败也返回 0.0。提取 doc.paragraphs 后过滤出 text.strip() 非空的段落；若无非空段落，返回 0.0。接着依次调用 6 个辅助检查函数：_check_title_formatting(non_empty)、_check_attendees_centered(non_empty)、_check_section_headings_bold_underline(non_empty)、_check_action_items_bold(non_empty)、_check_font_arial(paragraphs)、_check_footer_text(non_empty)。注意 _check_font_arial 接收的是包含空段落的原始 paragraphs，其余 5 项接收非空段落列表。每个辅助函数返回布尔值表示单项是否通过。最终统计 passed = 通过项之和，计算 score = passed / len(checks)（即 6 项等权平均）并返回。该函数采用累计打分式逻辑，任意一项失败会拉低分数，但不会直接归零。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_check_title_formatting",
+        "lineno": 89,
+        "description": "检查对象为非空段落列表 non_empty。将第一个非空段落视为标题，分三步判定：第一步验证 paragraph_format.alignment 是否等于 WD_PARAGRAPH_ALIGNMENT.CENTER；第二步遍历该段落所有 text.strip() 非空的 run，要求全部 run.bold 为 True；第三步要求至少存在一个 run，其 run.font.size 不为空且 run.font.size.pt 等于 18。以上三项全部满足返回 True，任一不满足即记录具体原因并返回 False。"
+      },
+      {
+        "name": "_check_attendees_centered",
+        "lineno": 123,
+        "description": "检查对象为非空段落列表。第一步遍历所有非空段落，将段落文本转小写后查找是否包含 attendees_keywords（即 \"attendee\" 或 \"attend\"）；若找到，立即检查该段落的 paragraph_format.alignment 是否为 WD_PARAGRAPH_ALIGNMENT.CENTER，并返回该布尔结果。第二步为回退逻辑：若未找到含关键词的段落且非空段落不少于 2 个，则将第二个非空段落推断为 attendees 段落，同样检查其是否居中并返回结果。若两步均未命中，返回 False。"
+      },
+      {
+        "name": "_check_section_headings_bold_underline",
+        "lineno": 163,
+        "description": "检查对象为非空段落列表（显式跳过第一个标题段落）。通过三种启发式规则识别章节标题：1）文本以小写关键词（HEADING_KEYWORDS 列表中的词）开头，或文本词数不超过 4 且包含该关键词；2）文本长度小于 60 且全为大写；3）文本匹配正则 ^[\\dIVX]+[\\.\\)]\\s+\\w+（如 \"1. Topic\" 或 \"I. Topic\"）。若未识别到任何标题，视为空真直接返回 True。否则遍历每个标题段落的所有非空 run，逐个检查 run.bold 和 run.underline；若存在任一 run 不满足则立即返回 False，全部满足返回 True。"
+      },
+      {
+        "name": "_check_action_items_bold",
+        "lineno": 216,
+        "description": "检查对象为非空段落列表。使用正则 ACTION_ITEM_PATTERN（^\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)?\\s*:.*）匹配段落文本，筛选出以大写人名（1 到 2 个单词）加冒号开头的行动项段落。若未匹配到任何行动项，视为空真返回 True。否则遍历每个行动项段落的所有非空 run，检查是否全部 run.bold 为 True；若发现未加粗的 run 立即返回 False，全部通过返回 True。"
+      },
+      {
+        "name": "_check_font_arial",
+        "lineno": 246,
+        "description": "检查对象为全部段落（包括空段落）。遍历每个段落的所有 run，跳过 text.strip() 为空的 run；统计总 run 数 total_runs 与 font.name 不区分大小写等于 \"arial\" 的 run 数 arial_runs。若 total_runs 为 0 返回 False。计算比例 ratio = arial_runs / total_runs，要求 ratio >= 0.9（90% 阈值）。满足返回 True，否则返回 False。"
+      },
+      {
+        "name": "_check_footer_text",
+        "lineno": 279,
+        "description": "检查对象为非空段落列表。取最后一个非空段落，获取 last_text = non_empty[-1].text.strip()，检查其是否完全等于 REQUIRED_FOOTER 常量，或包含该常量作为子串（允许尾部额外字符或空白）。REQUIRED_FOOTER 的固定文本为 \"Recorded by: Meeting Secretary | Distribution: All attendees + Board\"。满足任一条件返回 True，否则返回 False。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:57:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_3cf4aa78-196b-4654-a632-7f8c0b52c8e1./evaluator_function_labels.json"
+}

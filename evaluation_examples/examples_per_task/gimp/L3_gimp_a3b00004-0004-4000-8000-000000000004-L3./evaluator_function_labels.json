@@ -1,0 +1,235 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00004-0004-4000-8000-000000000004-L3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "has_transparency",
+      "lineno": 30
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 42
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 79
+    },
+    {
+      "name": "check_transparency_exists",
+      "lineno": 104
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 129
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 170
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 188
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 268
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 295
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 373
+    },
+    {
+      "name": "check_subject_scale_and_center",
+      "lineno": 432
+    },
+    {
+      "name": "check_white_background_ratio",
+      "lineno": 495
+    },
+    {
+      "name": "check_l3_shoes_listing_complete",
+      "lineno": 534
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "has_transparency",
+      "lineno": 30
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 42
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 79
+    },
+    {
+      "name": "check_transparency_exists",
+      "lineno": 104
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 129
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 170
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 188
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 213
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 242
+    },
+    {
+      "name": "_build_foreground_mask",
+      "lineno": 249
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 268
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 295
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 373
+    },
+    {
+      "name": "check_subject_scale_and_center",
+      "lineno": 432
+    },
+    {
+      "name": "check_white_background_ratio",
+      "lineno": 495
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 526
+    },
+    {
+      "name": "check_l3_shoes_listing_complete",
+      "lineno": 534
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证L3级别GIMP鞋子商品列表双输出任务。任务要求最终产出三个核心文件：一张1600×1600像素的JPEG主图（main_jpg）、一张1600×1600像素的PNG透明抠图（cutout_png）、以及保留图层结构的XCF工程文件。验证逻辑采用严格的“全通过”二进制聚合模式：对主图依次检查文件存在性、JPEG格式、尺寸精度（容差5像素）、文件大小上限（512000字节）、白色背景占比（≥78%，白场阈值245）、顶部左右区域（top_left、top_right）包含“NEW”字样（通过边缘密度或OCR验证）、以及相对于原始素材的对比度提升（≥3%）；对抠图检查文件存在性、PNG格式、尺寸精度、透明通道存在性、主体在画面中的高度占比（55%–90%）及水平/垂直居中偏移容忍度；对XCF工程文件检查文件头有效性及是否包含Shoes_Product、Shadow_Soft、Badge_NEW、BG_White四个图层（不强制顺序）。全部13项子检查由_all_binary_checks_pass聚合，仅当每一项均返回1时才最终返回1.0（成功），任一失败即返回0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "接收一个PIL Image对象作为输入，将其转换为灰度模式（'L'），通过ImageStat.Stat计算像素值的标准差，并将该标准差作为图像对比度数值返回。该返回值被check_contrast_increase用于量化比较两张图的对比度差异。"
+      },
+      {
+        "name": "has_transparency",
+        "lineno": 30,
+        "description": "接收一个PIL Image对象，判断其是否存在透明像素：若图像模式为RGBA，则提取alpha通道并检查是否存在任何像素alpha值小于255；若模式为P且info字典中包含transparency键，也视为存在透明。返回布尔值。该函数被check_transparency_exists调用以判断PNG抠图是否真正含有透明区域。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 42,
+        "description": "接收图像路径、预期宽度expected_width、预期高度expected_height（可选，为None时仅检查宽度）及容差tolerance（默认5像素）。使用PIL打开图像后，比较实际宽高与预期值，计算绝对偏差。若宽度偏差≤容差，且高度偏差也≤容差（当高度参数提供时），则返回1，否则返回0。文件不存在或读取异常时返回0并记录错误日志。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 79,
+        "description": "接收图像路径，使用PIL打开文件后检查img.format是否严格等于'PNG'。若是则返回1，否则返回0。文件不存在或读取异常时返回0。用于验证cutout_png是否为PNG格式。"
+      },
+      {
+        "name": "check_transparency_exists",
+        "lineno": 104,
+        "description": "接收图像路径，打开图像后调用has_transparency检查是否存在透明像素（alpha通道存在且含<255的像素，或P模式含透明索引）。存在透明返回1，否则返回0。文件不存在或异常时返回0。用于验证抠图是否具备透明背景。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 129,
+        "description": "接收源图像路径src_path、目标图像路径tgt_path和最小提升百分比min_increase_percent（默认10.0）。分别打开两张图并调用calculate_contrast获取对比度。若源图对比度为0则直接返回0；否则计算提升百分比公式为((tgt_contrast - src_contrast) / src_contrast) * 100。当提升百分比≥min_increase_percent时返回1，否则返回0。任一路径不存在或读取失败返回0。在本任务中阈值被设为3.0%。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 170,
+        "description": "接收文件路径file_path，使用os.path.isfile判断该路径是否为存在的文件。存在返回1，不存在或路径为None返回0。用于验证主图和抠图文件是否已生成。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 188,
+        "description": "接收图像路径，使用PIL打开文件后检查img.format是否严格等于'JPEG'。若是则返回1，否则返回0。文件不存在或读取异常时返回0。用于验证主图是否为JPEG格式。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 268,
+        "description": "接收图像路径和rule字典（可选字段min_size、max_size，单位字节）。获取文件实际字节大小，判断其是否落在[min_size, max_size]闭区间内；rule缺失时默认min_size为0，max_size为10^18。在范围内返回1，否则返回0。文件不存在或异常返回0。在本任务中用于限制主图大小不超过512000字节。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 295,
+        "description": "接收XCF文件路径和rule字典（必须含layers预期图层名列表，ordered布尔值默认False）。首先验证文件头是否以b'gimp xcf'开头。优先尝试使用gimpformats库解析图层名称列表；若解析失败或图层名为空，则回退到对文件内容进行字节级字符串搜索定位各图层名。检查所有expected_layers是否均存在；若ordered为True，还需确保各图层在解析出的列表（或二进制内容）中的出现顺序与预期列表顺序一致（索引严格递增）。全部满足返回1，任一图层缺失或顺序错误返回0。文件不存在或非XCF格式返回0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 373,
+        "description": "接收图像路径和rule字典（regions区域名列表默认[\"center\"]；keywords关键词列表可选；min_edge_density默认0.008；edge_threshold默认40.0）。对每个指定区域，调用_resolve_region_bbox获取像素坐标，裁剪灰度图后调用_edge_density计算边缘密度。若任一区域边缘密度低于min_edge_density，返回0。若提供了keywords，尝试导入pytesseract进行OCR，将识别结果归一化（正则替换空白为单空格、去首尾空白、转小写）后，检查是否包含所有关键词（大小写不敏感），缺失任一关键词返回0。OCR模块不可用或异常时仅记录警告，不直接导致失败（前提是边缘密度已通过）。所有检查通过返回1。"
+      },
+      {
+        "name": "check_subject_scale_and_center",
+        "lineno": 432,
+        "description": "接收图像路径和rule字典（min_height_ratio默认0.65，max_height_ratio默认0.85，center_tolerance_ratio默认0.12，white_threshold默认245，alpha_threshold默认40）。调用_build_foreground_mask构建前景掩码，提取前景像素的包围盒，计算包围盒高度占全图高度的比例（height_ratio），以及包围盒中心相对于图像中心的水平偏移比例（dx_ratio）和垂直偏移比例（dy_ratio）。判定条件为：min_height_ratio ≤ height_ratio ≤ max_height_ratio，且dx_ratio ≤ center_tolerance_ratio，且dy_ratio ≤ center_tolerance_ratio * 1.8。全部满足返回1，否则返回0。若未检测到前景像素返回0。"
+      },
+      {
+        "name": "check_white_background_ratio",
+        "lineno": 495,
+        "description": "接收图像路径和rule字典（white_threshold默认245，min_ratio默认0.9）。将图像转换为RGB模式后，统计三个通道值均≥white_threshold的像素占比。若该占比≥min_ratio则返回1，否则返回0。文件不存在或异常返回0。在本任务中min_ratio被设为0.78。"
+      },
+      {
+        "name": "check_l3_shoes_listing_complete",
+        "lineno": 534,
+        "description": "复合评测入口，接收result_paths列表（要求为列表且长度≥4，依次取前四个元素：main_jpg主图路径、cutout_png抠图路径、xcf_path工程文件路径、src_path原始素材路径）。依次执行13项二进制子检查：主图与抠图文件存在性、JPEG与PNG格式、两张图尺寸均为1600×1600（容差5像素）、主图文件大小≤512000字节、主图白底占比≥78%（white_threshold=245）、主图top_left与top_right区域含\"NEW\"字样（min_edge_density=0.005）、抠图存在透明通道、抠图主体高度占比55%–90%且中心偏移在容忍度内、主图对比度较原始素材提升≥3%、XCF包含Shoes_Product等四个图层（ordered=False）。将所有子检查得分传入_all_binary_checks_pass，仅当全部返回1时才最终返回1.0，否则返回0.0。输入格式非法时直接返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 208,
+        "description": "接收图像宽度width、高度height和区域名称region_name（如\"top_left\"、\"center\"、\"bottom\"等字符串）。将粗粒度区域名解析为像素坐标元组(x0, y0, x1, y1)。区域按三列三分或四等分等方式划分，例如top_left为(0, 0, w//3, h//3)，center为(w//4, h//4, 3*w//4, 3*h//4)。若区域名无法匹配，默认返回全图区域(0, 0, w, h)。被check_text_in_region_keywords用于将语义区域转换为实际裁剪坐标。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 236,
+        "description": "接收灰度numpy数组gray_array和边缘阈值edge_threshold（默认40.0）。分别计算数组在水平轴和垂直轴上的梯度绝对值，求和得到边缘强度图，统计强度大于阈值的像素占全图像素的比例作为边缘密度返回。被check_text_in_region_keywords用于判断指定区域是否含有足够的文字或纹理边缘。"
+      },
+      {
+        "name": "_build_foreground_mask",
+        "lineno": 243,
+        "description": "接收PIL Image对象、白场阈值white_threshold（默认245）和透明阈值alpha_threshold（默认40）。若图像模式非RGBA则先转换。优先依据alpha通道判断：若存在alpha值<250的像素，则掩码为alpha > alpha_threshold；否则回退到RGB通道，掩码为任一颜色通道<white_threshold的非白像素。返回二维布尔numpy数组。被check_subject_scale_and_center用于从背景中分离主体，以计算主体占比和中心位置。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 525,
+        "description": "接收scores列表，过滤掉None值后将剩余项转为浮点数。若有效列表为空则返回0.0；否则仅当所有有效分数均≥1.0时返回1.0，任一分数低于1.0则返回0.0。该函数是check_l3_shoes_listing_complete的最终聚合器，实现严格的“全部满足”逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:17:19",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00004-0004-4000-8000-000000000004-L3./evaluator_function_labels.json"
+}

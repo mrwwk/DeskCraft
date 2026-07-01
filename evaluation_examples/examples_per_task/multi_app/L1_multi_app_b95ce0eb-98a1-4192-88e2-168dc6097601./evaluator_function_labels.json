@@ -1,0 +1,313 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_b95ce0eb-98a1-4192-88e2-168dc6097601./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 30
+    },
+    {
+      "name": "check_file_content",
+      "lineno": 43
+    },
+    {
+      "name": "exact_match",
+      "lineno": 72
+    },
+    {
+      "name": "match_in_list",
+      "lineno": 81
+    },
+    {
+      "name": "literal_match",
+      "lineno": 90
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 107
+    },
+    {
+      "name": "diff_text_file",
+      "lineno": 115
+    },
+    {
+      "name": "fuzzy_match",
+      "lineno": 126
+    },
+    {
+      "name": "fuzzy_place_math",
+      "lineno": 132
+    },
+    {
+      "name": "check_csv",
+      "lineno": 153
+    },
+    {
+      "name": "check_list",
+      "lineno": 182
+    },
+    {
+      "name": "check_accessibility_tree",
+      "lineno": 247
+    },
+    {
+      "name": "run_sqlite3",
+      "lineno": 304
+    },
+    {
+      "name": "check_json",
+      "lineno": 310
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 413
+    },
+    {
+      "name": "compare_time_in_speedtest_results",
+      "lineno": 514
+    },
+    {
+      "name": "is_included_all_json_objects",
+      "lineno": 539
+    },
+    {
+      "name": "is_gold_text_included_in_pdf",
+      "lineno": 558
+    },
+    {
+      "name": "file_contains",
+      "lineno": 585
+    },
+    {
+      "name": "check_line_number",
+      "lineno": 602
+    },
+    {
+      "name": "compare_terminal_and_txt",
+      "lineno": 621
+    },
+    {
+      "name": "compare_python_pure_text",
+      "lineno": 632
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 30
+    },
+    {
+      "name": "check_file_content",
+      "lineno": 43
+    },
+    {
+      "name": "exact_match",
+      "lineno": 72
+    },
+    {
+      "name": "match_in_list",
+      "lineno": 81
+    },
+    {
+      "name": "literal_match",
+      "lineno": 90
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 107
+    },
+    {
+      "name": "diff_text_file",
+      "lineno": 115
+    },
+    {
+      "name": "fuzzy_match",
+      "lineno": 126
+    },
+    {
+      "name": "fuzzy_place_math",
+      "lineno": 132
+    },
+    {
+      "name": "check_csv",
+      "lineno": 153
+    },
+    {
+      "name": "check_list",
+      "lineno": 182
+    },
+    {
+      "name": "check_accessibility_tree",
+      "lineno": 247
+    },
+    {
+      "name": "run_sqlite3",
+      "lineno": 304
+    },
+    {
+      "name": "check_json",
+      "lineno": 310
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 413
+    },
+    {
+      "name": "compare_time_in_speedtest_results",
+      "lineno": 514
+    },
+    {
+      "name": "is_included_all_json_objects",
+      "lineno": 539
+    },
+    {
+      "name": "is_gold_text_included_in_pdf",
+      "lineno": 558
+    },
+    {
+      "name": "file_contains",
+      "lineno": 585
+    },
+    {
+      "name": "check_line_number",
+      "lineno": 602
+    },
+    {
+      "name": "compare_terminal_and_txt",
+      "lineno": 621
+    },
+    {
+      "name": "compare_python_pure_text",
+      "lineno": 632
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator是一个通用桌面环境任务评测库，用于验证各类长程桌面操作任务的最终执行结果。它检查的最终产物或状态涵盖：文本文件内容、JSON/YAML/CSV/XML等结构化数据、SQLite数据库查询结果、PDF文档、Word文档、Python源代码文件、终端命令输出、以及系统无障碍树（Accessibility Tree）的XML快照。核心检查对象通常是任务产出的文件路径或直接返回的字符串结果。评测逻辑采用多维度比对策略，包括：精确相等匹配、子串包含与排除、正则表达式行级匹配、rapidfuzz模糊相似度打分、结构化数据字段路径校验、时间差阈值比较、代码文本归一化后纯文本比较等。成功判定的总体思路为：根据任务类型选择对应的主评测函数，读取实际产出并按规则逐项比对；绝大多数函数采用“全部满足则1.0，任一关键条件失败则0.0”的硬判定逻辑，少数函数（如diff_text_file、fuzzy_match、check_accessibility_tree）返回0.0到1.0之间的连续相似度分数；对于CSV/JSON/列表等结构化数据，通常要求所有预期项必须出现且所有非预期项必须未出现。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 30,
+        "description": "接收result字符串和rules字典（含include列表与exclude列表）。直接检查result非None后，判断result是否同时包含所有include指定的子串，并且不包含任何exclude指定的子串。若两项条件全部满足则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_file_content",
+        "lineno": 43,
+        "description": "接收result作为待测文件路径，rules含include与exclude字符串列表。以utf-8编码打开文件读取全部内容；若文件无法读取则返回0.0。随后检查文件内容是否包含所有include子串且不包含任何exclude子串。全部满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 72,
+        "description": "接收result和rules（含expected键）。直接比较result与rules[\"expected\"]是否完全相等（Python == 判断）。相等返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "match_in_list",
+        "lineno": 81,
+        "description": "接收result和rules（含expected列表）。检查result是否存在于expected列表中（in操作）。存在返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "literal_match",
+        "lineno": 90,
+        "description": "接收result、expected与options（含type和ignore_case）。若type为str，将双方转为字符串后比较，ignore_case为True时转为小写再比较；若type为list，要求双方均为list/tuple且长度相同，将每个元素字符串化（可选忽略大小写）后逐位比较。完全相等返回1.0，类型不符或内容不符返回0.0。"
+      },
+      {
+        "name": "is_in_list",
+        "lineno": 107,
+        "description": "接收result（通常为列表）和rules（含expected）。检查expected是否存在于result列表中。存在返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "diff_text_file",
+        "lineno": 115,
+        "description": "接收result和expect，二者均为文件路径。读取两个文件并按行分割为列表，使用difflib.SequenceMatcher计算行级相似度ratio。返回0.0到1.0的相似度分数；若result为None则直接返回0.0。"
+      },
+      {
+        "name": "fuzzy_match",
+        "lineno": 126,
+        "description": "接收result和rules（含expected）。使用rapidfuzz.fuzz.ratio计算result与expected的模糊相似度，将原始分数除以100后返回0.0到1.0之间的浮点数。"
+      },
+      {
+        "name": "fuzzy_place_math",
+        "lineno": 132,
+        "description": "接收result_file_path（docx文件路径）和rules（含expected，为一个可能答案的列表）。使用python-docx读取文档所有段落文本，用split()按空白分割为words_list。对words_list中的每个word，与expected中所有候选答案计算fuzz.ratio并取最大值。若words_list长度不等于3，直接返回0.0；否则返回三个最大分数的算术平均值。"
+      },
+      {
+        "name": "check_csv",
+        "lineno": 153,
+        "description": "接收result为CSV文件路径，rules含expect与unexpect（均为记录字典列表）。使用csv.DictReader逐行读取CSV。对每一行，调用_match_record检查是否匹配任一expect记录（任一匹配即标记该expect为True），并检查是否匹配任一unexpect记录（要求全部未匹配）。最终仅当所有expect记录至少被匹配一次且所有unexpect记录均未被匹配时返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_list",
+        "lineno": 182,
+        "description": "接收result为文本文件路径，rules含expect与unexpect（均为正则字符串列表）。逐行读取文件，将expect和unexpect编译为Pattern。对每一行，检查是否匹配任一expect正则（每个expect至少匹配一行），并确保不匹配任何unexpect正则（所有unexpect必须全局零匹配）。全部满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_accessibility_tree",
+        "lineno": 247,
+        "description": "接收result为无障碍树XML字符串，rules为规则列表（每条规则可含xpath、selectors、text、exact字段），以及osname指定系统。使用lxml.etree.fromstring解析XML，并根据_accessibility_ns_map获取对应命名空间。对每条规则：优先使用xpath定位元素，否则将selectors用\", \"连接后使用CSSSelector定位；若未找到任何元素则直接返回0.0。若规则含text字段，exact为True时使用operator.eq精确比较元素text，否则使用fuzz.ratio/100进行模糊匹配，并取所有匹配元素中的最高分为该规则得分；不含text时该规则得分为1.0。最终返回所有规则得分的连乘积。"
+      },
+      {
+        "name": "run_sqlite3",
+        "lineno": 304,
+        "description": "接收result为SQLite数据库文件路径，rules含sql字段。连接数据库并执行该SQL语句，取fetchone()结果的第一列。将结果转为float返回；若查询结果为None则返回0.0。"
+      },
+      {
+        "name": "check_json",
+        "lineno": 310,
+        "description": "接收result为JSON或YAML文件路径，rules含expect与unexpect规则列表（每条规则含key路径列表、method、ref），is_yaml标志控制解析方式。首先检查文件存在性，不存在返回0.0。使用json.load或yaml.safe_load解析文件，解析失败返回0.0。对expect规则：按key列表逐级字典取值，遇到KeyError或TypeError直接返回0.0，最终用_match_value_to_rule校验值；对unexpect规则：同样按key取值，若key缺失则value视为None，要求_match_value_to_rule返回False。仅当所有expect满足且所有unexpect不满足时返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 413,
+        "description": "接收result（可为JSON字符串或对象）和rules（含expected、expect_in_result、ignore_list_order等）。若result为字符串，先strip、将单引号替换为双引号、再用json.loads解析；解析失败或result为None返回0.0。若expected中包含\"__EVALUATION_FAILED__\"标记，直接返回0.0。若expect_in_result为False：逐key精确比较result与expected，ignore_list_order为True时先将列表排序再比较，任一key不符返回0.0。若expect_in_result为True：检查result中是否包含expected的值——若expected值为list，要求result对应key的列表包含至少一个候选值；若expected值为str，要求result对应key的字符串包含该子串；任一条件失败返回0.0。全部通过返回1.0。"
+      },
+      {
+        "name": "compare_time_in_speedtest_results",
+        "lineno": 514,
+        "description": "接收speedtest_result_path（CSV文件路径）和time_diff（分钟阈值）。打开CSV，读取索引为1的第2行，按逗号分割取第2列作为日期字符串，提取末尾5位得到HH:MM格式时间。获取当前系统时间并格式化为HH:MM，计算两者时间差的绝对值（分钟）。若差值小于time_diff则返回1，否则返回0；文件不存在或读取异常返回0。"
+      },
+      {
+        "name": "is_included_all_json_objects",
+        "lineno": 539,
+        "description": "接收gold_file_path和result_file_path两个JSON文件路径。读取两个JSON对象后，遍历gold_json的所有key，检查每个key是否都存在于result_json中且对应值完全相等（==）。全部满足返回1，任一key缺失或值不等返回0；路径为空返回0。"
+      },
+      {
+        "name": "is_gold_text_included_in_pdf",
+        "lineno": 558,
+        "description": "接收pdf_file_path和gold_text_path（JSON文件路径）。读取gold_json，使用pdfplumber打开PDF并提取所有页面的文本拼接为完整字符串。检查gold_json中每个value是否都出现在PDF文本中。全部包含返回1，有任一缺失返回0；路径为空返回0。"
+      },
+      {
+        "name": "file_contains",
+        "lineno": 585,
+        "description": "接收file_path和config（含expected文本列表）。读取整个文件内容，检查每个expected字符串是否都是文件内容的子串。全部包含返回1.0，任一缺失或文件无法读取返回0.0。"
+      },
+      {
+        "name": "check_line_number",
+        "lineno": 602,
+        "description": "接收file_path和line_number字典（含expected整数值）。检查文件存在性，不存在返回0.0。逐行读取文件，使用正则`([01]\\d|2[0-3]):[0-5]\\d:([0-5]\\d|60)`匹配时间格式，统计匹配成功的行数。若统计值等于line_number[\"expected\"]则返回1，否则返回0；异常返回0。"
+      },
+      {
+        "name": "compare_terminal_and_txt",
+        "lineno": 621,
+        "description": "接收txt_file_path和terminal_output。读取txt文件的全部内容，与terminal_output字符串进行完全相等比较（==）。相等返回1，否则返回0；任一路径或输出为空返回0。"
+      },
+      {
+        "name": "compare_python_pure_text",
+        "lineno": 632,
+        "description": "接收py_file_path和gold_file_path两个Python文件路径。内部定义_normalize辅助函数，对代码进行最小化归一化：跳过前3行内的shebang/encoding注释（如#!、# -*- coding:、# coding:、# coding=），将tab扩展为4个空格，去除行尾空白，过滤空行。读取两个文件并应用_normalize后，比较归一化文本是否完全一致。一致返回1.0，不一致返回0.0；文件读取或解码异常返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_accessibility_ns_map",
+        "lineno": 208,
+        "description": "一个顶层字典常量，非函数。为ubuntu、windows、macos三个系统定义了无障碍树XML所需的命名空间映射（如st、attr、cp、doc等前缀对应的URI）。供check_accessibility_tree在解析XML和构造xpath/CSSSelector时作为namespaces参数使用。"
+      },
+      {
+        "name": "_normalize",
+        "lineno": 644,
+        "description": "嵌套定义在compare_python_pure_text内部的辅助函数。接收一段Python代码文本，执行最小化归一化：按行分割后仅跳过前3行内的文件元数据注释（shebang和encoding声明），对其余行执行expandtabs(4)和rstrip()，并过滤掉空行，最后将处理后的行用换行符拼接返回。用于消除代码中仅因格式差异（如缩进空白、空行、文件头注释）导致的不匹配，同时保留实际代码内容以便检测多余内容。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:18:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_b95ce0eb-98a1-4192-88e2-168dc6097601./evaluator_function_labels.json"
+}

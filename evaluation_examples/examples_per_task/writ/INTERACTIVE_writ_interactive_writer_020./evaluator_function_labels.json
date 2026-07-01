@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_020./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 4
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 4
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 对一段文本结果执行二元合规性判定。核心任务是验证输出字符串是否同时满足两类规则：必须包含所有指定的必需子字符串（include 规则），且必须不包含任何指定的禁止子字符串（exclude 规则）。评测逻辑基于精确的子串包含与排除检查，最终返回 1.0（完全合规）或 0.0（不合规），不存在中间分数或加权累计。若待检测文本本身为 None，则直接判定为失败。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 4,
+        "description": "该函数接收两个参数：待检测的文本字符串 result，以及包含 \"include\" 和 \"exclude\" 键的规则字典 rules。首先检查 result 是否为 None，若为 None 则直接返回 0.0。随后从 rules 中提取 include 列表（必需子字符串）和 exclude 列表（禁止子字符串）。检查逻辑分为两步：第一步验证 result 中是否包含 include 列表中的每一个子字符串；第二步验证 result 中是否不包含 exclude 列表中的任何一个子字符串。只有当两个条件同时满足时，函数才返回 1.0，表示通过；否则返回 0.0，表示失败。该函数不调用其他辅助函数，所有判断均基于 Python 的 in / not in 子串匹配完成。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:55:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_020./evaluator_function_labels.json"
+}

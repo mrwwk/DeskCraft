@@ -222,167 +222,167 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Audacity音频编辑任务的完成质量，采用两种核心检查路径：一是直接分析导出的WAV音频文件，二是解析Audacity项目文件(.aup3)。对于WAV文件，evaluator使用标准库wave读取音频元数据（时长、采样率、声道数、采样位宽）与原始样本数据，将多声道平均为单声道后，计算整体或分段的RMS电平（dB）、峰值振幅（dB），并通过滑动窗口分析判断淡入（RMS递增）或淡出（RMS递减）趋势，同时检测指定时间段是否满足静音或内容存在条件。对于.aup3项目文件，evaluator通过SQLite连接提取project或autosave表中的XML文档，解析波形轨（WaveTrack）和标签轨（LabelTrack）的结构，验证音轨总数、指定音轨的增益（将线性gain转为dB对比）、静音/独奏状态以及标签的时间与文本内容。针对五个特定交互式任务（IA01–IA05），evaluator提供组合验证器，将时长、电平、淡入淡出、静音区间、声道数等检查按任务需求串联，采用“全部满足则通过、任一失败则整体失败”的硬阈值逻辑，成功返回1.0，失败返回0.0，无加权或部分得分机制。",
+    "overall_validation": "该evaluator用于验证Audacity音频编辑任务在OSWorld环境中的完成质量，核心是对两类产物进行核查：一是导出的WAV音频文件，二是Audacity的.aup3项目工程文件。对于WAV文件，它通过标准库wave模块读取采样率、声道数、时长等元数据，并将原始样本解析为归一化浮点数，进而计算整体或分段的RMS电平、峰值振幅、淡入淡出趋势，以及特定时段的静音/内容状态。对于.aup3项目文件，它通过SQLite直接连接工程数据库，从project或autosave表中提取项目XML，解析出各轨道（wave/label）的增益、静音、独奏、声像及标签信息。验证以原子检查为基础，采用阈值比较（如时长容差、RMS范围、窗口趋势判断、线性增益转dB后的容差等），成功返回1.0，失败返回0.0；复合检查函数与交互式任务（IA01-IA05）则串联多项原子检查，要求全部满足才视为成功。",
     "main_functions": [
       {
         "name": "check_audio_duration",
         "lineno": 190,
-        "description": "检查WAV音频文件的时长。接收file_path与rule，调用_read_wav_info读取文件元数据，提取duration字段；将实际时长与rule['expected_duration']对比，允许误差为rule['tolerance']（默认0.5秒）。若abs(actual - expected) <= tolerance，返回1.0；否则返回0.0。文件不存在或读取异常也返回0.0。"
+        "description": "接收file_path与rule，先判断文件是否存在，再调用_read_wav_info读取WAV元数据，获取实际duration。将实际时长与rule[\"expected_duration\"]比较，容忍度取rule.get(\"tolerance\", 0.5)。若绝对差值在容忍度内则返回1.0，否则返回0.0。任何异常也返回0.0。"
       },
       {
         "name": "check_audio_sample_rate",
         "lineno": 211,
-        "description": "检查WAV音频文件的采样率。调用_read_wav_info获取sample_rate，与rule['expected_sr']进行严格整型相等比较。相等返回1.0，否则返回0.0。文件不存在或异常返回0.0。"
+        "description": "接收file_path与rule，调用_read_wav_info读取WAV信息，比较sample_rate与rule[\"expected_sr\"]。两者严格相等返回1.0，否则返回0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_channels",
         "lineno": 228,
-        "description": "检查WAV音频文件的声道数。调用_read_wav_info获取channels，与rule['expected_channels']进行严格整型相等比较。相等返回1.0，否则返回0.0。文件不存在或异常返回0.0。"
+        "description": "接收file_path与rule，调用_read_wav_info读取WAV信息，比较channels与rule[\"expected_channels\"]。严格相等返回1.0，否则返回0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_rms_level",
         "lineno": 245,
-        "description": "检查WAV音频文件的整体RMS电平是否处于指定dB范围内。调用_get_mono_samples将音频转为单声道样本并获取采样率，使用_rms_db计算整体RMS（dB）；检查该值是否落在rule['min_rms_db']与rule['max_rms_db']之间（含边界）。在范围内返回1.0，否则返回0.0。"
+        "description": "接收file_path与rule，调用_get_mono_samples将音频转为单声道样本，再用_rms_db计算整体RMS（dB）。检查该值是否落在[rule[\"min_rms_db\"], rule[\"max_rms_db\"]]闭区间内，满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_fade_in",
         "lineno": 263,
-        "description": "检查WAV音频文件开头是否存在淡入效果。调用_get_mono_samples获取单声道样本与采样率；根据rule['fade_duration']计算前fade_duration秒对应的样本数，将其均分为rule['num_windows']（默认5）个窗口；对每个窗口调用_rms_db计算RMS序列。判定逻辑：统计相邻窗口中后一个RMS大于前一个的数量（increases），若increases >= num_windows - 2（即允许至多1个相邻窗口对未递增），则判定为存在淡入，返回1.0；否则返回0.0。若淡入时长大于音频总长度或窗口大小小于1，返回0.0。"
+        "description": "接收file_path与rule，调用_get_mono_samples获取单声道样本与采样率。根据rule[\"fade_duration\"]计算淡入样本长度，若超过音频总长或窗口大小不足1则失败。将淡入区分成num_windows个窗口（默认5），逐窗口计算_rms_db。要求RMS总体递增：相邻窗口中后一个RMS大于前一个的次数至少为num_windows-2（允许最多1次非递增）。满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_fade_out",
         "lineno": 303,
-        "description": "检查WAV音频文件末尾是否存在淡出效果。逻辑与check_audio_fade_in对称：调用_get_mono_samples后，取最后fade_duration秒的样本，均分为num_windows（默认5）个窗口，计算各窗口RMS。判定逻辑：统计相邻窗口中后一个RMS小于前一个的数量（decreases），若decreases >= num_windows - 2（允许至多1个相邻窗口对未递减），返回1.0；否则返回0.0。"
+        "description": "接收file_path与rule，调用_get_mono_samples获取单声道样本与采样率。根据rule[\"fade_duration\"]计算淡出样本长度，从音频末尾向前截取。分num_windows个窗口（默认5）计算各窗口_rms_db。要求RMS总体递减：相邻窗口中后一个RMS小于前一个的次数至少为num_windows-2。满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_silence_at",
         "lineno": 343,
-        "description": "检查WAV音频文件在指定时间段内是否为静音。调用_get_mono_samples获取单声道样本与采样率；使用_extract_time_range按rule['start_time']和rule['end_time']提取区间样本；计算该区间的RMS（dB），并与rule['max_rms_db']（默认-40.0 dB）比较。若RMS <= max_rms_db，返回1.0；否则返回0.0。若提取结果为空，返回0.0。"
+        "description": "接收file_path与rule，调用_get_mono_samples与_extract_time_range提取[start_time, end_time]区间的样本。若区间为空则失败。计算该区间的_rms_db，要求小于等于rule.get(\"max_rms_db\", -40)。满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_has_content_at",
         "lineno": 368,
-        "description": "检查WAV音频文件在指定时间段内是否存在有效音频内容。调用_get_mono_samples与_extract_time_range提取rule['start_time']至rule['end_time']区间样本；计算区间RMS（dB），并与rule['min_rms_db']（默认-30.0 dB）比较。若RMS >= min_rms_db，返回1.0；否则返回0.0。若提取结果为空，返回0.0。"
+        "description": "接收file_path与rule，调用_get_mono_samples与_extract_time_range提取[start_time, end_time]区间的样本。若区间为空则失败。计算该区间的_rms_db，要求大于等于rule.get(\"min_rms_db\", -30)。满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_peak_amplitude",
         "lineno": 393,
-        "description": "检查WAV音频文件的峰值振幅是否处于指定dB范围。调用_get_mono_samples获取单声道样本，计算所有样本绝对值的最大值peak；若peak小于1e-10则peak_db为-100.0，否则按20.0 * math.log10(peak)转为dB。检查peak_db是否在rule['min_peak_db']与rule['max_peak_db']之间，是则返回1.0，否则返回0.0。"
+        "description": "接收file_path与rule，调用_get_mono_samples获取单声道样本。遍历样本取绝对值最大值peak；若peak小于1e-10则peak_db为-100.0，否则用20.0*math.log10(peak)转为dB。检查peak_db是否在[rule[\"min_peak_db\"], rule[\"max_peak_db\"]]闭区间内，满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_audio_file_valid",
         "lineno": 416,
-        "description": "检查音频文件是否存在且可被标准库wave正常读取。若文件不存在直接返回0.0；否则调用_read_wav_info尝试读取并记录采样率、声道数、时长信息，成功则返回1.0，任何异常返回0.0。rule中可选包含expected_format字段，但当前实现未实际校验该字段值。"
+        "description": "接收file_path与rule，检查文件是否存在且能被_read_wav_info正常读取。若成功读取到采样率、声道、时长等信息则返回1.0。rule中虽可含expected_format，但代码中未实际校验该字段，仅作为WAV可读性检查。异常返回0.0。"
       },
       {
         "name": "check_audio_properties",
         "lineno": 436,
-        "description": "组合检查WAV音频的时长、采样率与声道数。依次执行：1) 调用_read_wav_info读取元数据；2) 检查duration与rule['expected_duration']的偏差是否在tolerance（默认0.5秒）内，失败立即返回0.0；3) 若rule包含expected_sr，检查sample_rate严格相等，失败返回0.0；4) 若rule包含expected_channels，检查channels严格相等，失败返回0.0。全部通过返回1.0。"
+        "description": "复合检查函数。接收file_path与rule，先调用_read_wav_info读取信息。第一步检查duration：与expected_duration比较，容忍度默认0.5，超差则返回0.0。若rule含expected_sr，则严格比较sample_rate，不符返回0.0。若rule含expected_channels，则严格比较channels，不符返回0.0。三项全部通过返回1.0。异常返回0.0。"
       },
       {
         "name": "check_audio_with_fades",
         "lineno": 474,
-        "description": "组合检查WAV音频时长及可选的淡入/淡出效果。步骤：1) 调用_read_wav_info读取时长，与rule['expected_duration']对比，允许tolerance（默认0.5秒），失败返回0.0；2) 若rule包含fade_in_duration，构造fade_rule并调用check_audio_fade_in，失败返回0.0；3) 若rule包含fade_out_duration，构造fade_rule并调用check_audio_fade_out，失败返回0.0。num_windows默认5，用于淡入淡出子检查。全部通过返回1.0。"
+        "description": "复合检查函数。接收file_path与rule，先调用_read_wav_info检查duration（容忍度默认0.5），失败直接返回0.0。num_windows默认5。若rule含fade_in_duration，则构造fade_rule并调用check_audio_fade_in，失败返回0.0。若rule含fade_out_duration，则构造fade_rule并调用check_audio_fade_out，失败返回0.0。全部通过返回1.0。异常返回0.0。"
       },
       {
         "name": "check_aup3_track_count",
         "lineno": 516,
-        "description": "检查.aup3项目文件中的音轨总数。调用_parse_aup3_tracks解析项目XML获取tracks列表，将列表长度与rule['expected_track_count']进行严格整型相等比较。相等返回1.0，否则返回0.0。文件不存在或解析异常返回0.0。"
+        "description": "接收file_path与rule，调用_parse_aup3_tracks解析.aup3项目中的轨道列表。比较len(tracks)与rule[\"expected_track_count\"]。严格相等返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_aup3_track_gain",
         "lineno": 533,
-        "description": "检查.aup3项目中指定音轨的增益（以dB为单位）。调用_parse_aup3_tracks获取tracks列表；按rule['track_index']取出对应音轨，读取其线性gain值（默认1.0）；若gain <= 0则actual_db为-100.0，否则按20.0 * math.log10(gain)转为dB。将actual_db与rule['expected_gain_db']对比，允许误差rule['tolerance']（默认2.0 dB）。在误差范围内返回1.0，否则返回0.0。索引越界返回0.0。"
+        "description": "接收file_path与rule，调用_parse_aup3_tracks解析轨道。按rule[\"track_index\"]取对应轨道，若索引越界则失败。将轨道的gain字段（线性倍数，默认1.0）转为dB：若小于等于0则记为-100.0，否则用20.0*math.log10转换。与rule[\"expected_gain_db\"]比较，绝对差值小于等于rule.get(\"tolerance\", 2.0)则返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_aup3_track_mute",
         "lineno": 564,
-        "description": "检查.aup3项目中指定音轨的静音状态。调用_parse_aup3_tracks获取tracks列表；按rule['track_index']取出对应音轨，读取其mute字段（XML字符串'1'为True，其余为False）。将实际布尔值与rule['expected_mute']进行严格相等比较，相等返回1.0，否则返回0.0。索引越界返回0.0。"
+        "description": "接收file_path与rule，调用_parse_aup3_tracks解析轨道。按rule[\"track_index\"]取对应轨道的mute布尔值，与rule[\"expected_mute\"]进行严格相等比较。相等返回1.0，否则0.0。索引越界或异常返回0.0。"
       },
       {
         "name": "check_aup3_labels",
         "lineno": 587,
-        "description": "检查.aup3项目中的标签内容与时间。调用_parse_aup3_tracks提取所有type为label的音轨标签，汇总为all_labels列表。遍历rule['expected_labels']，为每个期望标签在all_labels中寻找匹配项：时间差绝对值不超过rule['time_tolerance']（默认1.0秒），且文本满足双向包含关系（不区分大小写、去除首尾空格）。每个期望标签必须找到唯一未匹配过的实际标签，全部匹配成功返回1.0；若实际标签总数少于期望数，或任一期望标签未找到匹配，返回0.0。"
+        "description": "接收file_path与rule，调用_parse_aup3_tracks解析轨道，收集所有type为label的轨道中的labels列表。要求实际标签总数不少于expected_labels数量。对每个expected_label，在未匹配的实际标签中查找：时间差绝对值小于等于rule.get(\"time_tolerance\", 1.0)，且文本满足双向子串包含（不区分大小写，即expected文本在actual文本中，或反之）。每个expected_label都必须找到唯一匹配，否则返回0.0。全部匹配成功返回1.0。异常返回0.0。"
       },
       {
         "name": "check_audio_duration_range",
         "lineno": 639,
-        "description": "检查WAV音频文件时长是否落在指定区间内。调用_read_wav_info读取duration，检查其是否满足rule['min_duration'] <= actual <= rule['max_duration']。满足返回1.0，否则返回0.0。文件不存在或异常返回0.0。"
+        "description": "接收file_path与rule，调用_read_wav_info读取WAV时长。检查duration是否落在[rule[\"min_duration\"], rule[\"max_duration\"]]闭区间内，满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_aup3_project_valid",
         "lineno": 660,
-        "description": "检查.aup3项目文件是否可读且包含足够数量的音轨。调用_parse_aup3_tracks解析tracks；分别统计总音轨数total、波形轨数wave_count、标签轨数label_count。检查三项是否同时满足：total >= rule['min_track_count']（默认1）、wave_count >= rule['min_wave_tracks']（默认0）、label_count >= rule['min_label_tracks']（默认0）。全部满足返回1.0，任一不满足返回0.0。文件不存在或无解析结果返回0.0。"
+        "description": "接收file_path与rule，调用_parse_aup3_tracks解析.aup3轨道。要求总轨道数大于等于rule.get(\"min_track_count\", 1)，wave类型轨道数大于等于rule.get(\"min_wave_tracks\", 0)，label类型轨道数大于等于rule.get(\"min_label_tracks\", 0)。三项全部满足返回1.0，任一不满足返回0.0。异常返回0.0。"
       },
       {
         "name": "check_interactive_audacity_ia01",
         "lineno": 703,
-        "description": "IA-01交互任务验证器：验证部分降噪后音频时长保留且头尾仍有内容。步骤：1) 调用check_audio_duration检查时长，使用rule['expected_duration']与rule['duration_tolerance']（默认1.0秒）；2) 调用_get_mono_samples获取样本，用_extract_time_range分别提取intro段（默认0.0–2.0秒）和tail段（默认2.0秒至预期时长）；3) 分别计算两段RMS，要求intro_rms >= rule['intro_min_rms_db']（默认-30.0 dB）且tail_rms >= rule['tail_min_rms_db']（默认-38.0 dB）。全部满足返回1.0，否则返回0.0。"
+        "description": "IA-01交互任务验证（部分降噪）。接收file_path与rule，先调用check_audio_duration检查时长（容忍度默认1.0），失败返回0.0。随后调用_get_mono_samples与_extract_time_range分别提取intro段（默认0.0-2.0秒）和tail段（默认2.0秒到expected_duration）。计算两段_rms_db，要求intro_rms大于等于rule.get(\"intro_min_rms_db\", -30.0)且tail_rms大于等于rule.get(\"tail_min_rms_db\", -38.0)。全部满足返回1.0，否则0.0。异常返回0.0。"
       },
       {
         "name": "check_interactive_audacity_ia02",
         "lineno": 754,
-        "description": "IA-02交互任务验证器：验证修剪+峰值归一化+淡出导出。步骤：1) 调用check_audio_duration检查时长，使用rule['expected_duration']与rule['duration_tolerance']（默认0.8秒）；2) 调用check_audio_peak_amplitude检查峰值，默认范围[-3.0, -0.1] dB，可通过rule['min_peak_db']和rule['max_peak_db']覆盖；3) 调用check_audio_fade_out检查淡出，默认fade_duration为2.0秒，num_windows为5。三项全部通过返回1.0，任一失败返回0.0。"
+        "description": "IA-02交互任务验证（修剪+峰值归一化+淡出）。接收file_path与rule，先调用check_audio_duration检查时长（容忍度默认0.8），失败返回0.0。再调用check_audio_peak_amplitude检查峰值是否在[min_peak_db(默认-3.0), max_peak_db(默认-0.1)]，失败返回0.0。最后调用check_audio_fade_out检查淡出（fade_duration默认2.0，num_windows默认5），失败返回0.0。全部通过返回1.0。异常返回0.0。"
       },
       {
         "name": "check_interactive_audacity_ia03",
         "lineno": 787,
-        "description": "IA-03交互任务验证器：验证降噪+头部剪切+淡出导出。步骤：1) 调用check_audio_duration检查时长，使用rule['expected_duration']与rule['duration_tolerance']（默认0.8秒）；2) 调用check_audio_fade_out检查淡出，默认fade_duration为3.0秒，num_windows为5。两项全部通过返回1.0，否则返回0.0。"
+        "description": "IA-03交互任务验证（降噪+头部剪切+淡出）。接收file_path与rule，先调用check_audio_duration检查时长（容忍度默认0.8），失败返回0.0。再调用check_audio_fade_out检查淡出（fade_duration默认3.0，num_windows默认5），失败返回0.0。全部通过返回1.0。异常返回0.0。"
       },
       {
         "name": "check_interactive_audacity_ia04",
         "lineno": 813,
-        "description": "IA-04交互任务验证器：验证混合输出包含插入间隙且为单声道导出。步骤：1) 调用check_audio_duration_range检查时长，默认范围[29.5, 33.5]秒；2) 调用check_audio_silence_at检查指定间隙区间（默认15.0–16.8秒）是否为静音，默认max_rms_db为-38.0 dB；3) 调用check_audio_channels检查声道数是否为1（单声道）。三项全部通过返回1.0，否则返回0.0。"
+        "description": "IA-04交互任务验证（混合输出+插入间隙+单声道导出）。接收file_path与rule，先调用check_audio_duration_range检查时长范围（默认29.5-33.5秒），失败返回0.0。再调用check_audio_silence_at检查指定区间是否为静音（默认15.0-16.8秒，max_rms_db默认-38.0），失败返回0.0。最后调用check_audio_channels检查声道数（默认1），失败返回0.0。全部通过返回1.0。异常返回0.0。"
       },
       {
         "name": "check_interactive_audacity_ia05",
         "lineno": 844,
-        "description": "IA-05交互任务验证器：验证修改后的片段时长正确并包含淡出。步骤：1) 调用check_audio_duration检查时长，使用rule['expected_duration']与rule['duration_tolerance']（默认1.0秒）；2) 调用check_audio_fade_out检查淡出，默认fade_duration为3.0秒，num_windows为5。两项全部通过返回1.0，否则返回0.0。"
+        "description": "IA-05交互任务验证（修改片段时长+淡出）。接收file_path与rule，先调用check_audio_duration检查时长（容忍度默认1.0），失败返回0.0。再调用check_audio_fade_out检查淡出（fade_duration默认3.0，num_windows默认5），失败返回0.0。全部通过返回1.0。异常返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_read_wav_info",
-        "lineno": 35,
-        "description": "使用标准库wave模块打开指定WAV文件，读取并返回音频元数据字典，包含channels（声道数）、sample_rate（采样率）、n_frames（总帧数）、sampwidth（采样位宽，字节数）以及计算得到的duration（时长，秒）。该函数是后续所有WAV时长、采样率、声道数检查的基础读取器。"
+        "lineno": 32,
+        "description": "使用标准库wave模块以\"rb\"模式打开WAV文件，读取并返回包含基础元数据的字典：channels（声道数）、sample_rate（采样率）、n_frames（总帧数）、duration（时长，帧数除以采样率）、sampwidth（采样位宽）。供所有WAV相关主函数获取音频基础信息。"
       },
       {
         "name": "_read_wav_samples",
-        "lineno": 48,
-        "description": "使用wave模块读取WAV文件的全部原始帧数据，根据sampwidth（1/2/3/4字节）分别通过struct.unpack或int.from_bytes将原始字节解析为归一化到[-1.0, 1.0]范围的浮点样本列表。对于多声道音频，返回的是交错样本（interleaved）。该函数为RMS、峰值、淡入淡出等样本级分析提供原始数据。"
+        "lineno": 45,
+        "description": "使用wave模块读取WAV全部原始帧，根据sampwidth（1/2/3/4字节）分别通过struct.unpack或int.from_bytes将原始字节解析为浮点数列表，并归一化到[-1.0, 1.0]区间。多声道时样本按交错顺序返回。为_rms_db和_get_mono_samples提供原始样本数据。"
       },
       {
         "name": "_rms_db",
-        "lineno": 75,
-        "description": "对传入的浮点样本列表计算均方根（RMS）值，并转换为dB（公式：20 * log10(rms)）。若样本为空或rms小于1e-10，返回-100.0 dB。该函数被所有需要电平评估的检查（整体RMS、分段RMS、淡入淡出窗口RMS）复用。"
+        "lineno": 72,
+        "description": "对浮点样本列表计算均方根值（RMS）并转换为分贝：20.0 * math.log10(sqrt(mean(x^2)))。若样本为空或RMS小于1e-10，则返回-100.0。这是音频电平判断的核心计算函数，被所有涉及音量、静音、峰值的主函数间接或直接调用。"
       },
       {
         "name": "_get_mono_samples",
-        "lineno": 85,
-        "description": "先调用_read_wav_info和_read_wav_samples读取WAV信息及样本；若声道数大于1，则将交错样本按帧取平均，转换为单声道样本列表。返回(mono_samples, sample_rate)元组。该函数是绝大多数基于样本的分析（RMS、峰值、淡入淡出、静音检测）的统一入口，确保后续计算基于单声道。"
+        "lineno": 82,
+        "description": "调用_read_wav_info和_read_wav_samples读取WAV文件。若声道数大于1，则将交错的多声道样本按帧取平均，转换为单声道样本列表。返回单声道样本列表与采样率。绝大多数WAV主函数先调用此函数以统一声道后再做电平或趋势分析。"
       },
       {
         "name": "_extract_time_range",
-        "lineno": 97,
-        "description": "根据采样率sr，将起始时间start_time和结束时间end_time转换为样本索引，对samples列表进行切片，返回指定时间区间内的样本子集。用于实现精准的时间段静音检测和内容检测。"
+        "lineno": 93,
+        "description": "根据采样率sr将start_time和end_time转换为样本索引，并裁剪到有效范围[0, len(samples)]，返回对应区间的样本切片。用于在音频中定位特定时间段的内容，供check_audio_silence_at、check_audio_has_content_at等函数使用。"
       },
       {
         "name": "_open_aup3",
-        "lineno": 110,
-        "description": "使用sqlite3.connect打开.aup3文件并返回数据库连接对象。该函数是.aup3项目解析的底层入口，被_get_aup3_project_xml调用。"
+        "lineno": 106,
+        "description": "使用sqlite3.connect打开.aup3文件路径并返回数据库连接对象。是.aup3项目解析的入口，被_get_aup3_project_xml调用。"
       },
       {
         "name": "_get_aup3_project_xml",
-        "lineno": 116,
-        "description": "打开.aup3的SQLite数据库，优先从project表读取doc字段；若不存在，则尝试autosave表。将读取到的内容（若为bytes则按UTF-8解码）作为项目XML字符串返回。该函数是连接Audacity项目二进制存储与XML解析的关键桥梁。"
+        "lineno": 112,
+        "description": "打开.aup3数据库后，先执行SELECT doc FROM project LIMIT 1获取项目XML；若project表无数据，则回退到SELECT doc FROM autosave LIMIT 1。将取到的字节或字符串解码为UTF-8文本返回；若均不存在返回None。为_parse_aup3_tracks提供原始XML源。"
       },
       {
         "name": "_parse_aup3_tracks",
-        "lineno": 133,
-        "description": "调用_get_aup3_project_xml获取XML字符串，使用xml.etree.ElementTree解析根元素，处理命名空间后遍历所有子元素。识别标签为wavetrack/WaveTrack的波形轨，提取name、gain（线性）、mute、solo、pan；识别labeltrack/LabelTrack的标签轨，提取name及其下所有label的time、t1、text/title。返回包含所有音轨信息的字典列表。该函数是全部.aup3相关主检查（音轨数、增益、静音、标签）的统一解析器。"
+        "lineno": 128,
+        "description": "解析项目XML字符串，自动处理命名空间。遍历根元素子节点，识别wavetrack/WaveTrack与labeltrack/LabelTrack两类轨道。wave轨道提取name、gain（线性倍数，浮点）、mute（布尔）、solo（布尔）、pan；label轨道提取每个label的time、t1、text/title。返回轨道字典列表，是所有.aup3主函数的数据源。"
       }
     ]
   },
-  "created_at": "2026-06-30 20:52:29",
+  "created_at": "2026-07-01 14:22:44",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00013-0013-4000-8000-000000000013./evaluator_function_labels.json"
 }

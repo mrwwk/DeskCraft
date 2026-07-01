@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_correction_104./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "根据提供的代码片段，该 evaluator 目前仅实现了一个通用的精确匹配评分逻辑。它通过比较任务返回的实际结果（result）与规则中预设的期望值（rules['expected']）来判断是否一致：完全一致则返回 1.0，否则返回 0.0。代码中虽然导入了大量与文档解析、模糊匹配、数据库操作相关的库（如 rapidfuzz、lxml、pdfplumber、docx 等），但在提供的函数中均未使用。由于代码中未包含针对 INTERACTIVE_vscode_interactive_vscode_correction_104 任务场景的特定验证逻辑（例如 VSCode 编辑器状态检查、文件内容比对、交互式补全结果捕获等），因此无法从现有代码还原完整的任务验证闭环。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收两个参数：result（任务实际输出或结果）和 rules（评测规则字典，其中必须包含 'expected' 键）。检查步骤极为直接：首先提取 rules['expected'] 作为期望值，然后使用 Python 的 == 运算符比较 result 与 expect 是否完全相等。若相等，返回 1.0 表示成功/满分；否则返回 0.0 表示失败/零分。该函数未调用任何辅助函数，未使用任何近似匹配、正则匹配或容错阈值，也未读取任何外部文件、页面或图像。代码中未明确体现该函数在 VSCode 交互式修正任务中的具体调用上下文（例如 result 是文件内容、终端输出还是编辑器状态）。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:38:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_correction_104./evaluator_function_labels.json"
+}

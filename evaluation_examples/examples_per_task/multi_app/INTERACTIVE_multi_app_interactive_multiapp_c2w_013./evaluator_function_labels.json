@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_013./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对单一字符串结果进行二元分值判定。核心检查对象是一个字符串类型的 result，以及由 rules 参数指定的包含规则（rules[\"include\"]）和排除规则（rules[\"exclude\"]）。验证逻辑采用严格的子串全匹配方式：要求 result 必须同时包含所有 include 列表中的字符串，且必须同时不包含所有 exclude 列表中的字符串。若 result 为 None，直接判定为失败（返回 0.0）；仅当所有包含条件与排除条件全部满足时返回 1.0，否则返回 0.0。这是一种全有或全无的硬性字符串内容检查机制。代码中未明确体现 result 的具体来源（如具体文件、页面或命令输出）。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收字符串参数 result 与字典参数 rules，对 result 执行包含与排除子串检查。具体步骤为：1）若 result 为 None，直接返回 0.0；2）从 rules 中读取 include 列表（键名为 \"include\"）和 exclude 列表（键名为 \"exclude\"），若对应键不存在则默认为空列表；3）使用 Python 的 `in` 操作符检查 result 是否包含 include 中所有子串；4）同样使用 `in` 操作符检查 result 是否不包含 exclude 中所有子串；5）若步骤 3 和步骤 4 全部满足，返回 1.0，否则返回 0.0。函数执行过程中会将 result 与 rules 打印至标准输出以便调试。该函数未调用其他辅助函数，独立完成全部判定逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:13:52",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_013./evaluator_function_labels.json"
+}

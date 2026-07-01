@@ -1,0 +1,255 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_456c4488-c4c4-475f-b671-0556dac8696a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 16
+    },
+    {
+      "name": "enable_debug_logging",
+      "lineno": 29
+    },
+    {
+      "name": "check_presenter_console_disable",
+      "lineno": 39
+    },
+    {
+      "name": "check_image_stretch_and_center",
+      "lineno": 63
+    },
+    {
+      "name": "is_red_color",
+      "lineno": 101
+    },
+    {
+      "name": "get_master_placeholder_color",
+      "lineno": 106
+    },
+    {
+      "name": "check_slide_numbers_color",
+      "lineno": 120
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 167
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 191
+    },
+    {
+      "name": "check_strikethrough",
+      "lineno": 745
+    },
+    {
+      "name": "check_slide_orientation_Portrait",
+      "lineno": 776
+    },
+    {
+      "name": "evaluate_presentation_fill_to_rgb_distance",
+      "lineno": 787
+    },
+    {
+      "name": "check_left_panel",
+      "lineno": 844
+    },
+    {
+      "name": "check_transition",
+      "lineno": 862
+    },
+    {
+      "name": "check_page_number_colors",
+      "lineno": 900
+    },
+    {
+      "name": "check_auto_saving_time",
+      "lineno": 1043
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 16
+    },
+    {
+      "name": "enable_debug_logging",
+      "lineno": 29
+    },
+    {
+      "name": "check_presenter_console_disable",
+      "lineno": 39
+    },
+    {
+      "name": "check_image_stretch_and_center",
+      "lineno": 63
+    },
+    {
+      "name": "is_red_color",
+      "lineno": 101
+    },
+    {
+      "name": "get_master_placeholder_color",
+      "lineno": 106
+    },
+    {
+      "name": "check_slide_numbers_color",
+      "lineno": 120
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 167
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 191
+    },
+    {
+      "name": "check_strikethrough",
+      "lineno": 745
+    },
+    {
+      "name": "check_slide_orientation_Portrait",
+      "lineno": 776
+    },
+    {
+      "name": "evaluate_presentation_fill_to_rgb_distance",
+      "lineno": 787
+    },
+    {
+      "name": "check_left_panel",
+      "lineno": 844
+    },
+    {
+      "name": "check_transition",
+      "lineno": 862
+    },
+    {
+      "name": "check_page_number_colors",
+      "lineno": 900
+    },
+    {
+      "name": "check_auto_saving_time",
+      "lineno": 1043
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证LibreOffice Impress或PowerPoint（PPTX）演示文稿编辑任务的完成质量。它通过python-pptx库解析PPTX文件，或直接读取PPTX压缩包内的XML、LibreOffice配置文件及无障碍访问树（accessibility tree）等多种数据源，检查幻灯片的内容、格式、布局、母版样式、页面设置、过渡动画及应用程序配置。核心比较方式包括：与原始文件或预期文件进行逐幻灯片、逐形状、逐段落、逐run的严格比对（compare_pptx_files）；按规则直接检查特定属性（如删除线、页码颜色、自动保存时间、幻灯片方向、过渡效果）；以及基于RGB欧氏距离计算背景色相似度（evaluate_presentation_fill_to_rgb_distance）。成功判定以二元判定为主（返回1.0表示通过，0.0表示失败），部分检查采用连续分数（如背景色相似度），且compare_pptx_files默认采用“任一不匹配即整体返回0”的严格逻辑，同时支持通过options参数灵活开关各检查维度。",
+    "main_functions": [
+      {
+        "name": "enable_debug_logging",
+        "lineno": 16,
+        "description": "配置名为desktopenv.metric.slides.debug的日志记录器，将其级别设为DEBUG，并添加StreamHandler，使用格式'[PPTX_DEBUG] %(message)s'。用于在compare_pptx_files中开启调试日志输出，打印详细比对过程。"
+      },
+      {
+        "name": "enable_debug_logging",
+        "lineno": 29,
+        "description": "功能与line 16的同名函数类似，但日志格式包含时间戳、名称和级别。由于Python中后定义的同名函数会覆盖前者，实际生效的是此版本。用于输出带时间戳的PPTX详细调试信息。"
+      },
+      {
+        "name": "check_presenter_console_disable",
+        "lineno": 39,
+        "description": "接收LibreOffice配置文件路径（XML格式）。使用ET.parse解析XML，在oor命名空间下查找oor:path为'/org.openoffice.Office.Impress/Misc/Start'且oor:name为'EnablePresenterScreen'的配置项。读取其value子节点文本，若转换为小写后为'false'，说明演示者控制台已禁用，返回1.0；否则返回0.0。解析异常也返回0.0。"
+      },
+      {
+        "name": "check_image_stretch_and_center",
+        "lineno": 63,
+        "description": "接收modified_ppt和original_ppt两个文件路径。使用Presentation加载后，取各自第一张幻灯片，筛选shape_type为13（图片）的形状。在原始幻灯片中定位第一张图片，在修改后的幻灯片中通过image.blob匹配找到同一张图片。检查该图片修改后是否满足：宽度与幻灯片宽度差值不超过0.5英寸、高度与幻灯片高度差值不超过0.5英寸、水平居中偏移不超过0.5英寸、垂直居中偏移不超过0.5英寸。全部满足返回1.0，任一不满足或找不到图片返回0.0。"
+      },
+      {
+        "name": "is_red_color",
+        "lineno": 101,
+        "description": "接收一个颜色对象。判断该颜色是否存在且其rgb属性等于(255, 0, 0)。返回布尔值。服务于check_slide_numbers_color等函数判断颜色是否为纯红色。"
+      },
+      {
+        "name": "get_master_placeholder_color",
+        "lineno": 106,
+        "description": "接收一个Presentation对象。遍历所有slide_masters中的placeholders，查找has_text_frame为真且text为'<number>'的占位符。返回其text_frame中第一个段落的字体颜色（font.color）。若未找到则返回None。用于获取母版中页码占位符的颜色定义。"
+      },
+      {
+        "name": "check_slide_numbers_color",
+        "lineno": 120,
+        "description": "接收PPTX文件路径。加载演示文稿后，遍历所有幻灯片的所有形状，查找text属性为纯数字（isdigit()）的形状（即页码文本框）。同时调用get_master_placeholder_color获取母版页码占位符的颜色。若页码文本存在且母版占位符颜色不为None且is_red_color判断为红色，则返回1，否则返回0。"
+      },
+      {
+        "name": "get_all_text_shapes",
+        "lineno": 167,
+        "description": "接收一个slide对象。内部定义递归函数extract_text_shapes，递归收集当前shape及其子shape（如果是GROUP，即hasattr(shape, 'shapes')）中所有同时具备text和text_frame属性的shape。返回列表。用于compare_pptx_files中确保不遗漏GROUP内部的文本形状。"
+      },
+      {
+        "name": "compare_pptx_files",
+        "lineno": 191,
+        "description": "核心比对函数，接收两个PPTX文件路径file1_path、file2_path及大量可选参数options。使用Presentation加载两个文件后，按幻灯片顺序逐一比对。默认开启的检查项包括：幻灯片数量、背景色（通过get_slide_background_color）、备注（通过get_slide_notes）、形状数量、形状位置尺寸（left/top/width/height，使用is_approximately_equal，默认容差0.005）、文本内容、段落数量、缩进级别、字体名称/大小/粗体/斜体/颜色/下划线/删除线、对齐方式（None视为PP_ALIGN.LEFT）、项目符号（通过_extract_bullets和_compare_bullets_with_tolerance）、表格行列数及单元格内容格式、图片尺寸等。特殊位置检查（examine_title_bottom_position、examine_table_bottom_position、examine_right_position、examine_top_position）针对特定幻灯片和形状类型进行阈值判断；examine_shape_for_shift_size对特定文本形状豁免位置检查；examine_modify_height仅在examine_shape=False时生效，对无文本或FREEFORM形状仅检查height。对于表格，逐单元格、逐段落、逐run比对字体属性。对于GROUP内的文本，通过get_all_text_shapes递归提取后额外进行对齐检查。所有检查默认是“任一不匹配即返回0”的严格模式，全部通过才返回1。"
+      },
+      {
+        "name": "check_strikethrough",
+        "lineno": 745,
+        "description": "接收PPTX路径和rules字典（包含slide_index_s、shape_index_s、paragraph_index_s三个索引列表）。遍历指定的幻灯片、形状、段落索引，检查每个指定段落的第一个run（runs[0]）的font._element.attrib中是否包含'strike'属性。若所有指定位置均包含该属性则返回1，任一缺失或发生异常则返回0。"
+      },
+      {
+        "name": "check_slide_orientation_Portrait",
+        "lineno": 776,
+        "description": "接收PPTX路径。加载演示文稿后，比较slide_width和slide_height。若宽度小于高度，判定为纵向（Portrait）布局，返回1；否则返回0。"
+      },
+      {
+        "name": "evaluate_presentation_fill_to_rgb_distance",
+        "lineno": 787,
+        "description": "接收PPTX文件路径和rules字典（包含rgb目标颜色和可选的original_rgb）。定义内部函数slide_fill_distance_to_rgb计算单张幻灯片背景色与目标RGB的归一化欧氏距离。对于每张幻灯片，先检查背景填充类型：若为纯色填充（type==1），取前景色；若为母版填充（type==5），取slide_layout.slide_master.background.fill的前景色。若提供了original_rgb且当前颜色等于original_rgb（即未改变），则距离为1（最大）。否则计算RGB三维欧氏距离并除以sqrt(255^2+255^2+255^2)归一化。最终返回1减去所有幻灯片平均距离，即相似度分数，范围[0,1]。"
+      },
+      {
+        "name": "check_left_panel",
+        "lineno": 844,
+        "description": "接收accessibility_tree字符串（XML格式）。解析XML后，遍历所有document-frame节点，若存在attrib中name等于'Slides View'的节点，说明左侧幻灯片缩略图面板已打开，返回1.0；否则返回0.0。"
+      },
+      {
+        "name": "check_transition",
+        "lineno": 862,
+        "description": "接收PPTX文件路径和rules字典（包含slide_idx和transition_type）。使用zipfile打开PPTX，定位到ppt/slides/slide{slide_idx+1}.xml。解析该幻灯片XML，在p命名空间下查找transition元素，再查找名为transition_type的子元素（如dissolve）。若找到则返回1.0，否则返回0.0。若幻灯片不存在也返回0.0。"
+      },
+      {
+        "name": "check_page_number_colors",
+        "lineno": 900,
+        "description": "接收PPTX文件路径和rules字典（包含color，如'red'/'blue'/'green'/'black'）。使用zipfile直接读取ppt/slideMasters/slideMaster1.xml。通过多级回退策略定位页码颜色：首先查找phType='sldNum'的占位符下的a:srgbClr；未找到则查找sldNum/ftr/dt类型占位符；仍未找到则查找文本运行中的非黑色颜色；最后回退到任意非黑色颜色或最后一个颜色元素。解析颜色值为RGB元组后，使用对应颜色的阈值函数（如is_red要求r > g+50且r > b+50）进行判断。符合预期颜色返回1，否则返回0。"
+      },
+      {
+        "name": "check_auto_saving_time",
+        "lineno": 1043,
+        "description": "接收XML配置文件路径和rules字典（包含minutes）。解析XML，在oor命名空间下查找path为'/org.openoffice.Office.Common/Save/Document'的item，再查找name为'AutoSaveTimeIntervall'的prop元素。将其value文本转为整数，若等于minutes则返回1，否则返回0。解析失败或文件不存在返回0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "is_approximately_equal",
+        "lineno": 204,
+        "description": "嵌套定义于compare_pptx_files内部。接收两个数值val1、val2和容差参数tolerance（默认0.005）。若两值相等或均为0则返回True；若其一为0则返回False；否则计算相对差值abs(val1-val2)/max(abs(val1),abs(val2))，判断是否小于等于容差。用于形状位置、尺寸等浮点数的近似匹配。"
+      },
+      {
+        "name": "nonempty_runs",
+        "lineno": 212,
+        "description": "嵌套定义于compare_pptx_files内部。接收一个段落对象para。使用列表推导过滤出runs中text.strip()不为空的run列表。用于处理空段落中仅包含格式占位run的情况，避免run数量误判。"
+      },
+      {
+        "name": "get_slide_background_color",
+        "lineno": 254,
+        "description": "嵌套定义于compare_pptx_files内部。接收slide对象。检查slide.background.fill的类型：若为1（纯色填充），返回fill.fore_color.rgb；若为5（母版填充），则取slide.slide_layout.slide_master.background.fill的前景色；其他情况返回None。用于比较两张幻灯片的背景色是否一致。"
+      },
+      {
+        "name": "get_slide_notes",
+        "lineno": 267,
+        "description": "嵌套定义于compare_pptx_files内部。接收slide对象。获取slide.notes_slide，若存在则返回notes_text_frame.text，否则返回None。用于比较幻灯片备注内容。"
+      },
+      {
+        "name": "_extract_bullets",
+        "lineno": 600,
+        "description": "嵌套定义于compare_pptx_files内部。接收XML字节数据（utf-8解码）。解析a:p段落元素，提取每个段落的级别（lvl）、项目符号字符（buChar）、文本内容（a:t拼接）和颜色（buClr/a:srgbClr的val属性）。仅保留text.strip()非空的段落。返回列表。用于从run的底层XML提取项目符号信息。"
+      },
+      {
+        "name": "_compare_bullets_with_tolerance",
+        "lineno": 625,
+        "description": "嵌套定义于compare_pptx_files内部。接收两个bullets列表。比较长度是否一致，再逐对比较：文本必须完全相同，项目符号字符必须相同，级别将None归一化为'0'后比较，颜色差异被忽略。全部匹配返回True，否则False。用于在项目符号比对中容忍主题色差异。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 19:07:10",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_456c4488-c4c4-475f-b671-0556dac8696a./evaluator_function_labels.json"
+}

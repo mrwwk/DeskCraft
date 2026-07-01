@@ -26,32 +26,32 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Blender 场景中指定名称灯光（Light）的能量（energy）属性是否符合预期。它接收来自 check_object.py 脚本输出的 JSON 文本，解析为结构化数据后，在场景对象列表中按精确名称定位目标灯光，确认其类型为 LIGHT，随后将实际 energy 数值与 rule 中给定的 expected_energy（若未提供则回退到 energy 字段）进行容差比较。比较采用绝对差值法，默认容差为 10。只有 JSON 解析成功、对象存在、类型正确且能量值在容差范围内时，才返回 1.0（成功）；任何一步失败或发生异常，均返回 0.0（失败）。整体为单指标、阈值式的二元打分判定逻辑。",
+    "overall_validation": "该evaluator用于验证Blender场景中指定光源的能量（energy）属性是否达到任务要求。它通过读取Blender检查脚本（check_object.py）输出的JSON数据，在场景对象列表中按精确名称定位目标光源，核对其类型必须为LIGHT，并将其energy字段值与预期值进行容差比较。若实际能量值落在预期值±容差范围内，则判定任务成功并返回1.0分；若解析失败、对象不存在、类型不符、能量偏差超出容差，或过程中发生任何异常，则返回0.0分。整体采用单指标硬阈值打分逻辑，不满足即零分。",
     "main_functions": [
       {
         "name": "check_blender_light_energy",
         "lineno": 48,
-        "description": "该函数接收 command_output（来自 check_object.py 的 JSON 字符串）和 rule 字典。首先调用 _parse_blender_output 将原始输出解析为字典；若解析失败或结果为空，直接返回 0.0。接着从 rule 中提取 light_name（默认空字符串）、expected_energy（优先取 expected_energy 键，缺失则回退到 energy 键，默认值为 0）以及 tolerance（默认 10）。然后调用 _find_object 在解析结果的 objects 列表中按精确名称查找目标对象；若对象不存在，或其 type 字段不等于 LIGHT，则返回 0.0。随后读取该对象的 energy 字段作为实际值，调用 _check_tolerance 判断实际值与预期值的绝对差是否在容差范围内；若满足则返回 1.0，否则记录警告日志并返回 0.0。整个流程被 try-except 包裹，任何异常均返回 0.0。"
+        "description": "该主函数接收两个参数：command_output为Blender检查脚本输出的JSON字符串，rule为包含校验规则的字典。其执行步骤如下：1）调用_parse_blender_output将command_output解析为Python字典，若解析失败或输出为空则直接返回0.0；2）从rule中提取light_name（光源名称，默认空字符串）、expected_energy（优先取该键，若不存在则回退到energy键，默认0）以及tolerance（容差，默认10）；3）调用_find_object在解析结果的objects列表中按精确名称查找目标对象，若未找到或该对象的type字段不等于LIGHT，则返回0.0；4）获取目标对象的energy字段作为实际值；5）调用_check_tolerance判断实际能量值是否在预期值的容差范围内；6）若通过容差检查则返回1.0，否则记录警告并返回0.0。整个流程被try-except包裹，任何异常均捕获后返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 19,
-        "description": "接收 Blender 检查脚本输出的原始字符串 command_output，去除首尾空白后使用 json.loads 解析为 Python 字典。若输入为空或仅含空白，或解析时抛出 JSONDecodeError / ValueError，则记录错误日志并返回 None。该函数是主评测流程的数据入口，负责将 check_object.py 的原始文本输出转换为结构化数据，供后续对象查询与字段比较使用。"
+        "lineno": 14,
+        "description": "该辅助函数负责将Blender检查脚本输出的原始字符串解析为结构化数据。它先判断输入是否为空或仅含空白，若是则记录错误并返回None；否则对去除首尾空白后的内容执行json.loads，返回对应的Python字典。若遇到JSONDecodeError或ValueError，则记录错误日志并返回None。该函数是主函数的数据入口，为后续对象查找和字段比较提供结构化数据基础。"
       },
       {
         "name": "_find_object",
-        "lineno": 32,
-        "description": "接收 _parse_blender_output 返回的结果字典 result 和对象名称字符串 name，遍历 result 中 objects 列表的每个元素，通过精确字符串匹配（obj.get(\"name\") == name）查找指定对象。若找到则返回该对象字典，否则返回 None。该函数被主函数用于在 Blender 场景对象中定位目标灯光实例，是对象级检查的基础定位器。"
+        "lineno": 25,
+        "description": "该辅助函数在已解析的Blender场景结果中按精确名称检索对象。它遍历result字典中objects列表的每个元素，将元素的name字段与传入的name参数进行精确字符串匹配，返回第一个匹配到的完整对象字典；若遍历结束未找到，则返回None。该函数服务于主函数的定位逻辑，要求对象名称必须完全一致，不支持模糊或部分匹配。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 40,
-        "description": "接收 actual（实际值）、expected（预期值）和 tol（容差）三个参数。若 actual 或 expected 为 None，直接返回 False；否则将三者转换为 float，计算绝对差值 abs(float(actual) - float(expected))，并判断是否小于等于 float(tol)。该函数提供数值近似匹配能力，被主函数用于判定灯光 energy 字段是否在允许的误差阈值范围内。"
+        "lineno": 33,
+        "description": "该辅助函数实现数值容差比较。它接收actual（实际值）、expected（预期值）和tol（容差）三个参数，首先检查actual或expected是否为None，若任一缺失则返回False；否则将两者均转为浮点数，计算绝对差值并判断是否小于等于tol。该函数被主函数用于判定光源energy字段是否落在允许误差区间内，是一个通用的数值近似匹配器。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:06:30",
+  "created_at": "2026-07-01 14:34:33",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_698d2b6a-8843-40ef-9258-d31d4fef6a0a./evaluator_function_labels.json"
 }

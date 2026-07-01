@@ -154,107 +154,107 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "本evaluator用于验证桌面环境中Chrome浏览器操作及关联文件处理的执行结果。核心检查对象分为三大类：一是浏览器实时状态，包括活动标签页URL、全部打开标签页、已安装扩展、书签结构、搜索查询参数、Cookie存活情况、历史记录内容、实验性功能开关、字体大小设置等；二是桌面级产物，如桌面快捷方式（按名称或执行命令匹配）、Steam购物车内容；三是文件内容比对，包括PDF文本相似度、PDF内嵌图像感知哈希比对、压缩包内部文件一致性（支持text/pdf/docx/ppt/image/csv/table/audio/video等多种类型）、HTML文档递归DOM结构比对。验证手段涵盖精确相等、集合包含、正则匹配、URL归一化与去参近似匹配、模糊文本相似度（rapidfuzz）、感知哈希图像比对（imagehash.phash，阈值5）、逐元素递归属性比对等。成功判定总体思路为：状态类检查通常要求实际值与预期值完全一致或满足包含/子集关系；删除类检查要求目标数据在对应集合中完全消失；文件类检查要求文件列表对齐且内容相似度达到满分或超过阈值。各函数独立返回0（失败）到1（成功）之间的分数。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器及关联桌面任务的多维度完成状态与文件内容一致性。核心检查对象涵盖：浏览器活动标签页URL（精确匹配或忽略查询参数匹配）、全部打开标签页集合、已安装扩展列表、书签结构（书签栏文件夹名称、书签栏网址、特定文件夹如\"Liked Authors\"下的网址组合）、搜索查询URL的正则匹配、Cookie与历史记录的删除状态（支持关键词存在/缺失的组合判断）、桌面快捷方式（.desktop文件的Name或Exec字段匹配）、浏览器实验功能启用列表、字体大小设置（精确值或开区间范围），以及Steam购物车页面内容检测。此外提供多种文件级比较能力：PDF文本模糊相似度（rapidfuzz）、PDF内嵌图片的感知哈希比对（imagehash，阈值5）、归档文件（zip等）内部文件列表一致性及内容级联比较（支持text/pdf/docx/ppt/image/csv/table/audio/video类型，动态路由到对应比较器）、HTML递归DOM结构比较（标签名、去空白文本、属性，可选忽略sdnum属性）。判定逻辑以二元判定（0或1）为主，部分文件比较返回连续分数（0.0–1.0），各指标独立计算，由上层调用方决定联合方式。",
     "main_functions": [
       {
         "name": "is_expected_active_tab",
         "lineno": 35,
-        "description": "接收Chrome活动标签页信息active_tab_info（字典或字符串）与规则rule。当rule['type']为'url'时，先调用_normalize_chrome_url对rule['url']和active_tab_info中的实际URL进行归一化（修复https:///误捕获为file:///的bug），再调用compare_urls进行精确URL比对。若匹配则返回1，否则返回0。"
+        "description": "接收active_tab_info（字典含'url'键或字符串）与rule（字典含'type'和'url'）。若输入为空直接返回0。当match_type为'url'时，先用_normalize_chrome_url对expected_url和actual_url做规范化（修复https:///前缀捕获bug），再调用compare_urls进行精确URL匹配。匹配成功返回1，否则返回0；遇到未知type则记录错误并返回0。"
       },
       {
         "name": "is_expected_active_tab_approximate",
         "lineno": 58,
-        "description": "接收Chrome活动标签页信息active_tab_info与规则rule。当rule['type']为'url'时，先_normalize_chrome_url归一化预期与实际URL，再通过urlparse去除查询参数（query），仅比较协议、域名、路径部分。去参后相等返回1，否则返回0。"
+        "description": "接收active_tab_info与rule。若输入为空返回0。当match_type为'url'时，同样先经_normalize_chrome_url规范化URL，随后使用urllib.parse.urlparse去掉查询参数（query），仅比较协议、域名与路径部分。去参后完全一致返回1，否则返回0。"
       },
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 87,
-        "description": "接收result（字符串URL或含'url'键的字典）与规则rules。从result中提取待测URL后，遍历rules['expected']中的每一个正则pattern，使用re.search检查该pattern是否均能在URL中命中。所有pattern都匹配返回1，任一pattern未匹配立即返回0。"
+        "description": "接收result（字符串URL或含'url'字段的字典）与rules（字典，其中'expected'为正则模式列表）。先从result中提取字符串URL；随后遍历rules['expected']中的每个pattern，使用re.search在URL中逐一查找。要求所有pattern必须全部匹配（逻辑与），全部命中返回1，任一未命中立即返回0。"
       },
       {
         "name": "is_expected_installed_extensions",
         "lineno": 119,
-        "description": "接收已安装扩展列表installed_extensions与预期expected字典。将expected['expected']与installed_extensions均转为集合，判断预期扩展集合是否为实际安装集合的子集。若是则返回1，否则返回0，即要求所有预期扩展都必须已安装。"
+        "description": "接收installed_extensions（已安装扩展列表）与expected（字典，其中'expected'为期望扩展列表）。将两个列表转为set，检查set_expected_extensions是否为set_installed_extensions的子集。若是返回1，否则返回0；若installed_extensions为空返回0。"
       },
       {
         "name": "is_expected_tabs",
         "lineno": 137,
-        "description": "接收打开的标签页列表open_tabs（每个元素为含'url'的字典）与规则rule。当rule['type']为'url'时，提取所有标签页的url组成actual_urls，调用are_lists_equal（以compare_urls作为元素比对函数）检查rule['urls']与actual_urls是否完全一致（含顺序与内容）。一致返回1，否则返回0。"
+        "description": "接收open_tabs（标签页字典列表）与rule（字典含'type'和'urls'）。若open_tabs为空返回0。当match_type为'url'时，提取所有tab的'url'组成actual_urls列表，调用are_lists_equal(expected_urls, actual_urls, compare_urls)比较两个列表是否相等。相等返回1，否则返回0并记录错误日志。"
       },
       {
         "name": "is_expected_bookmarks",
         "lineno": 160,
-        "description": "接收Chrome书签数据bookmarks与规则rule，按rule['type']分三支处理：1) bookmark_bar_folders_names：提取书签栏中type为'folder'的name列表，与rule['names']做集合相等判断；2) bookmark_bar_websites_urls：提取书签栏中type为'url'的url列表，与rule['urls']做集合相等判断；3) liked_authors_websites_urls：在书签栏查找名为'Liked Authors'的文件夹，若存在则提取其下所有url，与rule['urls']比对；rule['urls']中每项可为字符串或列表，使用itertools.product生成所有可能组合，若任一组合与实际URL集合完全相等则返回1，否则返回0。"
+        "description": "接收bookmarks（Chrome书签结构字典）与rule。若bookmarks为空返回0。按rule['type']分三支：1) bookmark_bar_folders_names：提取bookmark_bar下type为'folder'的name列表，与rule['names']做集合相等比较；2) bookmark_bar_websites_urls：提取bookmark_bar下type为'url'的url列表，与rule['urls']做集合相等比较；3) liked_authors_websites_urls：在bookmark_bar的子节点中查找name为'Liked Authors'且type为'folder'的节点，若存在则提取其下所有type为'url'的url组成集合；rule['urls']中每个元素若为字符串会被包装为单元素列表，随后用itertools.product生成所有可能的URL组合，检查是否有任一组合与实际集合相等。匹配返回1，否则返回0；未知type抛TypeError。"
       },
       {
         "name": "is_expected_search_query",
         "lineno": 203,
-        "description": "接收active_tab_info与规则rules。在active_tab_info['url']中使用re.search查找rules['expect']['pattern']指定的正则表达式。若匹配成功返回1，否则返回0。"
+        "description": "接收active_tab_info（字典）与rules（字典，其中'expect'含'pattern'）。若active_tab_info为空返回0。使用re.search在active_tab_info['url']中查找pattern。匹配成功返回1，否则返回0。"
       },
       {
         "name": "compare_pdfs",
         "lineno": 215,
-        "description": "接收pdf1_path与pdf2_path（均可为字符串或列表）。对每一对PDF，使用fitz（PyMuPDF）逐页提取纯文本，调用rapidfuzz.fuzz.ratio计算文本相似度并除以100映射为0~1分数。若传入列表，则对所有配对求平均分。任一文件处理异常时记录日志并跳过，最终返回平均分数。"
+        "description": "接收pdf1_path与pdf2_path（可为字符串或字符串列表）。若输入非列表则统一包装为单元素列表。内部定义extract_text_from_pdf，使用fitz逐页提取文本并拼接。对每一对PDF路径，提取文本后使用rapidfuzz.fuzz.ratio计算文本相似度，除以100映射为0–1分数并累加。若某对处理异常则记录日志且该对不计分。最终返回所有PDF对的平均分数（总分除以pdf2_path的长度）。"
       },
       {
         "name": "compare_pdf_images",
         "lineno": 252,
-        "description": "接收pdf1_path与pdf2_path。先校验文件存在性，创建临时目录复制PDF后，使用fitz提取每页所有内嵌图像并转为PIL Image，再用imagehash.phash计算感知哈希。要求两PDF图像数量完全一致，否则返回0；若均无图像则返回1.0。设定hash_threshold=5，逐对比较哈希差值，差值≤5计为匹配。最终返回匹配图像数/总图像数。"
+        "description": "接收pdf1_path与pdf2_path。若路径不存在返回0。内部定义extract_images_from_pdf，使用fitz提取每页所有内嵌图片并转为PIL Image。先将PDF复制到同级临时目录处理，处理完毕后清理临时目录。比较两PDF提取到的图片数量：数量不一致返回0；若均无图片返回1.0。随后对每对对应图片计算imagehash.phash感知哈希，差值阈值hash_threshold为5。统计差值小于等于5的图片数量，返回匹配比例（匹配数/总图片数）。"
       },
       {
         "name": "compare_archive",
         "lineno": 322,
-        "description": "接收预测压缩包路径pred_path、标准答案路径gold_path及kwargs。将两者解压到临时目录（gold目录存在则复用缓存），检查kwargs['file_path']指定子路径下的文件名列表（排序后）是否完全一致，不一致直接返回0。一致后根据kwargs['file_type']动态选择比较函数（支持text/pdf/docx/ppt/image/csv/table/audio/video），逐文件比对并返回平均分。"
+        "description": "接收pred_path（预测归档路径）、gold_path（标准归档路径）与**kwargs。解压pred_path到同名_pred文件夹（预测端每次重建），gold_path解压到同名_gold文件夹（标准端可缓存）。读取kwargs中file_path指定的子目录，对其下文件名排序后比较：若文件列表不一致直接返回0。一致时根据kwargs['file_type']（默认'text'）动态导入并选择比较函数：text→vscode.compare_text_file、pdf→compare_pdfs、docx→docs.compare_docx_files、ppt→slides.compare_pptx_files、image→vlc.compare_images、csv→table.compare_csv、table→table.compare_table、audio→vlc.compare_audios、video→vlc.compare_videos。对每对同名文件调用比较函数并累加分数，最终返回平均分。"
       },
       {
         "name": "compare_htmls",
         "lineno": 388,
-        "description": "接收两个HTML文件路径与options。使用BeautifulSoup（lxml解析器）读取并解析，通过recursiveChildGenerator递归遍历所有子元素。对每对元素：若非Tag则直接比较相等性；若为Tag则依次比较name、text.strip()、attrs。当options['ignore_sdnum']为真时，比较attrs会忽略'sdnum'属性。任一位置不匹配即返回0，全部遍历通过返回1。"
+        "description": "接收html_path1、html_path2与**options。使用BeautifulSoup（lxml解析器）读取并解析两个HTML文件。内部定义compare_elements递归比较节点：非Tag节点直接判等；Tag节点依次比较name、text.strip()、attrs；若options含ignore_sdnum=True，比较attrs时忽略'sdnum'键。使用recursiveChildGenerator遍历两文档的所有子节点，任一节点不匹配则记录日志并返回0.0；全部匹配返回1。"
       },
       {
         "name": "is_cookie_deleted",
         "lineno": 427,
-        "description": "接收cookie_data与规则rule。当rule['type']为'domains'时，提取所有cookie的domain组成列表，遍历rule['domains']中的每个预期domain，使用compare_urls与实际domain比对。若任一预期domain在实际中存在，说明Cookie未删除，返回0；全部未找到则返回1。"
+        "description": "接收cookie_data（Cookie列表）与rule。当rule['type']为'domains'时，提取cookie_data中每个cookie的domain字段（索引1位置）。遍历rule['domains']，若任一期望domain通过compare_urls匹配到实际cookie中的domain，说明Cookie仍存在，返回0；若全部未匹配到（已删除干净）返回1。其他type抛TypeError。"
       },
       {
         "name": "is_shortcut_on_desktop",
         "lineno": 443,
-        "description": "接收桌面快捷方式字典shortcuts（键为路径，值为文件内容字符串）与规则rule。当rule['type']为'name'时，在每个shortcut_content中查找'Name='行，先尝试精确匹配，再检查预期name与实际name的互相包含（不区分大小写）。当rule['type']为'exec'时，同理查找'Exec='行并支持精确匹配与互相包含。找到任一匹配即返回1，否则返回0。type为'url'或'id'时抛出TypeError。"
+        "description": "接收shortcuts（字典，键为.desktop文件路径，值为文件内容字符串）与rule。当rule['type']为'name'时，遍历所有shortcut_content，先尝试精确子串匹配\"Name=\"+expected_name+\"\\n\"；否则逐行解析Name=后的实际名称，支持expected_name与实际名称的互相包含（不区分大小写）。当rule['type']为'exec'时，逻辑类似，匹配\"Exec=\"行，支持精确相等或互相包含。找到匹配返回1.0，否则返回0.0。type为'url'或'id'时抛TypeError。"
       },
       {
         "name": "check_history_deleted",
         "lineno": 534,
-        "description": "接收history_data与规则rule。当rule['type']为'keywords'时，提取所有历史记录的domain，遍历rule['keywords']，若任一keyword出现在任一history_domain中，说明历史记录未删除，返回0；全部keyword均未出现则返回1。"
+        "description": "接收history_data（历史记录列表）与rule。当rule['type']为'keywords'时，提取history_data中每条记录的domain（索引0位置）。遍历rule['keywords']，若任一keyword被任一history_domain包含（in操作），说明历史未删干净，返回0；若所有keyword均不存在于历史domain中返回1。其他type抛TypeError。"
       },
       {
         "name": "check_history_keywords_absent_and_present",
         "lineno": 550,
-        "description": "接收history_data与规则rule，要求rule['type']为'keywords_absent_present'。提取所有历史记录URL并转为小写。对absent_keywords，若任一关键词出现在任一URL中则返回0；对present_keywords，若任一关键词未出现在任何URL中则返回0。两类关键词条件全部满足返回1。"
+        "description": "接收history_data与rule。要求rule['type']为'keywords_absent_present'。提取所有历史URL并转为小写。absent_keywords中每个keyword都必须不出现在任何历史URL中（若出现则返回0）；present_keywords中每个keyword都必须至少出现在一个历史URL中（若未出现则返回0）。两类关键词约束全部满足返回1。"
       },
       {
         "name": "check_enabled_experiments",
         "lineno": 576,
-        "description": "接收enabled_experiments列表与规则rule。将每个experiment按'@'分割取前半部分作为实验名称。当rule['type']为'names'时，判断处理后的名称列表与rule['names']是否完全相等（顺序与内容均一致）。相等返回1，否则返回0。"
+        "description": "接收enabled_experiments（实验功能字符串列表，格式如\"name@value\"）与rule。提取每个experiment中'@'前的名称组成列表。当rule['type']为'names'时，与rule['names']进行精确列表相等比较。相等返回1，否则返回0。"
       },
       {
         "name": "check_font_size",
         "lineno": 588,
-        "description": "接收font_size字典与规则rule。提取default_font_size。当rule['type']为'value'时，判断default_font_size是否等于rule['value']；当rule['type']为'range'时，判断default_font_size是否满足rule['min'] < default_font_size < rule['max']。满足返回1，否则返回0。其他type抛出TypeError。"
+        "description": "接收font_size（字典含'default_font_size'键）与rule。当rule['type']为'value'时，检查default_font_size与rule['value']精确相等；当rule['type']为'range'时，检查default_font_size是否满足rule['min'] < default_font_size < rule['max']（严格开区间）。满足返回1，否则返回0；其他type抛TypeError。"
       },
       {
         "name": "is_added_to_steam_cart",
         "lineno": 602,
-        "description": "接收active_tab_info（含'content'字段）与规则rule。检查rule['items']中的每一个item字符串是否都出现在active_tab_info['content']中。全部包含返回1，任一缺失返回0。"
+        "description": "接收active_tab_info（字典，需含'content'字段）与rule（字典含'items'列表）。遍历rule['items']中的每个item字符串，检查其是否都存在于active_tab_info['content']中。全部包含返回1，任一缺失返回0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_normalize_chrome_url",
         "lineno": 20,
-        "description": "对可能被Chrome自动化错误捕获的URL进行归一化。若URL以'https:///'开头（本地文件URL被误录为无效https格式），则将其替换为'file://'前缀。该函数被is_expected_active_tab与is_expected_active_tab_approximate调用，用于确保URL比较前格式正确。"
+        "description": "URL规范化辅助函数，专门修复Chrome自动化捕获本地文件URL时的已知bug：将非法前缀'https:///'替换为'file:///'。该函数被is_expected_active_tab与is_expected_active_tab_approximate调用，确保后续URL比较（如compare_urls）不会因协议捕获错误而失败。若输入为空或无需修复则原样返回。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:39:02",
+  "created_at": "2026-07-01 15:01:56",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_progressive_103./evaluator_function_labels.json"
 }

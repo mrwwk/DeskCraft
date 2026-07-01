@@ -46,42 +46,42 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "这个 evaluator 总体用于验证 Blender 3D 场景在任务执行后的状态是否符合预期。它通过读取外部 Blender 检查脚本（如 check_object.py、check_collection.py、check_constraints.py）输出的 JSON 数据，对场景中的对象父子层级、集合成员归属以及对象约束条件进行精确检查。核心比较方式是基于字段精确匹配和集合包含关系：父子关系要求 parent 字段精确对应且 children 列表包含所有预期成员；集合成员要求指定集合的 objects 列表包含所有预期对象；约束条件要求 type、target、track_axis、up_axis 等关键属性逐一精确相等。判定逻辑采用二元分数制（1.0 表示完全成功，0.0 表示失败），各检查函数内部要求所有子条件全部满足，任一子条件不满足即直接返回 0.0。数据解析失败或异常也统一视为失败。",
+    "overall_validation": "该evaluator用于验证Blender 3D场景中的对象层级关系、集合成员归属以及对象约束条件。它通过读取Blender检查脚本（如check_object.py、check_collection.py、check_constraints.py）输出的JSON数据，对场景状态进行精确匹配检查。核心检查对象包括：对象间的父子链接（parent/children字段）、集合内的成员列表（collections/objects字段）、以及对象上附加的约束属性（type、target、track_axis、up_axis等）。判定采用二元制分数（0.0表示失败，1.0表示成功），要求rule中指定的所有条件必须全部满足才视为成功，任一条件不符或对象缺失即立即返回失败。",
     "main_functions": [
       {
         "name": "check_blender_parent_child",
         "lineno": 41,
-        "description": "接收来自 check_object.py 的 JSON 字符串 command_output 和规则字典 rule。首先调用 _parse_blender_output 解析 JSON，解析失败返回 0.0。该函数按三种模式依次检查：1）若 rule 包含 parent 与 expected_children，则通过 _find_object 定位父对象，检查其 children 列表是否包含所有预期子对象（集合包含关系），父对象不存在或子对象缺失均返回 0.0；2）若包含 parent_map，则逐对验证子对象的 parent 字段是否精确等于预期父对象，若包含 not_parent，则验证子对象的 parent 字段不等于指定错误父对象，任一违反返回 0.0；3）若 parent_has_children 为真，则遍历所有对象，检查是否存在 children 数量大于等于 min_children_count（默认 1）的对象，不存在则返回 0.0。所有检查通过返回 1.0，异常返回 0.0。"
+        "description": "接收来自check_object.py的JSON输出字符串command_output和规则字典rule，调用_parse_blender_output解析数据，并依据rule中的不同字段组合执行三种检查模式：模式一，若rule包含parent和expected_children，则通过_find_object定位该父对象，检查其children列表是否包含所有预期子对象（要求expected_children是actual_children的子集）；模式二，若rule包含parent_map，则逐个检查指定子对象的parent字段是否等于预期父对象，若包含not_parent，则检查指定子对象的parent字段不等于指定值；模式三，若rule包含parent_has_children，则遍历所有对象，检查是否存在任意对象的children数量大于等于min_children_count（默认值为1）。三种模式按顺序判断，任一检查失败即返回0.0，全部通过返回1.0。"
       },
       {
         "name": "check_blender_collection_members",
         "lineno": 100,
-        "description": "接收来自 check_collection.py 的 JSON 字符串 command_output 和规则字典 rule。首先调用 _parse_blender_output 解析 JSON，失败返回 0.0。提取 collection_name 与 expected_members 集合后，先遍历 result[\"collections\"] 列表，按 name 精确匹配目标集合，并检查 expected_members 是否为该集合 objects 列表的子集，满足则返回 1.0，不满足则记录缺失成员并返回 0.0。若在 collections 中未找到目标集合，则退而检查 result[\"object_collections\"]：对每个预期成员，验证其所属集合列表是否包含 collection_name，任一成员不在该集合中即返回 0.0。全部通过返回 1.0，异常返回 0.0。"
+        "description": "接收来自check_collection.py的JSON输出字符串command_output和规则字典rule，调用_parse_blender_output解析数据。首先通过collection_name在collections列表中查找目标集合，检查expected_members是否全部属于该集合的objects列表（集合包含关系）。若未在collections中直接找到目标集合，则退而通过object_collections字典反向验证：检查每个预期成员对象是否都被记录为属于该集合。所有预期成员都必须在集合中，任一缺失即返回0.0，全部满足返回1.0。"
       },
       {
         "name": "check_blender_constraints_multi",
         "lineno": 136,
-        "description": "接收来自 check_constraints.py 的 JSON 字符串 command_output 和规则字典 rule。首先调用 _parse_blender_output 解析 JSON，失败返回 0.0。遍历 rule[\"constraints\"] 中的每个预期约束项，针对其 object_name 在 result 中取出该对象的约束列表。在列表中查找同时满足以下条件的约束：type 必须精确匹配；若规则指定了 target、track_axis 或 up_axis，则对应字段也必须精确相等。只要有一个预期约束在对应对象上找不到匹配项，即记录警告并返回 0.0。所有约束均匹配成功则返回 1.0，异常返回 0.0。"
+        "description": "接收来自check_constraints.py的JSON输出字符串command_output和规则字典rule，调用_parse_blender_output解析数据。遍历rule[\"constraints\"]中的每一个预期约束项，在解析结果中以object_name为键获取该对象的实际约束列表。对每个预期约束，在实际约束列表中逐项匹配：要求type字段必须相等；若rule中指定了target、track_axis或up_axis，则对应字段也必须精确相等。所有预期约束都必须在场景中找到匹配项，任一约束缺失或字段不匹配即返回0.0，全部匹配成功返回1.0。"
       },
       {
         "name": "check_blender_hierarchy",
         "lineno": 175,
-        "description": "接收来自 check_object.py 的 JSON 字符串 command_output 和规则字典 rule。该函数是 check_blender_parent_child 的薄封装，直接将参数原样转发给 check_blender_parent_child 并返回其结果。因此实际检查逻辑与 check_blender_parent_child 完全一致，用于验证 parent_map 与 not_parent 等对象层级父子关系，返回 1.0 或 0.0。"
+        "description": "接收command_output和rule，作为check_blender_parent_child的薄封装直接调用该函数完成判断。本身不实现额外逻辑，仅用于以语义化的函数名验证父层级关系，返回被封装函数的判定结果（0.0或1.0）。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 16,
-        "description": "接收 Blender 检查脚本输出的原始字符串 command_output。先检查输出是否为空或仅含空白字符，若是则记录错误并返回 None。随后对去空后的字符串执行 json.loads，返回解析后的 Python 对象（通常为字典或列表）。若触发 JSONDecodeError 或 ValueError，则记录错误及原始输出片段，并返回 None。该函数是所有主函数的入口预处理步骤，为后续字段级检查提供结构化数据。"
+        "lineno": 20,
+        "description": "接收Blender检查脚本输出的原始字符串command_output，去除首尾空白后使用json.loads解析为Python字典或列表。若输出为空或JSON解析失败（JSONDecodeError/ValueError），则记录错误日志并返回None。该函数为所有主函数提供统一的JSON解析入口，解析失败会导致主函数直接返回0.0。"
       },
       {
         "name": "_find_object",
-        "lineno": 28,
-        "description": "接收 _parse_blender_output 返回的 result 字典和目标对象名称 name。遍历 result.get(\"objects\", []) 列表，逐个比较 obj.get(\"name\") 与 name 是否精确相等，返回首个匹配到的对象字典；若遍历结束未找到，则返回 None。该函数主要服务于 check_blender_parent_child，用于在场景对象列表中按名称精确定位目标对象。"
+        "lineno": 33,
+        "description": "接收_parse_blender_output解析后的result字典和目标对象名称name，在result[\"objects\"]列表中遍历查找name字段与传入值精确匹配的对象。返回匹配到的对象字典，未找到则返回None。该函数被check_blender_parent_child用于定位特定的父对象或子对象。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:14:28",
+  "created_at": "2026-07-01 14:40:56",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_407b1850-9689-49a9-b4fa-abddbfeede0a./evaluator_function_labels.json"
 }

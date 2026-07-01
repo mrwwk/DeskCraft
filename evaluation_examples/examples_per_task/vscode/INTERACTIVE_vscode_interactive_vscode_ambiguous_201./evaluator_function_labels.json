@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_ambiguous_201./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_b2b_landing_page_prototype",
+      "lineno": 16
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 12
+    },
+    {
+      "name": "check_b2b_landing_page_prototype",
+      "lineno": 16
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证智能体是否完成了\"制作一个看起来像B2B产品首屏的页面原型\"这一任务，最终产物必须是一个可被正常读取的zip压缩包。核心检查对象是压缩包内的HTML文件（优先index.html，不强制要求styles.css、manifest.json等辅助文件）。evaluator采用\"全部满足即通过\"的严格联合判定逻辑：依次检查zip可读性、HTML文件存在性、内容长度、基础HTML文档结构、以及B2B落地页关键词覆盖度。所有检查项必须同时达标，任一环节失败即返回0.0；全部通过则返回1.0。不存在与预期答案的逐字比对，而是基于规则阈值和关键词命中数进行判定。",
+    "main_functions": [
+      {
+        "name": "check_b2b_landing_page_prototype",
+        "lineno": 16,
+        "description": "该函数接收actual参数（zip文件的本地路径字符串），负责执行完整的B2B落地页原型闭环检查。流程如下：1）尝试以zipfile.ZipFile打开actual，若抛出异常则直接返回0.0；2）读取压缩包内所有文件名，调用_normalize_ui_bundle_path统一路径格式（去左侧\"./\"、反斜杠改斜杠），筛选出所有以.html或.htm结尾且非空字符串的文件；若找不到任何HTML文件，返回0.0；3）在找到的HTML文件中优先定位index.html/index.htm（不区分大小写），若不存在则取列表中的第一个HTML文件；4）通过原始文件名读取对应字节的UTF-8解码内容，先执行长度检查：strip后长度必须大于等于200字节，否则返回0.0；5）基础HTML结构检查：要求小写内容中至少出现<!doctype、<html、<body三者之一，若均未出现则返回0.0（代码中虽计算了<head/<title但未纳入最终判定条件）；6）B2B特征检查：维护一个涵盖CTA/转化元素、导航/布局、区块标记、B2B商业内容、常见价值主张共5大类的关键词列表，统计小写内容中命中的关键词总数，若少于3个则返回0.0；7）以上全部通过后返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 10,
+        "description": "该辅助函数接收一个路径字符串，执行两项规范化转换：移除字符串左侧的\"./\"前缀，并将所有反斜杠\"\\\"替换为正斜杠\"/\"，返回规范化后的路径。其作用是消除不同操作系统或压缩工具导致的路径格式差异，确保主函数在zip包内查找HTML文件（特别是匹配index.html）以及将规范化名映射回原始zip条目时能够正确对应。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:38:41",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_ambiguous_201./evaluator_function_labels.json"
+}

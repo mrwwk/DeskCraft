@@ -1,0 +1,97 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_dc7809c8-2255-4684-9ac8-d4ebcfcd35be./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 16
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 27
+    },
+    {
+      "name": "get_slide_notes_xml_fallback",
+      "lineno": 45
+    },
+    {
+      "name": "get_slide_notes",
+      "lineno": 73
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 92
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 16
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 27
+    },
+    {
+      "name": "get_slide_notes_xml_fallback",
+      "lineno": 45
+    },
+    {
+      "name": "get_slide_notes",
+      "lineno": 73
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 92
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证对 PPTX 演示文稿的编辑任务是否完成，核心要求为：所有幻灯片的标题段落必须按指定方向对齐（如 RIGHT），且第 2 张幻灯片必须包含预期的备注文本。评测采用“全部满足则通过，任一失败即否决”的严格二元判定（返回 1.0 或 0.0），支持两种工作模式：1）目标检查模式，直接检验结果文件自身的对齐属性与备注内容，不依赖预期文件；2）比较模式，将结果文件与预期文件逐张幻灯片、逐个形状、逐段文本、逐 run 进行多维度比对，涵盖形状数量、位置尺寸（近似匹配，容差 0.005）、文本内容、段落对齐与缩进、字体名称/大小/粗体/斜体/颜色/下划线/删除线，以及项目符号等细节。",
+    "main_functions": [
+      {
+        "name": "enable_debug_logging",
+        "lineno": 16,
+        "description": "配置并启用名为 desktopenv.metric.slides.debug 的调试日志记录器。当 compare_pptx_files 的 enable_debug 选项为 True 时会被调用，功能是为 debug_logger 设置 DEBUG 级别，并添加一个 StreamHandler，输出格式为 [PPTX_DEBUG] %(message)s。该函数本身不参与具体检查判定，仅用于在评测过程中打印详细的比对轨迹（如 mismatch 位置、对齐值、备注差异等），帮助定位失败原因。"
+      },
+      {
+        "name": "get_all_text_shapes",
+        "lineno": 27,
+        "description": "接收一个 slide 对象，递归提取该幻灯片中所有具备 text 和 text_frame 属性的形状，包括嵌套在 GROUP 类型形状内部的子形状。内部通过 extract_text_shapes 递归函数遍历 shape.shapes。返回结果是一个扁平化的形状列表。在 compare_pptx_files 的目标检查模式中，当某张幻灯片找不到标准标题占位符（TITLE 或 CENTER_TITLE）时，该列表会作为回退的检查对象；在比较模式中，也用于辅助核对文本形状数量及段落对齐。"
+      },
+      {
+        "name": "get_slide_notes_xml_fallback",
+        "lineno": 45,
+        "description": "作为 python-pptx 无法读取备注时的 XML 级兜底解析器。接收 slide 对象，获取其 notes_slide._element 底层 XML，然后在命名空间 a:http://schemas.openxmlformats.org/drawingml/2006/main 下查找所有 a:t 标签，拼接其文本内容后返回；若不存在备注或解析异常则返回 None。专门用于处理 LibreOffice Impress 将备注文本存放在 sldNum 占位符而非 body 占位符导致的读取失败问题。被 get_slide_notes 在兜底分支中调用。"
+      },
+      {
+        "name": "get_slide_notes",
+        "lineno": 73,
+        "description": "获取单张幻灯片备注文本的统一入口。首先尝试使用 python-pptx 内置的 notes_slide.notes_text_frame.text 获取；若结果为 None、空白或抛出 AttributeError/TypeError，则调用 get_slide_notes_xml_fallback 进行原始 XML 解析兜底。最终返回备注字符串或 None。在 compare_pptx_files 中，无论是目标检查模式（核对第 2 张幻灯片备注）还是比较模式（逐张幻灯片比对备注），均通过该函数读取备注内容。"
+      },
+      {
+        "name": "compare_pptx_files",
+        "lineno": 92,
+        "description": "核心评测函数，接收 file1_path（结果文件）、file2_path（参考文件）及 options 关键字参数，返回 1.0（通过）或 0.0（失败）。若 options 中包含 alignment_target（如 \"RIGHT\"），进入目标检查模式：遍历 file1 的每张幻灯片，先查找标题占位符（TITLE/CENTER_TITLE），若无则回退到 get_all_text_shapes 获取的所有文本形状；对每个非空段落检查 alignment 是否严格等于目标值（None 视为 PP_ALIGN.LEFT）；若 examine_note 为 True，进一步通过 get_slide_notes 检查第 2 张幻灯片备注是否严格等于 expected_note_text。若 alignment_target 未设置，进入比较模式：先核对幻灯片总数，再逐张幻灯片通过 zip 并行遍历 file1 与 file2 的形状，依次检查形状数量、备注文本（get_slide_notes）、多种特殊位置规则（examine_title_bottom_position、examine_table_bottom_position 等）、常规形状尺寸与位置（is_approximately_equal，容差 0.005）、表格行列数、文本内容、段落数量、段落对齐（None 视为 LEFT）、缩进级别、run 数量、run 级字体属性（名称/大小/粗体/斜体/颜色/下划线/删除线）以及项目符号（_extract_bullets）。在主形状循环结束后，还会对 get_all_text_shapes 提取的文本形状进行补充对齐检查（当 examine_alignment 为真且两侧文本形状数量相等时），或在 examine_text_shapes_count 为真时核对文本形状总数。任一检查失败立即返回 0.0；全部通过返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "is_approximately_equal",
+        "lineno": 224,
+        "description": "内部嵌套函数，用于比较模式中所有数值型属性的近似相等判定。接收两个数值 val1、val2 及 tolerance=0.005。判定逻辑为：若两值相等或均为 0 则返回 True；若仅其一为 0 则返回 False；否则计算相对误差 abs(val1-val2)/max(abs(val1),abs(val2))，小于等于 0.005 时返回 True。被 compare_pptx_files 广泛用于比较形状 left、top、width、height 等位置尺寸属性。"
+      },
+      {
+        "name": "nonempty_runs",
+        "lineno": 232,
+        "description": "内部嵌套函数，用于清洗段落中的空 run。接收 para 对象，返回其中 text 去除空白后非空的 run 列表。在比较模式中，当段落文本为空或仅含空白时，先用该函数过滤 run，再比较 run 数量及 run 级字体属性，避免空白 run 导致数量不一致的误判。"
+      },
+      {
+        "name": "_extract_bullets",
+        "lineno": 405,
+        "description": "内部嵌套函数，用于解析 run 对应 XML blob 中的项目符号细节。接收 xml_data（UTF-8 解码后的 XML 字符串），解析命名空间 a: 和 p: 下的所有 a:p 段落，提取每个段落的 lvl（级别）、buChar（符号字符）、文本内容及 buClr 颜色值，仅保留文本非空的条目。返回列表供比较模式核对项目符号数量、文本、符号字符及级别是否一致。被 compare_pptx_files 在 examine_bullets 为 True 时调用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:27:25",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_dc7809c8-2255-4684-9ac8-d4ebcfcd35be./evaluator_function_labels.json"
+}

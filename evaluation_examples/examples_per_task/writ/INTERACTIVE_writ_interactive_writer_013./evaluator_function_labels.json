@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_013./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定 INTERACTIVE_writ_interactive_writer_013 任务的最终结果是否满足特定的内容合规要求。其核心检查对象是一个结果字符串（result），通过白名单（include）与黑名单（exclude）机制进行判定：结果中必须同时包含所有指定的子串，且必须不包含任何指定的排除子串。比较方式为精确的子串包含检查（`all(r in result for r in include)` 与 `all(r not in result for r in exclude)`），最终返回二值化分数 1.0 表示完全符合，0.0 表示不符合或结果为空。整体思路是“全部满足且全部排除”的硬匹配策略，无近似匹配、无阈值缓冲、无多指标加权。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "接收参数 `result: str` 与 `rules: Dict[str, List[str]]`。第一步检查 `result` 是否为 `None`，若为 `None` 直接返回 `0.`。第二步通过 `rules.get(\"include\", [])` 与 `rules.get(\"exclude\", [])` 提取规则列表。第三步执行组合判定：使用 `all(r in result for r in include)` 验证结果字符串是否包含所有 include 子串，同时使用 `all(r not in result for r in exclude)` 验证结果字符串是否不包含任何 exclude 子串。两步同时成立则返回 `1.`，否则返回 `0.`。函数执行过程中会打印 `result` 与 `rules` 内容。该函数是 evaluator 的唯一主入口，直接决定任务成功或失败。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:55:19",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_013./evaluator_function_labels.json"
+}

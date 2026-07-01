@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00010-0010-4000-8000-000000000010-L1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_white_to_alpha_transparency",
+      "lineno": 23
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_white_to_alpha_transparency",
+      "lineno": 23
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP图像编辑任务：将原始图像中的白色（或接近白色）背景像素转换为透明像素。它通过对比原始图像（expected_path）和任务输出图像（result_path），从四个维度进行判定：1）输出图像必须包含alpha通道（支持透明）；2）输出图像中透明像素占比需超过10%，证明确实进行了去背景操作；3）原始图像中亮度高于阈值（255-tolerance）的白色像素，在结果图中必须有超过50%变为透明（alpha<128）；4）原始图像中的非白色内容（前景）必须有超过50%保持可见（alpha>128）。只有以上四个条件全部同时满足，任务才被判定为成功（返回1.0），否则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_white_to_alpha_transparency",
+        "lineno": 23,
+        "description": "该函数接收result_path（VM中的输出图像路径）、expected_path（云端原始图像路径）和tolerance（白色检测容差，默认30）。其检查流程如下：首先验证两个路径均不为None且对应文件存在；然后使用PIL.Image.open分别打开原始图和结果图，检查结果图是否包含alpha通道（模式为RGBA/LA或info中包含transparency关键字），若无则直接失败；接着将两图统一转换为RGBA模式，若尺寸不一致则使用LANCZOS重采样对齐；将图像转为numpy数组后，提取结果图的alpha通道，统计透明像素（alpha<255）占比，要求必须超过10%；在原始图中计算每个像素的RGB均值作为亮度，将亮度大于(255-tolerance)的像素标记为白色像素，然后检查这些白色像素在结果图中是否变为透明（alpha<128），要求转换比例超过50%；同时检查原始图中非白色像素在结果图中是否保持可见（alpha>128），要求保留比例超过50%。最终，当且仅当\"存在alpha通道\"、\"透明比例>0.1\"、\"白色转透明比例>0.5\"、\"非白色内容保留比例>0.5\"四个条件全部满足时返回1.0，任一条件不满足或发生异常时返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:13:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00010-0010-4000-8000-000000000010-L1./evaluator_function_labels.json"
+}

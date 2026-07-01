@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_bedcedc4-4d72-425e-ad62-21960b11fe0d./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_power_settings",
+      "lineno": 19
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 6
+    },
+    {
+      "name": "check_os_power_settings",
+      "lineno": 19
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统电源设置是否被正确配置。它通过解析shell收集器输出的键值对文本，检查关键电源参数（idle_dim、idle_delay）是否严格匹配预期规则值，并验证一个状态标志（file_ok）是否为\"true\"。评测采用\"全部满足\"式的严格匹配逻辑：只有当idle_dim、idle_delay、file_ok三项检查同时通过时，才判定任务成功并返回1.0分；若任意一项不匹配或解析过程发生异常，则返回0.0分。",
+    "main_functions": [
+      {
+        "name": "check_os_power_settings",
+        "lineno": 19,
+        "description": "该主函数接收result（shell收集器输出的原始字符串，预期包含idle_dim、idle_delay、file_ok等key=value行）和rules（期望规则字典，通常包含idle_dim和idle_delay的目标值）。它首先调用辅助函数_parse_kv将result解析为字典。随后依次执行三项严格相等检查：1）idle_dim的值必须等于rules中指定的值（若rules未提供该键则默认期望\"false\"）；2）idle_delay的值必须等于rules中指定的值（若rules未提供该键则默认期望\"0\"）；3）file_ok的值必须严格等于\"true\"。以上三项必须全部同时满足，函数才返回1.0表示成功；若任意一项不匹配，或解析/比较过程中发生异常，则返回0.0表示失败。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 6,
+        "description": "该辅助函数接收一个shell输出字符串，按行遍历并解析其中包含\"=\"符号的键值对（格式为key=value），使用split(\"=\", 1)将每行分割为键和值并去除首尾空白字符，最终组装成字典返回。它为主函数check_os_power_settings提供数据预处理服务，将非结构化的shell文本输出转换为结构化的字典，以便后续进行字段级别的精确比较。如果输入为空字符串或没有有效键值对行，则返回空字典。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:27",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_bedcedc4-4d72-425e-ad62-21960b11fe0d./evaluator_function_labels.json"
+}

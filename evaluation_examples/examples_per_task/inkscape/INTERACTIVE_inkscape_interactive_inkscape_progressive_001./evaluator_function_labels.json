@@ -1,0 +1,123 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_progressive_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 139
+    },
+    {
+      "name": "check_interactive_inkscape_ii03",
+      "lineno": 150
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 66
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 75
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 139
+    },
+    {
+      "name": "check_interactive_inkscape_ii03",
+      "lineno": 150
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape交互式任务（特别是渐进式图标优化场景）的最终产物与状态。核心检查对象包括三类：1）SVG文件中指定ID元素的填充颜色（fill）是否符合预期，支持从内联style或直接属性读取，并对text元素会额外降级查找其子tspan标签的fill；2）SVG文件中指定文本元素（含tspan等后代节点）的文本内容是否与预期完全一致；3）导出文件是否真实存在（通过vm_command_line的stdout确认）。所有检查均采用精确匹配（字符串完全相等或颜色规范化后完全相等），以0.0表示失败、1.0表示成功。对于II-03综合任务，采用“全部满足”的串联逻辑：rule中列出的所有fill_checks必须逐一通过，且若存在text_check也必须通过，整体才返回1.0，任一环节失败即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 83,
+        "description": "接收svg_file_path和rule（需包含\"element_id\"与\"expected_fill\"）。首先调用_parse_svg读取并解析SVG，若解析失败返回0.0；接着调用_find_element_by_id按id定位目标元素，若找不到返回0.0。然后调用_get_style_prop获取该元素的fill属性值；若元素本地标签为text且自身无fill，则遍历其所有子节点，对本地标签为tspan的子元素再次调用_get_style_prop尝试获取fill，取第一个非空值。将实际获取到的颜色与预期颜色均通过_normalize_color规范化（处理3位hex扩6位、8位hex截6位、转小写、保留none）后进行精确比较：若预期为'none'，则实际必须为'none'；其他情况必须完全相等。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_text_content",
+        "lineno": 116,
+        "description": "接收svg_file_path和rule（需包含\"element_id\"与\"expected_text\"）。首先调用_parse_svg解析SVG，失败则返回0.0；再调用_find_element_by_id定位元素，找不到返回0.0。使用elem.itertext()递归收集该元素及其所有后代节点（例如tspan）的文本内容，拼接后执行strip()去除首尾空白，得到actual_text。将actual_text与rule.get(\"expected_text\", \"\")的strip结果进行精确字符串比较，完全一致返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_export_file_exists",
+        "lineno": 139,
+        "description": "接收result_str（通常为vm_command_line检查文件存在性后的stdout输出）和rule（含\"expected\"字段，默认值为\"OK\"）。对result_str与expected分别执行strip()后进行精确字符串比较，两者完全相等返回1.0，否则返回0.0。该函数不直接读取文件系统，而是依赖外部命令输出作为判断依据。"
+      },
+      {
+        "name": "check_interactive_inkscape_ii03",
+        "lineno": 150,
+        "description": "接收svg_file_path和rule（需包含\"fill_checks\"数组与可选的\"text_check\"对象）。依次遍历rule[\"fill_checks\"]中的每一项，对每一项调用check_inkscape_fill_color；若有任意一次返回值小于1.0，立即返回0.0。随后，若rule中包含\"text_check\"键，则调用check_inkscape_text_content进行检查，若返回值小于1.0也立即返回0.0。仅当所有fill_checks全部通过且text_check（若存在）也通过时，才返回1.0。整体属于严格的串联/全部满足式判定逻辑。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 14,
+        "description": "将CSS样式字符串（如'fill:#ff0000;stroke:#000'）按分号分割为若干段，每段再按第一个冒号拆分为键和值，去除首尾空白后构建字典返回。用于_get_style_prop解析元素内联style属性。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 24,
+        "description": "对颜色值进行规范化处理：去除首尾空白并转小写；若值为'none'则保持'none'；若为hex颜色，将3位短格式（#f00）扩展为6位（#ff0000），将8位带alpha格式（#rrggbbaa）截断为6位（#rrggbb）；其他命名颜色原样返回。供check_inkscape_fill_color统一实际颜色与预期颜色的比较基准。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 39,
+        "description": "遍历SVG根节点下的所有元素（root.iter()），查找其id属性等于传入element_id的元素。若找到则返回该元素，否则返回None。供check_inkscape_fill_color与check_inkscape_text_content定位被测SVG元素。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 46,
+        "description": "先从元素的style属性字符串中解析CSS键值对（调用_parse_style），若其中包含目标属性prop则返回对应值；若style中不存在，则回退到读取该元素的直接属性（elem.get(prop)）。供check_inkscape_fill_color获取fill值。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 53,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，成功时返回(tree, tree.getroot())；任何异常情况下均返回(None, None)。供check_inkscape_fill_color与check_inkscape_text_content完成SVG文件读取与根节点获取。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 62,
+        "description": "去除XML标签中的命名空间前缀。若标签字符串包含'}'，则取'}'之后的部分作为本地标签名；否则原样返回。供check_inkscape_fill_color判断元素是否为text标签以及其子节点是否为tspan标签。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:37:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_progressive_001./evaluator_function_labels.json"
+}

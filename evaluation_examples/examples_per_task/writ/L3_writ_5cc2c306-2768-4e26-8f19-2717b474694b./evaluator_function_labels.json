@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_5cc2c306-2768-4e26-8f19-2717b474694b./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_docx_content_and_format",
+      "lineno": 17
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_docx_content_and_format",
+      "lineno": 17
+    },
+    {
+      "name": "_normalize",
+      "lineno": 248
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证agent生成的.docx提案文档是否在文本内容与格式上同时满足任务要求。它通过python-docx库解析Word文档，同时读取agent产出文件(result_path)与gold参考文件(expected_path)。验证分为两条主线：一是文本内容必须与gold文档逐段一致（包括审批行，不允许增删段落），通过归一化后一对一字符串比对实现；二是格式必须满足6项硬性要求——标题及前两行元信息居中对齐、标题22pt粗体、所有已知节标题为深蓝色(#003366)粗体、正文11pt（允许样式继承导致的None）、Expected Benefits后的首段正文斜体、文档末尾包含指定审批行。所有检查采用一票否决制，任意一项失败即返回0.0，全部通过返回1.0。",
+    "main_functions": [
+      {
+        "name": "compare_docx_content_and_format",
+        "lineno": 17,
+        "description": "该函数接收result_path（agent生成的.docx路径）与expected_path（gold文档路径，可选）。首先使用Document()加载结果文档；若expected_path提供且可加载，则同时加载gold文档。随后过滤掉仅含空白字符的段落得到result_paras。若gold_doc存在，则对result与gold的非空段落按顺序进行一对一文本比对：调用_normalize()将连续空白折叠为单个空格并去除首尾空白后，逐段比较字符串是否相等，且要求两段文档的非空段落总数必须相同；任何文本不匹配或段落数差异均立即返回0.0。接着按位置与内容启发式识别关键段落：result_paras[0]为标题，[1]为Submitted to行，[2]为Date行；遍历所有段落，将文本存在于_SECTION_HEADINGS集合中的段落识别为节标题并记录其索引；若遇到文本等于Expected Benefits的节标题，则向后查找第一个text.strip()非空的段落记为expected_benefits_body；将索引不为0、1、2且不在heading_indices中的段落归入body_paras（代码未显式排除末段，因此审批行若不符合前述排除条件也会被纳入正文集合）；result_paras[-1]固定作为approval_para。之后依次执行6项格式检查：(1) 标题、Submitted to、Date三段的paragraph_format.alignment必须严格等于WD_PARAGRAPH_ALIGNMENT.CENTER；(2) 标题段落的所有runs中，需存在至少一个非空run其bold属性为真，且存在至少一个非空run其font.size.pt与22.0的绝对误差严格小于1.5（二者不要求同一run）；(3) 每个节标题段落的所有runs中，需存在至少一个非空run同时满足bold为真且font.color.rgb转为大写字符串后等于003366；(4) body_paras中每个段落的每个非空run，若font.size为None则跳过（接受样式继承），否则其pt值与11.0的绝对误差必须不超过1.5；(5) expected_benefits_body必须存在，且其runs中至少有一个非空run的italic为真；(6) approval_para经_normalize()处理后转为小写，必须包含子串approved by:。以上任一检查失败均记录error并立即返回0.0；全部通过返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize",
+        "lineno": 247,
+        "description": "该辅助函数接收一个字符串text，使用正则表达式re.sub将其中所有连续空白字符（包括空格、制表符、换行等）替换为单个空格，再执行strip()去除首尾空白，返回规范化后的字符串。在主函数中，它服务于两个环节：一是gold文档与结果文档的段落文本比对前，对双方文本进行归一化，以消除因换行或缩进差异造成的误判；二是在审批行检查前，对末段文本进行规范化，以便执行不区分大小写的子串包含判断。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 17:00:16",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_5cc2c306-2768-4e26-8f19-2717b474694b./evaluator_function_labels.json"
+}

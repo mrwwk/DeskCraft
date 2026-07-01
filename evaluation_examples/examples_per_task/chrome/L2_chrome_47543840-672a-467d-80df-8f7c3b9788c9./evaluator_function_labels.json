@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator总体用于验证浏览器环境中的两类独立任务完成状态。第一类任务要求最终产物为包含特定查询参数的arXiv搜索URL，核心检查对象是浏览器活动标签页的URL字符串（由active_tab_info getter提供），主要比较方式是将URL与expected中提供的多条正则模式进行不区分大小写的逐一匹配（re.search），成功判定思路为严格的逻辑与：所有模式必须全部命中，任一模式缺失或输入异常（None、空URL、无模式列表）均判定失败（0.0），全部通过则得1.0。第二类任务要求验证Chrome浏览器的Safe Browsing保护设置状态，核心检查对象是enable_safe_browsing getter返回的字符串标识（如\"true\"/\"false\"），主要比较方式是将结果与期望值进行小写化、去空白后的精确字符串比对，成功判定思路为二元匹配：完全一致得1.0，否则得0.0。两个主函数相互独立，各自返回二元分数，不存在联合加权或累计逻辑。",
+    "overall_validation": "该evaluator包含两个相互独立的二元判定函数，分别用于验证浏览器环境下的两类不同任务结果。第一类任务验证arXiv搜索URL是否完整包含所有必需的查询参数（如query、searchtype、abstracts、order等），通过对URL进行多正则模式匹配实现，要求所有模式全部命中才视为成功。第二类任务验证Chrome浏览器的安全浏览（Safe Browsing）保护功能是否处于启用状态，通过将getter返回的字符串与期望值进行规范化（转小写、去空白）后的精确比较来判定。两个函数各自独立运行，均返回1.0表示通过、0.0表示失败，不存在跨指标的联合打分、加权累计或部分得分逻辑。",
     "main_functions": [
       {
         "name": "check_arxiv_url_patterns",
         "lineno": 7,
-        "description": "该函数检查浏览器当前活动标签页的arXiv搜索URL是否包含所有必需的查询参数。它接收两个参数：result可以是URL字符串或来自active_tab_info getter的字典（若为字典则提取'url'键值，否则直接转字符串）；expected为包含'patterns'键的字典，其值是一组正则表达式字符串。检查步骤依次为：1）若result为None则直接返回0.0；2）提取并校验URL字符串，若为空则返回0.0；3）从expected获取patterns列表，若为空则返回0.0；4）遍历每个pattern，使用re.search(..., re.IGNORECASE)在URL中执行不区分大小写的正则搜索。判定依据为严格的逻辑与：只要有一个pattern未匹配成功，立即返回0.0；仅当所有pattern全部命中时才返回1.0。"
+        "description": "该函数检查arXiv搜索URL是否包含所有必需的查询参数。输入result为URL字符串或包含'url'键的字典（通常来自active_tab_info getter），输入expected为包含'patterns'键的字典（内含正则表达式列表）。检查步骤如下：首先判断result是否为None，若是则直接返回0.0；接着从result中提取URL字符串（字典类型时优先取'url'键值，否则直接转为字符串），若提取后的URL为空则返回0.0；然后从expected中获取正则模式列表，若列表为空则返回0.0；随后遍历每个pattern，使用re.search并以re.IGNORECASE方式进行不区分大小写的匹配，若任一pattern在URL中未找到则立即返回0.0；仅当所有pattern全部匹配成功时才返回1.0。判定依据为'全部满足'式的正则匹配，任一缺失即失败。"
       },
       {
         "name": "check_safe_browsing_enabled",
         "lineno": 56,
-        "description": "该函数检查Chrome浏览器的Safe Browsing（安全浏览）保护是否处于启用状态。它接收两个参数：result为来自enable_safe_browsing getter的字符串返回值（例如\"true\"或\"false\"）；expected为包含'expected'键的字典，默认期望值为\"true\"。检查步骤依次为：1）若result为None则直接返回0.0；2）从expected字典中取出expected_val（若expected非字典则直接使用其字符串值，默认\"true\"）；3）将result与expected_val均转换为字符串，执行strip()去除首尾空白并转为小写，进行规范化处理；4）比较两个规范化后的字符串。判定依据为精确相等：若完全一致则返回1.0，否则返回0.0。"
+        "description": "该函数检查Chrome的安全浏览（Safe Browsing）保护功能是否已启用。输入result为字符串（通常来自enable_safe_browsing getter，例如'true'或'false'），输入expected为包含'expected'键的字典（默认期望值为'true'）。检查步骤如下：首先判断result是否为None，若是则返回0.0；接着从expected中提取期望值（若expected非字典类型则直接将其转为字符串，否则取'expected'键值，缺省为'true'）；然后将result与expected均转为字符串、去除首尾空白并统一转为小写，完成规范化处理；最后比较两个规范化后的字符串，若完全相等则返回1.0，否则返回0.0。判定依据为规范化后的精确字符串比对，不区分大小写且忽略前后空白字符。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:45:28",
+  "created_at": "2026-07-01 15:08:10",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_47543840-672a-467d-80df-8f7c3b9788c9./evaluator_function_labels.json"
 }

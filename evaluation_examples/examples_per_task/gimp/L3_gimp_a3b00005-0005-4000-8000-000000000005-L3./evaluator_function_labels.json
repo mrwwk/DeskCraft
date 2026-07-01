@@ -1,0 +1,174 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00005-0005-4000-8000-000000000005-L3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_saturation",
+      "lineno": 23
+    },
+    {
+      "name": "calculate_contrast",
+      "lineno": 31
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 38
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 75
+    },
+    {
+      "name": "check_saturation_increase",
+      "lineno": 100
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 141
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 182
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 236
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 314
+    },
+    {
+      "name": "check_l3_perfume_hero_complete",
+      "lineno": 381
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_saturation",
+      "lineno": 23
+    },
+    {
+      "name": "calculate_contrast",
+      "lineno": 31
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 38
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 75
+    },
+    {
+      "name": "check_saturation_increase",
+      "lineno": 100
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 141
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 182
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 200
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 229
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 236
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 314
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 373
+    },
+    {
+      "name": "check_l3_perfume_hero_complete",
+      "lineno": 381
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证L3级别GIMP香水主视觉横幅（perfume hero banner）任务的完成质量。它要求最终产出同时满足以下全部条件：1）生成一张2200×1400像素的PNG格式横幅图；2）该PNG在top_left、top_center、center区域需具备足够边缘密度（文字痕迹），且通过OCR能识别到\"ESSENCE\"与\"PREMIUM\"关键词；3）该PNG相比原始源图，对比度和饱和度均需提升至少5%；4）保留的XCF源文件中必须包含Perfume_Main、BG_Concrete、BG_Metal、Light_Glow、Title、Subtitle六个图层（顺序不限）。evaluator采用严格的\"全部通过与\"逻辑：7项二进制子检查必须全部返回1，整体才得1.0分；任一子检查失败即整体得0.0分。",
+    "main_functions": [
+      {
+        "name": "calculate_saturation",
+        "lineno": 23,
+        "description": "接收一个PIL Image对象作为输入。先将图像转换为HSV色彩模式，提取S（饱和度）通道，再使用ImageStat.Stat计算该通道的像素均值，返回平均饱和度（float）。该数值通常被check_saturation_increase调用，用于量化图像饱和度，以便与源图进行百分比比较。"
+      },
+      {
+        "name": "calculate_contrast",
+        "lineno": 31,
+        "description": "接收一个PIL Image对象作为输入。先将图像转换为灰度模式（'L'），再使用ImageStat.Stat计算灰度像素值的标准差，以此作为图像对比度度量返回（float）。该数值通常被check_contrast_increase调用，用于量化图像对比度，以便与源图进行百分比比较。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 38,
+        "description": "接收image_path、expected_width、expected_height（可选，默认None）和tolerance（默认5像素）。首先检查路径非空且文件存在；然后用PIL打开图像获取实际宽高。若expected_height为None，仅判断实际宽度与expected_width之差的绝对值是否不超过tolerance；若指定了expected_height，则宽高均需在各自容差范围内。满足条件返回1，否则返回0。文件缺失或打开异常也返回0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 75,
+        "description": "接收image_path。先检查路径非空且文件存在；再用PIL打开图像，读取其format属性，严格判断是否等于字符串'PNG'。是则返回1，否则返回0。文件缺失或读取异常也返回0。"
+      },
+      {
+        "name": "check_saturation_increase",
+        "lineno": 100,
+        "description": "接收src_path、tgt_path和min_increase_percent（默认10.0）。检查两个路径均非空且对应文件存在；分别打开图像并调用calculate_saturation计算饱和度。若源图饱和度为0，直接返回0（避免除零）。计算饱和度提升百分比：((tgt_saturation - src_saturation) / src_saturation) * 100。若提升百分比大于等于min_increase_percent则返回1，否则返回0。异常或文件缺失返回0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 141,
+        "description": "接收src_path、tgt_path和min_increase_percent（默认10.0）。检查两个路径均非空且对应文件存在；分别打开图像并调用calculate_contrast计算对比度（灰度标准差）。若源图对比度为0，直接返回0。计算对比度提升百分比：((tgt_contrast - src_contrast) / src_contrast) * 100。若提升百分比大于等于min_increase_percent则返回1，否则返回0。异常或文件缺失返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 182,
+        "description": "接收file_path。使用os.path.isfile判断该路径是否为真实存在的文件。若存在返回1，若不存在或路径为None返回0。仅做存在性检查，不验证内容或格式。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 236,
+        "description": "接收xcf_path和rule字典（应包含\"layers\"列表与可选\"ordered\"布尔值，默认False）。先检查文件存在且文件头以b'gimp xcf'开头。优先尝试用gimpformats库解析XCF：读取所有图层名称，检查是否包含全部expected_layers；若ordered为True，还需这些图层在解析出的图层列表中的索引位置严格递增（即保持给定顺序）。若gimpformats解析失败或不可用，回退到二进制字节搜索：在文件内容中查找每个图层名的utf-8编码位置；若ordered为True，要求这些位置按从小到大排列。任一图层缺失、顺序不符或文件头非法返回0，全部满足返回1。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 314,
+        "description": "接收image_path和rule字典（含\"regions\"列表、可选\"keywords\"列表、min_edge_density默认0.008、edge_threshold默认40.0）。先检查图片存在，打开后转为灰度numpy数组。对每个region_name调用_resolve_region_bbox获取子区域坐标并裁剪，再调用_edge_density计算该区域的边缘密度。若任一区域密度低于min_edge_density，认为该区域缺乏文字/纹理痕迹，返回0。若rule中提供了keywords，尝试导入pytesseract对全图进行OCR，将结果规范化（正则\\\\s+替换为单空格、strip、lower）后，检查每个keyword.lower()是否都出现在规范化文本中；若有缺失返回0。若OCR模块不可用或报错，仅记录warning，不因此直接判负（前提是前面区域密度检查已全部通过）。全部通过返回1。"
+      },
+      {
+        "name": "check_l3_perfume_hero_complete",
+        "lineno": 381,
+        "description": "该任务的复合评测入口。接收result_paths列表，要求至少包含3个元素，依次取为png_path、xcf_path、src_path。然后顺序执行7项二进制检查并收集为scores列表：1) check_file_exists(png_path) —— PNG存在性；2) check_png_format(png_path) —— PNG格式；3) check_image_dimensions(png_path, 2200, 1400) —— 尺寸2200×1400（容差5像素）；4) check_text_in_region_keywords(png_path, {\"regions\":[\"top_left\",\"top_center\",\"center\"],\"keywords\":[\"ESSENCE\",\"PREMIUM\"],\"min_edge_density\":0.006}) —— 三区域文字痕迹及OCR关键词；5) check_contrast_increase(src_path, png_path, 5.0) —— 对比度较源图提升≥5%；6) check_saturation_increase(src_path, png_path, 5.0) —— 饱和度较源图提升≥5%；7) check_xcf_layers_structure(xcf_path, {\"layers\":[...],\"ordered\":False}) —— XCF包含6个指定图层（顺序不限）。最后调用_all_binary_checks_pass(scores)：仅当所有7项得分均≥1.0时返回1.0，否则返回0.0。任一子检查失败即导致整体失败。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 200,
+        "description": "接收图像width、height和region_name字符串。将region_name转为小写并去除空白后，映射为预定义的归一化坐标框(x0, y0, x1, y1)。支持top_left、top_center、top_right、bottom_left、bottom_center、bottom_right、center、left、right、top、bottom等区域语义。若名称不匹配则回退为全图范围(0, 0, w, h)。专供check_text_in_region_keywords使用，将语义区域名称转换为实际像素裁剪坐标。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 227,
+        "description": "接收灰度numpy数组gray_array和edge_threshold（默认40.0）。分别计算数组在x轴和y轴方向的梯度绝对值（np.gradient），相加得到边缘强度图，然后统计强度大于edge_threshold的像素占比（mean of boolean mask），返回该比例作为边缘密度。专供check_text_in_region_keywords使用，用于判断图像某区域是否含有足够边缘信息（文字或纹理痕迹）。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 370,
+        "description": "接收scores列表，过滤掉None值；若无有效分数返回0.0。仅当所有有效分数都大于等于1.0时返回1.0，否则返回0.0。这是check_l3_perfume_hero_complete的最终聚合逻辑，体现严格的\"全部满足\"判定策略：7项子检查中任一失败，整体即判为0分。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:17:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00005-0005-4000-8000-000000000005-L3./evaluator_function_labels.json"
+}

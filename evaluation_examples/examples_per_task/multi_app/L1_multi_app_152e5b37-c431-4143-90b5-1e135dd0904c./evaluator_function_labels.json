@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_152e5b37-c431-4143-90b5-1e135dd0904c./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 41
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 69
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 41
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 69
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测多应用任务完成状态，核心验证两个独立维度：一是Chrome浏览器当前活动标签页的URL是否与预期一致（比对时忽略查询参数），二是任务生成的JSON设置文件中是否完整包含所有预期的键值对。检查对象分别为浏览器实时标签页状态与本地JSON配置文件内容；比较方式采用去查询参数的URL精确字符串匹配，以及JSON字典的键值对包含关系（要求键存在且值完全相等）；成功判定采用离散0/1打分制，任一检查项未完全命中即返回0分，全部匹配才返回1分。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 41,
+        "description": "该函数接收Chrome当前活动标签页信息active_tab_info与匹配规则rule，判定当前活动标签页是否为预期页面。首先检查active_tab_info是否为空，若空则直接返回0分。当rule['type']为'url'时，从active_tab_info中提取实际URL：若active_tab_info为字典则取'url'键值，否则直接使用该值；随后通过urlparse分别去除预期URL与实际URL的查询参数，再进行精确字符串比对。去除查询参数后两者完全一致返回1，不一致返回0。若rule['type']为其他未支持类型，则记录错误日志并返回0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 69,
+        "description": "该函数接收actual（字符串，指向待测JSON文件的本地路径）与expected（字典，内含键'expected'对应预期配置字典），用于验证JSON设置内容。首先判断actual是否为空，若空返回0分；随后尝试打开并解析该路径的JSON文件，若文件不存在或解析失败也返回0分。接着遍历expected['expected']中的每一对预期键值，逐一检查该键是否存在于实际JSON数据中且对应值完全相等；只要存在任一预期键缺失或值不匹配，立即返回0分。仅当所有预期键值对全部命中时，才返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:16:20",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_152e5b37-c431-4143-90b5-1e135dd0904c./evaluator_function_labels.json"
+}

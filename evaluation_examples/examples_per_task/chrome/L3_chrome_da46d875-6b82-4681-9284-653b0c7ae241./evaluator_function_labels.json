@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于评测Chrome浏览器任务及通用JSON数据任务的完成状态，采用严格的二元打分机制（通过返回1.0，不通过返回0.0）。其核心验证对象分为两类：一是浏览器当前激活标签页的URL字符串，要求必须同时满足一组正则表达式约束；二是任务返回的JSON对象，要求必须符合预期的字段结构与内容。对于JSON验证，支持精确相等匹配（可配置忽略列表顺序）和包含匹配（验证result中是否包含expected指定的字段值或子串）两种模式，并在比较前自动拦截\"__EVALUATION_FAILED__\"失败标记。两个主函数均采用\"一票否决\"逻辑，任一检查项失败即返回0分，全部通过才返回满分。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器相关任务的完成状态，采用0/1二值打分机制。核心检查对象分为两类：一是浏览器当前激活标签页的URL文本，二是程序返回或页面提取的JSON结构化数据。对于URL检查，evaluator要求从任务结果中提取出URL字符串（支持直接字符串或含'url'键的字典），并验证其是否同时满足配置中给出的所有正则表达式模式，任一模式不匹配即判失败。对于JSON对象检查，evaluator先将结果统一解析为Python字典，然后依据rules中的'expect_in_result'标志决定比较模式：在严格相等模式下，要求结果字典与预期JSON的指定键值完全相等（若预期字典中设置'ignore_list_order'为True，则对列表值排序后比较以忽略顺序）；在包含模式下，要求结果中对应字段包含预期字符串（子串匹配）或包含预期列表中的至少一个元素。此外，若预期值中出现'__EVALUATION_FAILED__'标记，或结果解析失败、格式异常，均直接判0分。只有全部检查项通过才返回1.0。",
     "main_functions": [
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 50,
-        "description": "该函数接收浏览器当前状态result与规则rules，验证URL是否匹配预期正则模式。首先判断result是否为空，若为空直接返回0.0；接着从result中提取URL，若result为字符串则直接使用，若为字典则提取'url'键对应的值，格式非法也返回0.0。然后从rules[\"expected\"]获取正则模式列表，使用re.search逐一检查每个pattern是否在URL中匹配。遍历过程中只要有一个pattern未匹配成功，立即返回0.0；只有当所有pattern全部匹配成功时，才返回1.0。"
+        "description": "该函数负责检查浏览器当前URL是否匹配预期正则模式。输入参数result为待检查的URL信息，可以是纯字符串URL，也可以是包含'url'键的字典；rules为配置字典，其中'expected'键对应一个正则表达式模式列表。函数首先提取result中的URL字符串，若格式非法则返回0.0。随后遍历rules['expected']中的每一个正则pattern，使用re.search在URL字符串中逐一搜索。判定依据为'全部满足'：只要有一个pattern未匹配成功，立即返回0.0；只有当所有pattern均匹配成功时，才返回1.0。"
       },
       {
         "name": "check_direct_json_object",
         "lineno": 82,
-        "description": "该函数接收任务结果result与规则rules，对JSON对象进行深度验证。第一步，若result为字符串，先执行strip去除首尾空白，将所有单引号替换为双引号，再通过json.loads解析为字典；若result为None则返回0.0。第二步，检查rules[\"expected\"]中是否存在值为\"__EVALUATION_FAILED__\"的项，若存在直接返回0.0。第三步，读取rules中的expect_in_result标志（默认False）并分两支处理：若expect_in_result为False（精确匹配模式），则遍历rules[\"expected\"]的每个key，当rules中ignore_list_order为True时对列表排序后比较，否则直接比较expected_value与actual_value，任一key不匹配即返回0.0；若expect_in_result为True（包含匹配模式），则对rules[\"expected\"]每个key，若期望值为list，检查result对应值（list或str）是否包含至少一个期望元素，若期望值为str，检查result对应值是否包含该子串，类型不支持或匹配失败均返回0.0。所有key检查通过返回1.0，任何异常也返回0.0。"
+        "description": "该函数负责直接比较任务返回的JSON对象与预期结构。输入result可以是JSON字符串或字典，rules包含预期配置。执行步骤如下：1）若result为字符串，先strip去除首尾空白，将单引号替换为双引号，再用json.loads解析为字典；若解析后仍为None则返回0.0。2）检查rules['expected']中是否存在值为'__EVALUATION_FAILED__'的键，若存在直接返回0.0。3）读取rules中的'expect_in_result'布尔标志（默认False）。若该标志为False，进入严格相等模式：遍历预期字典的每个键，若预期字典中设置'ignore_list_order'为True，则对预期和实际的列表值排序后比较；否则直接比较键值，任一不等即返回0.0，全部相等返回1.0。若'expect_in_result'为True，进入包含模式：遍历预期键，若预期值为列表，则检查实际值（列表时检查元素是否存在，字符串时检查是否完全相等）是否包含列表中至少一个元素；若预期值为字符串，则检查该字符串是否为实际值的子串；若预期值为其他类型或不满足包含关系，返回0.0。全部通过返回1.0。任何异常捕获后均返回0.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:49:51",
+  "created_at": "2026-07-01 15:10:25",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_da46d875-6b82-4681-9284-653b0c7ae241./evaluator_function_labels.json"
 }

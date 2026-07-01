@@ -1,0 +1,83 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_social_cover_ambiguous_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 37
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 78
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 101
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 37
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_float",
+      "lineno": 58
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 69
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 78
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 101
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证与 Inkscape 相关的任务产出，核心检查对象是 SVG 文件的内容与属性，同时也支持通用的字符串包含/排除检查。具体而言，它会读取候选 SVG 文件，验证指定 ID 的文本元素内容是否与预期完全一致（去除空白后精确匹配），并验证文档的宽度、高度是否落在预期值的 ±5 单位容差范围内（支持从 width/height 属性或 viewBox 中解析）。此外，它还支持对任意结果字符串进行包含/排除规则检查。每个主函数独立执行，采用\"全部满足则得 1.0，任一不满足则得 0.0\"的硬判定逻辑，不存在加权或累计打分。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 37,
+        "description": "接收一个 result 字符串和一个 rules 字典。首先取出 rules 中的 include 列表与 exclude 列表。判定逻辑为：只有当 include 中所有字符串都出现在 result 中，且 exclude 中所有字符串都不出现在 result 中时，才返回 1.0；任一条件不满足即返回 0.0。若 result 为 None，直接返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_text_content",
+        "lineno": 78,
+        "description": "接收 svg_file_path 和 rule 字典（要求含 element_id 与 expected_text）。首先调用 _parse_svg 解析 SVG 文件获取根元素；若解析失败返回 0.0。接着调用 _find_element_by_id 在整棵树中查找 id 属性等于 element_id 的元素；若找不到返回 0.0。然后使用 elem.itertext() 收集该元素及其所有子节点（如 tspan）的完整文本内容，去除首尾空白后得到 actual_text。最后将 actual_text 与 expected_text（同样去除首尾空白）进行精确字符串比较，完全一致返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_document_properties",
+        "lineno": 101,
+        "description": "接收 svg_file_path 和 rule 字典（可选 expected_width 与 expected_height）。首先调用 _parse_svg 获取 SVG 根元素；若解析失败返回 0.0。若 rule 中包含 expected_width，则先通过 _get_float 提取预期宽度，再尝试从根元素的 width 属性获取实际宽度；若 width 属性缺失，则进一步从 viewBox 属性（按空格分割取第 3 项）解析。若任一值无法解析或实际与预期的绝对差大于 5，则返回 0.0。对 expected_height 执行相同逻辑，优先读取 height 属性，缺失时从 viewBox（取第 4 项）解析，容差同样为 5。只有宽、高检查（如存在）全部通过才返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_element_by_id",
+        "lineno": 50,
+        "description": "遍历 SVG 根元素下的所有子孙元素，检查每个元素的 id 属性是否等于传入的 element_id。若找到则返回该元素，否则返回 None。服务于 check_inkscape_text_content，用于定位待检查的文本节点。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 58,
+        "description": "将传入值安全转换为浮点数。若值为 None 则返回 default；否则先将值转为字符串并去除首尾空白，再用正则 r'[a-zA-Z%]+$' 去掉末尾的单位字符（如 px、mm、% 等），最后尝试 float 转换。转换失败也返回 default。服务于 check_inkscape_document_properties，用于统一处理带单位的尺寸字符串。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 68,
+        "description": "使用 xml.etree.ElementTree 解析指定路径的 SVG 文件。成功时返回 (tree, tree.getroot())；任何异常情况下返回 (None, None)。服务于 check_inkscape_text_content 与 check_inkscape_document_properties，作为 SVG 文件的统一读取与解析入口。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:38:14",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_social_cover_ambiguous_001./evaluator_function_labels.json"
+}

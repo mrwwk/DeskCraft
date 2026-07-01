@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_b6781586-6346-41cd-935a-a6b1487918fc./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_timezone_utc",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_timezone_utc",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统时区配置任务是否完成。它要求最终状态时区必须被设置为指定的UTC时区（默认预期值为\"Etc/UTC\"），NTP服务必须处于\"active\"状态，并且存在一项配置文件状态标记\"file_ok\"必须为\"true\"。评测逻辑基于shell收集器输出的key=value格式文本，通过解析提取timezone、ntp、file_ok三个字段，与预期规则进行精确字符串相等比对。只有当这三个检查点全部同时满足时，才判定任务成功并返回1.0；任一字段不匹配、缺失或发生解析异常，均返回0.0。属于严格的\"全部满足\"联合判定模式。",
+    "main_functions": [
+      {
+        "name": "check_os_timezone_utc",
+        "lineno": 31,
+        "description": "该主函数接收两个参数：result为shell收集器输出的原始字符串，rules为包含预期规则的字典。其执行步骤如下：首先调用辅助函数_parse_kv将result字符串解析为键值对字典；随后从rules中获取预期的时区值（键\"timezone\"，缺省为\"Etc/UTC\"）和NTP状态值（键\"ntp\"，缺省为\"active\"）；接着依次进行三项精确匹配检查：1) 解析出的timezone字段必须严格等于预期时区字符串；2) 解析出的ntp字段必须严格等于预期NTP状态字符串；3) 解析出的file_ok字段必须严格等于\"true\"。上述三项条件必须全部同时成立，函数才返回1.0；若任意一项不匹配，或在解析、取值过程中发生异常，则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 16,
+        "description": "该辅助函数接收一段shell输出字符串，将其按换行符分割为逐行文本。对每一行去除首尾空白后，查找第一个\"=\"字符，以该字符为界将行分割为键和值两部分，并分别去除首尾空白，最终汇总为一个字典返回。若输入为空或某行不含\"=\"，则跳过该行。该函数的作用是将shell收集器输出的timezone=...、ntp=...、file_ok=...等原始key=value文本转换为结构化字典，供主函数check_os_timezone_utc进行后续字段精确比对使用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_b6781586-6346-41cd-935a-a6b1487918fc./evaluator_function_labels.json"
+}

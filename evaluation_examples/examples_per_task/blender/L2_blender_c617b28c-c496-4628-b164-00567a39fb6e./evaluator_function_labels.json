@@ -18,22 +18,22 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Blender 任务中是否实现了“选择性平滑着色（selective smooth shading）”。它通过解析外部检查脚本 check_mesh.py 输出的 JSON 数据，核对场景中指定物体的着色状态：要求列在 smooth_objects 中的物体必须启用平滑着色（has_smooth 为真），而列在 flat_objects 中的物体必须保持平直着色（has_smooth 为假）。只有当所有被检查的物体都严格满足各自对应的着色要求时，才判定任务成功并返回 1.0；任一物体不符合要求或数据缺失，即返回 0.0。整体采用严格的二值判定逻辑，不存在部分得分或加权累计。",
+    "overall_validation": "该evaluator用于验证Blender任务中的选择性平滑着色（selective smooth shading）结果。它接收外部Blender检查脚本（如check_mesh.py）输出的JSON格式命令行回显，依据rule中指定的对象名单，逐一核查网格对象的平滑着色状态：要求所有列在smooth_objects中的对象必须启用平滑着色（has_smooth为真），所有列在flat_objects中的对象必须未启用平滑着色（has_smooth为假或不存在）。只有当两类对象全部满足对应条件时，任务才算成功，返回1.0；若JSON解析失败、任一smooth对象未平滑、或任一flat对象被设为平滑，则立即返回0.0。",
     "main_functions": [
       {
         "name": "check_blender_selective_smooth",
         "lineno": 33,
-        "description": "接收 command_output（即 check_mesh.py 脚本输出的 JSON 字符串）和 rule 字典（预期包含 smooth_objects 与 flat_objects 两个列表）。首先调用 _parse_blender_output 将命令输出解析为字典；若解析失败或输出为空，直接返回 0.0。随后依次执行两轮循环检查：第一轮遍历 smooth_objects 中的每个物体名称，从解析结果中取出对应 mesh_info，若该物体不存在或 has_smooth 字段不为真，则记录警告并返回 0.0；第二轮遍历 flat_objects 中的每个物体名称，若该物体存在且 has_smooth 字段为真，则记录警告并返回 0.0。若两轮检查全部通过，说明所有应平滑的物体已平滑、所有应平直的物体未平滑，最终返回 1.0。该函数采用“全部满足”的二值判定逻辑，任一条件失败即整体失败。"
+        "description": "接收两个参数：command_output为Blender检查脚本输出的JSON字符串，rule为包含smooth_objects与flat_objects对象名列表的字典。首先调用_parse_blender_output将command_output解析为字典；若解析失败返回0.0。随后遍历rule['smooth_objects']，对每个对象名在解析结果中查找对应mesh_info，若该对象不存在或mesh_info['has_smooth']不为真，则记录警告并返回0.0。接着遍历rule['flat_objects']，若对象存在于解析结果中且mesh_info['has_smooth']为真，则记录警告并返回0.0。若全部检查通过，返回1.0。整个过程中若抛出异常，也捕获后返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 17,
-        "description": "负责将 Blender 检查脚本（check_mesh.py）打印到标准输出的原始字符串解析为 Python 字典。具体步骤：先判断 command_output 是否为空或仅含空白，若为空则记录错误并返回 None；再尝试调用 json.loads 对去除首尾空白后的内容进行反序列化。若遭遇 json.JSONDecodeError 或 ValueError，则记录错误及原始输出内容（debug 级别），并返回 None。该函数是主评测流程的前置解析器，其返回值直接决定后续检查能否继续；通常被需要读取 Blender 网格/场景 JSON 报告的各类检查函数复用。"
+        "description": "负责将Blender检查脚本的命令行输出（JSON字符串）解析为Python字典。先判断输出是否为空或仅含空白，若是则记录错误并返回None；否则对字符串strip后使用json.loads解析。若遇到json.JSONDecodeError或ValueError，记录错误日志并返回None。该函数为check_blender_selective_smooth提供前置数据解析，解析成功后的字典以对象名为键、包含has_smooth等字段的网格信息为值。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:13:04",
+  "created_at": "2026-07-01 14:39:29",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_c617b28c-c496-4628-b164-00567a39fb6e./evaluator_function_labels.json"
 }

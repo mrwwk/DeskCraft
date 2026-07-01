@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_c5e9f0a1-2b34-4acd-d890-1e2f3a4b5c6d./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_firewall_rules",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_firewall_rules",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证操作系统层面的 UFW/iptables 防火墙规则配置是否达到任务预期的最终状态。它读取 shell 收集器输出的 key=value 格式文本（其中包含 fw_active、rule_ssh、rule_http、rule_https、deny_default、report_ok 等字段），通过辅助函数将其解析为结构化字典后，与任务规则中声明的预期值进行逐项严格字符串比对。只有当 rules[\"checks\"] 中所有检查项的键值对全部精确匹配时，才判定任务成功并返回 1.0；若任意一项不匹配，或在解析/比较过程中发生异常，则返回 0.0。该 evaluator 采用“全或无”的硬性判定策略，不支持部分得分、容错阈值或近似匹配。",
+    "main_functions": [
+      {
+        "name": "check_os_firewall_rules",
+        "lineno": 31,
+        "description": "该主函数接收 result（shell 收集器返回的原始字符串输出）和 rules（包含预期检查规则的字典）两个参数。执行步骤如下：首先调用辅助函数 _parse_kv 将 result 按行解析为键值对字典 kv；随后从 rules 字典中取出 checks 子字典，遍历其中的每一个 key（如 fw_active、rule_ssh 等）及其对应的 expected 期望值；接着检查 kv 中是否存在该 key，并将实际值与 expected 进行严格相等比较（==）。若所有检查项均完全匹配，则返回 1.0；一旦遇到任一 key 缺失或值不相等，立即返回 0.0。整个逻辑被 try-except 包裹，若解析或遍历过程中抛出任何异常，函数会记录错误日志并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该辅助函数负责将 shell 输出的原始文本转换为结构化字典，供防火墙规则检查等主评测逻辑复用。它接收一个 output 字符串，先去除首尾空白并按换行符分割为多行；对每一行去除首尾空白后，判断是否包含等号“=”；若包含，则使用 split(\"=\", 1) 以第一个等号为界将行拆分为键和值，并分别去除空白后存入结果字典。该函数对空输入返回空字典，并自动跳过不含等号的行，具备一定的容错性。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:37:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_c5e9f0a1-2b34-4acd-d890-1e2f3a4b5c6d./evaluator_function_labels.json"
+}

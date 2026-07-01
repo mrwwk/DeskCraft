@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_43b0833a-2da6-43e7-a8e3-93790bc2579a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 38
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 38
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定写作类任务生成的文档与预期参考文档的一致性程度。最终产物要求是一份 .docx 或 .odt 格式的文档。核心检查对象是两份文档的段落文本序列及其整体内容。主要比较方式依据配置选项分为：整体内容模糊/精确比对、逐段模糊/精确比对。具体而言，evaluator 先根据文件类型（仅支持同类型 .docx 或 .odt）提取全部段落文本，再依据 ignore_blanks（忽略空白，默认 True）、ignore_case（忽略大小写）、ignore_order（忽略段落顺序）、delete_empty_lines（删除空行）、content_only（仅比较整体内容）和 fuzzy_match（启用 rapidfuzz 模糊匹配）等选项进行预处理与分支比对。成功判定总体思路为：在精确匹配模式下，要求文本完全一致（整体或逐段）返回 1，否则返回 0；在模糊匹配或 content_only 模式下，返回 0 到 1 之间的连续相似度分数；文件类型不匹配、读取失败或段落数量不一致（非模糊整体比对时）均返回 0。",
+    "main_functions": [
+      {
+        "name": "compare_docx_files",
+        "lineno": 38,
+        "description": "该函数接收两个文件路径 file1、file2 及选项字典 options，返回 0（不匹配）、1（完全匹配）或 0~1 之间的相似度分数（模糊匹配时）。执行流程如下：首先检查文件是否存在，缺失则返回 0。函数内部定义了 get_paragraph_texts_odt 用于解析 ODT 文件的段落文本。接着按文件类型分流：若均为 .docx，使用 python-docx 的 Document 提取 paragraphs 文本；若均为 .odt，使用 odfpy 的 load 加载后通过 get_paragraph_texts_odt 提取；类型不匹配则返回 0。提取后，若 ignore_order 为 True 则对段落列表排序；若 delete_empty_lines 为 True 则剔除空白段落。随后进入多分支比较逻辑：若 content_only 为 True，将全部段落合并为单一字符串（正则 \\s+ 替换为空格并 strip），可选 ignore_case 转小写，使用 rapidfuzz 的 fuzz.ratio 计算整体相似度并返回分数。若 content_only 为 False 且 ignore_blanks 为 True，同样合并为单一字符串处理，此时若 fuzzy_match 为 True 返回 fuzz.ratio 相似度分数，否则进行精确比较，文本不等则返回 0。若 ignore_blanks 为 False，先严格校验两段列表长度是否相等，不等则返回 0；若 fuzzy_match 为 True，逐对计算 fuzz.ratio 相似度并取算术平均值返回；若 fuzzy_match 为 False，则逐段精确比对（可选 ignore_case），任何一段不一致时打印带颜色 repr 差异并返回 0。所有检查均通过则返回 1。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:58:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_43b0833a-2da6-43e7-a8e3-93790bc2579a./evaluator_function_labels.json"
+}

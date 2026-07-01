@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L2_writ_247db8e9-9fd2-49a6-85f9-b53854f64c47./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 38
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 38
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证两个文档文件（仅支持 .docx 与 .odt 格式且必须同类型）在段落文本层面的一致性。它从两份文件中提取全部段落文本，依据选项对空白字符、大小写、段落顺序、空行进行预处理，随后执行精确字符串比对或基于 rapidfuzz 的模糊相似度计算。最终返回 0 至 1 之间的分数：返回 1 表示文本完全一致；返回 0 表示文件缺失、格式不匹配、段落数量不一致或文本内容不一致；返回 0 到 1 之间的浮点数表示在 fuzzy_match 模式下的相似度得分。核心检查对象是文档段落级别的纯文本内容，不涉及样式、格式或元数据（content_only 开启时则仅做整体文本比对）。",
+    "main_functions": [
+      {
+        "name": "compare_docx_files",
+        "lineno": 38,
+        "description": "接收两个文件路径 file1、file2 及若干选项（ignore_blanks、ignore_case、ignore_order、content_only、fuzzy_match、delete_empty_lines），比较两份文档的文本内容。首先检查文件是否存在，若任一不存在直接返回 0。随后根据后缀名判断文件类型：若均为 .docx，使用 python-docx 的 Document 读取全部段落文本；若均为 .odt，使用 odf.opendocument.load 加载并调用内部嵌套逻辑 get_paragraph_texts_odt 提取段落文本（该逻辑会遍历 odf.text.P 元素及其内部的 text:span，拼接所有文本节点）；若类型不一致或不受支持则返回 0。提取完成后，若 ignore_order 为 True 则对两段段落列表分别排序；若 delete_empty_lines 为 True 则过滤掉仅含空白字符的段落。接着进入比较分支：若 content_only 为 True，将两段全部段落各自合并为单一字符串，使用 re.sub(r'\\s+', ' ') 将所有空白字符（含换行）替换为单个空格并去除首尾空白，若 ignore_case 为 True 则转小写，最终使用 fuzz.ratio 计算整体相似度并返回 0–1 的浮点数。若 content_only 为 False 且 ignore_blanks 为 True，同样合并并规范化空白后，若 fuzzy_match 为 True 则返回 fuzz.ratio 相似度，否则进行精确相等判断（不等则返回 0）。若 ignore_blanks 为 False，先严格校验两段段落数量是否一致，不一致则打印段落内容、长度并返回 0；随后若 fuzzy_match 为 True，逐段计算 fuzz.ratio 并取算术平均值返回（若段落列表为空且对方也为空则返回 1.0）；若 fuzzy_match 为 False，则逐段精确比对（可选 ignore_case 转小写），若发现任一段落不同，使用 repr() 打印绿色（p1）与红色（p2）差异信息后返回 0。仅当所有检查均通过时才返回 1。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:56:48",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L2_writ_247db8e9-9fd2-49a6-85f9-b53854f64c47./evaluator_function_labels.json"
+}

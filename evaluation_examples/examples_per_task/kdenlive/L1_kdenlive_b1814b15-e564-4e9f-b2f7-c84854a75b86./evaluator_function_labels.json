@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_b1814b15-e564-4e9f-b2f7-c84854a75b86./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_color_clip",
+      "lineno": 65
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_color_clip",
+      "lineno": 65
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 Kdenlive 视频编辑项目的完成状态，具体检查项目文件（.kdenlive，本质为 MLT XML）中是否存在一个颜色片段（color clip），且该片段的颜色值与任务要求的预期颜色一致。核心检查对象是项目 XML 中所有 producer 元素，筛选其中 mlt_service 为 \"color\" 的节点，读取其 resource 属性中的颜色字符串，并将双方统一归一化为 6 位 RGB 大写十六进制（忽略 # 或 0x 前缀及 Alpha 通道）后进行精确比对。判定逻辑为“任一满足”：只要遍历过程中发现至少一个 color producer 的 RGB 值与 expected_color 的 RGB 部分完全匹配，即返回 1.0；若遍历结束未找到、文件不存在、未指定颜色、或 XML 解析失败，则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_color_clip",
+        "lineno": 64,
+        "description": "该函数接收 project_file_path（Kdenlive 项目文件路径）和 rule（包含 expected_color 字段的字典）作为输入。首先检查文件路径是否有效，若 project_file_path 为 None 或文件不存在则返回 0.0；接着从 rule 中提取 expected_color，若为空字符串则返回 0.0。随后对预期颜色进行标准化处理：转大写、去除首尾空格、移除开头的 # 或 0x 前缀，并截取前 6 位作为 RGB 值。使用 ET.parse 解析项目 XML 后，遍历根节点下所有 producer 元素。对每个 producer，调用辅助函数 _get_mlt_service 获取服务类型，若其值为 \"color\"（不区分大小写），则调用 _get_property_value 读取 \"resource\" 属性的颜色字符串，同样按上述规则标准化为 6 位 RGB 大写字符串。若任一 producer 的标准化颜色与预期 RGB 完全相等，立即返回 1.0。若全部遍历完毕仍未匹配，返回 0.0。过程中遇到 XML 解析错误（ET.ParseError）或其他任何异常，均捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 20,
+        "description": "从 MLT XML 元素（xml.etree.ElementTree.Element）中提取 mlt_service 值。优先检查元素自身的 mlt_service 直接属性；若不存在，则遍历其所有名为 property 的子元素，查找 name 属性等于 \"mlt_service\" 的 property 节点，返回其文本内容。若均未找到则返回 None。该函数服务于主函数对 producer 节点类型的判定，用于识别 color 类型的片段。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 47,
+        "description": "从 MLT XML 元素的子 property 元素中，按 name 属性精确查找指定名称（由参数 property_name 传入）的属性节点，返回其文本值；若未找到则返回 None。该函数被主函数用于读取 color producer 的 resource 属性，以获取颜色字符串进行后续标准化与比对。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:04:10",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_b1814b15-e564-4e9f-b2f7-c84854a75b86./evaluator_function_labels.json"
+}

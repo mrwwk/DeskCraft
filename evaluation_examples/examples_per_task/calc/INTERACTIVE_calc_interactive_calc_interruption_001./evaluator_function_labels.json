@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于 INTERACTIVE_calc_interactive_calc_interruption_001 任务，其核心验证逻辑是对一个字符串形式的 result 进行基于规则的子串包含性检查。检查对象即为传入的 result 字符串，要求该字符串必须同时满足正向包含规则（include）与反向排除规则（exclude）：result 中必须出现 include 列表内的所有子串，且绝对不能出现 exclude 列表内的任何子串。比较方式为精确的子串存在性判断（in / not in），最终采用二元打分机制，当所有规则同时满足时返回 1.0，任一条件不满足或 result 为 None 时返回 0.0。代码中未明确体现该 result 的具体来源（如文件、页面、程序输出或用户交互返回值），也未体现与其他指标的联合判定逻辑。",
+    "overall_validation": "该 evaluator 的核心目的是对任务输出的文本字符串进行基于规则的二元合规性校验。它通过配置化的 include（必须包含子串列表）与 exclude（必须排除子串列表）规则，检查最终产物或程序输出中是否同时满足「所有指定内容必须出现」且「所有禁止内容不得出现」。评测逻辑采用严格的子串精确匹配（非正则、非模糊匹配），以 1.0 表示完全通过、0.0 表示不通过，适用于对命令行输出、文档片段、页面文本等字符串结果进行快速的内容存在性验证。",
     "main_functions": [
       {
         "name": "check_include_exclude",
         "lineno": 36,
-        "description": "该函数接收两个参数：result（待检查的字符串）与 rules（字典，预期包含 include 和 exclude 键）。执行步骤如下：1）若 result 为 None，直接返回 0.0；2）通过 print 输出 result 与 rules 的内容；3）从 rules 中安全提取 include 列表与 exclude 列表，缺省值为空列表；4）执行组合条件判断：使用 all(r in result for r in include) 确保 result 包含所有 include 子串，同时使用 all(r not in result for r in exclude) 确保 result 不包含任何 exclude 子串；5）若上述两个条件同时成立，返回 1.0，否则返回 0.0。代码中未明确体现该函数的调用上下文及 result 的具体获取方式。"
+        "description": "该函数接收待验证的字符串 result 和规则字典 rules 作为输入。检查步骤如下：1) 判空处理：若 result 为 None，直接返回 0.0；2) 规则提取：从 rules 字典中读取 include（必须包含的子串列表）和 exclude（必须排除的子串列表），若键不存在则默认为空列表；3) 包含检查：使用 all() 遍历 include 列表，通过子串包含判断（r in result）确认 result 中出现了所有必须出现的子串；4) 排除检查：使用 all() 遍历 exclude 列表，通过子串不包含判断（r not in result）确认 result 中未出现任何应排除的子串。判定依据为：仅当「全部 include 子串均被包含」且「全部 exclude 子串均未被包含」这两个条件同时满足时，返回 1.0；任一条件不满足则返回 0.0。此外，函数内部会通过 print() 将 result 和 rules 输出到控制台以供调试。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:21:25",
+  "created_at": "2026-07-01 14:45:21",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_interruption_001./evaluator_function_labels.json"
 }

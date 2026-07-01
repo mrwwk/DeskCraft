@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_8a9fd669-2142-46d4-bd0c-32cd6323b57f./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_slide1_colors",
+      "lineno": 8
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_slide1_colors",
+      "lineno": 8
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator验证结果PPTX文件的第一张幻灯片是否满足特定的颜色规范。具体而言，它检查两个必须同时满足的条件：第一，幻灯片1的背景颜色必须为深蓝色（RGB十六进制值00008B），该检查会同时考虑幻灯片自身的solid fill以及从slide master继承的背景；第二，幻灯片1上所有shape中的非空文本颜色必须为纯白色（RGB十六进制值FFFFFF），该检查会递归遍历所有段落、文本run以及GROUP等容器shape内的子shape。两个条件全部通过则返回1（成功），任一条件失败则返回0（失败）。其他属性如shape尺寸、字体、对齐方式以及其他幻灯片的内容均不在检查范围内。",
+    "main_functions": [
+      {
+        "name": "check_slide1_colors",
+        "lineno": 8,
+        "description": "该函数接收result_path（结果PPTX文件路径）作为输入，使用Presentation加载PPTX。首先检查演示文稿是否至少包含一张幻灯片，否则返回0。随后对第一张幻灯片执行两项严格匹配检查：1）背景颜色检查：读取slide.background.fill，若fill.type为1（solid fill）则直接提取fill.fore_color.rgb；若fill.type为5（继承自slide master）则追溯到slide.slide_layout.slide_master.background.fill，仅当其type为1时提取前景色RGB。背景色RGB字符串必须等于'00008B'，否则记录日志并返回0。2）文本颜色检查：借助内部递归逻辑遍历slide.shapes中的所有shape及其嵌套子shape（如GROUP容器），对每个shape的text_frame逐层遍历paragraphs与runs；仅当run.text.strip()非空且run.font.color.rgb不为None时，才将该RGB字符串与'FFFFFF'比对。若发现任何应检文本的颜色不是'FFFFFF'，则记录日志并返回0。仅当背景色与所有非空文本颜色均完全符合要求时，才返回1。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:23:34",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_8a9fd669-2142-46d4-bd0c-32cd6323b57f./evaluator_function_labels.json"
+}

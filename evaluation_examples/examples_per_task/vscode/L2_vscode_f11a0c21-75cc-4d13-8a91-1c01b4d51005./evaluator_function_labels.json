@@ -1,0 +1,83 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_f11a0c21-75cc-4d13-8a91-1c01b4d51005./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_required_patterns",
+      "lineno": 68
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 92
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 20
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 24
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 39
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_required_patterns",
+      "lineno": 68
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 92
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证一个 UI bundle（zip 压缩包）是否满足任务规定的文件结构、内容模式和 HTML 结构要求。最终产物是 actual 参数指向的 zip 文件。核心检查对象包括三类：1）必需文件是否存在；2）指定文本文件的内容是否匹配给定正则模式；3）HTML 文件是否通过 CSS 选择器及文本/属性的结构化校验。比较方式上，所有 zip 内路径先经 _normalize_ui_bundle_path 统一格式（去前导“./”、反斜杠转正斜杠）；文本内容通过 zip 读取并 UTF-8 解码；HTML 则经 BeautifulSoup 解析为 DOM 树后进行选择器查询。成功判定采用“全部满足”的硬门槛逻辑：每个主函数内部遍历其规则列表，任一检查项失败或发生异常立即返回 0.0，全部通过才返回 1.0。三个主函数分别对应 rules 中的 \"required_files\"、\"required_file_patterns\" 和 \"html_checks\" 键，可独立或组合调用。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 49,
+        "description": "接收 actual（zip 文件路径）和 rules 字典。首先判空：若 actual 为空直接返回 0.0；若 rules 中 \"required_files\" 为空列表则直接返回 1.0。随后调用 _load_ui_bundle_entries(actual) 读取 zip 全部条目，得到 normalized_to_raw 映射。遍历 rules[\"required_files\"] 中的每个 req 路径，先用 _normalize_ui_bundle_path 规范化，再检查该路径是否为 normalized_to_raw 的键。若所有必需文件均存在，返回 1.0；任一文件缺失或读取 zip 发生异常，返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_patterns",
+        "lineno": 68,
+        "description": "接收 actual（zip 文件路径）和 rules 字典。首先判空：若 actual 为空返回 0.0；若 rules 中 \"required_file_patterns\" 为空字典则返回 1.0。调用 _load_ui_bundle_entries(actual) 获取 zip 的 normalized_to_raw 映射和 text_contents 文本内容。遍历 rules[\"required_file_patterns\"] 的每项（file_name → patterns 列表）：先规范化 file_name 并确认该文件存在于 zip 中，缺失则返回 0.0；再取该文件的文本内容，对每个 pattern 使用 re.search(str(pattern), content, re.IGNORECASE | re.DOTALL) 进行不区分大小写、跨行匹配的正则搜索。若所有文件的所有模式均匹配成功，返回 1.0；任一文件缺失、任一模式未匹配或发生异常，返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 92,
+        "description": "接收 actual（zip 文件路径）和 rules 字典。首先判空：若 actual 为空返回 0.0；若 rules 中 \"html_checks\" 为空字典则返回 1.0。调用 _load_ui_bundle_entries(actual) 和 _get_ui_bundle_html_soup(text_contents, normalized_name) 将目标 HTML 解析为 BeautifulSoup 对象。遍历 rules[\"html_checks\"] 的每项（file_name → checks 列表）：确认文件存在且 soup 不为 None，否则返回 0.0。对每个 check 依据 \"type\" 执行以下分支：\"selector_exists\" 要求 soup.select_one(selector) 非 None；\"selector_count\" 要求 len(soup.select(selector)) 严格等于 int(expected_count)；\"selector_text_contains\" 要求 soup.select_one(selector) 的可见文本（get_text(\" \", strip=True)）在不区分大小写情况下包含 expected_text；\"selector_attribute_equals\" 要求 soup.select_one(selector) 的 attribute 属性值严格等于 expected_value；\"text_present\" 要求整个 soup.get_text(\" \", strip=True) 在不区分大小写情况下包含 expected_text；遇到未知 type 直接返回 0.0。所有检查项全部通过返回 1.0，任一失败或异常返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 20,
+        "description": "路径规范化工具。对传入的 zip 内文件路径执行两步处理：移除左侧的 \"./\" 前缀，并将反斜杠 \"\\\\\" 替换为正斜杠 \"/\"。用于统一 zip 条目路径的表示形式，避免因为路径写法差异导致匹配失败。被所有主函数在比对文件路径前调用。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 24,
+        "description": "zip 文件的核心读取与解析器。打开 actual 指定的 zip，获取所有原始文件名 raw_names，建立“规范化路径 → 原始路径”的映射 normalized_to_raw，记录各文件的 file_size，并提取后缀为 .html、.css、.js、.json、.md、.txt、.svg 的文本文件内容，以 UTF-8 解码（errors=\"ignore\"），存入 text_contents 字典。返回 (normalized_to_raw, file_sizes, text_contents) 三元组。三个主函数均依赖此函数获取 zip 内容，其中 file_sizes 当前未被使用。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 39,
+        "description": "HTML DOM 解析包装器。接收 _load_ui_bundle_entries 产出的 text_contents 字典和目标 file_name，先经 _normalize_ui_bundle_path 规范化文件名，再取出对应 HTML 文本，使用 BeautifulSoup 解析为 soup 对象返回。若文件不存在或未被提取为文本类型，则返回 None。专供 check_ui_bundle_html_checks 进行 CSS 选择器查询和文本/属性提取。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:51:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_f11a0c21-75cc-4d13-8a91-1c01b4d51005./evaluator_function_labels.json"
+}

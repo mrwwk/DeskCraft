@@ -30,32 +30,32 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender 3D场景中对象之间的父子层级关系是否符合任务要求。它接收来自Blender检查脚本（check_object.py）输出的JSON格式程序输出字符串（command_output），通过精确名称匹配定位场景中的对象，并依据rule参数中指定的规则进行二元判定（0.0或1.0）。核心检查对象包括对象的name、children列表和parent字段。主要比较方式分为三种：验证指定父对象是否包含全部预期的直接子对象（集合包含关系）；通过parent_map和not_parent分别验证子对象的parent字段是否等于预期值、以及是否不等于被禁止的值；检查是否存在任意对象拥有不少于min_children_count个直接子对象。成功判定的总体思路是：JSON解析成功且对象存在的前提下，所有被激活的规则模式必须全部满足，任一条件不满足或发生异常即判为失败（0.0），全部通过则判为成功（1.0）。",
+    "overall_validation": "该evaluator用于验证Blender 3D场景中对象之间的父子层级关系。它读取Blender检查脚本（check_object.py）输出的JSON数据，核心检查对象是场景中各对象的name、parent字段以及children列表。评测采用二元打分制（返回0.0或1.0），通过精确名称匹配定位对象，并依据rule参数中指定的三种模式之一进行判定：验证指定父对象是否包含全部预期子对象、验证子对象是否挂接在正确的父对象下且未挂接在错误父对象下、或验证场景中是否存在拥有足够数量子对象的父对象。只要任一检查项不满足即判定为失败（0.0），全部满足才返回成功（1.0）。",
     "main_functions": [
       {
         "name": "check_blender_parent_child",
         "lineno": 41,
-        "description": "该函数接收command_output（Blender检查脚本输出的原始字符串）和rule（包含验证规则的字典）作为输入。执行步骤如下：首先调用_parse_blender_output解析原始输出，若解析失败或为空则直接返回0.0。随后按三种互斥或组合模式依次检查：第一种模式，若rule同时包含\"parent\"和\"expected_children\"键，则通过_find_object查找父对象，若不存在返回0.0；再将其children列表转为集合，检查expected_children集合是否为actual_children的子集，若不是则返回0.0，若是则直接返回1.0（不再检查后续模式）。第二种模式，若rule包含\"parent_map\"，则遍历其中每个child_name与expected_parent，用_find_object查找子对象，若对象不存在或其parent字段不等于预期值则返回0.0；若rule包含\"not_parent\"，则遍历检查对应子对象的parent字段是否等于被禁止的wrong_parent，若等于则返回0.0。第三种模式，若rule中\"parent_has_children\"为真，则遍历result[\"objects\"]中所有对象，检查是否存在任一对象的children列表长度大于等于min_children_count（默认为1），若存在则返回1.0，若遍历结束都不存在则返回0.0。若上述检查全部通过且未提前返回，最终返回1.0。任何异常捕获后也返回0.0。"
+        "description": "该函数接收command_output（来自check_object.py的JSON字符串）和rule（字典）作为输入，首先调用_parse_blender_output将JSON解析为Python对象；若解析失败或输出为空，直接返回0.0。随后按rule内容进入三种互斥或顺序检查模式：\n1）若rule包含'parent'与'expected_children'，则使用_find_object按精确名称查找父对象，若找不到返回0.0；若找到，则取其'children'列表转为集合，检查expected_children集合是否为actual_children集合的子集（issubset），若缺少任何预期子对象则记录日志并返回0.0。\n2）若rule包含'parent_map'，则遍历其中每一对child_name与expected_parent，使用_find_object查找该子对象，若不存在或其'parent'字段不等于expected_parent，则返回0.0；若rule同时包含'not_parent'，则遍历其中每一对child_name与wrong_parent，若该子对象存在且其'parent'字段恰好等于wrong_parent，则返回0.0。\n3）若rule包含'parent_has_children'为真，则遍历所有对象的'children'列表，检查是否存在任意一个对象的子对象数量大于等于rule中'min_children_count'（默认为1），若没有任何对象满足则返回0.0。\n当所有适用检查均通过时返回1.0；若执行过程中发生异常也返回0.0。"
       },
       {
         "name": "check_blender_hierarchy",
         "lineno": 100,
-        "description": "该函数是check_blender_parent_child的薄封装，接收相同的command_output和rule参数，直接将其原样转发给check_blender_parent_child函数执行。自身不增加任何额外的检查逻辑、字段比较或阈值判断，完全复用后者的父子层级验证能力，返回值即为后者的返回值（0.0或1.0）。"
+        "description": "该函数是check_blender_parent_child的薄封装，直接将其接收的command_output和rule原样转发给check_blender_parent_child执行，并返回该函数的返回值。其自身不增加额外逻辑，仅用于在语义上表示对层级关系（hierarchy）的验证。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 19,
-        "description": "接收Blender检查脚本输出的原始字符串command_output，先判断字符串是否为空或仅含空白，若是则记录错误并返回None；否则尝试调用json.loads对去除首尾空白后的内容进行解析。若解析成功返回对应的Python字典（通常包含objects列表），若遇到json.JSONDecodeError或ValueError则记录错误日志及原始输出片段，并返回None。该函数为主评测函数提供输入数据的解析与清洗服务，是后续所有对象查找和关系验证的前置步骤。"
+        "lineno": 24,
+        "description": "负责将Blender检查脚本的命令行输出解析为结构化数据。接收command_output字符串，先判断是否为空或仅含空白字符，若是则记录错误并返回None；否则尝试使用json.loads解析去除首尾空白后的内容。若解析失败（JSONDecodeError或ValueError），记录错误日志并附带原始输出内容，返回None。成功时返回解析后的Python对象（通常为字典），供主函数进一步提取对象列表与层级信息。"
       },
       {
         "name": "_find_object",
-        "lineno": 32,
-        "description": "接收_parse_blender_output返回的结果字典result和目标对象名称name，在result字典的\"objects\"键对应的列表中进行线性遍历，通过精确字符串匹配（obj.get(\"name\") == name）查找指定对象。若找到则返回该对象的字典（通常包含name、children、parent等字段），若遍历结束未找到则返回None。该函数被主函数用于在Blender场景中精确定位需要验证父子关系的特定对象。"
+        "lineno": 35,
+        "description": "在已解析的Blender输出结果中按精确名称查找对象。接收result（字典）和name（字符串）两个参数，遍历result.get('objects', [])列表，逐一比对obj.get('name')是否与传入的name完全相等。若找到匹配对象则返回该对象字典，否则返回None。该函数被check_blender_parent_child多次调用，用于定位父对象和子对象以读取其parent、children等字段。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:10:41",
+  "created_at": "2026-07-01 14:38:10",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_81a9ba8c-f591-425f-8700-5addaf2f3ad6./evaluator_function_labels.json"
 }

@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_a462a795-fdc7-4b23-b689-e8b6df786b78./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_switch_user",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_switch_user",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统用户会话切换任务是否成功完成。它通过读取shell收集器返回的原始文本输出，利用键值对解析器提取结构化状态信息，核心检查对象是一个目标文件的三项属性：文件是否存在、文件内容是否正确、文件所有者是否正确。评测采用严格的全部满足策略（\"与\"逻辑），只有当file_exists、content_ok、owner_ok三个字段的值均精确等于\"true\"时，才判定任务成功并返回1.0分；任一字段不匹配或解析过程发生异常，均返回0.0分。",
+    "main_functions": [
+      {
+        "name": "check_os_switch_user",
+        "lineno": 31,
+        "description": "该函数接收shell收集器输出的原始字符串result和规则字典rules。首先调用辅助函数_parse_kv(result)将原始输出按行解析为字典。随后依次执行三项精确匹配检查：第一，检查kv.get(\"file_exists\")是否等于\"true\"，验证目标文件存在性；第二，检查kv.get(\"content_ok\")是否等于\"true\"，验证文件内容正确性；第三，检查kv.get(\"owner_ok\")是否等于\"true\"，验证文件所有者正确性。三个条件必须全部同时满足，函数才返回1.0；若任一条件不满足，或在解析、取值过程中触发异常，则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "接收shell输出的字符串output，将其按换行符分割为逐行文本。对每一行去除首尾空白后，若包含等号，则以第一个等号为界将行拆分为键和值，分别去除首尾空白后存入字典。若输入为空字符串或不包含等号，则返回空字典。该函数为check_os_switch_user提供数据预处理服务，将非结构化的shell输出转换为结构化字典，以便后续对file_exists、content_ok、owner_ok等字段进行精确字符串匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:34:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_a462a795-fdc7-4b23-b689-e8b6df786b78./evaluator_function_labels.json"
+}

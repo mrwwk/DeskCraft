@@ -74,62 +74,62 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender任务完成后的场景状态与输出产物。它通过读取外部Blender检查脚本（如check_modifier.py、check_world.py、check_mesh.py、check_material.py、check_object.py）生成的JSON输出，或直接读取本地渲染图像文件，对场景中的对象修改器堆栈、世界环境HDRI、网格平滑着色、材质纹理连接与PBR参数、相机配置以及渲染输出文件的尺寸与格式进行逐项检查。核心比较方式包括：对数值型参数（修改器参数、焦距、金属度、粗糙度等）采用容差近似匹配；对字符串、布尔值和文件名字段采用精确匹配或子串包含匹配；对渲染图像使用PIL库解析后校验宽高与格式。每个主检查函数独立运行，采用“全部关键条件满足则得1.0，任一失败即得0.0”的二元判定逻辑，最终分数由调用方根据具体任务规则决定。",
+    "overall_validation": "该 evaluator 用于验证 Blender 3D 创作任务的完成质量，核心检查对象是 Blender 场景中的对象属性、材质纹理、世界环境、相机配置以及最终渲染输出。它通过读取各类 Blender 检查脚本（如 check_modifier.py、check_world.py、check_mesh.py、check_material.py、check_object.py）输出的 JSON 数据，或读取本地渲染图像文件，来验证场景状态是否符合任务规则。评测逻辑以“全部满足”为主要模式：对于修改器堆栈、相机参数、世界 HDRI、材质纹理与 PBR 参数等，要求规则中指定的所有字段和对象都必须逐一匹配；数值型参数采用容差近似比较，字符串和布尔型采用精确匹配；渲染输出则通过 PIL 库校验文件存在性、图像尺寸和格式。任一检查项失败即返回 0.0，全部通过返回 1.0。",
     "main_functions": [
       {
         "name": "check_blender_modifier_stack",
         "lineno": 48,
-        "description": "验证指定对象上的修改器堆栈参数是否全部符合预期。输入command_output为check_modifier.py输出的JSON字符串，rule需包含object_name（对象名）、modifiers（修改器类型与参数字典）和可选tolerance（默认0.01）。执行步骤：1) 调用_parse_blender_output解析JSON；2) 在解析结果中获取该对象名下的修改器列表；3) 遍历rule中期望的每种修改器类型（如ARRAY、BEVEL）及其参数；4) 在对象修改器中按type字段精确匹配查找对应修改器，若某类型缺失直接返回0.0；5) 对参数值进行比对：若预期值为int/float，调用_check_tolerance进行容差比较，否则进行精确相等比较；6) 任一参数不匹配即返回0.0。判定依据：所有期望修改器类型存在且全部参数在容差内匹配，返回1.0。"
+        "description": "接收 check_modifier.py 输出的 JSON 字符串和 rule 字典。首先调用 _parse_blender_output 解析 JSON，然后按 rule[\"object_name\"] 提取该对象的修改器列表。接着遍历 rule[\"modifiers\"] 中要求的每种修改器类型（如 \"ARRAY\"、\"BEVEL\"），在对象修改器中查找同类型实例；对找到的类型，再逐个比对参数：若预期值为数值（int/float），则调用 _check_tolerance 在 rule[\"tolerance\"]（默认 0.01）容差内比较；否则进行精确相等比较。所有要求的修改器类型必须都存在，且每个指定参数都必须通过比对，函数才返回 1.0；若缺少修改器类型或任一参数不匹配，立即返回 0.0。"
       },
       {
         "name": "check_blender_world_hdri",
         "lineno": 93,
-        "description": "验证世界环境是否使用了指定的HDRI文件。输入command_output为check_world.py输出的JSON字符串，rule需包含hdri_filename（期望文件名）。执行步骤：1) 调用_parse_blender_output解析JSON；2) 检查result['has_hdri']是否为真，若为假说明未启用HDRI，返回0.0；3) 获取result['hdri_filename']，与rule中的hdri_filename进行比对，支持两种匹配模式：实际文件名包含预期文件名（子串匹配），或两者完全相等。判定依据：场景已启用HDRI且文件名满足上述匹配条件，返回1.0；否则返回0.0。"
+        "description": "接收 check_world.py 输出的 JSON 字符串和 rule 字典。调用 _parse_blender_output 解析后，先检查 result[\"has_hdri\"] 是否为真；若为假则返回 0.0。再提取 result[\"hdri_filename\"]，与 rule[\"hdri_filename\"] 进行匹配：支持实际文件名等于预期文件名，或预期文件名是实际文件名的子串。满足任一匹配方式返回 1.0，否则返回 0.0。"
       },
       {
         "name": "check_blender_smooth_shading",
         "lineno": 122,
-        "description": "验证网格对象是否启用或禁用了平滑着色。输入command_output为check_mesh.py输出的JSON字符串，rule需包含object_name（精确名称）或object_name_contains（名称子串），以及has_smooth布尔预期值（默认True）。执行步骤：1) 调用_parse_blender_output解析JSON；2) 若提供object_name，直接以该名称为键查找对应mesh_info字典，检查其has_smooth字段是否等于预期值，匹配返回1.0，否则0.0；3) 若提供object_name_contains，遍历JSON结果中的所有键，寻找键中包含指定子串且对应值为字典的项，检查其has_smooth字段，采用“任一满足”策略——只要有一个匹配对象的has_smooth等于预期值即返回1.0，遍历完无匹配则返回0.0。"
+        "description": "接收 check_mesh.py 输出的 JSON 字符串和 rule 字典。调用 _parse_blender_output 解析后，分两种模式检查：若 rule 包含 \"object_name\"，则精确查找该键对应的网格信息，比较其 \"has_smooth\" 字段与 rule[\"has_smooth\"]（默认 True），相等返回 1.0；若 rule 包含 \"object_name_contains\"，则遍历 result 中所有键，寻找键名包含该子串且值为字典的项，再比对 \"has_smooth\" 字段，任一匹配成功即返回 1.0。两种模式均未命中则返回 0.0。"
       },
       {
         "name": "check_blender_material_textures",
         "lineno": 160,
-        "description": "验证对象材质的纹理连接与PBR参数。输入command_output为check_material.py输出的JSON字符串，rule需包含object_name、textures纹理列表，以及可选的metallic、roughness、tolerance（默认0.05）。执行步骤：1) 调用_parse_blender_output解析JSON，获取指定对象名下的材质列表；2) 对rule中每个纹理规格（filename、可选connected_to），在材质中查找image_textures：先匹配filename，若指定了connected_to则要求该连接目标出现在tex['connected_to']列表中（支持字符串自动转列表）；3) 若上述未找到，启用fallback机制：检查mat['texture_filename']是否等于filename，且connected_to为None或'Base Color'；4) 若任一纹理未找到，返回0.0；5) 纹理全部通过后，若rule中指定了metallic或roughness，遍历该对象的所有材质，寻找至少一个材质能同时满足这些PBR参数的容差（通过_check_tolerance），找到即返回1.0，遍历完未找到返回0.0；6) 若仅检查textures而无PBR参数要求，直接返回1.0。"
+        "description": "接收 check_material.py 输出的 JSON 字符串和 rule 字典。调用 _parse_blender_output 解析后，先按 rule[\"object_name\"] 获取材质列表。然后遍历 rule[\"textures\"] 中的每个纹理规格，检查两点：一是 filename 必须匹配；二是若指定了 connected_to，则该纹理的 connected_to 列表（或字符串）中必须包含该值。查找范围包括 mat[\"image_textures\"] 列表，以及 mat[\"texture_filename\"] 作为 Base Color 的 fallback。所有纹理规格必须全部找到才继续。随后若 rule 中指定了 \"metallic\" 或 \"roughness\"，则遍历材质，调用 _check_tolerance 在 rule[\"tolerance\"]（默认 0.05）容差内比对 PBR 参数，任一材质同时满足纹理和 PBR 参数即返回 1.0。若仅检查纹理且无 PBR 参数，纹理全部匹配即返回 1.0；否则返回 0.0。"
       },
       {
         "name": "check_blender_render_output",
         "lineno": 234,
-        "description": "验证渲染输出图像文件是否存在及其属性是否符合预期。输入file_path为本地渲染文件路径，rule可选包含width、height、format。执行步骤：1) 检查file_path是否为None或文件不存在，若不存在返回0.0；2) 尝试导入PIL.Image并打开图像文件；3) 若rule指定width/height，将img.size与预期值进行精确整数比较，不匹配返回0.0；4) 若rule指定format，将img.format与预期格式进行不区分大小写比较，并处理JPG与JPEG的别名映射（fmt_map: {'JPG': 'JPEG'}），不匹配返回0.0；5) 若PIL未安装（ImportError），降级为仅检查文件是否存在，存在返回1.0，否则0.0。判定依据：文件存在且所有指定属性（尺寸、格式）完全匹配，返回1.0。"
+        "description": "接收本地渲染输出文件路径 file_path 和 rule 字典。首先检查文件是否存在，不存在返回 0.0。然后尝试用 PIL.Image.open 打开图像：若 rule 指定 \"width\" 或 \"height\"，要求与实际图像尺寸精确相等；若指定 \"format\"，要求与 img.format 匹配（不区分大小写，并兼容 JPG 与 JPEG 别名）。所有指定条件都满足返回 1.0。若环境中没有 PIL，则退化为仅检查文件是否存在，存在返回 1.0，否则 0.0。"
       },
       {
         "name": "check_blender_camera_config",
         "lineno": 278,
-        "description": "验证相机对象的配置参数。输入command_output为check_object.py输出的JSON字符串，rule需包含camera_name（默认'Camera'），以及可选的focal_length、dof_enabled、fstop、focus_distance、tolerance（默认0.5）。执行步骤：1) 调用_parse_blender_output解析JSON；2) 调用_find_object按camera_name精确查找对象，未找到返回0.0；3) 确认对象type为'CAMERA'，否则返回0.0；4) 对rule中指定的每个相机参数进行检查：focal_length、fstop、focus_distance使用_check_tolerance进行容差比较；dof_enabled进行布尔精确比较；5) 若某预期参数在相机数据中缺失（如'focal_length' not in obj），记录警告并返回0.0。判定依据：相机存在且所有指定参数均满足要求，返回1.0；任一参数缺失或不匹配返回0.0。"
+        "description": "接收 check_object.py 输出的 JSON 字符串和 rule 字典。调用 _parse_blender_output 解析后，使用 _find_object 按 rule[\"camera_name\"]（默认 \"Camera\"）精确查找对象；要求对象 type 必须为 \"CAMERA\"。然后检查 rule 中指定的相机属性：focal_length、dof_enabled、fstop、focus_distance。对于数值型属性（focal_length、fstop、focus_distance），调用 _check_tolerance 在 rule[\"tolerance\"]（默认 0.5）容差内比较；dof_enabled 为布尔精确比较。若 rule 要求某属性但输出中缺失该字段，或比对失败，均返回 0.0。所有指定属性全部通过返回 1.0。"
       },
       {
         "name": "check_blender_pbr_setup",
         "lineno": 341,
-        "description": "作为check_blender_material_textures的薄封装与别名，专门用于验证PBR材质与纹理设置。它直接接收相同的command_output和rule参数，并原样转发给check_blender_material_textures执行。因此其检查逻辑、判定依据、输入输出语义与check_blender_material_textures完全一致：验证指定对象的材质纹理连接（filename与connected_to）以及金属度/粗糙度等PBR参数是否在容差范围内。"
+        "description": "该函数是 check_blender_material_textures 的薄封装（别名）。接收相同的 command_output 和 rule 参数，直接将其转发给 check_blender_material_textures 执行，因此其检查逻辑、判定标准与后者完全一致：验证指定对象的材质纹理连接及 PBR 参数。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 24,
-        "description": "解析来自Blender检查脚本（如check_modifier.py、check_world.py、check_mesh.py、check_material.py、check_object.py等）的命令行JSON输出。具体行为：先检查command_output是否为空或仅包含空白字符，若是则记录error日志并返回None；随后尝试使用json.loads解析为Python对象；若遇到JSONDecodeError或ValueError，记录error日志并附带原始输出内容（debug级别），返回None。该函数是所有以command_output为输入的主函数的统一数据预处理入口，解析失败会导致主函数直接返回0.0。"
+        "lineno": 16,
+        "description": "解析来自各类 Blender 检查脚本（如 check_modifier.py、check_world.py 等）的标准输出字符串。先判空，再使用 json.loads 将输出反序列化为 Python 字典。若输出为空或 JSON 解析失败，记录错误并返回 None。该函数是所有主函数的数据预处理入口，负责将原始命令输出转换为结构化数据供后续字段比对使用。"
       },
       {
         "name": "_find_object",
-        "lineno": 36,
-        "description": "在check_object.py输出的JSON结构中按精确名称查找对象。它接收解析后的result字典和name字符串，遍历result['objects']列表，逐一比对obj['name']是否等于传入的name。若找到则返回该对象的字典（包含type、focal_length等字段），未找到返回None。该函数目前被check_blender_camera_config调用，用于定位特定相机对象。"
+        "lineno": 28,
+        "description": "在 check_object.py 输出的 JSON 字典中按精确名称查找对象。它读取 result[\"objects\"] 列表，遍历其中每个对象字典，匹配 obj[\"name\"] 等于传入的 name 参数。找到返回该对象字典，否则返回 None。专用于 check_blender_camera_config 等需要按名称定位场景对象的检查。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 43,
-        "description": "对两个数值进行容差范围内的近似相等判断。它接收actual（实际值）、expected（预期值）和tol（容差阈值）。若actual或expected任一为None，直接返回False；否则将三者均转为float，计算绝对差值abs(actual - expected)，判断是否小于等于tol。该函数被check_blender_modifier_stack（修改器数值参数）、check_blender_material_textures（metallic/roughness）和check_blender_camera_config（focal_length/fstop/focus_distance）复用，是evaluator中所有浮点数比较的通用比较器。"
+        "lineno": 36,
+        "description": "通用数值容差比较器。接收 actual、expected、tol 三个参数，先排除 None 值，再将三者转为 float，计算绝对差值是否小于等于 tol。返回布尔值。被 check_blender_modifier_stack、check_blender_material_textures、check_blender_camera_config 等主函数复用，用于处理浮点参数（如修改器参数、PBR 金属度/粗糙度、相机焦距等）的近似相等判定。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:15:46",
+  "created_at": "2026-07-01 14:41:54",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_a2ba5904-0f5f-4282-be35-9976a34b6c33./evaluator_function_labels.json"
 }

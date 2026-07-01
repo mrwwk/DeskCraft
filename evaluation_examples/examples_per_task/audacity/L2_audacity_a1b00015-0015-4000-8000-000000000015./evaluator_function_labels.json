@@ -46,47 +46,47 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证OSWorld环境中Audacity任务的执行结果，核心围绕两类产物展开检查：一是导出的WAV音频文件，二是Audacity项目文件。对于WAV文件，evaluator会原子化地检查音频时长是否落在指定容差范围内，以及单声道RMS电平（dB）是否处于指定区间；对于项目文件，evaluator会检查文件存在性、最小文件大小，并验证其是否为有效的.aup（XML格式，Audacity 2.x）或.aup3（SQLite格式，Audacity 3.x）。每个主函数均为独立判定，采用硬阈值方式：条件满足返回1.0，不满足或异常返回0.0，不存在加权或累计逻辑。",
+    "overall_validation": "这个 evaluator 用于验证 OSWorld 环境中 Audacity 任务的执行结果，核心围绕两类产物展开：一是导出的 WAV 音频文件，二是 Audacity 项目文件（.aup 或 .aup3）。对于 WAV 文件，evaluator 通过标准库 wave 模块与 struct 模块直接解析文件头与原始采样数据，计算实际音频时长与单声道 RMS 分贝值，并与 rule 中给定的期望值、容忍度或 dB 范围进行精确比较；对于项目文件，evaluator 先检查磁盘存在性与最小文件体积（默认 100 字节），再依次尝试以 SQLite 数据库和 XML 文档两种方式进行解析验证，只要有一种格式通过即视为有效。三个主函数各自独立判定，采用二元打分机制：条件完全满足时返回 1.0，任何检查失败或异常时返回 0.0，不存在加权或累计逻辑。",
     "main_functions": [
       {
         "name": "check_audio_duration",
         "lineno": 104,
-        "description": "检查指定路径WAV音频文件的播放时长。首先验证file_path是否存在；若不存在则返回0.0。随后调用_read_wav_info读取WAV元数据，获取实际duration。从rule字典中提取expected_duration（预期时长，必填）和tolerance（容差秒数，默认0.5）。计算实际时长与预期时长的绝对差值，若abs(actual - expected) <= tolerance则返回1.0，否则返回0.0。过程中任何异常均捕获并返回0.0。"
+        "description": "接收 file_path 与 rule 字典作为输入。首先使用 os.path.isfile 检查目标 WAV 文件是否存在，不存在则记录错误并返回 0.0；存在时调用辅助函数 _read_wav_info 读取文件头信息，提取实际 duration；接着从 rule 中读取 expected_duration 转为浮点数，并读取 tolerance（默认 0.5 秒）；计算实际时长与期望时长的绝对差值，若小于等于容忍度则返回 1.0，否则返回 0.0；整个流程包裹在 try-except 中，任何异常均记录错误并返回 0.0。"
       },
       {
         "name": "check_audio_rms_level",
         "lineno": 125,
-        "description": "检查指定路径WAV音频文件的单声道RMS电平是否处于指定dB范围内。首先验证file_path是否存在；若不存在则返回0.0。随后调用_get_mono_samples将音频转换为单声道样本列表并获取采样率；再调用_rms_db计算RMS分贝值。从rule字典中提取min_rms_db和max_rms_db作为上下界。若min_rms_db <= rms <= max_rms_db则返回1.0，否则返回0.0。过程中任何异常均捕获并返回0.0。"
+        "description": "接收 file_path 与 rule 字典作为输入。首先检查文件是否存在，不存在直接返回 0.0；存在时调用辅助函数 _get_mono_samples 将音频转换为单声道浮点样本序列（多声道时取各声道平均）并获取采样率；随后调用 _rms_db 计算该单声道序列的 RMS 分贝值；从 rule 中读取 min_rms_db 与 max_rms_db；判断计算出的 rms 是否落在闭区间 [min_rms_db, max_rms_db] 内，若是则返回 1.0，否则返回 0.0；异常时返回 0.0。"
       },
       {
         "name": "check_aup_project_exists",
         "lineno": 147,
-        "description": "检查指定路径的Audacity项目文件是否存在且格式有效，支持.aup（XML，Audacity 2.x）与.aup3（SQLite，Audacity 3.x）两种格式。首先验证file_path是否存在；随后获取实际文件大小，并与rule中的min_file_size（默认100字节）比较，若小于阈值则返回0.0。接着先尝试以sqlite3连接该文件，查询sqlite_master中是否存在名为'project'或'autosave'的表，若存在则判定为有效.aup3并返回1.0；若SQLite尝试失败，则回退到以xml.etree.ElementTree解析XML，若成功获取root则判定为有效.aup并返回1.0。若两种格式均无法解析，则返回0.0。过程中任何异常均捕获并返回0.0。"
+        "description": "接收 file_path 与 rule 字典作为输入。首先检查文件是否存在于磁盘，不存在则返回 0.0；接着获取文件实际大小，与 rule 中的 min_file_size（默认 100 字节）比较，若小于阈值则返回 0.0；然后按顺序进行两种格式验证：先尝试以 sqlite3.connect 打开文件，执行 SQL 查询 sqlite_master 系统表，筛选 type='table' 且 name 为 'project' 或 'autosave' 的记录，若 fetchone() 返回非空结果，则判定为有效的 .aup3（SQLite）格式并返回 1.0；若 SQLite 验证失败，则使用 xml.etree.ElementTree.parse 尝试解析 XML，若成功获取根节点（root is not None），则判定为有效的 .aup（XML）格式并返回 1.0；若两种解析方式均失败，最终返回 0.0；外层 try-except 捕获所有异常并返回 0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_read_wav_info",
-        "lineno": 22,
-        "description": "使用标准库wave模块打开WAV文件，提取channels、sample_rate、n_frames、sampwidth，并计算duration（n_frames / sample_rate）。返回包含上述字段的字典。该函数为check_audio_duration和_get_mono_samples提供音频基础元数据读取能力。"
+        "lineno": 24,
+        "description": "使用 Python 标准库 wave 以 \"rb\" 模式打开指定 WAV 文件，读取通道数（channels）、采样率（sample_rate）、总帧数（n_frames）、采样宽度（sampwidth），并计算 duration（n_frames / sample_rate，采样率大于 0 时）。返回包含上述字段的字典。该函数被 check_audio_duration 直接调用以获取时长，也被 _get_mono_samples 调用以获取通道数等元数据。"
       },
       {
         "name": "_read_wav_samples",
-        "lineno": 35,
-        "description": "读取WAV文件的全部原始帧数据，根据sampwidth（1/2/3/4字节）分别使用struct.unpack或int.from_bytes将无符号/有符号整数解码为[-1.0, 1.0]范围的浮点样本列表；多声道时样本按交错（interleaved）顺序排列。该函数为_get_mono_samples提供标准化后的音频样本数据。"
+        "lineno": 42,
+        "description": "使用 wave 模块读取 WAV 文件的全部原始帧字节流，根据 sampwidth 字段区分位深进行解析：8 位无符号使用 struct.unpack 配合 \"B\" 格式后映射到 [-1.0, 1.0]；16/32 位有符号小端分别使用 \"h\"/\"i\" 格式；24 位有符号小端使用 int.from_bytes 逐三字节解析。最终将样本归一化为 [-1.0, 1.0] 范围的浮点列表；多声道时样本按声道交错排列。该函数被 _get_mono_samples 调用，为 RMS 计算提供原始采样数据。"
       },
       {
         "name": "_rms_db",
-        "lineno": 64,
-        "description": "接收浮点样本列表，计算均方根（RMS）并转换为分贝值：20.0 * math.log10(rms)。若样本为空或rms小于1e-10，则返回-100.0 dB。该函数是check_audio_rms_level中音频电平检查的核心计算函数。"
+        "lineno": 76,
+        "description": "接收浮点样本列表，计算其均方根（RMS）并转换为分贝值。若样本为空或计算出的 RMS 小于 1e-10，则返回 -100.0 dB；否则返回 20.0 * math.log10(rms)。该函数被 check_audio_rms_level 调用，用于量化音频响度水平。"
       },
       {
         "name": "_get_mono_samples",
-        "lineno": 75,
-        "description": "依次调用_read_wav_info和_read_wav_samples读取WAV文件；若声道数大于1，则将交错样本按帧取平均转换为单声道样本；最终返回单声道样本列表与sample_rate。该函数为check_audio_rms_level提供单声道样本数据，确保RMS计算基于单声道信号。"
+        "lineno": 87,
+        "description": "封装了 WAV 读取与声道转换逻辑。依次调用 _read_wav_info 与 _read_wav_samples 加载指定文件；若通道数大于 1，则对交错排列的多声道样本按帧取算术平均，生成单声道浮点样本列表；最终返回单声道样本列表与采样率。该函数被 check_audio_rms_level 调用，确保 RMS 计算基于统一的单声道数据。"
       }
     ]
   },
-  "created_at": "2026-06-30 20:53:36",
+  "created_at": "2026-07-01 14:23:52",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00015-0015-4000-8000-000000000015./evaluator_function_labels.json"
 }

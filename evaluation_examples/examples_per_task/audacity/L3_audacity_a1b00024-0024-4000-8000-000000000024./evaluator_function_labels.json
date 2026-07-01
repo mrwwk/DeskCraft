@@ -54,52 +54,52 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Audacity音频编辑任务最终产出的WAV格式音频文件是否满足指定的客观技术指标。它通过Python标准库直接解析WAV文件的原始采样数据，对音频的物理属性进行独立、逐项的数值检查，核心检查对象包括：音频总时长、整体RMS电平（音量）、音频开头是否存在淡入效果、音频结尾是否存在淡出效果。每个主函数采用二元评分机制，独立返回1.0（通过）或0.0（不通过），彼此之间无加权或联合判定逻辑。成功判定总体思路为：时长检查使用绝对误差与容差比较；RMS检查使用闭区间包含判断；淡入淡出检查则将指定时段划分为多个窗口，通过统计窗口RMS的单调趋势（允许最多1个异常窗口）来判定渐变效果是否存在。",
+    "overall_validation": "该evaluator用于验证Audacity音频编辑任务最终导出的WAV文件是否满足指定的音频技术指标。它直接读取任务产出的WAV文件，利用标准库wave解析音频头信息，并将原始样本转换为浮点数进行数值分析。核心检查对象包括：音频总时长、整体RMS音量电平（dB）、音频开头是否存在淡入效果、音频结尾是否存在淡出效果。每个主函数独立执行一项检查，返回1.0表示该项通过、0.0表示不通过；各检查之间无联合打分或加权逻辑，由上层调用方按需组合使用。判定方式均为硬阈值比较：时长误差在容差范围内、RMS落在[min_rms_db, max_rms_db]区间、淡入/淡出时段内的分段RMS需呈现总体递增/递减趋势（允许最多一次异常波动）。",
     "main_functions": [
       {
         "name": "check_audio_duration",
         "lineno": 99,
-        "description": "接收file_path和rule字典作为输入。首先检查目标WAV文件是否存在，不存在则返回0.0。调用_read_wav_info读取音频基本信息。从rule中提取expected_duration（预期时长，单位秒）和tolerance（容差，默认0.5秒）。计算实际时长与预期时长的绝对差值，若差值小于等于容差则返回1.0，否则返回0.0。任何异常捕获后均返回0.0。"
+        "description": "接收file_path和rule字典，验证音频文件总时长。首先调用os.path.isfile确认文件存在；若不存在则记录错误并返回0.0。随后调用_read_wav_info读取WAV头信息，提取duration字段作为actual。rule中必须包含expected_duration（预期时长，单位秒），并可包含tolerance（容差，单位秒，默认0.5）。计算绝对误差abs(actual - expected)，若小于等于tolerance则返回1.0，否则返回0.0。任何解析异常均被捕获并返回0.0。"
       },
       {
         "name": "check_audio_rms_level",
         "lineno": 120,
-        "description": "接收file_path和rule字典作为输入。首先检查目标WAV文件是否存在，不存在则返回0.0。调用_get_mono_samples将音频转换为单声道样本列表并获取采样率。调用_rms_db计算整段单声道音频的RMS分贝值。从rule中提取min_rms_db和max_rms_db。若计算出的rms值落在[min_rms_db, max_rms_db]闭区间内则返回1.0，否则返回0.0。异常时返回0.0。"
+        "description": "接收file_path和rule字典，验证音频整体音量电平。首先确认文件存在；若不存在直接返回0.0。调用_get_mono_samples将音频转换为单声道样本序列并获取sample_rate。调用_rms_db计算整段音频的RMS分贝值。rule中必须包含min_rms_db和max_rms_db。若计算出的rms值落在[min_rms_db, max_rms_db]闭区间内则返回1.0，否则返回0.0。异常时返回0.0。"
       },
       {
         "name": "check_audio_fade_in",
         "lineno": 138,
-        "description": "接收file_path和rule字典作为输入。首先检查目标WAV文件是否存在，不存在则返回0.0。调用_get_mono_samples获取单声道样本和采样率。从rule中提取fade_duration（淡入时长，单位秒）和num_windows（窗口数，默认5）。将fade_duration乘以采样率得到淡入样本总数，若超过音频总长度则返回0.0。将淡入样本段均分为num_windows个窗口，逐个窗口调用_rms_db计算RMS值。统计相邻窗口中“后一个RMS大于前一个RMS”的递增次数。若递增次数大于等于num_windows - 2（即允许最多1个非递增窗口作为容错）则判定存在淡入效果，返回1.0；否则返回0.0。异常时返回0.0。"
+        "description": "接收file_path和rule字典，验证音频开头是否存在淡入效果。rule中必须包含fade_duration（淡入时长，单位秒），并可包含num_windows（分段窗口数，默认5）。调用_get_mono_samples获取单声道样本和采样率。将fade_duration转换为样本数fade_samples；若超过音频总长度则返回0.0。将fade_samples均分为num_windows个窗口（window_size = fade_samples // num_windows），逐个窗口截取样本并调用_rms_db计算各窗口RMS值。统计相邻窗口间RMS严格递增的次数increases。判定依据为：若increases >= num_windows - 2（即允许最多出现1次非递增波动）则返回1.0，否则返回0.0。异常时返回0.0。"
       },
       {
         "name": "check_audio_fade_out",
         "lineno": 178,
-        "description": "接收file_path和rule字典作为输入。首先检查目标WAV文件是否存在，不存在则返回0.0。调用_get_mono_samples获取单声道样本和采样率。从rule中提取fade_duration（淡出时长，单位秒）和num_windows（窗口数，默认5）。将fade_duration乘以采样率得到淡出样本总数，若超过音频总长度则返回0.0。从音频末尾向前截取该长度的样本段，并均分为num_windows个窗口，逐个窗口调用_rms_db计算RMS值。统计相邻窗口中“后一个RMS小于前一个RMS”的递减次数。若递减次数大于等于num_windows - 2（即允许最多1个非递减窗口作为容错）则判定存在淡出效果，返回1.0；否则返回0.0。异常时返回0.0。"
+        "description": "接收file_path和rule字典，验证音频结尾是否存在淡出效果。rule中必须包含fade_duration（淡出时长，单位秒），并可包含num_windows（分段窗口数，默认5）。调用_get_mono_samples获取单声道样本和采样率。计算末尾fade_samples长度；若超过音频总长度则返回0.0。从音频末尾倒数fade_samples处开始（offset = len(samples) - fade_samples），均分为num_windows个窗口，逐个窗口截取样本并调用_rms_db计算各窗口RMS值。统计相邻窗口间RMS严格递减的次数decreases。判定依据为：若decreases >= num_windows - 2（即允许最多出现1次非递减波动）则返回1.0，否则返回0.0。异常时返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_read_wav_info",
-        "lineno": 22,
-        "description": "使用Python标准库wave模块打开指定WAV文件，读取其元数据并返回字典。字典包含channels（声道数）、sample_rate（采样率）、n_frames（总采样帧数）、duration（时长，由n_frames/sample_rate计算，秒）、sampwidth（每样本字节宽度）。被check_audio_duration直接调用以获取时长；也被_get_mono_samples调用以获取声道数和采样率。"
+        "lineno": 21,
+        "description": "使用标准库wave.open以'rb'模式打开WAV文件，读取通道数(channels)、采样率(sample_rate)、总帧数(n_frames)、采样宽度(sampwidth)，并计算duration = n_frames / sample_rate。返回包含上述字段的字典。供check_audio_duration等需要音频头信息的函数使用。"
       },
       {
         "name": "_read_wav_samples",
-        "lineno": 37,
-        "description": "使用wave模块读取WAV文件的全部原始采样帧字节数据，根据sampwidth（支持1/2/3/4字节）分别使用struct.unpack或int.from_bytes将原始字节解析为浮点数列表，并归一化到[-1.0, 1.0]范围。多声道时返回交错排列的样本序列。被_get_mono_samples调用，作为原始采样数据的读取与解码器。"
+        "lineno": 38,
+        "description": "使用wave模块读取WAV文件的全部原始帧数据，根据sampwidth（支持1/2/3/4字节）分别使用struct.unpack或int.from_bytes将原始字节解析为整数，再归一化为[-1.0, 1.0]范围的浮点数列表。多声道时样本按声道交错排列。供_get_mono_samples及需要原始样本的分析逻辑调用。"
       },
       {
         "name": "_rms_db",
-        "lineno": 66,
-        "description": "对输入的浮点样本列表计算均方根（RMS）值，并转换为分贝刻度：20.0 * math.log10(rms)。若样本为空或RMS小于1e-10，则返回-100.0 dB。该函数是核心音量指标计算器，被check_audio_rms_level、check_audio_fade_in、check_audio_fade_out调用，用于将时域采样转换为可比较的电平值。"
+        "lineno": 68,
+        "description": "接收浮点样本列表，计算均方值mean_sq = sum(s*s)/len(samples)，开方得rms。若样本为空或rms < 1e-10则返回-100.0 dB；否则返回20.0 * math.log10(rms)。供check_audio_rms_level、check_audio_fade_in、check_audio_fade_out进行音量/能量比较。"
       },
       {
         "name": "_get_mono_samples",
-        "lineno": 76,
-        "description": "调用_read_wav_info和_read_wav_samples读取指定WAV文件的全部样本和元数据。若声道数大于1，则将交错样本按帧分组并取算术平均，转换为单声道样本列表。最终返回单声道样本列表和采样率。被check_audio_rms_level、check_audio_fade_in、check_audio_fade_out调用，确保后续RMS分析基于单声道数据，避免声道差异干扰。"
+        "lineno": 78,
+        "description": "先调用_read_wav_info获取文件信息，再调用_read_wav_samples读取样本。若通道数大于1，则将交错样本按帧分组取平均，转换为单声道样本序列。返回(mono_samples, sample_rate)元组。供所有需要基于单声道进行RMS分析的主函数使用。"
       }
     ]
   },
-  "created_at": "2026-06-30 20:57:58",
+  "created_at": "2026-07-01 14:28:57",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00024-0024-4000-8000-000000000024./evaluator_function_labels.json"
 }

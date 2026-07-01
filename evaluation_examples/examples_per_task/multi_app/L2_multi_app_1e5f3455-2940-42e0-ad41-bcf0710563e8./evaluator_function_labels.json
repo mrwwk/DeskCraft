@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_1e5f3455-2940-42e0-ad41-bcf0710563e8./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 27
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 183
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 220
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 27
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 183
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 220
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator针对任务 json_merge_bugfix_with_dict_docs（task_id: 1e5f3455）设置了三项独立评测指标，分别从代码正确性、浏览器页面状态、文档文本内容三个维度验证任务完成度。第一，通过运行测试套件检查 agent 修改的 Python 文件（主要是 merge.py 与 utils.py）是否正确修复了字典合并相关的 bug；若 agent 仅提供 utils.py 而未提供 merge.py，evaluator 会自动合成一个最小化的 merge.py 以保证测试仍可运行。第二，验证 Chrome 当前活动标签页的 URL（忽略查询参数）是否与预期的文档页面一致。第三，验证 MERGE_FIXED.txt 文本是否同时满足“包含所有指定字符串”且“不含任何禁止字符串”。三项指标各自独立返回 0.0 至 1.0 的分数，通常均需达到 1.0 才算对应维度通过， evaluator 文件中未体现最终的加权汇总逻辑。",
+    "main_functions": [
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 27,
+        "description": "该函数通过运行外部测试套件来验证 agent 修改的 Python 代码是否正确。输入包括 actual_files（agent 产出的文件路径，支持字符串、列表或 artifact 字典格式）、test_file（测试套件 .py 文件路径）以及 options（可指定 test_function_name，默认为 'test'）。执行流程如下：首先验证 test_file 存在且为文件；然后将 actual_files 规范化成 Path 列表，并在临时目录中创建隔离工作区；接着将测试文件和 agent 文件复制到该临时目录，若 agent 未提供 merge.py 但提供了 utils.py，则自动合成一个最小 merge.py（从 utils 导入 merge_user_defaults 并定义 build_profile 函数），若仍缺失还会尝试从测试文件同级目录复制邻居 merge.py；之后切换工作目录并将临时目录加入 sys.path，使用 importlib.util 动态加载测试模块（模块名带 uuid 避免冲突），查找并执行指定的测试函数。若测试函数抛出 AssertionError，说明代码修复不正确，直接返回 0.0；若抛出其他异常或测试函数不存在/不可调用，也返回 0.0。若测试正常完成，根据返回值判定：None 视为通过（1.0），bool 按真假返回 1.0/0.0，数值型归一化到 [0,1]，其他类型按真值判断。无论结果如何，finally 块会清理 sys.modules、恢复工作目录与 sys.path，并删除临时目录。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 183,
+        "description": "该函数验证 Chrome 当前活动标签页是否打开了预期的文档页面。输入 active_tab_info 可以是包含 url 键的字典，也可以是直接的 URL 字符串；输入 rule 是包含 type 和 url 的字典。检查步骤为：首先确认 active_tab_info 非空且 rule.type 为 \"url\"；然后分别提取 expected_url 与 actual_url；接着调用内部辅助逻辑 _strip_query 去除两个 URL 的查询参数（仅保留 scheme、netloc、path、params、fragment）；最后比较处理后的 URL 字符串，完全一致返回 1.0，否则返回 0.0。该匹配是去除查询参数后的精确字符串匹配。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 220,
+        "description": "该函数对文本结果进行包含与排除规则检查，常用于验证 MERGE_FIXED.txt 的内容。输入 result 为待检查的文本字符串（如文件内容），输入 rules 为包含 include（必需子串列表）和 exclude（禁止子串列表）的字典。判定逻辑为：当 result 为 None 时直接返回 0.0；否则只有当 result 同时满足“包含 include 列表中的每一个字符串”且“不包含 exclude 列表中的任何一个字符串”时，才返回 1.0；任一条件不满足即返回 0.0。该检查是子串级别的全包含/全排除判断，无近似匹配、无顺序要求、无字段结构要求。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_strip_query",
+        "lineno": 207,
+        "description": "该函数是嵌套在 is_expected_active_tab_approximate 内部的 URL 预处理辅助函数。它接收一个 URL 字符串，使用 urllib.parse.urlparse 解析后，将 query 字段替换为空字符串，再通过 urlunparse 重新组合成无查询参数的 URL。其作用是支持“忽略查询字符串”的 URL 比较逻辑，确保活动标签页验证时不会因为查询参数导致匹配失败。返回值为去除查询参数后的标准化 URL 字符串。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:19:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_1e5f3455-2940-42e0-ad41-bcf0710563e8./evaluator_function_labels.json"
+}

@@ -94,72 +94,72 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证GIMP交互式任务中香水商品透明底列表图（perfume listing）的完成质量。任务要求用户最终产出一张符合电商展示规范的PNG透明底商品图及其对应的XCF源文件。验证采用严格的“全通过”二进制逻辑：从输入路径列表中依次提取PNG产物路径、XCF源文件路径和未使用的源图路径，然后对PNG执行6项检查——文件存在性、PNG格式有效性、存在透明像素、尺寸是否为1200×1200像素（容差±5像素）、主体高度占比是否在0.68–0.84之间且水平/垂直居中偏移是否分别不超过0.14和0.252（垂直容差为水平的1.8倍）、主体下方是否存在符合半透明或灰度特征的软阴影（像素比例不低于0.008）；同时对XCF执行图层结构检查，要求必须包含名为“Product”、“Shadow”、“Guide_BG”的三个图层，且不强制顺序。所有7项检查的结果必须为1（通过），最终由_all_binary_checks_pass聚合后返回1.0；任何一项失败即返回0.0。",
+    "overall_validation": "该evaluator用于验证GIMP交互式任务\"perfume_listing\"（香水商品透明底图制作）的最终完成质量。它要求用户产出两个核心产物：一张1200×1200像素的透明背景PNG商品图，以及保留图层结构的XCF源文件。评测采用严格的\"全或无\"二进制判定逻辑：对PNG依次检查文件存在性、格式是否为PNG、是否存在透明通道、尺寸是否达标、商品主体是否占据合理画面比例且水平居中、主体下方是否存在柔和阴影；对XCF检查是否包含\"Product\"、\"Shadow\"、\"Guide_BG\"三个图层（不要求顺序）。以上7项检查必须全部通过，evaluator才返回1.0（成功），任一失败即返回0.0（失败）。",
     "main_functions": [
       {
         "name": "has_transparency",
         "lineno": 23,
-        "description": "检查对象：PIL Image对象。检查步骤：若图像模式为RGBA，提取alpha通道并检查是否存在任意像素值小于255；若图像模式为P（调色板模式），则检查图像info字典中是否包含transparency键。判定依据：存在透明像素或调色板透明信息时返回True，否则返回False。该函数通常被check_transparency_exists调用，用于判断PNG产物是否真正包含透明区域。"
+        "description": "检查PIL图像对象是否包含实际透明像素。若图像模式为RGBA，提取alpha通道并检查是否存在任何小于255的像素值；若模式为P且info中包含transparency键，也视为有透明。返回布尔值。该函数被check_transparency_exists调用，用于判定PNG是否真正存在透明区域而非仅带有alpha通道。"
       },
       {
         "name": "check_image_dimensions",
         "lineno": 35,
-        "description": "检查对象：指定路径的图像文件。检查步骤：使用PIL.Image.open打开图像，获取实际宽度与高度，与expected_width和expected_height进行数值比较，允许tolerance像素容差（默认5像素）。判定依据：宽度必须在容差内匹配预期值；若指定了expected_height，则高度也必须在容差内匹配，两项全部满足时返回1，否则返回0。"
+        "description": "验证指定图片文件的宽高是否匹配预期值。使用PIL打开图像，计算实际宽度与expected_width的绝对差，若不超过tolerance（默认5像素）则宽度通过；若提供了expected_height，则同样检查高度。只有宽高均满足容差时才返回1，否则返回0。在perfume任务中被调用以验证PNG是否为1200×1200。"
       },
       {
         "name": "check_png_format",
         "lineno": 72,
-        "description": "检查对象：指定路径的图像文件。检查步骤：使用PIL.Image.open打开图像，读取其format属性。判定依据：format属性等于字符串'PNG'时返回1，否则返回0。"
+        "description": "验证文件是否为有效PNG格式。使用PIL打开图像后，检查img.format是否等于字符串'PNG'。若文件不存在或读取失败则返回0。用于确保最终交付图像是PNG格式而非其他扩展名。"
       },
       {
         "name": "check_transparency_exists",
         "lineno": 97,
-        "description": "检查对象：指定路径的图像文件。检查步骤：使用PIL.Image.open打开图像，调用辅助函数has_transparency判断其是否包含透明通道或透明像素。判定依据：存在透明区域返回1，否则返回0。"
+        "description": "验证图片文件中是否存在透明区域。调用PIL打开图像，再调用has_transparency检查alpha通道。若图像包含透明像素（alpha<255）或调色板模式带有透明索引，则返回1，否则返回0。用于确认商品图背景已被抠除或透明化。"
       },
       {
         "name": "check_file_exists",
         "lineno": 122,
-        "description": "检查对象：指定路径的文件。检查步骤：使用os.path.isfile判断该路径是否为普通文件。判定依据：文件存在且为文件时返回1，否则返回0。"
+        "description": "最基础的文件存在性检查。使用os.path.isfile判断给定路径是否为文件。若路径为None或文件不存在返回0，存在返回1。用于确认PNG和XCF等结果文件已实际生成。"
       },
       {
         "name": "check_xcf_layers_structure",
         "lineno": 159,
-        "description": "检查对象：指定路径的XCF源文件及其图层结构规则rule。检查步骤：首先读取文件并验证文件头是否以b'gimp xcf'开头；优先尝试使用gimpformats库解析出所有图层名称列表，若解析失败则回退到对文件二进制内容进行字符串搜索以定位图层名；根据rule中的layers列表核对是否包含所有预期图层名，若rule中ordered为True则额外检查图层出现顺序是否与预期列表一致（通过index位置或二进制搜索位置判断）。判定依据：所有预期图层名均存在（且顺序正确，若ordered为True）返回1，任一图层缺失、解析失败或顺序错误返回0。"
+        "description": "检查GIMP的XCF源文件是否包含指定的图层结构。rule参数中layers为必须存在的图层名列表，ordered控制是否要求顺序一致。实现分为两层：优先尝试用gimpformats库解析XCF，提取所有图层名并检查是否包含全部expected_layers；若ordered为True，还要求这些图层在文件中的出现顺序与列表顺序一致（索引递增）。若gimpformats解析失败或不可用，则回退到二进制字节搜索，在文件内容中查找每个图层名的UTF-8编码字节串位置，同样支持ordered校验。文件必须以b'gimp xcf'开头才被视为有效XCF。全部满足返回1，否则返回0。"
       },
       {
         "name": "check_subject_scale_and_center",
         "lineno": 237,
-        "description": "检查对象：指定路径的PNG产物图像。检查步骤：调用_build_foreground_mask构建前景掩码（优先依据alpha通道阈值40，否则依据非白像素阈值245），在掩码上计算前景包围盒的宽高与整图高度的比例，以及包围盒中心点与图像几何中心的相对偏移比例；其中垂直方向容差为水平容差center_tolerance_ratio的1.8倍。判定依据：高度占比在min_height_ratio与max_height_ratio之间（默认0.65–0.85，主函数调用时覆盖为0.68–0.84），且水平中心偏移dx_ratio不超过center_tolerance_ratio（默认0.12，主函数调用时覆盖为0.14）、垂直中心偏移dy_ratio不超过其1.8倍时返回1，否则返回0。"
+        "description": "检查商品主体在画面中的占比和居中程度。首先调用_build_foreground_mask构建前景遮罩（优先使用alpha通道，否则使用非白像素）；然后计算前景像素的包围盒bbox。要求bbox高度占整图高度的比例在min_height_ratio与max_height_ratio之间（默认0.65-0.85），且bbox中心与图像中心的水平偏差比例不超过center_tolerance_ratio（默认0.12），垂直偏差放宽至该值的1.8倍以内。在perfume任务中采用更严格的参数（高度比0.68-0.84，中心容忍0.14）。全部满足返回1，否则返回0。"
       },
       {
         "name": "check_soft_shadow_presence",
         "lineno": 300,
-        "description": "检查对象：指定路径的PNG产物图像。检查步骤：将图像转为RGBA模式，以alpha>180提取主体区域，在主体正下方划定搜索带（顶部为主体最下端y1+1，底部为y1+max(8, h//5)，宽度向左右各扩展主体宽度的1/8），检查该区域内是否存在alpha值在alpha_low（默认20）到alpha_high（默认220）之间的半透明像素；若该比例不足min_shadow_ratio（默认0.01，主函数调用时覆盖为0.008），则回退检查该区域是否存在非白（RGB不全部≥245）、偏暗（均值<220）、低饱和（最大最小差<20）的灰度阴影像素。判定依据：阴影像素比例达到阈值返回1，否则返回0。"
+        "description": "检查商品主体下方是否存在柔和阴影。将图像转为RGBA，以alpha>180的像素作为前景，确定主体底部边界y1。在y1下方划定一个搜索带（高度至少8像素或图像高度的1/5），水平方向向左右扩展主体宽度的1/8（至少10像素）。在该区域内统计半透明像素（alpha在alpha_low到alpha_high之间，默认20-220）所占比例。若比例低于min_shadow_ratio（默认0.01），则启用回退逻辑：检查该区域内是否存在非纯白、平均亮度<220且饱和度<20的灰黑色像素，视为白色背景上的不透明阴影。任一方式达到阈值即返回1，否则返回0。"
       },
       {
         "name": "check_l2_perfume_listing_complete",
         "lineno": 375,
-        "description": "检查对象：包含至少3个路径的result_paths列表。检查步骤：依次提取png_path（第1个元素）、xcf_path（第2个元素）、_src_path（第3个元素，未被使用）；然后按顺序执行7项二进制检查：check_file_exists(png_path)、check_png_format(png_path)、check_transparency_exists(png_path)、check_image_dimensions(png_path, 1200, 1200, tolerance=5)、check_subject_scale_and_center（高度比0.68–0.84，中心容差0.14）、check_soft_shadow_presence（min_shadow_ratio=0.008）、check_xcf_layers_structure（要求包含[\"Product\", \"Shadow\", \"Guide_BG\"]三个图层，ordered=False）。判定依据：将7项得分传入_all_binary_checks_pass，仅当所有检查均返回1时最终返回1.0，任一检查失败则返回0.0。"
+        "description": "综合评测入口，采用\"全通过\"的二进制评分机制。要求result_paths为长度至少3的列表，依次取png_path、xcf_path、_src_path。然后顺序执行7项独立检查：1) check_file_exists(png_path) — PNG存在；2) check_png_format(png_path) — PNG格式；3) check_transparency_exists(png_path) — 存在透明；4) check_image_dimensions(png_path, 1200, 1200) — 尺寸1200×1200（容差5像素）；5) check_subject_scale_and_center(png_path, {min_height_ratio:0.68, max_height_ratio:0.84, center_tolerance_ratio:0.14}) — 主体占比与居中；6) check_soft_shadow_presence(png_path, {min_shadow_ratio:0.008}) — 底部柔和阴影；7) check_xcf_layers_structure(xcf_path, {layers:[\"Product\",\"Shadow\",\"Guide_BG\"], ordered:False}) — XCF包含三个指定图层（不要求顺序）。将7个0/1结果收集为scores，调用_all_binary_checks_pass。仅当所有检查均为1时返回1.0，否则返回0.0。"
       },
       {
         "name": "check_interactive_gimp_perfume_listing_complete",
         "lineno": 405,
-        "description": "检查对象：包含路径的result_paths列表。检查步骤：作为交互式任务的薄包装器，直接调用check_l2_perfume_listing_complete并透传参数。判定依据：完全依赖被包装函数的返回值，自身不做任何额外判断或转换。"
+        "description": "交互式任务的包装器/入口函数。直接透传result_paths给check_l2_perfume_listing_complete，不做任何额外处理，返回值与其完全一致。用于适配交互式评测框架的调用约定。"
       }
     ],
     "helper_functions": [
       {
         "name": "_build_foreground_mask",
-        "lineno": 141,
-        "description": "读取PIL Image对象，将其转换为RGBA模式。若alpha通道存在任意像素值小于250，则以alpha_threshold（默认40）为阈值生成前景掩码（alpha>threshold为True）；否则退而使用非白像素规则，将RGB三通道中任意通道小于white_threshold（默认245）的像素视为前景。返回二维布尔numpy数组。该掩码被check_subject_scale_and_center用于定位主体包围盒，进而计算比例与居中偏移。"
+        "lineno": 143,
+        "description": "为商品图构建粗略的前景遮罩，服务于主体占比与居中检查。将图像统一转为RGBA模式。若alpha通道中存在任何小于250的像素，说明图像带有透明信息，此时以alpha>alpha_threshold（默认40）作为前景mask；否则退回到基于颜色的判断，将RGB三通道并非全部大于white_threshold（默认245）的像素视为前景。返回二维布尔numpy数组。"
       },
       {
         "name": "_all_binary_checks_pass",
-        "lineno": 368,
-        "description": "读取scores列表，过滤掉None值后转为浮点数。判定依据：仅当列表非空且所有有效分数均大于等于1.0时返回1.0，否则返回0.0。该函数是check_l2_perfume_listing_complete的最终聚合器，实现严格的“全通过”逻辑，任一子检查未达标即整体失败。"
+        "lineno": 363,
+        "description": "二进制检查聚合器。接收scores列表，过滤掉None值后，要求所有有效分数均大于等于1.0才返回1.0；若列表为空或存在任何低于1.0的分数，则返回0.0。该函数实现了perfume任务的\"全或无\"判定逻辑，被check_l2_perfume_listing_complete用于最终打分。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:52:22",
+  "created_at": "2026-07-01 15:11:42",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_perfume_listing_workflow_001./evaluator_function_labels.json"
 }

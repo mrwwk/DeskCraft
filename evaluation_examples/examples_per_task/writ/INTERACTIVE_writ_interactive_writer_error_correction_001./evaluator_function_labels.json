@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_error_correction_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对任务 INTERACTIVE_writ_interactive_writer_error_correction_001，对最终产出的文本结果（result）执行严格的二元包含性检查。核心检查对象是程序输出或页面文本的字符串内容；主要比较方式是基于子串的“全包含”与“全排除”规则。具体而言，evaluator 要求 result 必须同时满足：1) 包含 rules 中 include 列表指定的所有字符串；2) 不包含 rules 中 exclude 列表指定的任何字符串。若两项均满足则返回 1.0（成功），若 result 为 None、任一 include 未命中或任一 exclude 被触发，则返回 0.0（失败）。这是一种非加权、非近似的硬性条件判定逻辑。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收字符串 result 与字典 rules 作为输入，直接执行字符串包含性判定。步骤如下：首先检查 result 是否为 None，若为 None 直接返回 0.0；随后从 rules 中读取键 include 与 exclude（缺失时默认为空列表）；接着执行组合条件判断：要求 result 包含 include 列表中的每一个字符串，并且不包含 exclude 列表中的任何一个字符串。函数在判定前会打印 result 与 rules 的内容。最终，若上述两个条件同时满足则返回 1.0，否则返回 0.0。该函数未调用其他辅助函数，完全依赖 Python 的 in/not in 操作完成判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:56:00",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_error_correction_001./evaluator_function_labels.json"
+}

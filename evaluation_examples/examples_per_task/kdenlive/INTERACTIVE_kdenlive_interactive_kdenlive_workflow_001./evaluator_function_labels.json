@@ -1,0 +1,57 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_workflow_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_preview_project",
+      "lineno": 69
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 38
+    },
+    {
+      "name": "_get_project_fps",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_preview_project",
+      "lineno": 69
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive交互式工作流第一阶段（粗剪）的任务完成度。它要求最终产物是一个保存在指定路径的.kdenlive项目文件，且项目状态必须同时满足：1）文件本身存在、非空且为合法XML；2）所有预期视频素材已通过producer形式导入项目库（bin）；3）这些视频片段被按顺序、无间隙地排列在时间线的V1视频轨道上；4）项目中存在指定类型（默认为luma，即Dissolve dissolve）的转场过渡。评测采用严格的串联逻辑（全有或全无），共6大检查步骤，任一环节失败立即返回0.0，全部通过才返回1.0。比较方式以XML DOM解析为主，依赖子串包含匹配文件名、属性值精确/子串匹配转场标识，以及轨道entry的文档顺序连续性判定。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_preview_project",
+        "lineno": 69,
+        "description": "该函数接收两个参数：project_file_path（来自VM的.kdenlive文件路径）和expected（字典，必须包含expected_files列表和可选的transition_type字符串，默认\"luma\"）。其检查步骤如下：1）文件存在性与非空性检查：验证路径非None且文件存在，文件大小不为0；2）XML合法性检查：使用ET.parse解析文件，确认存在根元素；3）素材入库检查：遍历根下所有producer元素，通过_get_property_value提取每个producer的resource属性，建立producer id到resource路径的映射，然后确认每个expected_file至少在一个resource路径中以子串形式出现；4）V1轨道定位：遍历所有playlist元素，通过_get_property_value读取kdenlive:track_name属性，筛选出track_name为\"V1\"的playlist id；5）V1片段存在检查：在V1 playlist下查找所有entry子元素，通过entry的producer属性关联到producer_resources，确认所有expected_files对应的资源都出现在V1轨道上（同样使用子串匹配）；6）连续性/序列检查：按文档顺序收集V1上所有entry对应的resource，记录每个预期文件首次出现的索引，排序后验证最大索引与最小索引之差等于匹配数量减1，确保片段之间无其他entry间隔；7）转场存在检查：先遍历所有transition元素，通过_get_mlt_service获取mlt_service并与transition_type进行不区分大小写的等值比较，若未命中则进一步读取kdenlive_id属性进行不区分大小写的子串包含匹配，若transition中仍未找到则遍历link元素（新版Kdenlive）重复mlt_service匹配，只要命中一次即算通过；8）最终判定：以上所有检查全部通过返回1.0，任何步骤失败（包括捕获XML解析异常或通用异常）均立即记录日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 24,
+        "description": "从MLT XML元素（如transition、filter、link）中提取mlt_service值。它优先读取元素的mlt_service属性；若不存在，则遍历该元素的所有子property元素，查找name属性等于\"mlt_service\"的property并返回其文本内容；若均未找到则返回None。该函数服务于主函数的转场类型判定，用于兼容MLT XML中mlt_service的两种不同存储形式。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 38,
+        "description": "从指定的MLT XML元素中，遍历其所有子property元素，查找name属性等于传入参数property_name的property，并返回该property的文本值；未找到则返回None。该函数被主函数多次复用，用于提取producer的resource路径、playlist的kdenlive:track_name轨道名、以及transition的kdenlive_id标识符等关键字段。"
+      },
+      {
+        "name": "_get_project_fps",
+        "lineno": 47,
+        "description": "从MLT项目XML根元素下查找profile元素，读取其frame_rate_num（默认25）和frame_rate_den（默认1）属性并相除得到帧率浮点值；若解析失败或分母为0，则回退到25.0。该函数在代码中定义但未明确体现被主评测逻辑调用，属于帧率解析的通用辅助能力。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:52:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_workflow_001./evaluator_function_labels.json"
+}

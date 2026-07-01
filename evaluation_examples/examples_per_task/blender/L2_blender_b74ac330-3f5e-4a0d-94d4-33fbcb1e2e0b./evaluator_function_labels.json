@@ -38,47 +38,47 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender多光源配置任务（L2_blender）的完成状态。它读取由check_object.py输出的JSON格式场景数据，针对rule中指定的多个光源（PointLight、SpotLight、AreaLight）逐一核查关键参数：能量（energy）、颜色（color）、聚光锥角（spot_size_deg）、面光形状（shape）及面光尺寸（area_size）。由于Blender内部以线性颜色空间存储光照颜色，而用户通过UI设置的颜色为sRGB空间，因此evaluator在比较颜色前会先将rule中的预期sRGB值转换为线性空间。所有光源的全部检查项必须同时满足容差或精确匹配要求，evaluator才返回1.0（成功）；若任一光源缺失、类型不符、任一参数超出容差或匹配失败，则立即返回0.0（失败）。",
+    "overall_validation": "该评测器用于验证Blender场景中多盏灯光的配置是否完全符合任务规则。它读取来自check_object.py输出的JSON字符串（内含场景中各物体的灯光属性），针对rule中定义的每一盏指定名称的灯光，依次检查其类型是否为LIGHT，并核验点光源的能量与颜色、聚光灯的锥角、区域光的形状与尺寸。由于Blender内部输出的颜色为线性空间值，而规则中的期望颜色是用户在UI中设置的sRGB值，因此评测器在比较颜色前会先将期望的sRGB值转换为线性空间。所有灯光的所有指定参数必须全部在各自容差范围内匹配，评测器才返回1.0；只要任何一项检查失败或发生异常，立即返回0.0。",
     "main_functions": [
       {
         "name": "check_blender_multi_light_config",
         "lineno": 89,
-        "description": "接收command_output（来自check_object.py的JSON字符串）和rule（包含'lights'列表的字典）作为输入。首先调用_parse_blender_output将JSON字符串解析为Python字典；随后遍历rule['lights']中的每一个光源规范。对每个光源规范：1）使用_find_object按精确名称在场景对象列表中查找对应对象，并校验其type必须为'LIGHT'；2）若规范中包含'energy'，则读取该光源的energy字段，使用_check_tolerance与预期值比较，容差默认为50；3）若规范中包含'color'，则读取场景中的light_color（线性空间），调用_srgb_color_to_linear将预期sRGB颜色转为线性空间后，使用_check_vector_tolerance逐通道比较，容差默认为0.05；4）若规范中包含'spot_size_deg'，先校验光源light_type必须为'SPOT'，再使用_check_tolerance比较spot_size_deg，容差优先取spot_tolerance，其次angle_tolerance，最后默认5.0；5）若规范中包含'shape'，先校验light_type必须为'AREA'，再精确比较area_shape字段；6）若规范中包含'area_size'或'size'，则使用_check_tolerance比较场景中的area_size，容差默认为0.1。以上任何一步失败都会记录warning并立即返回0.0；全部光源循环结束且所有检查通过后返回1.0。整个流程为“全部满足”式判定，无加权或累计打分。"
+        "description": "接收command_output（来自check_object.py的JSON字符串）和rule（包含lights列表的字典）。首先调用_parse_blender_output解析JSON，若解析失败或输出为空则返回0.0。随后遍历rule['lights']中的每个light_spec：使用_find_object按name精确查找对应物体，若找不到或obj['type']不是'LIGHT'则返回0.0。接着依据light_spec中存在的键进行分支检查：1) energy检查：使用_check_tolerance比较obj['energy']与期望值，容差默认50；2) color检查：将期望的sRGB颜色通过_srgb_color_to_linear转换为线性空间，再使用_check_vector_tolerance与obj['light_color']比较，容差默认0.05；3) spot_size_deg检查：先确认obj['light_type']为'SPOT'，再用_check_tolerance比较obj['spot_size_deg']与期望值，容差默认取spot_tolerance、angle_tolerance或5.0；4) shape检查：确认obj['light_type']为'AREA'，直接字符串比较obj['area_shape']与期望值；5) area_size检查：使用_check_tolerance比较obj['area_size']与期望值（规则键可为area_size或size），容差默认0.1。以上所有检查必须全部通过，任一失败立即返回0.0；全部通过则返回1.0。若执行过程中捕获异常，也返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_srgb_to_linear",
-        "lineno": 20,
-        "description": "对单个颜色通道执行标准sRGB到线性空间的转换（IEC 61966-2-1）：若输入值c<=0.04045，返回c/12.92；否则返回((c+0.055)/1.055)^2.4。该函数是颜色空间转换的基础计算单元，仅被_srgb_color_to_linear调用。"
+        "lineno": 24,
+        "description": "将单个sRGB颜色分量转换为线性空间。依据IEC 61966-2-1标准：若c <= 0.04045则返回c / 12.92，否则返回((c + 0.055) / 1.055) ^ 2.4。被_srgb_color_to_linear调用，服务于颜色空间转换逻辑。"
       },
       {
         "name": "_srgb_color_to_linear",
-        "lineno": 33,
-        "description": "接收一个包含R、G、B三个分量的sRGB颜色列表，对每个分量调用_srgb_to_linear进行转换，返回线性空间的颜色三元组。在主函数的color检查环节中被调用，用于将rule中的预期sRGB颜色转换为Blender内部线性空间后再与实际场景值比较。"
+        "lineno": 35,
+        "description": "对[R, G, B]三元组的每个分量调用_srgb_to_linear，返回线性空间的颜色向量。在主函数的颜色检查环节中使用，将规则中用户可见的sRGB期望值转换为Blender内部线性空间值，以便与check_object.py输出的light_color进行公平比较。"
       },
       {
         "name": "_parse_blender_output",
-        "lineno": 42,
-        "description": "负责将Blender检查脚本输出的原始字符串解析为Python字典。先判断输入是否为空或仅含空白，若为空则报错并返回None；否则尝试使用json.loads解析。若解析失败（JSONDecodeError或ValueError），记录错误及原始输出内容后返回None。主函数依赖此函数获取可供后续查找和比对的结构化场景数据。"
+        "lineno": 44,
+        "description": "解析来自Blender检查脚本的JSON输出字符串。先去除首尾空白，再使用json.loads加载为Python字典。若command_output为空或解析失败，则记录错误日志并返回None。主函数依赖此函数将原始输出转换为可遍历的场景数据结构。"
       },
       {
         "name": "_find_object",
-        "lineno": 54,
-        "description": "在_parse_blender_output返回的结果字典中，遍历result['objects']列表，按精确匹配（obj['name'] == name）查找指定名称的对象。若找到则返回该对象字典，否则返回None。主函数使用它来定位每个待检查的光源实例。"
+        "lineno": 56,
+        "description": "在解析后的结果字典result的'objects'列表中，按obj['name']与传入的name进行精确字符串匹配，返回匹配到的物体字典；若遍历完未找到则返回None。主函数使用它来定位每一盏待检查的灯光对象。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 62,
-        "description": "通用标量容差比较器。接收actual（实际值）、expected（预期值）和tol（容差）。若任一参数为None则返回False；否则判断两者差的绝对值是否小于等于容差。被主函数用于energy、spot_size_deg、area_size等数值型参数的近似匹配。"
+        "lineno": 64,
+        "description": "通用数值容差比较器。检查actual与expected是否均不为None，且两者的绝对差值是否小于等于tol。返回布尔值。被主函数中的能量、聚光角度、区域光尺寸检查复用。"
       },
       {
         "name": "_check_vector_tolerance",
-        "lineno": 68,
-        "description": "通用向量容差比较器。接收actual（实际向量列表）、expected（预期向量列表）和tol（容差）。若任一列表为空或长度不一致则返回False；否则对两个列表的对应分量逐对调用绝对差值<=容差的判断，全部满足才返回True。被主函数用于颜色（RGB三元组）的逐通道容差比较。"
+        "lineno": 71,
+        "description": "向量分量级容差比较器。要求actual与expected均非空且长度相同，然后逐分量检查绝对差是否均不超过tol。返回布尔值。被主函数中的颜色检查复用，用于比较RGB三元组。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:12:10",
+  "created_at": "2026-07-01 14:39:15",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_b74ac330-3f5e-4a0d-94d4-33fbcb1e2e0b./evaluator_function_labels.json"
 }

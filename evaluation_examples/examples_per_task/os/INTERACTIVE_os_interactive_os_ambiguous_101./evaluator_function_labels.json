@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_ambiguous_101./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于评测交互式操作系统任务（INTERACTIVE_os_interactive_os_ambiguous_101）的文本输出是否符合预期。其核心验证逻辑是：获取某个程序、命令或交互过程的字符串输出结果（result），并依据配置规则（rules）进行二元判定。具体而言，要求该字符串必须同时满足“包含所有指定的必须内容（include 列表）”以及“不包含任何指定的禁止内容（exclude 列表）”。比较方式采用 Python 子串精确匹配（in / not in），而非正则或模糊匹配；成功判定为全有或全无的打分制——全部满足返回 1.0，任一条件不满足或结果为空（None）则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数是评测入口，接收 result（待检查的字符串输出）和 rules（字典，内含 include 与 exclude 两个键对应的字符串列表）。执行步骤如下：1）若 result 为 None，直接返回 0.0；2）通过 rules.get 提取 include 与 exclude 列表，缺省为空列表；3）使用 all(r in result for r in include) 检查 result 是否包含所有必须子串；4）使用 all(r not in result for r in exclude) 检查 result 是否不包含任何禁止子串；5）仅在两项检查全部通过时返回 1.0，否则返回 0.0。函数执行过程中会通过 print(result, rules) 打印调试信息。判定依据为严格的逻辑与（AND）关系，无近似匹配阈值，也无加权累计。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:30:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_ambiguous_101./evaluator_function_labels.json"
+}

@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_8c708e3d-ff5e-4306-8fd3-3a4c674f30e7./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_effect_applied",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_audio_fade",
+      "lineno": 156
+    },
+    {
+      "name": "check_kdenlive_render_color_grading",
+      "lineno": 356
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_effect_applied",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_audio_fade",
+      "lineno": 156
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 262
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 332
+    },
+    {
+      "name": "check_kdenlive_render_color_grading",
+      "lineno": 356
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑类任务的完成质量，核心检查对象包括.kdenlive项目文件（底层为MLT XML格式）和渲染输出的MP4文件。对于项目文件，它通过解析XML中的<filter>节点，验证特定视频效果（如模糊、亮度、棕褐色/sepia等）是否已应用，同时检查音频淡入淡出（fade in/out）效果是否存在；对于渲染输出，它调用ffprobe检测MP4文件是否包含视频流、编码格式是否符合预期（默认h264）、时长是否达到最低阈值。整体判定采用严格的串联逻辑：在综合渲染检查函数中，渲染输出验证、亮度效果验证、棕褐色效果验证、音频淡入淡出验证必须全部通过才返回1.0，任一环节失败即返回0.0；单项效果检查则采用“全局存在即通过”的匹配逻辑，只要在项目文件的filter节点中找到匹配项即判定成功。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_effect_applied",
+        "lineno": 65,
+        "description": "接收.kdenlive项目文件路径和rule字典，验证指定视频效果是否已应用到项目中。首先检查文件存在性并解析XML；若rule中指定了source_file，会预先遍历<producer>和<chain>节点，收集资源路径包含该source_file的元素id（但实际判定中只要全局找到匹配效果即接受）。随后遍历所有<filter>节点，通过_get_mlt_service获取mlt_service并与rule['effect_service']列表进行大小写不敏感比较；若未命中，继续检查property 'kdenlive_id'是否包含预期服务名，以及property 'tag'是否直接匹配。任一filter满足条件即返回1.0，全部遍历无匹配则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_audio_fade",
+        "lineno": 156,
+        "description": "接收.kdenlive项目文件路径和rule字典（含fade_in、fade_out、source_file字段），验证音频淡入淡出效果是否存在。解析XML后遍历所有<filter>节点，维护found_fade_in和found_fade_out两个布尔标志。判定路径有三条：1）检查property 'kdenlive_id'是否包含'fade_from'/'fadein'（判定fade in）或'fade_to'/'fadeout'（判定fade out）；2）对mlt_service为'volume'或'brightness'的filter，提取property 'level'的关键帧字符串（多行'time=value'格式），解析首末帧浮点数值，若首值<0.1且末值>0.5则判定为fade in，若首值>0.5且末值<0.1则判定为fade out；3）忽略无法解析的数值异常。最终采用组合条件判定：若rule要求fade_in则必须found_fade_in，要求fade_out则必须found_fade_out，两者同时满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_color_grading",
+        "lineno": 356,
+        "description": "接收result_paths（multi:true配置下为[渲染MP4路径, 项目文件路径]列表，单文件时为字符串路径）和rule字典，执行综合串联检查。首先调用_extract_result_paths分离渲染路径与项目路径。第一步调用_verify_render_output检查MP4渲染输出是否存在、非空、包含视频流、codec_name包含expected_codec（默认h264）、duration不小于min_duration（默认1.0秒），失败直接返回0.0。第二步若rule['require_brightness']为true，调用check_kdenlive_effect_applied检查亮度相关效果（允许服务名：brightness、avfilter.eq、frei0r.brightness、lift_gamma_gain、avfilter.curves），失败返回0.0。第三步若rule['require_sepia']为true，调用check_kdenlive_effect_applied检查棕褐色效果（允许服务名：sepia、tcolor、frei0r.tint0r、frei0r.colorize、avfilter.colorbalance），失败返回0.0。第四步若rule要求fade_in或fade_out，调用check_kdenlive_audio_fade验证音频淡入淡出，失败返回0.0。以上四步全部通过则返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 20,
+        "description": "从MLT XML元素（如<filter>）中提取mlt_service标识。优先检查元素的直接属性mlt_service；若不存在，则遍历子<property name=\"mlt_service\">元素并返回其text内容。该函数是识别filter类型的核心解析器，被check_kdenlive_effect_applied和check_kdenlive_audio_fade调用。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 44,
+        "description": "通用MLT XML属性读取器。接收一个XML元素和property_name，遍历该元素的所有子<property>节点，匹配name属性后返回对应text值。被check_kdenlive_effect_applied用于提取kdenlive_id、tag、resource等字段，也被check_kdenlive_audio_fade用于提取level、kdenlive_id等关键帧和标识信息。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 264,
+        "description": "共享的渲染输出验证器。接收渲染MP4路径和rule，调用ffprobe -print_format json -show_streams -show_format获取媒体元数据。依次检查：文件存在且大小不为0；存在codec_type为video的流；codec_name包含expected_codec（默认h264，大小写不敏感）；duration优先从视频流取、其次从format取，且不小于min_duration（默认1.0秒）。返回(bool, error_msg)元组，供check_kdenlive_render_color_grading用于渲染质量把关。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 321,
+        "description": "路径提取包装器，用于统一处理任务返回的文件路径形态。若result_paths为列表（对应multi:true结果配置），则第0项作为render_path（渲染MP4）、第1项作为project_path（项目文件）；若为单一路径字符串，则视为render_path，project_path设为None。被check_kdenlive_render_color_grading调用，以适配单文件与多文件两种返回格式。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:10:47",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_8c708e3d-ff5e-4306-8fd3-3a4c674f30e7./evaluator_function_labels.json"
+}

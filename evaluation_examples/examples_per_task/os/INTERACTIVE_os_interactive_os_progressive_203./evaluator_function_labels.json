@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_progressive_203./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是针对任务 INTERACTIVE_os_interactive_os_progressive_203 的逐任务评测器。其总体验证目标是将任务执行后得到的实际结果与预设规则中的期望值进行严格比对，采用二值化打分判定任务是否完成。核心检查对象为 result（实际结果）与 rules['expected']（预期结果），主要比较方式为 Python 的精确相等判断（==）。成功判定思路为：若实际结果与预期结果在值和类型上完全一致，则返回 1.0（满分/成功）；任何不一致（包括格式、大小写、空格、类型差异）均返回 0.0（零分/失败）。该 evaluator 不涉及近似匹配、容差阈值或文件解析，属于严格的精确匹配评分逻辑。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数是唯一的评测入口，接收 result（任务实际输出或返回结果）和 rules（包含评测规则的字典）两个参数。检查步骤如下：1）从 rules 字典中读取键名为 'expected' 的字段作为预期值；2）在标准输出打印 result 与 expect 的值，用于调试或日志记录；3）使用 Python 的 == 运算符对 result 和 expect 进行严格相等比较；4）若比较结果为真，则返回浮点数 1.0，表示任务成功；否则返回 0.0，表示任务失败。该函数要求实际结果与预期结果在内容和类型上完全一致，不存在部分得分、模糊匹配或顺序忽略等容错机制。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:32:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_progressive_203./evaluator_function_labels.json"
+}

@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_85281b81-0f3a-4ed7-aed9-05c883aec8fe./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_config",
+      "lineno": 39
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 103
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 10
+    },
+    {
+      "name": "_repair_json_text",
+      "lineno": 26
+    },
+    {
+      "name": "compare_config",
+      "lineno": 39
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 103
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户是否正确修改了VS Code相关的JSON配置文件（如settings.json）。核心检查对象是磁盘上的JSON配置文件内容。评测采用二元打分（1.0或0.0）：通过两个主函数分别支持\"子集包含检查\"和\"严格键值对检查\"。对于compare_config，默认启用容错模式，允许实际文件包含预期之外的其他配置，并会通过三层递进策略判定：先尝试直接JSON子集匹配，若失败则自动修复常见JSON语法错误（如pyautogui输入导致的缺失逗号）后重试，最后退化为规范化空白后的子串包含检查。对于check_json_settings，则要求JSON中必须精确存在指定的顶层键值对。任一检查路径通过即得满分，否则零分。",
+    "main_functions": [
+      {
+        "name": "compare_config",
+        "lineno": 39,
+        "description": "接收参数actual（结果JSON文件路径）、rules（含\"expected\"键的字典，值为预期JSON文本字符串）和options（可选\"containment_ok\"布尔值，默认True）。首先判空：若actual为空或rules中无expected，直接返回0.0。接着读取actual文件的全部文本。若containment_ok为True（默认容错模式），按三层递进检查：①直接调用json.loads解析actual_text和expected_text，再调用_is_subset判断预期JSON是否为实际JSON的递归子集，成功返回1.0；②若①因解析失败或子集不匹配而失败，调用_repair_json_text修复常见JSON格式错误（如缺失逗号），修复后重新解析并再次做_is_subset子集检查，成功返回1.0；③若前两步均失败，将actual_text与expected_text的所有空白字符（\\s+）压缩为单个空格并去除首尾空白，检查expected_normalized是否为actual_normalized的子串，是则返回1.0，否则返回0.0。若containment_ok为False（严格模式），则先比较原始文本是否完全相等，再比较JSON解析后是否完全相等（json.loads(actual_text) == json.loads(expected_text)），任一满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 103,
+        "description": "接收参数actual（结果JSON文件路径）、expected（字典，其键\"expected\"对应的值是一个设置键值对字典）和options。首先判空：若actual为空返回0.0。然后以只读方式打开actual文件并用json.load解析为Python字典data。接着遍历expected[\"expected\"]中的每一对key和value，检查该key是否存在于data中，且data[key]与value完全相等。若存在任何键缺失或值不匹配，立即返回0.0；若全部键值对都匹配，返回1.0。该函数不做子集递归检查，仅做顶层键值对的精确相等判定。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 8,
+        "description": "递归比较器，用于判断第一个参数expected是否为第二个参数actual的\"子集\"。具体逻辑：若expected为字典，则要求actual也为字典，且expected中的每一个键都必须在actual中存在，对应值递归调用_is_subset检查；若expected为列表，则要求expected与actual完全相等（==）；对于其他基本类型，同样要求完全相等（==）。返回布尔值。该函数被compare_config在JSON解析后调用，用于判定预期配置结构是否被实际配置完整包含（允许实际配置有额外键）。"
+      },
+      {
+        "name": "_repair_json_text",
+        "lineno": 19,
+        "description": "JSON文本修复器，专门处理因pyautogui.typewrite输入丢字符导致的JSON语法错误（缺失逗号）。接收原始文本字符串，通过正则表达式进行两类修复：①同一行内，两个相邻引号之间存在2个或以上空格（[ \\t]{2,}）时，在它们之间插入逗号，正则替换为r'\",\\1\"'；②行尾引号与下一行开头引号之间（跨行空白\\s*\\n\\s*）缺失逗号时，同样插入逗号，正则替换为r'\",\\1\"'。返回修复后的文本字符串。该函数仅在compare_config的第二步容错检查中被调用，用于提高对轻微损坏配置文件的容忍度。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:52:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_85281b81-0f3a-4ed7-aed9-05c883aec8fe./evaluator_function_labels.json"
+}

@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_cf058642-f90e-469a-9aef-d065c5717ba1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    },
+    {
+      "name": "compare_config",
+      "lineno": 70
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 53
+    },
+    {
+      "name": "compare_config",
+      "lineno": 70
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 VS Code 相关配置任务的结果，核心检查对象是用户修改或生成的 JSON 配置文件（如 settings.json）。总体思路为：读取实际产出的配置文件内容，与预设的期望配置进行比对。比对方式分为两类：一是精确键值对检查（要求指定键的值完全相等），二是结构化子集/包含检查（要求实际配置至少包含期望配置的全部内容，或文本层面包含期望片段）。两个主函数均按\"全有或全无\"打分：只有全部条件满足才返回 1.0（成功），任何不匹配或读取失败均返回 0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "check_json_settings",
+        "lineno": 25,
+        "description": "该函数接收 actual（实际结果文件的路径字符串）和 expected（字典，其中必须包含键 'expected'）。首先判断 actual 是否为空，为空直接返回 0.0；接着尝试打开 actual 指向的文件并解析为 JSON，解析失败也返回 0.0。然后从 expected['expected'] 中提取期望的键值对字典，遍历其中每一项：检查 actual JSON 中是否存在该键，且对应的值与期望值完全相等（使用 == 比较）。只有当所有期望键值对全部存在且全部相等时，才返回 1.0；只要缺少任一键或任一值不匹配，立即返回 0.0。"
+      },
+      {
+        "name": "compare_config",
+        "lineno": 70,
+        "description": "该函数接收 actual（实际文件路径字符串）、rules（字典，需包含键 'expected'）和 options。首先检查 actual 是否为空，以及 rules['expected'] 是否为空，任一为空则返回 0.0。随后读取 actual 文件的完整文本内容。根据 options 中的 containment_ok 参数（布尔值，默认为 True）分两支处理：【宽松模式】下优先将实际文本与期望文本都解析为 JSON，若解析成功则调用 _is_subset 判断期望 JSON 是否为实际 JSON 的子集（即实际至少包含期望的全部键值结构），子集成立返回 1.0；若 JSON 解析失败，则回退到纯文本子串包含检查——期望文本去除首尾空白后若出现在实际文本中，返回 1.0，否则返回 0.0。【严格模式】下先比较文本完全相等（==），相等则返回 1.0；不相等则再尝试将双方解析为 JSON 并比较是否完全相等（此比较不忽略额外键，仅忽略格式差异），成功则返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 53,
+        "description": "这是一个递归辅助函数，用于判断 expected 是否为 actual 的\"子集\"。具体逻辑：若 expected 为字典，则要求 actual 也必须是字典，且 expected 中的每个键都存在于 actual 中，对应值递归调用 _is_subset 判断；若 expected 为列表，则要求与 actual 完全相等（使用 ==）；对于其他基本类型，同样使用 == 完全相等。返回布尔值。该函数主要被 compare_config 在宽松模式下调用，用于实现\"实际 JSON 至少包含期望 JSON 的全部结构\"的语义。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:53:52",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_cf058642-f90e-469a-9aef-d065c5717ba1./evaluator_function_labels.json"
+}

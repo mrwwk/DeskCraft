@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_fd3ae9f3-841f-4b11-b72d-e090eea0e706./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_render_mp4",
+      "lineno": 21
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_kdenlive_render_mp4",
+      "lineno": 21
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Kdenlive 视频编辑任务是否成功将项目渲染为符合要求的 MP4 视频文件。其核心检查对象是最终输出到指定路径的 MP4 文件，采用外部工具 ffprobe 对文件进行技术级解析。验证逻辑为“全部满足”式硬判定：必须同时满足文件存在且非空、包含有效视频流、视频编码为 H.264（默认，可通过 rule 参数覆盖）、视频时长大于指定阈值（默认 1 秒）这四项条件，才视为任务成功（返回 1.0）；任一检查失败即返回 0.0。时长的获取具备三层容错回退机制，优先读取视频流 duration，其次读取容器 format duration，最后尝试通过帧数与帧率反推。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_render_mp4",
+        "lineno": 21,
+        "description": "该函数接收 result_file_path（从虚拟机获取的待检测 MP4 文件路径）和 rule（可选验证规则字典，支持 min_duration 与 expected_codec 键，默认值分别为 1.0 和 \"h264\"）。检查步骤如下：1）判定文件存在性：验证路径非 None 且 os.path.exists 为真，同时 os.path.getsize 必须大于 0，否则立即返回 0.0；2）调用 ffprobe 子进程：组装命令 ffprobe -v quiet -print_format json -show_streams -show_format 对目标文件进行探测，超时阈值 30 秒，若返回码非 0 则失败；3）解析 ffprobe JSON 输出：使用 json.loads 读取 stdout，在 streams 列表中遍历查找 codec_type 等于 \"video\" 的流，若缺失则失败；4）编码校验：取 video_stream[\"codec_name\"] 转小写后，检查是否包含 expected_codec 的小写形式，不匹配则失败；5）时长提取与回退：优先读取 video_stream[\"duration\"]，其次读取 format_info[\"duration\"]，若两者皆无，则尝试利用 video_stream[\"nb_frames\"] 与 \"r_frame_rate\"（默认 \"30/1\"）计算时长，计算异常则时长保持 0.0；6）时长判定：若最终时长小于 min_duration 则失败。所有检查项全部通过后返回 1.0；任何异常（文件缺失、空文件、ffprobe 超时、JSON 解析失败、无视频流、编码不符、时长不足等）均捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:12:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_fd3ae9f3-841f-4b11-b72d-e090eea0e706./evaluator_function_labels.json"
+}

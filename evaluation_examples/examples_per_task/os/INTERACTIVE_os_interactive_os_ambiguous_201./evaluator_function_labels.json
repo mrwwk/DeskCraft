@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_ambiguous_201./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对任务结果进行精确匹配判定。它接收任务产出的结果值（result）与包含预期值的规则字典（rules），核心检查对象是result与rules[\"expected\"]是否完全相等。主要比较方式采用Python的严格相等运算符（==），要求结果在值与类型上均与预期一致。成功判定思路为：若result与预期值完全相等，则返回1.0表示任务成功；若有任何差异（包括但不限于数值、字符串内容、数据类型、大小写、空格等），则返回0.0表示失败。代码中未明确体现该evaluator涉及文件读取、页面解析、图像识别、数据库查询或复杂状态检查，其逻辑为单一的直接值比对。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收两个参数：任务执行结果result和评测规则rules。其检查逻辑为：首先从rules字典中通过键\"expected\"提取预期值expect，随后使用print语句将result与expect输出至标准输出；接着对二者进行严格相等比较（result == expect）。若比较结果为真，则返回浮点数1.0；否则返回0.0。该函数不调用任何辅助函数，也不存在近似匹配、阈值容忍、正则匹配或字段子集检查等逻辑，判定依据仅为完全一致的精确匹配。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:31:00",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_ambiguous_201./evaluator_function_labels.json"
+}

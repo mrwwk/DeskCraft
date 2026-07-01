@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_002./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是一个基于子串匹配的文本内容验证器，核心任务是检查输入字符串 result 是否同时满足正向包含规则与反向排除规则。具体而言，它要求 rules 字典中 include 列表里的每一个字符串都必须作为子串出现在 result 中，同时 exclude 列表里的每一个字符串都不能出现在 result 中。判定逻辑为严格的二值打分：全部满足返回 1.0，任一不满足或 result 为 None 则返回 0.0。代码中未明确体现 result 的具体来源（如文件、页面、程序输出或用户界面文本），也未明确体现该函数在更大评测流程中的调用时机，但其本质是对单一字符串快照进行关键词合规性校验。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收参数 result（待验证的字符串）与 rules（字典，键名为 include 和 exclude，对应值为字符串列表）。执行步骤如下：1）若 result 为 None，直接返回 0.0；2）通过 rules.get 分别获取 include 与 exclude 列表，缺省为空列表；3）使用 all(r in result for r in include) 检查所有必须包含的子串是否全部存在；4）使用 all(r not in result for r in exclude) 检查所有必须排除的子串是否全部不存在；5）当且仅当步骤 3 与步骤 4 同时为真时返回 1.0，否则返回 0.0。函数执行期间会将 result 与 rules 打印至标准输出。该函数不调用其他辅助函数，独立完成全部检查逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:12:23",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_002./evaluator_function_labels.json"
+}

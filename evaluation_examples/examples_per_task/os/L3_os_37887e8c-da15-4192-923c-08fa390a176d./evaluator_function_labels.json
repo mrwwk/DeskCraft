@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_37887e8c-da15-4192-923c-08fa390a176d./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_compress_logs",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_compress_logs",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator总体用于验证操作系统层面的压缩日志操作任务是否完成。最终产物或状态要求体现在shell收集器输出的一系列key=value标识中，核心检查对象包括gz压缩文件存在性、特定排除规则以及报告内容等字段。主要比较方式是将shell实际输出的键值对与预设规则（rules[\"checks\"]）进行严格字符串相等匹配。成功判定的总体思路为\"全部满足\"式二元判定：主函数依次核对rules中指定的每一个检查项，只有当实际输出字典中所有对应键的值都与期望值完全一致时，才判定任务成功并返回满分1.0；任何一项不匹配或处理异常均判定失败并返回0.0。不存在近似匹配、部分得分或容错阈值。",
+    "main_functions": [
+      {
+        "name": "check_os_compress_logs",
+        "lineno": 31,
+        "description": "该函数接收result（shell收集器输出的原始字符串）与rules（配置期望检查项的字典）作为输入。其检查对象为shell输出中key=value格式的状态标识，涉及gz文件存在性、排除规则、报告内容等。检查步骤为：首先调用辅助函数_parse_kv将result解析为字典kv；然后从rules中获取checks子字典；遍历checks中的每一个key与expected_val，使用kv.get(key)与实际值进行严格字符串相等比较。判定依据是\"全部满足\"原则：只有当所有期望键值对都完全匹配时，才返回1.0；若任意一项不匹配，立即返回0.0；若解析或比较过程中发生异常，同样返回0.0并记录错误日志。该逻辑为无阈值、无近似匹配的精确二元打分。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该辅助函数接收output（通常为shell命令输出的原始文本）作为输入，负责将多行key=value格式的字符串解析为Python字典。其处理流程为：若输入为空则返回空字典；否则按换行符分割，逐行去除首尾空白后，以第一个等号\"=\"为界分割键和值，再分别去除首尾空白存入字典。该函数服务于check_os_compress_logs主函数，为其提供结构化数据转换，使后续能够基于字典键进行精确的值比较。返回值语义为：键为shell输出中的状态标识名，值为对应的状态内容字符串。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:36:41",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_37887e8c-da15-4192-923c-08fa390a176d./evaluator_function_labels.json"
+}

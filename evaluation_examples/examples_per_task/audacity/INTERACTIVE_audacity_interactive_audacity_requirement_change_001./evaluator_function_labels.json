@@ -42,47 +42,47 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 针对 Audacity 交互式任务 IA-01（partial denoise delivery）的最终输出进行验证。核心检查对象是一个 WAV 音频文件，必须同时满足两项硬约束：第一，音频总时长须与预期时长保持一致（允许一定容差），确保处理过程没有意外截断或改变音频长度；第二，在指定的 intro（开头）与 tail（结尾）时间段内，音频仍须保留足够的能量（以 RMS dB 衡量，分别不低于约 -30 dB 与 -38 dB 的阈值），确保“部分降噪”没有将应保留的内容过度消除或静音。两项检查全部通过才判定成功，任一失败即返回 0 分。",
+    "overall_validation": "该evaluator用于验证Audacity交互式音频处理任务（IA-01）的最终输出WAV文件。核心要求是：经过部分降噪处理后，输出音频必须保持原始时长（不能过度截断或延长），且音频的开头段（intro）和结尾段（tail）仍需保留可感知的音频内容（即不能因降噪而被完全抹除或过度抑制）。评测采用“全部满足”的联合判定逻辑：首先检查文件存在性与音频时长是否在容差范围内；然后将音频转为单声道，按时间截取intro和tail区间，计算两段的RMS分贝值；只有当intro和tail的音量均高于各自预设阈值时，才判定任务成功返回1.0，任一条件不满足即返回0.0。",
     "main_functions": [
       {
         "name": "check_audio_duration",
         "lineno": 108,
-        "description": "接收 file_path 与 rule，校验输出 WAV 文件的时长。首先检查文件是否存在，不存在则返回 0.0；存在则调用 _read_wav_info 读取音频元数据，获取实际时长 actual。从 rule 中提取 expected_duration 作为目标时长，并读取 tolerance（默认值为 0.5 秒）作为容差。若 abs(actual - expected_duration) <= tolerance，返回 1.0；否则返回 0.0。所有异常均被捕获并返回 0.0。"
+        "description": "该主函数接收file_path（待测WAV文件路径）和rule字典（必须包含键expected_duration，可选键tolerance，默认值为0.5）。执行步骤如下：1) 检查文件是否存在，不存在则记录错误并返回0.0；2) 调用辅助函数_read_wav_info读取WAV头信息，获取实际时长actual；3) 从rule中提取expected_duration和tolerance；4) 计算actual与expected_duration的绝对差值，若差值小于等于tolerance则返回1.0（成功），否则返回0.0（失败）。任何异常捕获后均返回0.0。"
       },
       {
         "name": "check_interactive_audacity_ia01",
         "lineno": 129,
-        "description": "IA-01 任务的核心验证器，接收 file_path 与 rule。第一步检查文件是否存在。第二步构造 duration_rule（包含 expected_duration 与 duration_tolerance，默认 1.0 秒），调用 check_audio_duration 验证音频总时长是否被保留；若未通过直接返回 0.0。第三步调用 _get_mono_samples 获取单声道样本列表与采样率 sr。第四步使用 _extract_time_range 截取两段音频：intro 段（默认 intro_start=0.0 到 intro_end=2.0 秒）与 tail 段（默认 tail_start=2.0 秒到 tail_end=expected_duration 秒）。若任一段为空，返回 0.0。第五步对两段分别调用 _rms_db 计算能量，得到 intro_rms 与 tail_rms。第六步将 intro_rms 与 intro_min_rms_db（默认 -30.0）比较，tail_rms 与 tail_min_rms_db（默认 -38.0）比较。仅当 intro_rms >= intro_min 且 tail_rms >= tail_min 时返回 1.0；任一阈值未满足即返回 0.0。所有异常均被捕获并返回 0.0。"
+        "description": "该主函数是IA-01任务的核心验证器，接收file_path和rule字典，执行“全部满足”式联合判定：1) 检查文件是否存在，不存在返回0.0；2) 构造duration_rule（使用rule中的expected_duration和duration_tolerance，默认1.0秒），调用check_audio_duration验证时长，若返回值小于1.0则直接返回0.0；3) 调用_get_mono_samples将音频混音为单声道并获取采样率sr；4) 调用_extract_time_range按rule中的intro_start和intro_end（默认0.0秒至2.0秒）提取intro段样本；5) 调用_extract_time_range按rule中的tail_start和tail_end（默认2.0秒至expected_duration）提取tail段样本；6) 若intro或tail为空列表，返回0.0；7) 调用_rms_db分别计算intro和tail的RMS分贝值；8) 与rule中的intro_min_rms_db（默认-30.0 dB）和tail_min_rms_db（默认-38.0 dB）比较；9) 若intro_rms低于intro_min，或tail_rms低于tail_min，返回0.0；10) 全部通过则返回1.0。任何异常捕获后返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_read_wav_info",
-        "lineno": 24,
-        "description": "使用 Python 标准库 wave 打开指定 WAV 文件，读取其声道数 channels、采样率 sample_rate、总帧数 n_frames、采样宽度 sampwidth，并计算时长 duration = n_frames / sample_rate。返回包含上述字段的字典。该函数为时长验证和样本读取提供基础元数据，被 check_audio_duration 与 _get_mono_samples 调用。"
+        "lineno": 23,
+        "description": "使用Python标准库wave模块打开WAV文件，解析并返回头信息字典，包含channels（声道数）、sample_rate（采样率）、n_frames（总采样帧数）、duration（时长，秒，由n_frames/sample_rate计算）、sampwidth（每样本字节宽度）。该函数是音频元数据的基础读取器，被check_audio_duration和_get_mono_samples调用。"
       },
       {
         "name": "_read_wav_samples",
         "lineno": 41,
-        "description": "使用 wave 模块读取 WAV 文件的全部原始帧数据，根据采样宽度 sampwidth 分别按 8 位无符号、16/24/32 位有符号小端格式解包，并将整数值归一化到 [-1.0, 1.0] 范围的浮点数列表。若音频为多声道，返回的样本按声道交错排列。该函数是音频内容分析的数据源，被 _get_mono_samples 调用。"
+        "description": "使用wave模块读取WAV文件的全部原始帧字节流，根据sampwidth（支持1、2、3、4字节）分别使用struct.unpack或int.from_bytes将原始数据解析为归一化浮点样本，范围映射至[-1.0, 1.0]。多声道时返回交错排列的样本序列。该函数是音频波形数据的底层解析器，被_get_mono_samples调用。"
       },
       {
         "name": "_rms_db",
-        "lineno": 74,
-        "description": "接收一个浮点样本列表，计算其均方值 mean_sq 并开方得到 RMS，再通过 20.0 * math.log10(rms) 转换为分贝值。若样本为空或 RMS 小于 1e-10，则返回 -100.0。该函数用于量化音频片段的能量水平，被 check_interactive_audacity_ia01 调用以判断 intro 与 tail 是否仍具内容。"
+        "lineno": 75,
+        "description": "接收浮点样本列表，计算其均方根值（RMS）并转换为分贝：20.0 * math.log10(rms)。若样本为空或rms小于1e-10，则返回-100.0 dB。该函数用于量化音频段的能量水平，被check_interactive_audacity_ia01调用以评估intro和tail的音量是否达标。"
       },
       {
         "name": "_get_mono_samples",
-        "lineno": 85,
-        "description": "依次调用 _read_wav_info 与 _read_wav_samples 读取指定 WAV 文件。若声道数大于 1，则将交错的多样本按帧取平均，转换为单声道样本列表；若为单声道则直接使用原样本。返回 (mono_samples, sample_rate) 元组。该函数消除了声道差异对能量计算的影响，被 check_interactive_audacity_ia01 调用。"
+        "lineno": 86,
+        "description": "先调用_read_wav_info和_read_wav_samples读取指定WAV文件；若声道数大于1，则将交错样本按帧取平均值混音为单声道；最终返回单声道样本列表与采样率。该函数为后续时间截取和RMS计算提供统一的单声道数据源，被check_interactive_audacity_ia01调用。"
       },
       {
         "name": "_extract_time_range",
-        "lineno": 98,
-        "description": "接收单声道样本列表 samples、采样率 sr，以及起始时间 start_time 与结束时间 end_time（单位秒）。将时间转换为样本索引 int(time * sr)，并通过 max/min 钳制在有效范围内，最后返回切片后的样本子列表。该函数用于从完整音频中精确截取 intro 与 tail 区段，被 check_interactive_audacity_ia01 调用。"
+        "lineno": 99,
+        "description": "接收样本列表、采样率sr、起始时间start_time和结束时间end_time（单位均为秒），通过int(time * sr)计算对应样本索引，并使用max/min进行边界钳制，返回该闭区间内的样本子列表。该函数用于精确提取intro和tail时间段的音频内容，被check_interactive_audacity_ia01调用。"
       }
     ]
   },
-  "created_at": "2026-06-30 20:46:49",
+  "created_at": "2026-07-01 14:18:18",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/INTERACTIVE_audacity_interactive_audacity_requirement_change_001./evaluator_function_labels.json"
 }

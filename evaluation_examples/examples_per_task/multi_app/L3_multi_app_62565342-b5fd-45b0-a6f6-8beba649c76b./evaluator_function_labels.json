@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_62565342-b5fd-45b0-a6f6-8beba649c76b./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 26
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 135
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 176
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 26
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 135
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 176
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于cli_tool_bugfix_from_issue_tests_and_docs任务，通过三个相互独立的指标（metrics）判定任务完成度，每个指标单独返回0.0至1.0的分数。指标0验证功能修复：动态加载并执行test_file中的测试函数（默认名为test），对actual_files指向的修复后源文件运行测试套件，要求测试通过且源文件语法正确。指标1验证浏览器状态：检查Chrome当前活动标签页的URL（通过active_tab_info获取）是否匹配预期的f-string文档页面URL，匹配时忽略查询参数和锚点。指标2验证摘要文档合规性：检查FIX_SUMMARY.txt等文本输出是否同时满足包含规则（rules[\"include\"]中的所有字符串必须出现）和排除规则（rules[\"exclude\"]中的所有字符串不得出现）。三个指标各自独立判定，任一指标失败即在该维度得0分，evaluator层面未体现加权累加逻辑，通常由外部调用方分别或联合使用。",
+    "main_functions": [
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 26,
+        "description": "接收actual_files（被修复的源文件路径或列表）、test_file（测试文件路径）及options。首先验证test_file存在且为普通文件；若提供actual_files，则逐个检查文件是否存在、是否为普通文件，并用compile()进行快速Python语法检查。随后将工作目录切换到test_file所在目录，将该目录插入sys.path，使用importlib.util.spec_from_file_location动态加载测试模块并执行模块代码。接着从模块中获取由test_function_name指定名称的测试函数（默认为\"test\"），调用该函数。若函数返回bool，则True为1.0、False为0.0；若返回数值，则裁剪到[0.0, 1.0]区间；其他类型按真值判断。加载或执行过程中出现任何异常（如文件不存在、语法错误、导入错误、函数未找到、调用异常）均返回0.0。最终清理sys.modules、恢复原始工作目录和sys.path。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 135,
+        "description": "接收actual（active_tab_info字典或URL字符串）与expected（规则字典）。首先检查actual非空。若actual为字典则提取\"url\"键值，否则转为字符串；若expected为字典则提取\"url\"键值。调用辅助函数_strip_query对两个URL进行规范化：去除查询字符串（query string）和片段（fragment），仅保留scheme、netloc和path。若任一URL为空则返回0.0；规范化后相等返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 176,
+        "description": "接收actual（字符串内容，例如FIX_SUMMARY.txt）与rules（规则字典）。首先检查actual非空。从rules中提取include列表和exclude列表。依次检查include中每个字符串是否都存在于actual中，若任一缺失则返回0.0；再依次检查exclude中每个字符串是否都不存在于actual中，若任一出现则返回0.0。全部通过则返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_strip_query",
+        "lineno": 157,
+        "description": "嵌套于is_expected_active_tab_approximate内部。接收一个URL字符串，使用urlparse解析为六个组成部分，再通过urlunparse重组，丢弃params、query、fragment，仅保留scheme、netloc和path，返回规范化后的URL字符串。用于消除跟踪参数、锚点等次要差异，实现浏览器标签页URL的近似匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:26:14",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_62565342-b5fd-45b0-a6f6-8beba649c76b./evaluator_function_labels.json"
+}

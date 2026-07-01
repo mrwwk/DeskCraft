@@ -1,0 +1,109 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_2f9b8df0-54dc-4dbe-b6dd-6d6ca6fcb8ad./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 56
+    },
+    {
+      "name": "check_ui_bundle_min_file_sizes",
+      "lineno": 75
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 97
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 121
+    },
+    {
+      "name": "check_ui_bundle_no_remote_image_urls",
+      "lineno": 143
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 20
+    },
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 37
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 41
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 56
+    },
+    {
+      "name": "check_ui_bundle_min_file_sizes",
+      "lineno": 75
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 97
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 121
+    },
+    {
+      "name": "check_ui_bundle_no_remote_image_urls",
+      "lineno": 143
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对一个 UI bundle（ZIP 压缩包文件）进行多维度、逐项独立检查，以判定任务产出是否符合预期。核心检查对象是由 `actual` 参数传入的 ZIP 文件路径。Evaluator 会加载该 ZIP，对其中的文件条目进行路径规范化（去除前导 `./`、统一正斜杠），然后围绕五大规则维度展开验证：1）必需文件是否存在；2）指定文件大小是否达到最小字节阈值；3）指定文本文件内容是否包含所有必需关键词（不区分大小写）；4）`manifest.json` 的结构是否为预期 manifest 的超集（递归子集匹配）；5）HTML/CSS/JS 文本中是否禁止出现远程图片 URL（同时包含 `http://`/`https://` 与图片扩展名）。每个主检查函数独立返回 0.0（失败）或 1.0（通过），任一检查项内部采用“一票否决”逻辑：只要有一条规则不满足即返回 0.0，全部满足才返回 1.0。若规则未配置或 `actual` 为空，则按约定返回 0.0 或 1.0。所有 ZIP 读取与解析操作均包裹在 try-except 中，异常时一律返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 56,
+        "description": "接收 `actual`（ZIP 文件路径）与 `rules`（含 `required_files` 列表）。先判空：若 `actual` 为空直接返回 0.0；若 `required_files` 为空列表则返回 1.0。随后调用 `_load_ui_bundle_entries` 打开 ZIP 并获取规范化路径到原始路径的映射。遍历 `required_files`，将每个需求路径经 `_normalize_ui_bundle_path` 规范化后，检查该路径是否存在于 ZIP 条目中。只要有一个必需文件缺失，立即返回 0.0；全部存在则返回 1.0。若 ZIP 加载或解析过程中抛出异常，同样返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_min_file_sizes",
+        "lineno": 75,
+        "description": "接收 `actual`（ZIP 文件路径）与 `rules`（含 `min_file_size_bytes` 字典，键为文件名，值为最小字节数）。先判空返回 0.0；若规则字典为空则返回 1.0。调用 `_load_ui_bundle_entries` 加载 ZIP，获取文件大小映射。遍历规则中的每个文件，先用 `_normalize_ui_bundle_path` 规范化文件名，检查该文件是否存在于 ZIP；若存在，再比较其实际大小是否大于等于 `int(min_size)`。任一文件缺失或大小低于阈值，立即返回 0.0；全部满足则返回 1.0。异常时返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_keywords",
+        "lineno": 97,
+        "description": "接收 `actual`（ZIP 文件路径）与 `rules`（含 `required_file_keywords` 字典，键为文件名，值为关键词列表）。先判空返回 0.0；若规则字典为空则返回 1.0。调用 `_load_ui_bundle_entries` 加载 ZIP 并提取文本文件内容字典。遍历规则，对每个目标文件先检查其是否存在于 ZIP；若存在，则将该文件内容整体转小写，再逐一检查每个关键词（同样转小写）是否都出现在内容中。任一文件缺失或任一关键词未命中，立即返回 0.0；全部命中则返回 1.0。异常时返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_manifest_subset",
+        "lineno": 121,
+        "description": "接收 `actual`（ZIP 文件路径）与 `rules`（含 `expected_manifest` 字典）。先判空返回 0.0；若 `expected_manifest` 为 None 则返回 1.0。调用 `_load_ui_bundle_entries` 加载 ZIP，检查 `manifest.json` 是否存在于条目中。若存在，读取其文本内容并用 `json.loads` 解析为 Python 对象，随后调用 `_is_subset` 判定 `expected_manifest` 是否为实际 manifest 的递归子集（即实际 manifest 必须包含预期所有键值，嵌套字典也逐层满足子集关系，列表要求完全相等）。若 `manifest.json` 缺失或结构不满足子集关系，返回 0.0；否则返回 1.0。异常时返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_no_remote_image_urls",
+        "lineno": 143,
+        "description": "接收 `actual`（ZIP 文件路径）与 `rules`（含布尔标志 `forbid_remote_image_urls` 与可选的 `image_extensions` 列表）。先判空返回 0.0；若 `forbid_remote_image_urls` 为 False 则直接返回 1.0。将 `image_extensions` 转为元组，默认值为 `[\".png\", \".jpg\", \".jpeg\", \".webp\", \".gif\", \".svg\"]`。调用 `_load_ui_bundle_entries` 获取文本内容，仅扫描扩展名为 `.html`、`.css`、`.js` 的文件。对每个文件内容转小写后，若其中包含 `http://` 或 `https://`，则进一步遍历图片扩展名列表；若内容中同时出现 `http://`（或 `https://`）与某一图片扩展名字符串（如 `.png`），即判定存在远程图片引用，立即返回 0.0。全部通过则返回 1.0。异常时返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 20,
+        "description": "递归通用子集比较器。判断第一个参数 `expected` 是否为第二个参数 `actual` 的子集。若 `expected` 为字典，要求 `actual` 也为字典，并递归检查 `expected` 中的每个键都存在于 `actual` 且对应值满足子集关系；若 `expected` 为列表，要求两者完全相等；其他基本类型要求直接相等。返回布尔值。专供 `check_ui_bundle_manifest_subset` 使用，用于验证 `manifest.json` 的结构是否包含预期的所有字段与值。"
+      },
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 37,
+        "description": "路径规范化函数。对传入的路径字符串去除前导的 `./`，并将所有反斜杠 `\\` 替换为正斜杠 `/`，返回规范化后的路径。用于统一 ZIP 内部条目路径与规则配置中的路径格式，避免因路径表示差异（如 `./index.html` 与 `index.html`，或 Windows 反斜杠）导致匹配失败。被 `_load_ui_bundle_entries` 以及多个主函数在路径比较前调用。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 41,
+        "description": "ZIP 文件加载与解析器。接收 `actual` 文件路径，使用 `zipfile.ZipFile` 以只读模式打开。构建并返回三个对象：1）`normalized_to_raw`：规范化路径到原始路径的映射字典；2）`file_sizes`：规范化路径到文件大小的字典；3）`text_contents`：针对扩展名为 `.html`、`.css`、`.js`、`.json`、`.md`、`.txt`、`.svg` 的条目，读取其原始字节并以 UTF-8（忽略解码错误）解码后的内容字典。所有主函数均通过此函数统一读取 ZIP 内容，避免重复打开压缩包。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:52:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_2f9b8df0-54dc-4dbe-b6dd-6d6ca6fcb8ad./evaluator_function_labels.json"
+}

@@ -1,0 +1,144 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00007-0007-4000-8000-000000000007-L2./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 145
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 223
+    },
+    {
+      "name": "check_icon_presence_region",
+      "lineno": 282
+    },
+    {
+      "name": "check_l2_camera_metal_poster_complete",
+      "lineno": 340
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 103
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 132
+    },
+    {
+      "name": "_to_rgb_array",
+      "lineno": 139
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 145
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 223
+    },
+    {
+      "name": "check_icon_presence_region",
+      "lineno": 282
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 332
+    },
+    {
+      "name": "check_l2_camera_metal_poster_complete",
+      "lineno": 340
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP L2相机金属海报任务的最终完成状态。任务要求产出两个核心文件：一张PNG导出图和一份XCF源文件。evaluator采用严格的“全部满足”式二进制聚合逻辑，对PNG文件依次检查其存在性、格式是否为PNG、尺寸是否接近1600×1000（容差5像素）、右侧区域是否包含图标级高频信号（边缘密度≥0.018且颜色标准差≥12.0）、以及左上与上中区域是否具备文本特征（边缘密度≥0.006且OCR需识别到“PRO SHOOT”关键词）；对XCF文件则检查其是否包含指定的五个图层（BG_Metal、Camera_Main、Shadow、Vignette、Title），且不强制图层顺序。所有子检查必须全部返回1，最终得分才为1.0，任一失败即整体返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_image_dimensions",
+        "lineno": 23,
+        "description": "接收图片路径、期望宽度、期望高度（可选）和容差（默认5像素）。先判断路径非空且文件存在，再用PIL打开图片获取实际宽高；计算实际宽度与期望宽度的绝对差，若小于等于容差则宽度通过；若提供了期望高度，则同样比较高度。宽度和高度（如提供）均满足容差时返回1，否则返回0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 60,
+        "description": "接收图片路径。先判断路径非空且文件存在，再用PIL打开图片，读取其format属性。若format等于字符串'PNG'则返回1，否则返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 85,
+        "description": "接收文件路径。若路径为None直接返回0；否则调用os.path.isfile判断该路径是否为真实文件，是返回1，否返回0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 145,
+        "description": "接收XCF文件路径和rule字典（必须包含layers列表，可选ordered布尔值，默认False）。先检查文件存在且二进制内容以b'gimp xcf'开头；优先尝试用gimpformats库解析出所有图层名称，检查expected_layers中每个名称是否都出现在解析结果中；若ordered为True，则额外检查这些图层在文件中的出现顺序与expected_layers列表顺序一致（通过index位置递增判断）。若gimpformats解析失败或不可用，回退到在二进制内容中直接搜索各图层名的UTF-8字节串位置，同样验证存在性与顺序性。全部满足返回1，任一不满足返回0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 223,
+        "description": "接收图片路径和rule字典（包含regions区域列表、可选keywords关键词列表、min_edge_density默认0.008、edge_threshold默认40.0）。先检查文件存在，将图片转为灰度图；对每个指定区域，通过_resolve_region_bbox获取像素坐标并裁剪，计算该裁剪区域的_edge_density；若任一区域密度低于min_edge_density则返回0。若rule提供了keywords，则尝试调用pytesseract.image_to_string进行OCR，将识别结果归一化（正则替换\\s+为单个空格并转小写），依次检查每个关键词是否包含在归一化文本中；若OCR失败仅记录warning，不因此直接判失败。所有检查通过返回1。"
+      },
+      {
+        "name": "check_icon_presence_region",
+        "lineno": 282,
+        "description": "接收图片路径和rule字典（包含region区域名或bbox坐标列表、min_edge_density默认0.02、min_color_std默认15.0）。先检查文件存在，打开图片并获取RGB与灰度数组；若rule提供了长度为4的bbox列表则直接使用该像素坐标（并裁剪到图像边界内），否则通过_resolve_region_bbox解析region名（默认bottom_left）得到坐标；对裁剪区域计算_edge_density（内部edge_threshold固定为45.0）和颜色标准差（RGB三通道标准差的均值）；仅当edge_density大于等于min_edge_density且color_std大于等于min_color_std同时满足时返回1，否则返回0。"
+      },
+      {
+        "name": "check_l2_camera_metal_poster_complete",
+        "lineno": 340,
+        "description": "接收result_paths列表，要求至少包含两个元素，分别视为png_path和xcf_path。依次执行6项二进制检查：1) PNG文件存在性（check_file_exists）；2) PNG格式（check_png_format）；3) PNG尺寸1600×1000（check_image_dimensions，容差默认5）；4) 右侧区域图标特征（check_icon_presence_region，region=\"right\"，min_edge_density=0.018，min_color_std=12.0）；5) 左上/上中区域文本关键词（check_text_in_region_keywords，regions=[\"top_left\",\"top_center\"]，keywords=[\"PRO SHOOT\"]，min_edge_density=0.006）；6) XCF图层结构（check_xcf_layers_structure，layers=[\"BG_Metal\",\"Camera_Main\",\"Shadow\",\"Vignette\",\"Title\"]，ordered=False）。将6项得分收集为列表，交由_all_binary_checks_pass聚合；仅当所有得分均大于等于1.0时返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 101,
+        "description": "接收图片宽度、高度和区域名字符串。将区域名规范化（小写、去空格）后映射为像素坐标元组(x0,y0,x1,y1)。支持top_left、top_center、top_right、bottom_left、bottom_center、bottom_right、center、left、right、top、bottom等预设区域；若区域名无法识别，默认返回全图坐标(0,0,w,h)。供check_text_in_region_keywords和check_icon_presence_region调用，用于将语义区域转换为实际裁剪坐标。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 131,
+        "description": "接收灰度numpy数组和edge_threshold（默认40.0）。分别计算图像在x轴和y轴方向的梯度绝对值，将两者相加得到边缘强度图，统计强度大于阈值的像素比例作为边缘密度。返回值是0到1之间的浮点数。供check_text_in_region_keywords和check_icon_presence_region调用，用于判断区域是否含有足够的高频边缘信息（文本或图标特征）。"
+      },
+      {
+        "name": "_to_rgb_array",
+        "lineno": 138,
+        "description": "接收PIL Image对象。若图像模式不是RGB，则先执行convert('RGB')，再转为numpy数组返回。供check_icon_presence_region调用，为颜色标准差计算提供标准化的RGB数组。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 333,
+        "description": "接收scores列表。过滤掉None值并将其余项转为float；若结果为空则返回0.0；仅当所有有效值均大于等于1.0时返回1.0，否则返回0.0。供check_l2_camera_metal_poster_complete调用，实现“全部子检查通过则任务通过”的严格聚合逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:15:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00007-0007-4000-8000-000000000007-L2./evaluator_function_labels.json"
+}

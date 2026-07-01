@@ -1,0 +1,458 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_3dad2051-0596-4886-93c5-9ed78df81f99./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "read_x11_image",
+      "lineno": 29
+    },
+    {
+      "name": "find_default_font",
+      "lineno": 100
+    },
+    {
+      "name": "contains_page_break",
+      "lineno": 126
+    },
+    {
+      "name": "compare_docx_files",
+      "lineno": 160
+    },
+    {
+      "name": "compare_init_lines",
+      "lineno": 284
+    },
+    {
+      "name": "compare_docx_tables",
+      "lineno": 308
+    },
+    {
+      "name": "compare_docx_images",
+      "lineno": 341
+    },
+    {
+      "name": "compare_image_text",
+      "lineno": 370
+    },
+    {
+      "name": "compare_line_spacing",
+      "lineno": 505
+    },
+    {
+      "name": "compare_insert_equation",
+      "lineno": 534
+    },
+    {
+      "name": "compare_font_names",
+      "lineno": 556
+    },
+    {
+      "name": "compare_subscript_contains",
+      "lineno": 576
+    },
+    {
+      "name": "has_page_numbers_in_footers",
+      "lineno": 595
+    },
+    {
+      "name": "is_first_line_centered",
+      "lineno": 616
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 632
+    },
+    {
+      "name": "check_tabstops",
+      "lineno": 639
+    },
+    {
+      "name": "compare_contains_image",
+      "lineno": 682
+    },
+    {
+      "name": "evaluate_colored_words_in_tables",
+      "lineno": 701
+    },
+    {
+      "name": "check_highlighted_words",
+      "lineno": 744
+    },
+    {
+      "name": "evaluate_strike_through_last_paragraph",
+      "lineno": 769
+    },
+    {
+      "name": "evaluate_conversion",
+      "lineno": 793
+    },
+    {
+      "name": "evaluate_spacing",
+      "lineno": 819
+    },
+    {
+      "name": "check_italic_font_size_14",
+      "lineno": 839
+    },
+    {
+      "name": "evaluate_alignment",
+      "lineno": 861
+    },
+    {
+      "name": "get_unique_train_ids",
+      "lineno": 897
+    },
+    {
+      "name": "check_no_duplicates",
+      "lineno": 921
+    },
+    {
+      "name": "compare_docx_lines",
+      "lineno": 957
+    },
+    {
+      "name": "compare_docx_files_and_ignore_new_lines",
+      "lineno": 981
+    },
+    {
+      "name": "compare_highlighted_text",
+      "lineno": 1023
+    },
+    {
+      "name": "compare_references",
+      "lineno": 1063
+    },
+    {
+      "name": "compare_unique_train_records",
+      "lineno": 1121
+    },
+    {
+      "name": "check_docx_title_format",
+      "lineno": 1190
+    },
+    {
+      "name": "check_docx_section_headings",
+      "lineno": 1250
+    },
+    {
+      "name": "check_docx_body_format",
+      "lineno": 1294
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "read_x11_image",
+      "lineno": 29
+    },
+    {
+      "name": "find_default_font",
+      "lineno": 100
+    },
+    {
+      "name": "contains_page_break",
+      "lineno": 126
+    },
+    {
+      "name": "compare_docx_files",
+      "lineno": 160
+    },
+    {
+      "name": "compare_init_lines",
+      "lineno": 284
+    },
+    {
+      "name": "compare_docx_tables",
+      "lineno": 308
+    },
+    {
+      "name": "compare_docx_images",
+      "lineno": 341
+    },
+    {
+      "name": "compare_image_text",
+      "lineno": 370
+    },
+    {
+      "name": "compare_line_spacing",
+      "lineno": 505
+    },
+    {
+      "name": "compare_insert_equation",
+      "lineno": 534
+    },
+    {
+      "name": "compare_font_names",
+      "lineno": 556
+    },
+    {
+      "name": "compare_subscript_contains",
+      "lineno": 576
+    },
+    {
+      "name": "has_page_numbers_in_footers",
+      "lineno": 595
+    },
+    {
+      "name": "is_first_line_centered",
+      "lineno": 616
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 632
+    },
+    {
+      "name": "check_tabstops",
+      "lineno": 639
+    },
+    {
+      "name": "compare_contains_image",
+      "lineno": 682
+    },
+    {
+      "name": "evaluate_colored_words_in_tables",
+      "lineno": 701
+    },
+    {
+      "name": "check_highlighted_words",
+      "lineno": 744
+    },
+    {
+      "name": "evaluate_strike_through_last_paragraph",
+      "lineno": 769
+    },
+    {
+      "name": "evaluate_conversion",
+      "lineno": 793
+    },
+    {
+      "name": "evaluate_spacing",
+      "lineno": 819
+    },
+    {
+      "name": "check_italic_font_size_14",
+      "lineno": 839
+    },
+    {
+      "name": "evaluate_alignment",
+      "lineno": 861
+    },
+    {
+      "name": "get_unique_train_ids",
+      "lineno": 897
+    },
+    {
+      "name": "check_no_duplicates",
+      "lineno": 921
+    },
+    {
+      "name": "compare_docx_lines",
+      "lineno": 957
+    },
+    {
+      "name": "compare_docx_files_and_ignore_new_lines",
+      "lineno": 981
+    },
+    {
+      "name": "compare_highlighted_text",
+      "lineno": 1023
+    },
+    {
+      "name": "compare_references",
+      "lineno": 1063
+    },
+    {
+      "name": "compare_unique_train_records",
+      "lineno": 1121
+    },
+    {
+      "name": "check_docx_title_format",
+      "lineno": 1190
+    },
+    {
+      "name": "check_docx_section_headings",
+      "lineno": 1250
+    },
+    {
+      "name": "check_docx_body_format",
+      "lineno": 1294
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证桌面办公环境中对文档（主要是docx，部分支持odt）的处理结果。它通过读取用户生成的结果文件，与参考答案或规则进行多维度比对，判定任务是否完成。核心检查对象包括：文档文本内容（精确匹配、模糊匹配、集合比较）、文档结构（表格、图片、公式、分页符、参考文献）、排版格式（字体、字号、颜色、对齐方式、行距、制表位、页脚页码、粗体/斜体/下标/删除线/高亮）、以及特定业务数据（train records的去重与字段匹配）。成功判定总体思路分为三类：一是严格二元判定（0/1），要求所有检查点全部满足；二是相似度打分（0~1），基于rapidfuzz或CIEDE2000色差、制表位位置误差等计算；三是组合判定，通常先调用通用内容比较器（如compare_docx_files）确认基础内容一致，再进行专项格式或元素检查。对于图像类验证，支持X11屏幕截图的自动格式转换与OCR文本提取。",
+    "main_functions": [
+      {
+        "name": "read_x11_image",
+        "lineno": 29,
+        "description": "读取X11/XWD格式屏幕截图文件，解析二进制头部获取宽度、高度、像素深度，跳过头部后读取像素数据。支持32位BGRA（转为RGB）和24位RGB格式，使用numpy重组数组后转为PIL Image对象返回。若格式不支持则抛出ValueError，读取失败则抛出IOError。该函数主要供compare_image_text在遇到X11格式图像时进行纯Python转换，无需外部依赖。"
+      },
+      {
+        "name": "find_default_font",
+        "lineno": 100,
+        "description": "接收LibreOffice Writer配置文件路径（XML格式）和rules字典（含font_name字段）。使用xml.etree.ElementTree解析文件，在命名空间oor下查找oor:path为/org.openoffice.Office.Writer/DefaultFont且oor:name为Standard的节点，读取其value文本作为默认字体。若读取值与expected_font一致返回1，否则返回0；文件不存在或解析异常也返回0。"
+      },
+      {
+        "name": "contains_page_break",
+        "lineno": 126,
+        "description": "接收docx文件路径和rules字典。使用python-docx加载文档，遍历所有段落和run，在XML命名空间w下查找w:br元素，若其type属性为page则计为分页符。若rules中指定了page_break_count，则要求统计值必须严格等于该值；未指定时，只要分页符数量大于0即返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_docx_files",
+        "lineno": 160,
+        "description": "通用文档比较器，接收两个文件路径和**options（ignore_blanks默认True、ignore_case、ignore_order、content_only、fuzzy_match、delete_empty_lines）。支持docx与odt两种格式：docx使用python-docx.Document加载，odt使用odfpy.load加载并通过get_paragraph_texts_odt提取文本。根据选项对段落列表进行排序或删除空行处理。若content_only为True，将所有段落合并为单段文本（合并空白字符），忽略大小写后用rapidfuzz.fuzz.ratio计算整体相似度并返回0~1分数。若ignore_blanks为True且fuzzy_match为True，同样合并空白后整体模糊匹配返回分数；若ignore_blanks为True但非模糊匹配，则合并后精确比较返回0/1。若ignore_blanks为False，先比较段落数量，再逐段比较：fuzzy_match时计算每段fuzz.ratio的平均值；非模糊匹配时逐段精确比较，遇到差异打印repr并返回0。"
+      },
+      {
+        "name": "compare_init_lines",
+        "lineno": 284,
+        "description": "接收两个docx文件路径。使用python-docx加载后提取所有段落文本，逐段按顺序精确比较。所有对应段落文本完全相等返回1，任一不等返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_docx_tables",
+        "lineno": 308,
+        "description": "接收两个docx文件路径。使用python-docx加载后获取tables列表，先比较表格数量；再逐对比较表格的行数和列数；最后逐单元格比较cell.text.strip()。全部一致返回1，任一维度不符返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_docx_images",
+        "lineno": 341,
+        "description": "接收两个docx文件路径。使用python-docx加载后，从文档part.rels中筛选reltype包含image的关系，提取target_part.blob字节数据存入BytesIO列表。先比较图片数量，再逐对用Image.open读取并比较tobytes()进行逐字节比对。数量和字节内容完全一致返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_image_text",
+        "lineno": 370,
+        "description": "接收图像路径和rule字典（type、text）。先检查文件是否存在；使用subprocess.run调用file命令识别格式，若含x-window screen dump或xwd则依次尝试三种转换：PIL直接打开保存PNG、read_x11_image自定义转换、netpbm工具链（xwdtopnm→pnmtopng）转换，生成临时文件。随后使用easyocr.Reader(['en'])对实际图像路径进行OCR，拼接所有识别文本。若rule['type']为text，检查target_text是否存在于extracted_text中，存在返回1否则返回0。任何转换失败或OCR异常返回0，并在finally中清理临时文件。"
+      },
+      {
+        "name": "compare_line_spacing",
+        "lineno": 505,
+        "description": "接收两个docx文件路径。先调用compare_docx_files进行内容比对，若内容不一致直接返回0。再使用python-docx加载两文档，确保段落数相同后逐段比较paragraph_format.line_spacing。所有对应段落行间距完全一致返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_insert_equation",
+        "lineno": 534,
+        "description": "接收两个docx文件路径。先调用compare_docx_files进行内容比对，若内容不一致直接返回0。再使用python-docx加载两文档，逐段逐run使用xpath检查XML中是否包含w:object元素（公式对象）。找到对应位置均包含公式对象则返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_font_names",
+        "lineno": 556,
+        "description": "接收docx文件路径和rules字典（含font_name）。使用python-docx加载后遍历所有段落和run，读取run.font.name。要求所有run的字体名称都等于expected_font，全部满足返回1，任一不符返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_subscript_contains",
+        "lineno": 576,
+        "description": "接收两个docx文件路径。使用python-docx加载后逐段逐run比较，检查run.font.subscript属性。只要找到至少一对对应run均设置了subscript（下标），即返回1；遍历完未找到返回0。加载失败返回0。"
+      },
+      {
+        "name": "has_page_numbers_in_footers",
+        "lineno": 595,
+        "description": "接收docx文件路径。使用python-docx加载后遍历所有section，获取每个section.footer。要求每个节的页脚均存在且footer.paragraphs[0].text中至少包含一个数字字符（视为页码）。所有节满足返回1，任一节无页脚或无数字返回0。加载失败返回0。"
+      },
+      {
+        "name": "is_first_line_centered",
+        "lineno": 616,
+        "description": "接收docx文件路径。使用python-docx加载后取paragraphs[0]，检查其paragraph_format.alignment是否等于WD_PARAGRAPH_ALIGNMENT.CENTER。首段居中返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 632,
+        "description": "接收directory和filename。使用os.path.join拼接路径后调用os.path.isfile检查。文件存在返回1，否则返回0；任一参数为空返回0。"
+      },
+      {
+        "name": "check_tabstops",
+        "lineno": 639,
+        "description": "接收两个docx文件路径和**kwargs（word_number_split_by_tabstop、index等）。使用python-docx加载后过滤掉空段落，确保两文档非空段落数相同。若指定word_number_split_by_tabstop，对file1的每个段落按\\t分割，取index段按\\s分割并过滤空串后检查单词数是否等于指定值。随后遍历对应段落，过滤掉alignment为WD_TAB_ALIGNMENT.CLEAR或alignment为LEFT且position为0的默认制表位，比较剩余制表位数量、alignment是否一致，并累加position绝对差值除以paragraph_width（page_width - left_margin - right_margin）。最终返回score = 1 - (minus / len(para1))。任何前置检查失败返回0.0。"
+      },
+      {
+        "name": "compare_contains_image",
+        "lineno": 682,
+        "description": "接收两个docx文件路径。使用python-docx加载后逐段逐run检查XML字符串中是否包含graphicData。若对应run的图片包含状态不一致（一个有graphicData、一个没有）返回0；所有对应run状态一致返回1。加载失败返回0。"
+      },
+      {
+        "name": "evaluate_colored_words_in_tables",
+        "lineno": 701,
+        "description": "接收两个文件路径和**kwargs（threshold默认3.5）。先调用compare_docx_files确保内容一致，不一致返回0。再使用python-docx加载file1，遍历所有表格单元格中的paragraph和run。对每个非空单词取首字母：若为元音（aeiou），要求字体颜色与RGBColor(255,0,0)的CIEDE2000色差不超过threshold；若为辅音，要求与RGBColor(0,0,255)的色差不超过threshold。任一单词颜色不符返回0，全部符合返回1。"
+      },
+      {
+        "name": "check_highlighted_words",
+        "lineno": 744,
+        "description": "接收两个文件路径。先调用compare_docx_files确保内容一致，不一致返回0。再使用odfpy.load加载file1（odt格式），遍历所有text:span元素，通过stylename查找automaticstyles中对应样式的backgroundcolor属性。若发现任何高亮（背景色为#ffff00）返回0；未发现高亮返回1。"
+      },
+      {
+        "name": "evaluate_strike_through_last_paragraph",
+        "lineno": 769,
+        "description": "接收两个文件路径。先调用compare_docx_files确保内容一致，不一致返回0。再使用python-docx加载file1，取最后一段paragraphs[-1]，遍历其中所有run检查run.font.strike。最后一段所有run均具有删除线返回1；任一run没有返回0。加载失败返回0。"
+      },
+      {
+        "name": "evaluate_conversion",
+        "lineno": 793,
+        "description": "接收文件路径。使用python-docx加载后遍历所有表格单元格和段落中的run，检查run.text.isupper()。若发现任何大写文本返回0（要求全部转为小写）；未发现大写文本返回1。加载失败返回0。"
+      },
+      {
+        "name": "evaluate_spacing",
+        "lineno": 819,
+        "description": "接收文件路径。使用python-docx加载后检查前三个段落的paragraph_format.line_spacing：第一段必须为1.0，第二段必须为2.0，第三段必须为1.5。三者严格匹配返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "check_italic_font_size_14",
+        "lineno": 839,
+        "description": "接收两个文件路径。先调用compare_docx_files确保内容一致，不一致返回0。再使用python-docx加载path1，遍历所有段落run，对斜体run（run.italic为真）检查font.size是否为14pt（run.font.size.pt == 14）。所有斜体run均为14pt返回1；任一斜体run字号不符或size为None返回0。加载失败返回0。"
+      },
+      {
+        "name": "evaluate_alignment",
+        "lineno": 861,
+        "description": "接收docx路径。使用python-docx加载后遍历每个段落，按句号分割为句子，再按空格分词。对至少包含3个词的句子，取前三个词拼接为first_part，剩余词拼接为second_part，检查sentence中是否同时包含first_part和second_part且first_part出现位置在second_part之前。任一句子不满足该结构返回0；全部满足返回1。加载失败返回0。"
+      },
+      {
+        "name": "get_unique_train_ids",
+        "lineno": 897,
+        "description": "接收初始文件路径。使用python-docx加载后遍历段落，按逗号分割，筛选出恰好4个字段的行，取第2个字段（train_id）并去重，同时统计处理的行数。返回元组(train_ids集合, processed_lines计数)。加载失败或文件不存在返回空集合和0。"
+      },
+      {
+        "name": "check_no_duplicates",
+        "lineno": 921,
+        "description": "接收初始文件路径和处理后文件路径。先调用get_unique_train_ids获取初始文件中的唯一train_id集合和行数。再使用python-docx加载处理后文件，逐行解析4字段CSV格式，检查train_id是否在processed集合中已存在（存在则返回0），并收集train_ids_pro。最终比较train_ids_pro与初始集合是否相等且行数是否相等，均相等返回1，否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_docx_lines",
+        "lineno": 957,
+        "description": "接收两个docx文件路径。使用python-docx加载后提取所有非空段落文本（strip后），将两个列表转为set进行集合比较。集合相等返回1（忽略顺序和重复），否则返回0。加载失败返回0。"
+      },
+      {
+        "name": "compare_docx_files_and_ignore_new_lines",
+        "lineno": 981,
+        "description": "接收两个文件路径和**options（ignore_blanks默认True）。仅支持docx格式。使用python-docx加载后过滤掉text为空的段落，提取段落文本列表。若ignore_blanks为True，使用re.sub(r'\\s+', ' ')合并所有空白字符后整体字符串比较；若ignore_blanks为False，先比较段落数量，再逐段精确比较。一致返回1，否则返回0。加载失败或格式不支持返回0。"
+      },
+      {
+        "name": "compare_highlighted_text",
+        "lineno": 1023,
+        "description": "接收两个docx文件路径。将docx作为zip打开，读取word/document.xml，使用xml.etree.ElementTree解析。在命名空间w下查找所有w:r，筛选包含w:highlight且val属性不为none的run，提取其中w:t的文本。将两个文档的高亮文本列表转为set比较，集合相同返回1，否则返回0。注释说明：Ubuntu保存的docx可能无法使用此函数检测高亮。"
+      },
+      {
+        "name": "compare_references",
+        "lineno": 1063,
+        "description": "接收两个文件路径和**options（reference_indicator默认'References'，reference_base_result默认0.5）。仅支持docx。使用python-docx加载后提取段落文本，找到reference_indicator最后一次出现的索引，提取其后所有非空段落作为参考文献条目。要求两文档参考文献条目数相同，逐条使用rapidfuzz.fuzz.ratio计算相似度并求平均。若平均相似度大于等于reference_base_result + 0.01，返回归一化分数(result - base) / (1 - base)；否则返回0。格式不支持或加载失败返回0。"
+      },
+      {
+        "name": "compare_unique_train_records",
+        "lineno": 1121,
+        "description": "接收处理后文件路径和expected_files列表（第0项为gold标准文件，第1项为初始文件）以及**kwargs。内部定义get_lines_and_ids_from_file函数，使用python-docx加载并提取非空段落，解析4字段CSV格式获取行列表和train_id列表。依次执行四项严格检查：1）处理后文件的行集合必须是初始文件行集合的子集；2）处理后文件的train_id无重复；3）处理后train_id集合与gold文件完全一致；4）处理后行数与gold文件完全一致。任一检查失败记录日志并返回0，全部通过返回1。参数不合法或加载失败也返回0。"
+      },
+      {
+        "name": "check_docx_title_format",
+        "lineno": 1190,
+        "description": "接收result_path和**options。使用python-docx加载文档，检查首段格式：paragraph_format.alignment必须为WD_PARAGRAPH_ALIGNMENT.CENTER；首段每个非空run的font.bold必须为True，font.size.pt必须约等于26（误差<=0.5），font.color.rgb必须等于RGBColor(0x00, 0x64, 0x00)（深绿色）。全部满足返回1，任一不满足记录日志并返回0。无段落或加载失败返回0。"
+      },
+      {
+        "name": "check_docx_section_headings",
+        "lineno": 1250,
+        "description": "接收result_path和**options。使用python-docx加载文档，遍历所有段落，筛选出以'Week '开头且包含':'的section heading段落。要求至少存在一个这样的标题，且每个标题下的所有非空run的font.bold为True、font.size.pt约等于16（误差<=0.5）。全部满足返回1；无标题或任一不满足记录日志并返回0。加载失败返回0。"
+      },
+      {
+        "name": "check_docx_body_format",
+        "lineno": 1294,
+        "description": "接收result_path和**options（font_name默认'Georgia'，font_size默认11）。使用python-docx加载文档，先识别所有以'Week '开头且含':'的heading索引，确定每个heading下的正文范围（heading+1至下一个heading或'Last updated'行之前）。遍历正文段落，要求每个非空run的font.name为Georgia、font.size.pt约等于11（误差<=0.5）。bold规则：仅第一个section（Week 1）下的正文应为粗体，其他section正文不应为粗体。至少存在一个正文段落且全部满足返回1；无正文或任一不满足记录日志并返回0。加载失败返回0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-06-30 23:58:05",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_3dad2051-0596-4886-93c5-9ed78df81f99./evaluator_function_labels.json"
+}

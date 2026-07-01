@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator验证名为WeeklySales.xlsx的Excel文件是否完成了正确的Sheet备份任务。核心要求是：工作簿必须同时包含Sheet1和Sheet2；Sheet2必须具有指定的三列（Week、Sales、COGS）且至少包含1行数据；Sheet1的原始数据和列结构必须保持完整无损；并且Sheet2中的数据必须是Sheet1对应列数据的子集（即备份数据不能出现原始数据中不存在的值）。所有检查项必须全部满足，evaluator才判定任务成功并返回1.0；任何一项失败即返回0.0。",
+    "overall_validation": "该evaluator验证WeeklySales.xlsx文件是否成功完成数据备份任务。最终产物必须是一个包含Sheet1（原始数据）和Sheet2（备份数据）的Excel工作簿；两个工作表的列结构必须完全一致（默认要求Week、Sales、COGS三列）；两个工作表都必须包含至少最小数量的数据行（默认至少1行）；最关键的是，Sheet2中的数据必须是Sheet1数据的子集，即备份列的非空值集合必须被原始对应列的非空值集合完全包含，确保备份数据不引入原始数据中不存在的值。所有检查项采用“全部满足”的严格逻辑，必须全部通过才判定任务成功并返回1.0，任一检查失败或发生异常即返回0.0。",
     "main_functions": [
       {
         "name": "check_sheet_backup",
         "lineno": 7,
-        "description": "该函数接收result_path（从虚拟机拉取的xlsx本地路径）、expected（包含expected_columns、expected_sheets、min_data_rows等规则的字典）以及options参数。其执行流程如下：首先检查result_path是否存在，若不存在直接返回0.0；接着尝试导入pandas，若未安装也返回0.0。然后从expected中提取预期配置，默认列名为[\"Week\", \"Sales\", \"COGS\"]，默认工作表为[\"Sheet1\", \"Sheet2\"]，默认最少数据行数为1。随后使用pd.ExcelFile打开文件，依次执行六项检查：1）遍历expected_sheets，确认所有预期工作表都存在于文件中；2）分别读取Sheet1和Sheet2为DataFrame；3）精确比对Sheet2的列名是否与expected_columns完全一致（顺序敏感）；4）检查Sheet2的数据行数是否大于等于min_data_rows；5）精确比对Sheet1的列名是否与expected_columns完全一致，并检查其数据行数是否大于等于min_data_rows；6）对每一预期列，取Sheet1和Sheet2该列的非空值构成集合，验证Sheet2的值集合是否为Sheet1值集合的子集，若Sheet2出现Sheet1中不存在的值则判定失败。以上所有检查全部通过时返回1.0，任一环节失败或发生异常时返回0.0。"
+        "description": "该函数接收result_path（从VM拉取的xlsx本地路径）和expected（包含expected_columns、expected_sheets、min_data_rows的规则字典）作为输入，**options预留未使用。其测试逻辑如下：首先检查result_path是否存在且不为None，并尝试导入pandas；随后使用pd.ExcelFile打开Excel文件，依次执行六项检查：1）工作表存在性检查：遍历expected_sheets（默认['Sheet1', 'Sheet2']），确认每个工作表名称都包含在工作簿的sheet_names中；2）Sheet2列名检查：读取Sheet2，验证list(df2.columns)是否与expected_columns（默认['Week', 'Sales', 'COGS']）完全一致；3）Sheet2行数检查：验证Sheet2的数据行数len(df2)是否不小于min_data_rows（默认1）；4）Sheet1列名检查：读取Sheet1，验证其列名是否与expected_columns完全一致；5）Sheet1行数检查：验证Sheet1的数据行数是否不小于min_data_rows；6）数据一致性/子集检查：遍历每个expected_columns中的列，取Sheet1和Sheet2该列的dropna()非空值并转为集合，验证sheet2_values是否为sheet1_values的issubset，若Sheet2出现Sheet1中不存在的值则判定失败。以上所有检查必须全部通过才返回1.0，任何一步失败会立即记录warning并返回0.0；若文件缺失、pandas未安装或任何异常发生，同样返回0.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:20:23",
+  "created_at": "2026-07-01 14:44:24",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_011./evaluator_function_labels.json"
 }

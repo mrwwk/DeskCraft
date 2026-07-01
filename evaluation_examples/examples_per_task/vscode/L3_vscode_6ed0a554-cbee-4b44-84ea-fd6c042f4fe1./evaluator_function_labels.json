@@ -1,0 +1,191 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_6ed0a554-cbee-4b44-84ea-fd6c042f4fe1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 9
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 62
+    },
+    {
+      "name": "compare_text_file",
+      "lineno": 90
+    },
+    {
+      "name": "compare_pdf_content",
+      "lineno": 127
+    },
+    {
+      "name": "compare_zip_files",
+      "lineno": 146
+    },
+    {
+      "name": "compare_config",
+      "lineno": 222
+    },
+    {
+      "name": "compare_answer",
+      "lineno": 272
+    },
+    {
+      "name": "is_extension_installed",
+      "lineno": 291
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 304
+    },
+    {
+      "name": "check_python_file_by_gold_file",
+      "lineno": 452
+    },
+    {
+      "name": "check_html_background_image",
+      "lineno": 456
+    },
+    {
+      "name": "compare_result_files",
+      "lineno": 475
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 9
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 62
+    },
+    {
+      "name": "compare_text_file",
+      "lineno": 90
+    },
+    {
+      "name": "compare_pdf_content",
+      "lineno": 127
+    },
+    {
+      "name": "compare_zip_files",
+      "lineno": 146
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 179
+    },
+    {
+      "name": "_normalize_files_exclude_keys",
+      "lineno": 196
+    },
+    {
+      "name": "compare_config",
+      "lineno": 222
+    },
+    {
+      "name": "compare_answer",
+      "lineno": 272
+    },
+    {
+      "name": "is_extension_installed",
+      "lineno": 291
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 304
+    },
+    {
+      "name": "check_python_file_by_gold_file",
+      "lineno": 452
+    },
+    {
+      "name": "check_html_background_image",
+      "lineno": 456
+    },
+    {
+      "name": "compare_result_files",
+      "lineno": 475
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于对多种任务产出的文件、配置、文本、代码及压缩包进行自动化评分。核心验证对象包括：JSON 列表/字典配置（如快捷键绑定、编辑器设置）、纯文本文件、ZIP 归档（内含普通文件或 PDF）、Python 代码（通过外部测试套件执行）、HTML 样式、以及扩展安装状态等。检查方式涵盖：精确文本匹配（可忽略大小写与空白）、JSON 子集包含检查（对 VS Code 的 files.exclude 键做 **/ 前缀归一化）、PDF 文本相似度比对（阈值 0.95）、数值近似相等（误差 1e-4）、子字符串包含、以及动态加载并执行测试函数。总体判定思路为：按任务类型选择对应主函数，读取实际产物与预期规则或标准文件逐项比对，全部条件满足则返回 1.0，任一关键条件失败即返回 0.0；Python 测试套件执行结果支持布尔、数值或真值映射到 [0,1] 分数。",
+    "main_functions": [
+      {
+        "name": "check_json_keybindings",
+        "lineno": 9,
+        "description": "接收 actual 结果文件路径与 expected 规则字典。依次尝试直接读取 JSON 与跳过首行后读取 JSON，要求解析结果为 list 类型。若 expected 包含 'all_of'，则要求列表中每个 binding 都通过 _is_subset 被至少一个列表元素包含；若包含 'none_of'，则要求列表中完全不存在这些 binding；否则检查 expected['expected'] 的单个 binding 是否被包含。任一条件不满足返回 0.0，全部满足返回 1.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 62,
+        "description": "接收 actual 文件路径与 expected 字典（内含 'expected' 键）。读取 actual 文件并解析为 JSON，遍历 expected['expected'] 中的每一对 key-value，检查该 key 是否存在于 actual 中且值完全相等。所有键值对均匹配返回 1.0，任一不匹配返回 0.0。"
+      },
+      {
+        "name": "compare_text_file",
+        "lineno": 90,
+        "description": "接收 actual 与 expected 两个文本文件路径，支持 options 中的 ignore_blanks 与 ignore_case。读取两文件全文，若 ignore_blanks 为真，则将 [\\t\\n] 替换为空格并合并连续空白后 strip；若 ignore_case 为真，则全部转小写。处理后的两文本完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_pdf_content",
+        "lineno": 127,
+        "description": "接收 content1、content2 两份 PDF 字节内容，以及 text_similarity_threshold 阈值。将内容写入临时文件后，使用 PyPDF2 逐页提取文本并拼接全文；再通过 difflib.SequenceMatcher 计算两段文本的 similarity_ratio。若 ratio 大于等于阈值返回 True，否则返回 False。通常被 compare_zip_files 调用。"
+      },
+      {
+        "name": "compare_zip_files",
+        "lineno": 146,
+        "description": "接收 actual 与 expected 两个 ZIP 文件路径。打开两压缩包后，首先比较 namelist 集合是否完全一致；随后遍历每个文件名，若文件名以 .pdf 结尾（不区分大小写），则调用 compare_pdf_content 进行文本相似度比较（阈值固定为 0.95）；其余文件直接进行字节级相等比较。文件列表或任一文件内容不匹配返回 0.0，全部通过返回 1.0。"
+      },
+      {
+        "name": "compare_config",
+        "lineno": 222,
+        "description": "接收 actual 文件路径、rules 字典（含 'expected' 文本）及 options（默认 containment_ok=True）。读取 actual 文本后，若 containment_ok 为真，优先尝试将双方解析为 JSON，并通过 _normalize_files_exclude_keys 对 files.exclude 的键去除 **/ 前缀，再用 _is_subset 判断 expected_json 是否为 actual_json 的子集；JSON 解析失败则回退为 expected_text.strip() 是否属于 actual_text 的子字符串。若 containment_ok 为假，先严格文本相等比较，再尝试 JSON 完全相等（==）比较。满足对应条件返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_answer",
+        "lineno": 272,
+        "description": "接收 actual 结果字符串与 rules 字典（含 'expected'）。直接进行字符串相等比较，相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "is_extension_installed",
+        "lineno": 291,
+        "description": "接收 actual 字符串（如扩展列表文本）与 rules 字典（含 'type' 与 'expected'）。若 type 为 'contain'，检查 rules['expected'] 是否为 actual 的子串；若为 'not_contain'，检查是否不在其中。满足返回 1.0，不满足返回 0.0；其他 type 值抛出 NotImplementedError。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 304,
+        "description": "接收 actual_files（由测试文件内部引用）、test_file 测试文件路径，及 options（可指定 test_function_name，默认为 'test'）。验证 test_file 存在后，切换工作目录至其所在目录并加入 sys.path；使用 importlib.util 动态加载模块，获取指定名称的测试函数并执行。对返回值分类处理：bool 类型直接映射为 1.0/0.0；int/float 类型裁剪到 [0.0, 1.0]；其他类型按真值判断。执行或加载过程中任何异常均返回 0.0，并在 finally 中恢复工作目录、sys.path 及清理 sys.modules。"
+      },
+      {
+        "name": "check_python_file_by_gold_file",
+        "lineno": 452,
+        "description": "代码中未明确体现（函数体为 pass）。"
+      },
+      {
+        "name": "check_html_background_image",
+        "lineno": 456,
+        "description": "接收 src_path（HTML 文件路径）与 rule 字典（含 'value' 图片地址）。使用 BeautifulSoup 解析 HTML，查找所有 style 标签，检查是否存在 style 文本精确包含 'background-image: url(\\'{rule[\"value\"]})\\')'。找到返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_result_files",
+        "lineno": 475,
+        "description": "接收 src_path 与 tgt_path 两个文件路径。读取并 strip 两文件内容后，优先尝试数值比较：先将 tgt_content 转为 float，若 tgt_content 是 src_content 的子串则返回 1.0（允许 src 为语言描述+数值的超集）；否则将 src_content 也转为 float，若两者绝对差小于 1e-4 返回 1.0。若数值转换失败，回退为字符串完全相等比较。满足任一条件返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 198,
+        "description": "递归判断 expected 是否为 actual 的子集。若 expected 为 dict，要求 actual 也为 dict，且 expected 的每个 key 都存在于 actual 中，对应值递归满足子集关系；若 expected 为 list，要求双方完全相等（==）；其他基础类型要求完全相等。返回布尔值。被 check_json_keybindings、compare_config 等用于实现宽松包含判断。"
+      },
+      {
+        "name": "_normalize_files_exclude_keys",
+        "lineno": 213,
+        "description": "递归遍历字典，当遇到 key 为 'files.exclude' 且其值为 dict 时，将该字典内每个键的 '**/' 前缀去除（例如 '**/__pycache__' 归一化为 '__pycache__'），其余结构保持不变。用于消除 VS Code 配置中 glob 模式的风格差异，防止因写法不同导致误判。被 compare_config 在 JSON 子集检查前调用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:52:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_6ed0a554-cbee-4b44-84ea-fd6c042f4fe1./evaluator_function_labels.json"
+}
