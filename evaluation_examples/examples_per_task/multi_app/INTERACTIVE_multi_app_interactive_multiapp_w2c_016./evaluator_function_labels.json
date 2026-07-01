@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_016./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于评测任务 INTERACTIVE_multi_app_interactive_multiapp_w2c_016 的最终结果是否符合预期的文本内容规则。其核心检查对象是一个字符串形式的执行结果（result），通过判断该结果是否同时满足「必须包含所有指定的子串内容（include）」以及「必须不包含任何指定的排除子串（exclude）」来判定任务完成度。检查方式采用严格的字符串子串匹配（Python in 操作符），判定逻辑为二元打分：仅当全部包含规则与全部排除规则同时满足时返回 1.0（完全成功），任一条件不满足或结果本身为 None 时返回 0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收两个参数：result（待检查的字符串结果）和 rules（包含 include 与 exclude 规则的字典）。执行流程如下：首先判断 result 是否为 None，若为 None 则直接返回 0.0；随后从 rules 中读取 include 列表（默认空列表）与 exclude 列表（默认空列表）；接着使用 Python 子串匹配（in 操作符）进行两步验证：第一步要求 result 必须包含 include 列表中的每一个字符串（all 逻辑），第二步要求 result 必须不包含 exclude 列表中的任何一个字符串（all 逻辑）。只有当「所有 include 项均存在于 result 中」且「所有 exclude 项均不存在于 result 中」这两个条件同时成立时，才返回 1.0；否则返回 0.0。函数执行过程中会调用 print 输出 result 与 rules 的内容。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:51",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_016./evaluator_function_labels.json"
+}

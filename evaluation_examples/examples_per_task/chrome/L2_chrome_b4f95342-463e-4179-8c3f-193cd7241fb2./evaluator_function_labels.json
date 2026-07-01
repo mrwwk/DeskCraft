@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于评估与休闲/娱乐场景相关的桌面环境任务完成度，核心验证目标分为两个独立维度：一是确认目标网页是否成功渲染出营地可用性网格（availability grid），二是确认当前浏览器活动标签页的URL是否符合预期的地址模式。两个检查函数各自独立运行，均采用二元打分机制（满足条件返回1.0，不满足返回0.0），不存在加权累计或联合判定逻辑。第一个维度通过读取active_tab_html_parse输出的解析字典（或其JSON字符串），检测其中是否存在名为camp-sortable-column-header的键且内容非空，以此推断页面已加载可排序的营地可用性表格；第二个维度通过读取active_tab_info提供的URL，与配置中给定的正则表达式列表逐一进行re.search匹配，要求所有模式必须全部命中。标注人员可将这两个函数视为各自独立的\"满分/零分\"检查器。",
+    "overall_validation": "该evaluator用于休闲娱乐类桌面环境任务，提供两种独立的页面状态验证能力：一是验证页面HTML解析结果中是否呈现了营地可用性网格（通过检查camp-sortable-column-header键是否存在且内容非空），二是验证当前浏览器活动标签页的URL是否符合一组预期的正则表达式模式。两个主函数各自独立返回0.0或1.0的分数，evaluator内部不存在组合加权或联合判定逻辑，由外部框架根据任务配置决定调用其中一个或多个检查，并决定是否要求全部满足。核心比较方式包括：对特定字典键值进行非空判定，以及对URL进行多正则模式的逐一匹配（要求全部命中）。",
     "main_functions": [
       {
         "name": "check_page_has_availability_grid",
         "lineno": 8,
-        "description": "该函数接收来自active_tab_html_parse的解析结果result（可以是字典，也可以是JSON字符串），用于检查页面是否展示了营地可用性网格。检查步骤如下：1）若result为字符串类型，先执行strip()去除首尾空白，并将所有单引号替换为双引号，随后尝试用json.loads反序列化为字典；若解析失败则直接返回0.0。2）若result为None或反序列化后不是字典类型，同样返回0.0。3）从字典中提取键camp-sortable-column-header对应的值，若该键存在且其值转换为字符串并strip()后长度大于0，则判定页面已渲染可用性网格，返回1.0；若键不存在或内容为空，则返回0.0。全程未调用其他辅助函数，属于单一字段存在性+非空性检查。"
+        "description": "接收来自active_tab_html_parse的result（可为字典或JSON字符串）以及框架兼容用的expected参数。首先对字符串类型的result进行预处理：去除首尾空白、将单引号替换为双引号后尝试json.loads解析，若解析失败则记录警告并返回0.0；接着检查result是否为非空字典，否则返回0.0。随后提取字典中camp-sortable-column-header键对应的值，若该值不为None且转为字符串并去除首尾空白后长度大于0，则判定页面存在可用性网格，返回1.0；若键不存在或值为空，则返回0.0。"
       },
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 48,
-        "description": "该函数接收result（来自active_tab_info的URL字符串，或包含'url'键的字典）以及rules配置对象，用于验证当前页面URL是否完全符合预期的正则规则。检查步骤如下：1）若result为空（假值），直接返回0.0。2）若result是字符串，则直接作为目标URL；若result是字典且包含'url'键，则提取该键值作为目标URL；其他格式均视为非法，返回0.0。3）从rules[\"expected\"]中取出正则表达式字符串列表，遍历每一个pattern，使用re.search在目标URL中搜索匹配。4）采用\"全部满足\"策略：只要有一个pattern未能匹配，立即返回0.0；只有当所有pattern都匹配成功时，才返回1.0。全程未调用其他辅助函数，属于多正则全匹配的URL模式校验。"
+        "description": "接收result（来自active_tab_info的URL字符串或含url键的字典）和rules字典。首先处理result：若为空则返回0.0；若为字符串则直接作为URL，若为字典则提取url键的值，格式无效则记录错误并返回0.0。然后从rules[\"expected\"]中获取正则模式列表，使用re.search依次检查每个模式是否在URL中匹配。采用短路逻辑：只要有一个模式未匹配立即返回0.0；仅当所有模式全部匹配时才返回1.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:48:02",
+  "created_at": "2026-07-01 15:09:29",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b4f95342-463e-4179-8c3f-193cd7241fb2./evaluator_function_labels.json"
 }

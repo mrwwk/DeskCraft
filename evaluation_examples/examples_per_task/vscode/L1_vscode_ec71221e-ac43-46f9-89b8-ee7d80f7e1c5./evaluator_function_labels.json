@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_ec71221e-ac43-46f9-89b8-ee7d80f7e1c5./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 78
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证VS Code键盘快捷键配置文件（通常为keybindings.json）的内容是否符合任务预期。它读取实际生成的快捷键配置文件，尝试将其解析为JSON数组，然后检查数组中是否包含预期的快捷键绑定对象。核心比较方式采用递归子集匹配：预期绑定对象可以是实际绑定对象的子集（允许实际对象包含更多字段）。检查模式分为三种：单一绑定存在性检查、all_of（所有列出绑定必须同时存在）、none_of（所有列出绑定必须同时不存在）。最终判定为二值打分：只有当文件成功解析且所有指定条件全部满足时返回1.0，否则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_json_keybindings",
+        "lineno": 25,
+        "description": "该函数接收actual（待测文件路径字符串）和expected（预期条件字典）作为输入。首先依次尝试两种JSON加载策略：直接加载文件内容；若失败则跳过第一行后加载（用于兼容带注释头的配置）。若两种策略均失败或解析结果不是list类型，直接返回0.0。随后定义内部函数contains_binding，利用_is_subset遍历检查data数组中是否存在某个dict项包含目标绑定。接着进入分支判断：若expected字典包含'all_of'或'none_of'键，则遍历'all_of'列表要求每个绑定都必须被包含（任一缺失返回0.0），并遍历'none_of'列表要求每个绑定都必须不被包含（任一存在返回0.0），全部通过返回1.0；若不存在上述组合键，则提取expected['expected']进行单一绑定存在性检查，存在返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 79,
+        "description": "这是一个递归辅助比较函数，用于判断第一个参数expected是否是第二个参数actual的\"子集\"。具体逻辑为：若expected为dict，则要求actual也为dict，且expected中的每个键都必须在actual中存在，对应值递归满足子集关系（允许actual有额外键）；若expected为list，则要求expected与actual完全相等；对于其他基本类型，要求两者完全相等。该函数被check_json_keybindings中的contains_binding调用，用于判断预期快捷键绑定对象是否被实际配置文件中的某一项所包含，从而支持\"预期字段必须匹配，但允许实际配置有更多字段\"的灵活匹配策略。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:46:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_ec71221e-ac43-46f9-89b8-ee7d80f7e1c5./evaluator_function_labels.json"
+}

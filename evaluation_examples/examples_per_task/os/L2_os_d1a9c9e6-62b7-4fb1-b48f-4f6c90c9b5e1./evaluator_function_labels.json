@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_d1a9c9e6-62b7-4fb1-b48f-4f6c90c9b5e1./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_extract_services",
+      "lineno": 18
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_os_extract_services",
+      "lineno": 18
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证任务是否成功提取了系统中的失败服务列表。它接收由 Shell 收集器直接输出的文件内容（字符串形式），并将其与预设的期望字符串进行精确比对。核心检查对象是经过首尾空白去除（strip）后的结果文本与期望文本是否完全一致。判定逻辑为二元打分：若提取结果为空（None）或与预期不符，则返回 0.0 表示失败；若两者完全匹配，则返回 1.0 表示成功。不存在部分得分或近似匹配机制。",
+    "main_functions": [
+      {
+        "name": "check_os_extract_services",
+        "lineno": 18,
+        "description": "该函数接收 result（字符串，由 Shell 收集器直接输出的文件内容）和 rules（字典，预期包含键 \"expected\"）。执行步骤如下：1）从 rules 中获取 \"expected\" 值，若不存在则默认为空字符串；2）检查 result 是否为 None，若为 None 直接返回 0.0；3）对 result 和 expected 分别调用 strip() 去除首尾空白；4）进行精确字符串相等比较，若完全一致返回 1.0，否则返回 0.0。整个逻辑被 try-except 包裹，若发生任何异常则记录错误日志并返回 0.0。该函数未调用其他辅助函数，独立完成精确匹配判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:35:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_d1a9c9e6-62b7-4fb1-b48f-4f6c90c9b5e1./evaluator_function_labels.json"
+}

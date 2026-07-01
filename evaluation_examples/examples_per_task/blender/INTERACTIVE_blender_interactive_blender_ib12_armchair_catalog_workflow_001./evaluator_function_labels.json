@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender扶手椅目录工作流最终渲染输出的图像文件是否满足交付标准。核心检查对象是一个PNG格式的渲染文件，验证其三大属性：1）文件在指定路径真实存在；2）图像尺寸严格匹配规则要求的宽高（典型值为2000x2000），采用精确相等比较，无容错阈值；3）图像格式必须为PNG，比较时忽略大小写，并兼容常见别名映射（如JPG与JPEG视为等同）。判定逻辑为严格的“全或无”打分制：所有检查项必须全部通过才返回1.0（成功），任一维度不符或发生异常即返回0.0（失败）。若运行环境缺少PIL库，evaluator会降级为仅做文件存在性检查，存在则返回1.0，否则返回0.0。",
+    "overall_validation": "该evaluator用于验证Blender渲染任务是否成功输出了符合规格要求的图像文件，针对扶手椅目录工作流（armchair catalog workflow）的渲染产物进行闭环检查。核心验证对象是下载到本地的渲染输出文件（预期为PNG格式）。评估器通过PIL库读取图像文件，依次校验文件物理存在性、图像像素尺寸（宽度与高度）以及图像编码格式。所有检查项必须全部满足（如宽2000像素、高2000像素、格式为PNG），函数才会返回1.0表示任务成功；任一检查失败均立即返回0.0。若运行环境中缺少PIL库，则降级为仅检查文件是否存在，存在返回1.0，否则返回0.0。整体采用严格的二元判定逻辑，不存在部分得分或加权累计。",
     "main_functions": [
       {
         "name": "check_blender_render_output",
         "lineno": 14,
-        "description": "该函数接收下载后的渲染文件路径file_path和规则字典rule（可包含width、height、format字段）作为输入，对Blender输出进行逐项验证。检查顺序如下：首先判断file_path是否为None或文件在磁盘上不存在，若不存在则记录错误日志并直接返回0.0；随后尝试导入PIL并打开图像，获取实际宽高与格式属性。若rule中包含width字段，将实际宽度与rule['width']做精确相等比较；若rule中包含height字段，将实际高度与rule['height']做精确相等比较；若rule中包含format字段，将实际格式转为大写后与期望值比较，并通过fmt_map字典处理别名映射（如JPG映射为JPEG）。上述任一条件不匹配均记录警告日志并立即返回0.0。若全部条件通过，返回1.0。异常分支处理：当触发ImportError（PIL不可用）时，降级为仅检查文件是否存在，存在返回1.0，否则返回0.0；其他通用异常同样捕获并返回0.0。该函数未调用其他自定义辅助函数，所有逻辑内聚在单一函数中完成。"
+        "description": "该函数是评测入口，接收file_path（渲染输出文件路径）和rule（包含预期width、height、format的字典）作为输入。其测试逻辑按以下顺序执行：首先验证file_path非空且文件在磁盘上真实存在，若不存在则记录错误并直接返回0.0；接着尝试导入PIL并用Image.open()加载图像，解析实际宽度、高度（img.size）以及图像格式（img.format）。随后进行三项严格比对：1）若rule中包含width字段，比较实际宽度与rule['width']，不匹配则记录警告并返回0.0；2）若rule中包含height字段，比较实际高度与rule['height']，不匹配则返回0.0；3）若rule中包含format字段，将预期格式与实际格式均转为大写后比较，并通过fmt_map兼容JPG与JPEG的别名映射，若映射后仍不匹配则返回0.0。当所有检查均通过时返回1.0。异常处理分支：若触发ImportError（PIL未安装），降级为仅检查文件是否存在，存在返回1.0，否则返回0.0；其他任意异常均捕获后返回0.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:05:10",
+  "created_at": "2026-07-01 14:33:23",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib12_armchair_catalog_workflow_001./evaluator_function_labels.json"
 }

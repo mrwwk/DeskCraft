@@ -1,0 +1,96 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_1f157bab-72e1-4c29-8fed-453077dbf28f./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 134
+    },
+    {
+      "name": "check_blender_text_styling",
+      "lineno": 163
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 209
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 40
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 134
+    },
+    {
+      "name": "check_blender_text_styling",
+      "lineno": 163
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 209
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 Blender 任务完成后场景状态与渲染产物是否符合预期。它通过读取外部 Blender 检查脚本（如 check_material.py、check_world.py、check_text.py）输出的 JSON 数据，以及直接读取本地渲染输出图像文件，对四类核心对象进行核查：1）物体材质的 PBR 参数（材质名称、基础颜色 base_color、金属度 metallic、粗糙度 roughness）；2）世界环境节点中引用的 HDRI 文件；3）文本对象的样式属性（内容 body、尺寸 size、挤出 extrude、倒角深度 bevel_depth、水平对齐 align_x）；4）渲染输出图像的元数据（宽度 width、高度 height、图像格式 format）。比较方式结合了精确字符串匹配、单数值容差比较（默认 tolerance 为 0.05）、向量分量容差比较、HDRI 文件名的子串包含匹配，以及图像格式别名兼容（JPG 与 JPEG 视为等同）。成功判定上，材质检查采用在候选对象与材质中遍历的「任一满足全部规则即成功」逻辑；文本样式、世界 HDRI 与渲染输出则采用「所有指定字段必须全部满足」逻辑。各主函数独立返回 0.0（失败）或 1.0（成功）。",
+    "main_functions": [
+      {
+        "name": "check_blender_material_pbr",
+        "lineno": 50,
+        "description": "接收来自 check_material.py 的 JSON 字符串 command_output 与规则字典 rule。首先调用 _parse_blender_output 将输出解析为 Python 字典。随后根据 rule 中的 object_name（精确匹配目标物体）、object_name_contains 或 name_contains（物体名称子串匹配）或两者皆无（全局遍历所有非下划线开头的物体）三种模式，构建候选物体及其材质列表。遍历每个候选物体的材质数组，对每个材质依次检查：若 rule 指定了 material_name，要求 mat[\"name\"] 精确相等；若指定 expected_color，通过 _check_vector_tolerance 比较 mat[\"base_color\"] 与期望颜色数组；若指定 metallic 或 roughness，通过 _check_tolerance 比较对应数值。只要遇到第一个同时满足所有指定条件的材质，立即返回 1.0；若全部遍历完毕仍无匹配，返回 0.0。"
+      },
+      {
+        "name": "check_blender_world_hdri",
+        "lineno": 134,
+        "description": "接收来自 check_world.py 的 JSON 字符串 command_output 与规则字典 rule。调用 _parse_blender_output 解析后，首先检查 result[\"has_hdri\"] 是否为真，若为假则直接返回 0.0。再提取 result[\"hdri_filename\"] 与 rule[\"hdri_filename\"] 进行比对，采用宽松匹配策略：只要期望文件名等于实际文件名，或期望文件名是实际文件名的子串（expected in actual），即判定通过并返回 1.0；否则记录警告并返回 0.0。"
+      },
+      {
+        "name": "check_blender_text_styling",
+        "lineno": 163,
+        "description": "接收来自 check_text.py 的 JSON 字符串 command_output 与规则字典 rule。调用 _parse_blender_output 解析后，通过 rule[\"object_name\"] 从结果字典中定位对应文本对象数据 text_data，若不存在则直接返回 0.0。随后按顺序执行以下检查：若 rule 包含 body，要求 text_data[\"body\"] 与期望值精确相等；若包含 size、extrude 或 bevel_depth，分别通过 _check_tolerance 与实际值进行容差比较；若包含 align_x，要求与 text_data[\"align_x\"] 精确相等。所有被指定的字段必须全部满足才返回 1.0，任一条件不满足即立即返回 0.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 209,
+        "description": "接收渲染输出文件的本地路径 file_path 与规则字典 rule。首先检查 file_path 是否非空且文件真实存在，不存在则返回 0.0。随后尝试使用 PIL.Image.open 打开图像：若 rule 指定 width 或 height，要求与实际图像尺寸精确相等；若指定 format，将期望值转大写后与 img.format 的大写形式比较，并通过 fmt_map 兼容 JPG 与 JPEG 的别名（两者视为等同）。所有指定条件均满足则返回 1.0。若环境中未安装 PIL，则退化为仅检查文件存在性，存在返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 20,
+        "description": "接收 Blender 检查脚本输出的原始字符串 command_output。先判断是否为空或仅含空白字符，若是则记录错误并返回 None；否则尝试使用 json.loads 将其解析为 Python 对象。若遇到 JSONDecodeError 或 ValueError，记录错误日志与原始输出调试信息，并返回 None。该函数是 check_blender_material_pbr、check_blender_world_hdri、check_blender_text_styling 三个主函数共同的前置解析器，负责将外部脚本输出转换为可供后续逻辑处理的数据结构。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 33,
+        "description": "接收 actual、expected、tol 三个参数，用于单数值属性的近似匹配。当 actual 或 expected 为 None 时返回 False；否则将两者转为 float，计算绝对差值是否小于等于 tol。该函数被 check_blender_material_pbr（检查 metallic、roughness）、check_blender_text_styling（检查 size、extrude、bevel_depth）等主函数复用，实现带容差的数值相等判定。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 40,
+        "description": "接收 actual、expected、tol 三个参数，用于向量或数组属性的逐分量近似匹配。先检查 actual 与 expected 非空且长度一致，否则返回 False；随后对每一对对应分量转为 float 后计算绝对差值，要求所有分量均小于等于 tol 才返回 True。该函数主要被 check_blender_material_pbr 调用，用于比对 base_color 等颜色向量。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:40:37",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_1f157bab-72e1-4c29-8fed-453077dbf28f./evaluator_function_labels.json"
+}

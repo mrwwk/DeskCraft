@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_error_correction_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator服务于INTERACTIVE_impr_interactive_impress_error_correction_001任务，总体目标是对任务产出的结果字符串进行基于规则的内容合规性检查。核心检查对象是单个结果字符串（result），主要比较方式为精确的子串包含与排除匹配。评测采用二元打分机制：要求结果字符串同时满足“包含rules中include列表的所有指定子串”和“不包含rules中exclude列表的任何指定子串”两项条件；若结果为空（None）或违反任一规则，则判定为失败。成功时返回1.0，失败时返回0.0，属于严格的全部满足式通过/不通过判定。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收result（待评测的结果字符串）和rules（字典，包含include与exclude键）作为输入。执行步骤如下：1）若result为None，直接返回0.0；2）从rules中提取include列表（默认空）与exclude列表（默认空）；3）使用all()遍历include列表，检查result是否包含每一个指定子串；4）使用all()遍历exclude列表，检查result是否不包含任何一个指定子串；5）仅当步骤3和步骤4同时成立时返回1.0，否则返回0.0。函数内部通过print输出result与rules内容用于调试，但不改变判定逻辑。该函数不依赖其他辅助函数，直接基于Python原生字符串包含操作完成全部检查，判定依据为严格的逻辑与（AND）组合。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:22:31",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_error_correction_001./evaluator_function_labels.json"
+}

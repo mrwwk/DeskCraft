@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_009./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 文件服务于 INTERACTIVE_multi_app_interactive_multiapp_w2c_009 任务。从提供的代码来看，其核心验证手段是通过 check_include_exclude 对字符串形式的结果（如程序输出、页面文本或文档内容）执行严格的包含与排除规则检查：要求结果必须同时包含所有指定的关键子串，且必须不包含任何禁止出现的子串。若待检查结果为 None，或未能同时满足上述双向条件，则判为失败（返回 0.0）；仅当全部包含规则与全部排除规则均满足时，才判为成功（返回 1.0）。代码中未明确体现对文件系统状态、图像内容、数据库记录、多应用界面元素或复杂文档格式的解析与检查逻辑，也未体现多种指标联合打分、加权累计或近似匹配的评测模式。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数是 evaluator 的核心检查入口，接收 result（待验证的字符串结果，如命令输出或文本内容）和 rules（规则字典）作为输入。执行步骤如下：1）若 result 为 None，直接返回 0.0，判定失败；2）通过 rules.get 提取 include 列表（必须包含的子串，默认空列表）和 exclude 列表（必须排除的子串，默认空列表）；3）使用 all() 遍历 include，检查 result 中是否包含每一个必须存在的子串；4）使用 all() 遍历 exclude，检查 result 中是否不包含任何禁止存在的子串；5）仅当“所有 include 子串全部命中”且“所有 exclude 子串全部未命中”这两个条件同时满足时，返回 1.0 表示成功，否则返回 0.0 表示失败。函数在检查前会通过 print 输出 result 和 rules 的内容。该判定属于严格的“全包含+全排除”联合判定，不存在近似匹配、阈值打分或顺序要求。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:21",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_009./evaluator_function_labels.json"
+}

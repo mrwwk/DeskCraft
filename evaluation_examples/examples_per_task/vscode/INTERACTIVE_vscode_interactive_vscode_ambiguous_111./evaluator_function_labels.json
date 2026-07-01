@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_ambiguous_111./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 对应任务 INTERACTIVE_vscode_interactive_vscode_ambiguous_111，其总体判定逻辑为精确匹配。它接收外部传入的实际结果 result 与评测规则 rules，核心检查对象是 result 与 rules['expected'] 是否严格等价。主要比较方式直接使用 Python 的 == 运算符进行二元判定，不做任何预处理、模糊匹配或容差比较。成功判定的总体思路为：若 result 与 expected 在值和类型上完全一致，则返回 1.0 表示任务成功；否则返回 0.0 表示失败。代码中未明确体现该任务具体的最终产物形态（如文件、页面状态或文档内容），也未使用文件中导入的 csv、pdfplumber、docx 等解析库，实际评测仅依赖 result 与 expected 的直接比对。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收两个参数：result（任务实际输出）和 rules（包含评测规则的字典）。执行步骤如下：1）从 rules 字典中读取键为 'expected' 的值作为期望值 expect；2）使用 print 输出 result 与 expect 供调试查看；3）通过 result == expect 进行严格相等比较；4）若比较结果为真，则返回 1.0；若比较结果为假，则返回 0.0。该函数未调用其他辅助函数，也未对输入数据进行清洗、类型转换、正则匹配或近似匹配，判定依据仅为严格的等价性判断。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:38:28",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_ambiguous_111./evaluator_function_labels.json"
+}

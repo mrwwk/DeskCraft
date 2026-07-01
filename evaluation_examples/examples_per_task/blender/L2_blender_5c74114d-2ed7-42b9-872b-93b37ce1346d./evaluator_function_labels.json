@@ -18,22 +18,22 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender场景中特定对象的Follow Path约束是否按任务要求正确配置。它并不直接读取Blender源文件，而是依赖外部检查脚本check_constraints.py生成的JSON输出作为数据源。核心检查对象是目标物体（由object_name指定）的约束列表，从中查找类型为FOLLOW_PATH的约束，并逐一比对其关联目标（target）、是否跟随曲线（use_curve_follow）、前进轴（forward_axis）和上轴（up_axis）等属性是否与rule中定义的预期值完全一致。评测采用二元打分机制：遍历目标对象的所有约束，只要存在任一约束同时满足rule中指定的所有字段条件，即返回1.0（成功）；若JSON解析失败、目标对象不存在、或没有找到完全匹配的约束，则返回0.0（失败）。",
+    "overall_validation": "该evaluator用于验证Blender场景中Follow Path约束（Constraint）是否按任务要求正确配置。它通过读取Blender检查脚本（check_constraints.py）输出的JSON数据，核查指定名称物体上的约束列表。核心检查对象是物体所携带的约束属性，包括约束类型、目标物体（target）、是否跟随曲线（use_curve_follow）、前进轴（forward_axis）、向上轴（up_axis）等。主要比较方式是将JSON中解析出的约束字段值与rule参数中声明的期望值进行逐一精确匹配（相等性判断）。成功判定的总体思路是：在指定物体的所有约束中，只要存在一个类型为FOLLOW_PATH且所有在rule中指定的属性都与实际值完全一致的约束，即判定为成功（返回1.0）；若遍历完所有约束均无匹配项，或JSON输出为空/解析失败，则判定为失败（返回0.0）。这是一种“任一满足即成功”的单约束匹配逻辑。",
     "main_functions": [
       {
         "name": "check_blender_follow_path",
         "lineno": 33,
-        "description": "该函数接收两个参数：command_output（来自check_constraints.py的JSON字符串输出）和rule（包含约束规则的字典）。首先调用辅助函数_parse_blender_output解析command_output；若返回None则直接返回0.0。接着从rule中获取object_name（默认空字符串），并从解析结果中取出该名称对应的约束列表。随后遍历该列表中的每个约束字典：先检查type字段是否等于rule中的constraint_type（默认为\"FOLLOW_PATH\"），不匹配则跳过；若rule中包含\"target\"键，则检查约束的target字段是否与之相等；若rule中包含\"use_curve_follow\"键，则检查对应布尔值是否相等；若rule中包含\"forward_axis\"键，则检查对应字符串是否相等；若rule中包含\"up_axis\"键，则检查对应字符串是否相等。当找到第一个同时满足上述所有条件的约束时，立即返回1.0。若遍历结束后仍未找到匹配约束，记录警告日志并返回0.0。异常发生时同样返回0.0。判定逻辑为\"任一约束满足全部指定字段即成功\"的单点通过制。"
+        "description": "该函数接收两个输入：command_output（来自check_constraints.py的JSON格式字符串）和rule（字典，包含object_name、constraint_type、target、use_curve_follow、forward_axis、up_axis等规则字段）。执行步骤如下：首先调用辅助函数_parse_blender_output将command_output解析为Python对象；若解析失败或输出为空，直接返回0.0。接着从rule中获取object_name，并从解析结果中提取该名称物体对应的约束列表。然后遍历该物体的所有约束，跳过type不等于FOLLOW_PATH的项。对于每个类型匹配的约束，依次进行条件过滤：若rule中包含target字段，则要求约束的target与之相等；若包含use_curve_follow，则要求布尔值相等；若包含forward_axis，则要求轴向字符串相等；若包含up_axis，则要求该字段相等。所有在rule中声明的字段必须与约束实际值完全匹配。一旦找到第一个满足全部条件的约束，立即返回1.0。若循环结束后仍未找到匹配约束，则记录警告并返回0.0。整个判定过程是严格的字段级精确匹配，不存在近似匹配或阈值容错。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 19,
-        "description": "该函数接收command_output字符串，负责将Blender检查脚本输出的原始文本解析为JSON对象。具体步骤为：先检查输入是否为空或仅含空白，若是则记录错误并返回None；否则调用json.loads尝试解析。若解析过程中抛出json.JSONDecodeError或ValueError，则记录错误及原始输出内容，并返回None。解析成功则返回对应的Python对象（通常为字典）。该函数是主评测函数check_blender_follow_path的前置数据解析器，其返回None会直接导致主函数判定任务失败（0.0分）。"
+        "description": "该辅助函数负责将Blender检查脚本的原始文本输出解析为结构化JSON数据。它接收command_output字符串，首先检查该字符串是否为空或仅包含空白字符，若是则记录错误日志并返回None。随后尝试对字符串执行strip()后使用json.loads()进行解析。若解析过程中抛出json.JSONDecodeError或ValueError，则记录错误日志及原始输出内容（调试级别），并返回None。解析成功时返回对应的Python字典或列表。该函数是主评测逻辑的通用JSON解析入口，为check_blender_follow_path提供数据预处理服务，将Blender脚本的文本输出转换为可供字段比对使用的结构化对象。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:09:19",
+  "created_at": "2026-07-01 14:36:54",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_5c74114d-2ed7-42b9-872b-93b37ce1346d./evaluator_function_labels.json"
 }

@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 的核心目标是验证 Chrome 浏览器是否已成功导航到扩展管理页面，从而确认其处于可调试本地扩展的就绪状态。最终要求的状态是：当前活跃标签页的 URL 为 chrome://extensions（或以其为前缀的合法子页面，如带查询参数的形式）。核心检查对象是从 active_url_from_accessTree getter 获取的实际页面 URL（可能是字符串或字典），以及 rules 中指定的期望 URL。主要比较方式是对两个 URL 去除末尾斜杠后进行标准化，再执行精确匹配或前缀匹配（期望 URL 加斜杠作为前缀）。成功判定的总体思路是：只要实际 URL 与期望 URL 完全一致，或者严格以期望 URL 加“/”开头，即返回 1.0；任何提取失败、空值或不匹配的情况均返回 0.0。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器是否已成功导航至扩展管理页面并就绪，以便进行本地扩展的调试、加载未打包扩展或启用Developer mode。其核心检查对象是当前活跃标签页的URL，具体通过比对getter返回的实际URL与rules中配置的期望URL（通常为chrome://extensions）来完成判定。比对时采用两种策略：先对双方去除末尾斜杠进行标准化，随后检查是否精确相等，或实际URL是否以“期望URL + '/'”为前缀（例如chrome://extensions/?id=xxx可匹配chrome://extensions）。只要满足任一匹配条件即返回1.0表示任务完成；若result为None、提取不到有效URL、期望URL未配置，或两种匹配均失败，则返回0.0表示未就绪。整个判定逻辑为二元打分制，不存在加权、累计或多指标联合判定。",
     "main_functions": [
       {
         "name": "check_chrome_debug_ready",
         "lineno": 6,
-        "description": "该函数接收 result（active_url_from_accessTree getter 返回的 URL 字符串，或包含 url/name 字段的字典）和 rules（包含 \"url\" 键的字典，或可直接转为字符串的期望 URL）作为输入。检查步骤如下：1）若 result 为 None，直接返回 0.0；2）按类型从 result 中提取实际 URL——字符串类型直接 strip，字典类型优先取 \"url\" 字段、其次取 \"name\" 字段，其他类型转为字符串后 strip，若结果为空则返回 0.0；3）按类型从 rules 中提取期望 URL——字典类型优先取 \"url\" 字段、其次取 \"expected\" 字段，其他类型转为字符串，若为空则返回 0.0；4）对实际 URL 和期望 URL 均执行 rstrip('/') 标准化；5）判定依据为两项条件满足其一即可返回 1.0：a) 精确匹配（url_norm == expected_norm）；b) 前缀匹配（url_norm 以 expected_norm + '/' 开头）。若两项均不满足，返回 0.0。函数内部未调用其他辅助函数，所有提取、标准化与比较逻辑均在函数内顺序完成，属于单一阈值（1.0/0.0）的或逻辑判定。"
+        "description": "该函数接收result（来自active_url_from_accessTree getter的返回值，类型可为字符串、含url或name键的字典，或其他类型）和rules（含url键的字典，或可直接转为字符串的期望URL配置）作为输入。第一步检查result是否为None，为None则记录日志并直接返回0.0。第二步从result中提取实际URL：若result为字符串则直接strip；若为字典则依次尝试取url键或name键的值并转为字符串后strip；其他类型则直接转为字符串strip；若提取结果为空字符串则记录日志并返回0.0。第三步从rules中提取期望URL：若rules为字典则依次尝试取url键或expected键的值；否则转为字符串；若结果为空则记录日志并返回0.0。第四步对实际URL和期望URL进行标准化，去除末尾斜杠。第五步执行两种匹配判断：1）精确匹配，即url_norm == expected_norm；2）前缀匹配，即url_norm.startswith(expected_norm + '/)。任一匹配成功则记录日志并返回1.0；若均不匹配则记录日志并返回0.0。该函数未调用任何其他自定义辅助函数，所有逻辑均在函数内部顺序完成。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:34:31",
+  "created_at": "2026-07-01 14:58:14",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_111./evaluator_function_labels.json"
 }

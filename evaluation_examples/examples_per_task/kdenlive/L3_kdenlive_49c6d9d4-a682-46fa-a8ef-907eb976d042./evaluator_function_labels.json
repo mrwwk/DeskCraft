@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_49c6d9d4-a682-46fa-a8ef-907eb976d042./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 21
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 21
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务的最终渲染产物（MP4文件）是否满足指定的自定义分辨率及基本视频属性要求。它通过调用ffprobe对输出文件进行媒体信息解析，核心检查对象包括：视频编码格式（默认要求h264）、视频分辨率（宽度和高度的精确像素值）、以及视频时长（默认至少1秒）。评测逻辑采用严格的\"全部满足\"策略：只有当文件存在且非空、ffprobe成功执行、成功解析出视频流、编码匹配、宽高精确符合预期、且时长不低于阈值时，才判定任务成功并返回1.0；任一环节失败或异常即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_render_custom_resolution",
+        "lineno": 21,
+        "description": "该函数接收result_file_path（渲染后的MP4文件路径）和rule（验证规则字典）作为输入，对视频文件进行逐项严格检查。具体步骤如下：1）文件存在性与非空性检查：确认result_file_path不为None、文件存在且文件大小不为0；2）规则参数提取：从rule中读取min_duration（默认1.0秒）、expected_codec（默认\"h264\"）、expected_width和expected_height；3）调用ffprobe获取媒体元数据：通过subprocess.run执行ffprobe命令，以JSON格式输出流信息和格式信息，设置30秒超时；4）视频流定位：解析ffprobe的JSON输出，在streams列表中查找codec_type为\"video\"的流；5）编码格式检查：将video_stream中的codec_name转小写后，检查是否包含expected_codec的转小写形式，若不包含则失败；6）宽度精确匹配：若rule中指定了expected_width，将video_stream中的width转为整数后与预期值进行精确相等比较；7）高度精确匹配：若rule中指定了expected_height，将video_stream中的height转为整数后与预期值进行精确相等比较；8）时长检查：优先从video_stream的duration字段获取时长，若不存在则从format_info的duration字段获取，转换为浮点数后检查是否大于等于min_duration。以上所有检查必须全部通过，函数才返回1.0；任何一项不匹配、文件缺失、ffprobe执行失败或超时、JSON解析异常、未找到视频流，或任何其他异常，均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:10:20",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_49c6d9d4-a682-46fa-a8ef-907eb976d042./evaluator_function_labels.json"
+}

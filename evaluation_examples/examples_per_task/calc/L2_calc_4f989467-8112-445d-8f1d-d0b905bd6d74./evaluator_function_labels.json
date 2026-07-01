@@ -46,47 +46,47 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证桌面办公场景中的表格处理任务结果，核心检查对象是Excel（.xlsx）和CSV文件的内容、结构及格式属性。它通过将结果文件与预期文件（或预期规则）进行多维度比对来判断任务是否完成。检查维度涵盖：工作表名称一致性、单元格内部数值与打印文本、特定区域的模糊匹配、图表与迷你图、单元格样式（含条件格式）、冻结窗格、缩放比例、数据验证规则、行列属性、筛选器、数据透视表以及单个单元格的属性值。对于CSV文件，支持基于文本行的严格或宽松比较。此外，针对特定业务场景（如会议城市列表），支持按顺序的模糊字符串匹配。总体判定采用“全部满足”策略：所有配置规则必须逐一通过（逻辑与），任一规则失败即返回0.0，全部通过返回1.0。",
+    "overall_validation": "该evaluator用于验证桌面办公环境中Excel与CSV表格处理任务的执行结果。核心思路是将Agent生成的结果文件（result）与标准答案文件（expected）进行多维度、细粒度的比对。验证范围涵盖：工作表名称是否完全一致；单元格数据在内部数值层面（通过pandas）和打印文本层面（通过CSV导出）的双通道精确匹配；指定单元格范围的模糊匹配（支持字符过滤、大小写忽略、归一化替换、相似度阈值控制）；图表、迷你图、筛选器、数据透视表的结构与配置；单元格样式与条件格式；冻结窗格、缩放比例、数据验证规则、行列属性等高级特性；以及特定单元格的属性与值检查。此外，还包含一个专用逻辑用于按顺序验证会议城市列表。整体判定采用严格的“全通过”机制：在compare_table中，所有rules必须顺序执行且全部满足，任一规则失败即整体返回0.0；而compare_csv采用“任一满足”机制，结果与多个候选期望文件之一完全匹配即可得1.0。",
     "main_functions": [
       {
         "name": "compare_csv",
         "lineno": 185,
-        "description": "接收result（结果CSV文件路径）和expected（预期CSV文件路径，或路径列表）。首先调用_safe_read_file读取结果文件的所有文本行。若expected为字符串，则包装为单元素列表。遍历每个预期文件路径，同样用_safe_read_file读取。根据options进行预处理：若strict为False（默认为True），对每行执行strip；若ignore_case为True（默认为False），对每行转小写。将处理后的结果行列表与预期行列表进行完全相等比较。只要与预期列表中的任意一个文件完全匹配，即返回1.0；若全部不匹配或任一方读取失败，返回0.0。若result为None或文件不存在，直接返回0.0。"
+        "description": "接收result（结果CSV文件路径）和expected（单个期望CSV路径，或路径列表）。首先通过_safe_read_file读取result文件内容，若文件不存在或读取失败直接返回0.0。将expected统一为列表后，遍历每个候选期望文件，同样通过_safe_read_file读取。根据options进行行级预处理：若strict为False（默认True），则对每行执行strip；若ignore_case为True（默认False），则对每行执行lower。将处理后的result行列表与每个候选expected行列表进行逐行精确比对，只要与任一候选文件完全一致即返回1.0，全部遍历后仍无匹配则返回0.0。"
       },
       {
         "name": "compare_table",
         "lineno": 240,
-        "description": "接收result（结果xlsx路径）、expected（预期xlsx路径，可为None）和options（必须包含rules列表）。核心逻辑是顺序遍历options['rules']中的每条规则，所有规则必须全部满足（passes = passes and metric），一旦某条规则失败立即中断并返回0.0，全部通过则返回1.0。首先用openpyxl.load_workbook和pd.ExcelFile加载结果工作簿（及预期工作簿）。对每条rule按type字段分发处理：1) sheet_name：直接比较双方sheet名称列表是否完全一致；2) sheet_data：通过_parse_sheet_idx和_load_sheet加载指定sheet为DataFrame，按precision参数（默认4位小数）四舍五入后，使用pandas.equals进行数值级比较；3) sheet_print：将sheet以CSV文本形式导出（通过_load_sheet传入字符串路径），支持ignore_case选项，逐行精确比较文本内容；4) sheet_fuzzy：对指定单元格范围（MultiCellRange解析）逐一读取值，依次执行normalization替换、trim_leadings左裁剪、trim_trailings右裁剪、ignore_chars字符过滤、ignore_case转小写等预处理，然后按rule子类型判定：includes（预期值在实际值中）、included_by（实际值在预期值中）、fuzzy_match（rapidfuzz.ratio不低于threshold，默认85）、exact_match（完全相等），范围内所有单元格必须满足；5) sparkline/chart/style/freeze/zoom/data_validation/row_props/col_props/filter/pivot_table：分别调用load_sparklines、load_charts、load_xlsx_styles、直接读取freeze_panes、_match_value_to_rule、load_rows_or_cols、load_filters、load_pivot_tables等辅助工具，进行相等性或规则匹配检查；6) check_cell：定位到指定坐标单元格，检查value（通过read_cell_value读取）或样式属性（通过_read_cell_style读取），并用_match_value_to_rule判定是否符合规则。其中sheet索引通过_parse_sheet_idx解析，支持整数、RI/RN/EI/EN等多种寻址协议。"
+        "description": "接收result（结果xlsx路径）、expected（期望xlsx路径）和options（含rules列表）。首先使用openpyxl和pandas分别加载双方工作簿，获取sheet名称列表。遍历options[\"rules\"]顺序执行检查，每条规则通过_parse_sheet_idx解析sheet索引（支持RI/RN/EI/EN等前缀以区分结果/期望文件）。支持的规则类型及检查逻辑如下：\n- sheet_name：比较双方sheet名称列表是否完全相等。\n- sheet_data：通过pandas读取指定sheet，按precision（默认4位小数）四舍五入后，使用DataFrame.equals进行精确比较。\n- sheet_print：将sheet按CSV行列表（打印值）读取，比较字符串列表是否完全一致，支持ignore_case选项。\n- sheet_fuzzy：对指定单元格范围（MultiCellRange解析）逐个坐标比对，支持includes（value2子串包含于value1）、included_by（value1子串包含于value2）、fuzzy_match（rapidfuzz.ratio >= threshold，默认85）、exact_match四种模式；比对前可执行normalization（字符串替换）、trim_leadings（左字符过滤）、trim_trailings（右字符过滤）、ignore_chars（字符集过滤）、ignore_case（转小写）。\n- sparkline：通过load_sparklines加载双方迷你图配置字典，比较是否相等。\n- chart：通过load_charts加载双方图表配置字典，可指定chart_props筛选属性，比较是否相等。\n- style：通过load_xlsx_styles加载双方单元格样式字典（含条件格式），可指定props筛选属性，比较是否相等。\n- freeze：比较双方Worksheet的freeze_panes属性是否相等。\n- zoom：读取指定sheet的sheet_view.zoomScale（默认100.0），通过_match_value_to_rule判定是否满足method/ref规则。\n- data_validation：读取sheet的数据验证器列表，要求实际验证器数量不少于期望的dv_props数量，且每个实际验证器必须至少匹配期望dv_props中的一条（每条期望属性通过_match_value_to_rule进行规则匹配）。\n- row_props/col_props：通过load_rows_or_cols分别加载行/列属性字典，比较是否相等。\n- filter：通过load_filters加载筛选器配置字典，比较是否相等。\n- pivot_table：通过load_pivot_tables加载数据透视表配置字典，可指定pivot_props，比较是否相等。\n- check_cell：定位到指定coordinate单元格，对props中每个属性进行判定：若属性为\"value\"则通过read_cell_value读取；否则通过_read_cell_style读取样式；最终均通过_match_value_to_rule判定。\n所有规则采用逻辑与累积（passes = passes and metric），任一规则失败立即break，最终返回float(passes)（即1.0或0.0）。"
       },
       {
         "name": "compare_conference_city_in_order",
         "lineno": 762,
-        "description": "接收actual_city_list_path（结果xlsx文件路径）和expected_city（字典，键为'expected'，值为城市名称列表，每个位置可以是字符串或字符串列表表示多候选）。使用openpyxl打开结果文件的active工作表，读取C2:C22范围内的单元格值，构建实际城市列表。按索引顺序与expected_city_list进行比对：对每个实际值和候选值调用_normalize_city_string进行标准化（小写、去重音符号、去标点、空格分隔）。判定条件为标准化后的期望候选字符串必须是标准化后实际字符串的子串（in操作）。每个位置只要有一个候选匹配即视为该位置通过。所有位置必须按序全部匹配成功才返回1.0，任一位置失败或发生异常则返回0.0。"
+        "description": "接收actual_city_list_path（结果xlsx文件路径）和expected_city（字典，键为\"expected\"，值为城市名称列表，其中每个元素可以是字符串或字符串列表以表示多候选）。使用openpyxl打开结果文件，读取active sheet中C2:C22范围的单元格值，构建actual_city_list。按索引顺序遍历，对每个实际城市调用_normalize_city_string进行规范化（NFKD去重音、去除组合字符、非字母数字替换为空格、转小写、strip）。每个期望条目同样规范化其所有候选字符串。判定条件为normalized_candidate in actual_normalized（子串包含关系），只要任一候选匹配即通过当前位置。若全部21个位置均通过返回1.0；任一位置不匹配或发生异常则返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_sheet_idx",
         "lineno": 34,
-        "description": "解析sheet索引标识，返回对应的(book, sheet_name)元组。支持的索引协议包括：整数（按result的sheet列表索引）、'RI{数字}'（result按索引）、'RN{名称}'（result按名称）、'EI{数字}'（expected按索引）、'EN{名称}'（expected按名称）。该函数被compare_table中几乎所有需要定位sheet的规则复用，用于统一处理结果侧与预期侧的sheet寻址。"
+        "description": "解析sheet索引，建立到具体工作簿对象与sheet名称的映射关系。支持多种索引格式：整数（结果文件第几个sheet）、RI+整数（结果文件索引）、RN+名称（结果文件名称）、EI+整数（期望文件索引）、EN+名称（期望文件名称）。返回元组(book, index)，被compare_table中各类规则广泛用于定位要比对的sheet。"
       },
       {
         "name": "_load_sheet",
-        "lineno": 76,
-        "description": "根据book类型加载并返回sheet对象。若book为字符串路径，则尝试读取同路径下名为'{base}-{sheet}.csv'的CSV文件，返回去除尾部空行后的文本行列表；若book为pd.ExcelFile，返回指定sheet的DataFrame；若book为openpyxl Workbook，返回Worksheet对象。该函数被sheet_data（DataFrame模式）、sheet_print（CSV文本模式）、freeze、zoom、data_validation、check_cell等多种检查逻辑复用。"
+        "lineno": 74,
+        "description": "根据book类型加载指定sheet并返回统一接口。若book为str（文件路径），则尝试加载同目录下\"{文件名}-{sheet名}.csv\"，返回去除首尾空行后的字符串行列表；若book为pd.ExcelFile，返回pandas DataFrame；若book为openpyxl Workbook，返回Worksheet对象。加载失败返回None。被sheet_data、sheet_print、freeze、zoom、data_validation、check_cell等多种规则复用。"
       },
       {
         "name": "_safe_read_file",
-        "lineno": 116,
-        "description": "安全读取文本文件，依次尝试utf-8、utf-8-sig、latin-1、windows-1252、gbk、cp1251、iso-8859-1等编码。若全部解码失败，最后使用utf-8并设置errors='replace'读取。返回文件内容的行列表（按splitlines分割）。该函数主要被compare_csv直接调用，也被_load_sheet在CSV模式下调用，用于解决不同平台生成的文本文件编码不一致问题。"
+        "lineno": 107,
+        "description": "多编码安全读取文本文件，依次尝试utf-8、utf-8-sig、latin-1、windows-1252、gbk、cp1251、iso-8859-1共7种编码。若全部失败，则以utf-8配合errors=\"replace\"作为兜底策略。返回文件内容的行列表，主要服务于compare_csv的CSV内容读取，确保在不同编码环境下均能稳定获取文本。"
       },
       {
         "name": "_normalize_city_string",
-        "lineno": 744,
-        "description": "对输入值进行字符串标准化：先使用unicodedata.normalize做NFKD分解并去除组合字符（去重音），再用正则将非字母数字字符替换为空格，最后转小写并去除首尾空白。返回标准化后的字符串。专用于compare_conference_city_in_order，实现对大小写、标点符号和重音符号的容忍匹配。"
+        "lineno": 745,
+        "description": "城市名称模糊匹配前的规范化处理器。执行流程：对输入值进行NFKD Unicode规范化；去除所有组合型重音符号；使用正则表达式将非字母数字字符替换为空格；转换为小写；去除首尾空白。返回规范化后的字符串，专用于compare_conference_city_in_order中实现容忍重音、标点差异的模糊子串匹配。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:23:13",
+  "created_at": "2026-07-01 14:47:56",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L2_calc_4f989467-8112-445d-8f1d-d0b905bd6d74./evaluator_function_labels.json"
 }

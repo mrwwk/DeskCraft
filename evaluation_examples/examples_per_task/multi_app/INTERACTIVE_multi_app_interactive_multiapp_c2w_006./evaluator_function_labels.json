@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_006./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于对任务产出的文本结果进行基于规则的内容符合性验证。核心检查对象是一个字符串形式的 result，通过配置化的「包含（include）」与「排除（exclude）」规则进行二元判定：只有当 result 同时包含所有必须出现的子串，并且不包含任何禁止出现的子串时，任务才被视为成功。判定结果为打分制，完全满足条件返回 1.0，任一条件不满足或结果为空时返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收 result（待验证的字符串结果）和 rules（字典，内含 include 与 exclude 两个键对应的字符串列表）作为输入。第一步检查 result 是否为 None，若为 None 则直接返回 0.0；第二步打印 result 与 rules 的内容用于调试；第三步从 rules 中分别取出 include 列表和 exclude 列表；最终判定逻辑为：result 必须同时满足「包含 include 中所有子串」且「不包含 exclude 中任何子串」，两项同时满足返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:12:54",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_006./evaluator_function_labels.json"
+}

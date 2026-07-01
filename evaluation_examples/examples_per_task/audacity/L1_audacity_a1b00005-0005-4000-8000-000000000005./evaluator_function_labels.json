@@ -30,37 +30,37 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Audacity 任务产出的 WAV 音频文件是否正确地实现了淡入（fade-in）效果。核心检查对象是磁盘上的目标 WAV 文件。评测逻辑为：读取音频的原始采样数据，按 rule 中指定的 fade_duration 截取初始时段，并将其划分为 num_windows 个（默认 5 个）连续时间窗口；计算每个窗口内的 RMS（均方根）能量（以 dB 表示），然后验证这些能量值在淡入阶段是否总体呈递增趋势。判定采用打分制：若相邻窗口间满足“至少递增 num_windows - 2 次”（即最多允许 1 次非递增或下降），则返回 1.0；否则返回 0.0。文件缺失、淡入时长超过音频长度、窗口过小或任何解析异常均直接返回 0.0。",
+    "overall_validation": "该evaluator用于验证任务生成的音频文件是否包含符合要求的淡入（fade-in）效果。它直接读取指定的WAV音频文件，关注音频起始阶段（时长由rule中的fade_duration指定）的响度变化趋势。核心思路是将淡入时段划分为多个等长窗口，计算每个窗口的RMS（均方根）分贝值，然后检查这些窗口的能量是否总体呈递增趋势。如果各窗口RMS值在整体上单调上升（允许最多出现一次非递增的容错），则判定淡入效果合格，返回1.0；否则返回0.0。任何文件缺失、时长不足或读取异常均直接判为失败（返回0.0）。",
     "main_functions": [
       {
         "name": "check_audio_fade_in",
         "lineno": 99,
-        "description": "该函数接收 file_path（待测 WAV 文件路径）和 rule（字典，必须包含 fade_duration 字段，可选 num_windows 字段，默认值为 5）。检查步骤如下：1）使用 os.path.isfile 确认文件存在，否则返回 0.0；2）调用 _get_mono_samples 将音频读取为单声道浮点样本列表及采样率 sr；3）根据 fade_duration 与 sr 计算淡入阶段总采样数 fade_samples，若其超过音频总长度则记录错误并返回 0.0；4）将 fade_samples 均分为 num_windows 个窗口（window_size = fade_samples // num_windows），若 window_size 小于 1 则返回 0.0；5）对每个窗口截取样本片段，调用 _rms_db 计算该片段的 RMS 分贝值，形成 rms_values 列表；6）统计相邻窗口中“后一个 RMS 严格大于前一个”的递增次数 increases；7）判定依据：若 increases >= num_windows - 2（允许最多 1 次非递增），返回 1.0，否则返回 0.0。整个流程被 try-except 包裹，任何异常均捕获后返回 0.0。"
+        "description": "该函数接收file_path（待测WAV文件路径）和rule（字典，必须包含fade_duration表示淡入秒数，可选num_windows表示窗口数量，默认5）。检查流程如下：1）判断文件是否存在，不存在则返回0.0；2）调用_get_mono_samples读取音频并混音为单声道，同时获取采样率；3）根据fade_duration与采样率计算淡入所需样本数，若超过音频总长度则报错并返回0.0；4）将淡入样本数划分为num_windows个等长窗口（window_size = fade_samples // num_windows），若窗口小于1则返回0.0；5）对每个窗口提取样本并调用_rms_db计算该窗口的RMS分贝值，得到rms_values列表；6）统计相邻窗口间RMS递增的次数（后一个大于前一个）。判定依据为：若递增次数大于等于num_windows - 2（即允许最多1次非递增或持平），则返回1.0表示淡入合格；否则返回0.0。整个流程被try-except包裹，任何异常均返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_read_wav_info",
-        "lineno": 17,
-        "description": "使用 Python 标准库 wave 模块打开指定路径的 WAV 文件，读取其基本元数据。返回一个字典，键包括 channels（通道数）、sample_rate（采样率）、n_frames（总帧数）、sampwidth（采样宽度，字节数）和 duration（时长，秒）。该函数为底层文件格式解析器，主要被 _get_mono_samples 调用以获取音频结构信息。"
+        "lineno": 16,
+        "description": "使用Python标准库wave模块打开指定WAV文件，读取并返回基础元信息字典，包含channels（声道数）、sample_rate（采样率）、n_frames（总帧数）、sampwidth（采样位宽，字节数）和duration（时长，秒）。为主函数及_get_mono_samples提供音频基本参数。"
       },
       {
         "name": "_read_wav_samples",
         "lineno": 30,
-        "description": "读取 WAV 文件的全部原始采样帧，根据 sampwidth（1/2/3/4 字节）分别使用 struct.unpack 或 int.from_bytes 将原始字节解析为归一化浮点样本，范围映射到 [-1.0, 1.0]。对于多通道音频，返回的样本按通道交错排列（interleaved）。若遇到不支持的采样宽度则抛出 ValueError。该函数为底层数据读取器，主要被 _get_mono_samples 调用。"
+        "description": "读取WAV文件的全部原始样本，并按采样位宽转换为[-1.0, 1.0]范围内的浮点数列表。支持8位无符号（归一化方式：(s-128)/128）、16位有符号（/32768）、24位有符号（/8388608）和32位有符号（/2147483648）。对于多声道音频，返回的列表是交织（interleaved）样本。该函数是后续能量分析和混音的数据来源。"
       },
       {
         "name": "_rms_db",
-        "lineno": 58,
-        "description": "接收一个浮点样本列表，计算其均方根（RMS）值并转换为分贝（dB）。具体计算为：先求样本平方的均值，再开方得到 RMS，最后用 20.0 * math.log10(rms) 得到 dB 值。若样本为空或 RMS 小于 1e-10，则返回 -100.0。该函数是能量量化的核心计算单元，被 check_audio_fade_in 用于评估每个时间窗口的响度水平。"
+        "lineno": 60,
+        "description": "接收一个浮点样本列表，计算其RMS（均方根）并转换为分贝值返回。计算公式为20*log10(sqrt(mean(s^2)))。若样本为空或RMS小于1e-10，则返回-100.0。该函数被主函数用于量化每个窗口的响度水平。"
       },
       {
         "name": "_get_mono_samples",
-        "lineno": 69,
-        "description": "整合音频读取流程：先调用 _read_wav_info 获取文件信息，再调用 _read_wav_samples 获取交错样本。若通道数大于 1，则对每个采样点取所有通道的算术平均值，转换为单声道（mono）样本列表；若原本就是单声道则直接返回原始样本。最终返回 (mono_samples, sample_rate) 元组。该函数是连接底层读取与主评测逻辑的包装器，被 check_audio_fade_in 调用以确保后续 RMS 计算基于单声道数据。"
+        "lineno": 70,
+        "description": "整合读取与混音流程：先调用_read_wav_info获取文件信息，再调用_read_wav_samples获取交织样本。若声道数大于1，则对每帧的各声道样本取平均值，生成单声道样本列表；若为单声道则直接返回。最终返回(mono_samples, sample_rate)元组。主函数通过它获得统一用于淡入分析的单声道数据。"
       }
     ]
   },
-  "created_at": "2026-06-30 20:48:17",
+  "created_at": "2026-07-01 14:19:40",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00005-0005-4000-8000-000000000005./evaluator_function_labels.json"
 }

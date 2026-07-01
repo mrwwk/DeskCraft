@@ -1,0 +1,157 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00005-0005-4000-8000-000000000005-L2./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 145
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 223
+    },
+    {
+      "name": "check_safe_margin_layout",
+      "lineno": 282
+    },
+    {
+      "name": "check_icon_presence_region",
+      "lineno": 335
+    },
+    {
+      "name": "check_l2_wechat_header_mountain_complete",
+      "lineno": 393
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 103
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 132
+    },
+    {
+      "name": "_to_rgb_array",
+      "lineno": 139
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 145
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 223
+    },
+    {
+      "name": "check_safe_margin_layout",
+      "lineno": 282
+    },
+    {
+      "name": "check_icon_presence_region",
+      "lineno": 335
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 385
+    },
+    {
+      "name": "check_l2_wechat_header_mountain_complete",
+      "lineno": 393
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 GIMP L2 任务 \"wechat header mountain\" 的完成质量。它要求用户最终产出一张符合微信头部封面规范的 PNG 图片，并保留包含特定图层的 XCF 源文件。核心检查对象分为两大类：一是输出图片（PNG）的格式、尺寸（900×383，容差 5px）、布局（左右安全边距清洁度）、内容（左下角图标区域的高频边缘与颜色丰富度、右下角文本 \"WEEKEND ESCAPE\" 的存在性）；二是源文件（XCF）的图层结构，要求必须包含 \"BG_Mountain\"、\"Logo_Icon\"、\"Caption_Text\" 三个图层，且不强制顺序。评测采用严格的“全量通过”逻辑：由 check_l2_wechat_header_mountain_complete 依次调用 7 项二进制检查，只有当所有检查均返回 1 时，最终得分才为 1.0，任一失败即整体 0 分。辅助函数主要负责语义区域到像素坐标的解析、边缘密度计算、RGB 数组转换及结果聚合。",
+    "main_functions": [
+      {
+        "name": "check_image_dimensions",
+        "lineno": 23,
+        "description": "检查单张图片的宽高尺寸是否符合预期。接收参数 image_path（图片路径）、expected_width（预期宽度）、expected_height（预期高度，若为 None 则只检查宽度）和 tolerance（容差像素，默认 5）。使用 PIL.Image.open 打开图片后读取 size，计算实际宽度与 expected_width 的绝对差值是否在 tolerance 内；若 expected_height 不为 None，则同样检查高度。宽（及高）均满足时返回 1，否则返回 0；文件不存在或打开异常也返回 0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 60,
+        "description": "检查目标文件是否为有效 PNG 格式。接收参数 image_path。使用 PIL.Image.open 打开文件后，判断 img.format 是否等于字符串 'PNG'。若是返回 1，否则返回 0；文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 85,
+        "description": "检查给定路径是否为真实存在的文件。接收参数 file_path，调用 os.path.isfile 进行判断。若路径为 None 返回 0；文件存在返回 1，不存在返回 0。该函数通常作为复合评测的第一道门槛，验证产物是否已生成。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 145,
+        "description": "检查 XCF 源文件的图层名称结构。接收参数 xcf_path 和 rule 字典，rule 中必须包含 \"layers\" 列表（预期图层名），以及可选的 \"ordered\" 布尔值（默认 False）。首先读取文件并校验文件头是否以 b'gimp xcf' 开头。优先尝试使用 gimpformats 库解析出所有图层名称列表，检查是否包含全部 expected_layers；若 \"ordered\" 为 True，还要求这些图层在列表中的出现顺序与 expected_layers 的顺序一致（即按 index 递增）。若 gimpformats 解析失败或不可用，则回退到字节级字符串搜索：在文件二进制内容中查找每个图层名对应的 utf-8 字节位置，确认存在性，并在 ordered 为 True 时检查这些位置是否按升序排列。全部满足返回 1，任一图层缺失、顺序错误或异常返回 0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 223,
+        "description": "检查图片指定区域是否具备文本特征，以及可选的 OCR 关键词是否命中。接收参数 image_path 和 rule 字典，rule 包含 \"regions\" 区域名列表（默认 [\"center\"]）、\"keywords\" 关键词列表（可选）、\"min_edge_density\"（默认 0.008）和 \"edge_threshold\"（默认 40.0）。对每个 region，先调用 _resolve_region_bbox 获取子图坐标，裁出灰度区域后使用 _edge_density 计算边缘密度；若任一区域的密度低于 min_edge_density，直接返回 0。若 rule 提供了 keywords，则尝试导入 pytesseract 对整张图片进行 OCR，将识别结果通过 re.sub(r'\\s+', ' ') 归一化空白并转小写，再检查每个 keyword 是否都出现在归一化后的文本中；若 OCR 模块不可用或识别失败，仅记录 warning，不因此直接判负（只要区域边缘密度检查已通过且 keywords 为空，或 OCR 成功匹配即可）。全部通过返回 1，异常返回 0。"
+      },
+      {
+        "name": "check_safe_margin_layout",
+        "lineno": 282,
+        "description": "检查图片左右外侧边距是否相对“干净”（边缘信号不能显著多于内侧）。接收参数 image_path 和 rule 字典，rule 包含 \"margin_px\"（默认 60）和 \"max_outer_to_inner_ratio\"（默认 1.2）。将图片转为灰度后，分别提取左右外侧各 margin_px 列（outer_l / outer_r）及其向内相邻的各 margin_px 列（inner_l / inner_r），使用 _edge_density 计算四块的边缘密度，取左右外侧均值与左右内侧均值。若图片宽度小于 margin_px * 3，直接返回 1（兜底通过）；若内侧密度小于 1e-4，也直接返回 1。否则计算 outer_density / inner_density 的比率，若 ratio <= max_outer_to_inner_ratio 则返回 1，否则返回 0。异常返回 0。"
+      },
+      {
+        "name": "check_icon_presence_region",
+        "lineno": 335,
+        "description": "检查图片指定区域是否包含类图标的高频信号（高边缘密度且颜色丰富）。接收参数 image_path 和 rule 字典，rule 包含 \"region\"（区域名称）或 \"bbox\"（绝对坐标列表 [x0, y0, x1, y1]）、\"min_edge_density\"（默认 0.02）和 \"min_color_std\"（默认 15.0）。若提供了长度为 4 的 bbox 列表，则直接使用该坐标（并做边界裁剪）；否则调用 _resolve_region_bbox 解析 region 名称（默认 \"bottom_left\"）。裁出该区域的灰度图和 RGB 图，计算 _edge_density（此处 edge_threshold 固定为 45.0）和 RGB 颜色标准差 color_std。仅当 edge_d >= min_edge_density 且 color_std >= min_color_std 同时成立时返回 1，否则返回 0；空区域或异常返回 0。"
+      },
+      {
+        "name": "check_l2_wechat_header_mountain_complete",
+        "lineno": 393,
+        "description": "该任务的复合评测主入口。接收 result_paths 列表，要求至少包含 2 个元素，前两个依次视为 png_path（输出图片）和 xcf_path（源文件）。依次执行 7 项二进制检查：① PNG 文件存在性（check_file_exists）；② PNG 格式有效性（check_png_format）；③ 图片尺寸 900×383（check_image_dimensions，容差 5px）；④ 安全边距布局（check_safe_margin_layout，参数 margin_px=60, max_outer_to_inner_ratio=1.25）；⑤ 左下角图标区域（check_icon_presence_region，参数 region=\"bottom_left\", min_edge_density=0.015, min_color_std=8.0）；⑥ 右下角文本关键词（check_text_in_region_keywords，参数 regions=[\"bottom_right\"], keywords=[\"WEEKEND ESCAPE\"], min_edge_density=0.006）；⑦ XCF 图层结构（check_xcf_layers_structure，参数 layers=[\"BG_Mountain\", \"Logo_Icon\", \"Caption_Text\"], ordered=False）。将 7 项得分传入 _all_binary_checks_pass，仅当所有检查均返回 1 时才返回 1.0，否则返回 0.0。输入格式非法（非列表或长度不足 2）也返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 101,
+        "description": "将粗粒度语义区域名称解析为像素级边界框坐标。接收图片 width、height 和 region_name 字符串。支持 \"top_left\"、\"top_center\"、\"top_right\"、\"bottom_left\"、\"bottom_center\"、\"bottom_right\"、\"center\"、\"left\"、\"right\"、\"top\"、\"bottom\" 等区域名，按照固定比例（如三等分、四分之一、全宽/全高等）返回 (x0, y0, x1, y1) 元组。若 region_name 无法识别，默认返回全图 (0, 0, w, h)。该函数被 check_text_in_region_keywords、check_icon_presence_region 等调用，用于把语义区域转换为实际裁切坐标。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 131,
+        "description": "计算灰度图像的边缘密度。接收 gray_array（二维 numpy 数组）和 edge_threshold（默认 40.0）。分别对 x 轴和 y 轴计算 np.abs(np.gradient)，相加得到 edges，返回 edges 中大于 edge_threshold 的像素所占比例（均值）。该指标用于判断区域是否含有文本、图标或杂乱信号，被 check_text_in_region_keywords、check_safe_margin_layout、check_icon_presence_region 等函数复用。"
+      },
+      {
+        "name": "_to_rgb_array",
+        "lineno": 138,
+        "description": "将 PIL Image 对象统一转换为 RGB 模式的 numpy 数组。接收 image（Image.Image），若其 mode 不为 'RGB' 则先调用 convert('RGB')，再返回 np.array(image)。被 check_icon_presence_region 调用，用于统一颜色空间后计算颜色标准差。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 386,
+        "description": "二进制检查结果的聚合器。接收 scores 列表，过滤掉 None 值并转为 float；若过滤后为空则返回 0.0。仅当所有有效分数均大于等于 1.0 时返回 1.0，否则返回 0.0。该函数被 check_l2_wechat_header_mountain_complete 调用，实现“全部满足才通过”的硬逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:15:25",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00005-0005-4000-8000-000000000005-L2./evaluator_function_labels.json"
+}

@@ -1,0 +1,110 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_96b14f1d-0aba-4f66-90ae-331fc9d61892./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_transform",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_l2_multi_transform",
+      "lineno": 143
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 66
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 75
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_transform",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_l2_multi_transform",
+      "lineno": 143
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证对 Inkscape SVG 文件进行特定编辑后的最终产物状态。核心检查对象是 SVG XML 中指定 id 的图形元素的填充颜色（fill）和几何变换（transform）。评测逻辑通过解析 SVG 文件，按 element_id 定位目标元素，读取其内联 style 或直接属性，并对颜色值进行规范化（如将 #f00 扩展为 #ff0000、大写转小写、忽略 8 位十六进制的 alpha 通道）后，与预期值做精确比对：颜色要求完全相等（其中 'none' 单独处理）；transform 要求属性值中包含指定的子字符串。各单项检查以 1.0（通过）或 0.0（不通过）的二元分数返回。对于 L2 复合任务，要求两项 transform 检查和一项 fill 检查必须全部同时通过，才判定整体成功。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 83,
+        "description": "接收 svg_file_path 和 rule（字典，需包含 \"element_id\" 和 \"expected_fill\"）。首先调用 _parse_svg 解析 SVG 文件，若解析失败则返回 0.0。接着用 _find_element_by_id 定位目标元素，若找不到则返回 0.0。然后调用 _get_style_prop 获取该元素的 fill 属性值；若该元素标签为 text 且自身 fill 为 None，则进一步遍历其直接子元素，对标签名为 tspan 的子元素同样调用 _get_style_prop 获取 fill，直到获得非空值。随后用 _normalize_color 对实际颜色进行规范化。最终判定：若 expected_fill 为 'none'，则仅当 actual_fill 也为 'none' 时返回 1.0，否则返回 0.0；对于其他颜色，仅当 actual_fill 与 expected_fill 完全相等时返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_transform",
+        "lineno": 116,
+        "description": "接收 svg_file_path 和 rule（字典，需包含 \"element_id\" 和 \"expected_transform_contains\"）。首先调用 _parse_svg 解析 SVG 文件，失败返回 0.0。通过 _find_element_by_id 查找目标元素，找不到返回 0.0。先读取元素的 transform 属性，检查其中是否包含 expected_transform_contains 指定的子串；若未命中，再调用 _get_style_prop 读取 style 内的 transform 属性并检查是否包含同一子串。只要任一来源包含目标子串即返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_l2_multi_transform",
+        "lineno": 143,
+        "description": "接收 svg_file_path 和 rule（字典，需包含 \"transform_check_1\"、\"transform_check_2\" 和 \"fill_check\" 三个子规则对象）。该函数是 L2 复合任务的封装入口，执行严格的“全部满足”联合判定：依次以 rule 中的 transform_check_1、transform_check_2 调用 check_inkscape_transform，并以 fill_check 调用 check_inkscape_fill_color。若三次调用中有任何一次返回值小于 1.0，立即返回 0.0；仅当三项检查全部返回 1.0 时，才返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 14,
+        "description": "接收一个 CSS 风格的样式字符串（如 'fill:#ff0000;stroke:#000'），按分号分割后，再按冒号拆分为键值对，去除空白后返回字典。该函数为 _get_style_prop 提供内联 style 属性的解析能力。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 24,
+        "description": "接收颜色字符串，进行规范化处理：去除空白并转小写；若值为 'none' 则原样返回；若为 # 开头的十六进制，将 3 位简写扩展为 6 位，若长度为 8 位（含 alpha）则截取前 6 位，最终返回小写的 #rrggbb 格式；对于命名颜色则原样返回。该函数被 check_inkscape_fill_color 用于统一比对基准。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 39,
+        "description": "接收 SVG 根节点 root 和目标 element_id，递归遍历 root 下所有元素（root.iter()），返回第一个 id 属性匹配的元素；找不到返回 None。被 check_inkscape_fill_color 和 check_inkscape_transform 用于定位待检查元素。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 46,
+        "description": "接收元素 elem 和属性名 prop，先调用 _parse_style 解析 elem 的 style 属性，若其中存在目标属性则返回；否则返回 elem 的直接属性值。该函数统一了内联样式和直接 XML 属性的读取逻辑，供颜色与变换检查复用。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 53,
+        "description": "接收 svg_file_path，使用 xml.etree.ElementTree.parse 解析 SVG 文件，成功返回 (tree, root)，任何异常都返回 (None, None)。是所有主函数读取被测文件的唯一入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 62,
+        "description": "接收 XML 元素 elem，若其 tag 包含命名空间前缀（如 '{http://...}text'），则截取 '}' 后的本地标签名返回；否则直接返回 tag。用于 check_inkscape_fill_color 中判断元素是否为 text 或 tspan。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:43:37",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_96b14f1d-0aba-4f66-90ae-331fc9d61892./evaluator_function_labels.json"
+}

@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_7654b5dc-1acb-401d-9c81-13fed5fbf55e./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 为任务 L1_multi_app_7654b5dc-1acb-401d-9c81-13fed5fbf55e 提供两种独立的评测能力，且均采用二元打分机制（通过返回 1.0 或 0.0/0. 表示成功或失败），两个主函数之间不存在联合判定、加权累计或组合逻辑。其一，通过 check_include_exclude 对输出字符串进行基于包含与排除规则的精确子串匹配；其二，通过 check_json_settings 对 JSON 配置文件进行基于键值对的精确相等性校验。字符串检查要求结果必须同时满足所有 include 规则且不满足任何 exclude 规则；JSON 检查要求目标文件必须可被正常读取和解析，且解析后的字典必须精确包含所有预期的键值对。任一条件不满足即判定为失败。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "接收 result（待检查的字符串）和 rules（规则字典）作为输入。首先从 rules 中提取 include 列表（必须包含的字符串数组）和 exclude 列表（必须排除的字符串数组）。检查步骤依次为：1）若 result 为 None，直接返回 0.；2）判断 result 是否同时包含 include 中每一个字符串；3）判断 result 是否不包含 exclude 中任何一个字符串。仅当包含条件与排除条件同时满足时返回 1.0，否则返回 0.。该函数使用精确子串匹配，无近似匹配、无顺序要求、无阈值容错，也不对 result 进行预处理。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 56,
+        "description": "接收 actual（目标 JSON 文件的路径字符串）和 expected（字典，其中应包含键 'expected'）作为输入。检查步骤依次为：1）若 actual 为空，返回 0.0；2）尝试打开 actual 指向的文件并将其内容解析为 JSON，若文件不存在、无法打开或解析失败则返回 0.0；3）从 expected['expected'] 中获取期望的键值对字典；4）遍历该字典中的每一对 key 与 value，检查解析后的实际 JSON 数据中是否存在该 key 且对应的 value 完全相等（使用 != 进行判断）；5）若所有键值对均匹配则返回 1.0，任一 key 缺失或 value 不匹配则立即返回 0.0。该函数要求精确匹配，不支持字段缺失容错、类型转换、近似比较或额外字段自动忽略。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:16:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_7654b5dc-1acb-401d-9c81-13fed5fbf55e./evaluator_function_labels.json"
+}

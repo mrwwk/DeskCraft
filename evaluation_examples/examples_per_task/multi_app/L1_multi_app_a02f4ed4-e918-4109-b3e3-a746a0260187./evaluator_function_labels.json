@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_a02f4ed4-e918-4109-b3e3-a746a0260187./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator为任务L1_multi_app_a02f4ed4-e918-4109-b3e3-a746a0260187提供两种相互独立的二元评分能力，分别验证文本内容合规性与JSON配置准确性。第一种能力通过check_include_exclude对某个结果字符串进行包含与排除检查，要求该字符串必须同时满足包含所有指定内容且不包含任何禁用内容，全部满足得1.0分，否则得0.0分。第二种能力通过check_json_settings读取指定路径的JSON文件，将其解析为字典后，与预期字典进行逐项键值对精确比对，要求实际JSON中必须存在预期中的每一个键且对应值完全相等，全部匹配得1.0分，任一不匹配或解析失败即得0.0分。两个主函数各自独立返回浮点分数，evaluator层面未体现多指标联合加权或累计逻辑。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "该函数接收result（待检查的字符串）和rules（规则字典）作为输入。首先判断result是否为None，若为None直接返回0.0。随后从rules字典中通过rules.get分别获取include列表（应包含的字符串集合）和exclude列表（应排除的字符串集合）。核心判定逻辑为：使用Python的in运算符检查result是否同时满足'all(r in result for r in include)'和'all(r not in result for r in exclude)'。两个条件同时成立时返回1.0，任一条件不成立（即缺少应包含内容或存在应排除内容）则返回0.0。函数执行中会调用print输出result和rules的内容。该检查为严格的子串包含判定，不涉及正则匹配、近似匹配、顺序要求或阈值容忍。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 56,
+        "description": "该函数接收actual（字符串类型，表示待检查JSON文件的绝对或相对路径）、expected（字典类型，内部必须包含键'expected'）以及可选的**options参数。首先判断actual是否为空或假值，若是则返回0.0。随后使用open(actual, 'r')打开文件并通过json.load解析为Python字典data，若文件读取或JSON解析过程中抛出任何Exception，则捕获并返回0.0。接着从expected['expected']中提取预期键值对字典，使用for循环遍历其中每一个key和value，检查data中是否存在该key且data[key]与value完全相等（使用!=判断）。若所有预期键值对均存在且完全匹配，返回1.0；若发现任一预期键缺失或对应值不相等，立即返回0.0。该检查要求键名精确存在、值精确相等，代码中未体现对嵌套字典的递归比对、类型转换或近似匹配逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:17:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_a02f4ed4-e918-4109-b3e3-a746a0260187./evaluator_function_labels.json"
+}

@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_4d117223-a354-47fb-8b45-62ab1390a95f./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_file_permissions",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_file_permissions",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证操作系统中指定文件的权限设置是否与预期规则完全一致。它接收 shell 收集器输出的原始文本，从中提取各文件的实际权限模式（格式为 perm_<文件名>=<权限模式>），并与规则字典中声明的期望权限（如 640、755 等）进行逐项精确字符串比对。只有当所有被检查文件的权限全部匹配成功时，才判定任务完成并返回 1.0；若任一文件权限不符、缺失或解析过程发生异常，则判定失败并返回 0.0。整体采用“全部满足”的严格通过/失败评分逻辑。",
+    "main_functions": [
+      {
+        "name": "check_os_file_permissions",
+        "lineno": 31,
+        "description": "该函数接收两个参数：shell 收集器输出的原始字符串 result，以及包含期望规则的字典 rules。执行步骤如下：首先调用辅助函数 _parse_kv 将 result 解析为键值对字典；然后从 rules 中获取键为 \"permissions\" 的子字典，遍历其中每个 \"文件名:期望权限模式\" 条目；对每个文件构造查询键 \"perm_{文件名}\"，并在解析后的字典中查找对应的实际权限值；通过字符串相等性比对实际值与期望值。若所有文件的权限均完全匹配，则返回 1.0；若任一文件不匹配，或在解析、遍历过程中捕获到任何异常，则立即返回 0.0。检查逻辑为逐项精确匹配，且要求全部被检查文件同时满足。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 16,
+        "description": "该函数接收一个 shell 输出字符串 output，负责将其中的 key=value 行解析为结构化字典。具体处理流程为：若输入为空则直接返回空字典；否则按换行符分割文本，逐行去除首尾空白后，检查是否包含 \"=\"；若包含，则以第一个 \"=\" 为界将行拆分为 key 和 value，并分别去除空白后存入字典。最终返回该字典。此函数主要服务于 check_os_file_permissions，用于将 shell 收集器输出的 \"perm_文件名=权限模式\" 类文本转换为可供快速查找的键值对结构。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:34:13",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_4d117223-a354-47fb-8b45-62ab1390a95f./evaluator_function_labels.json"
+}

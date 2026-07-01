@@ -1,0 +1,70 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_7b23d8e5-5c42-4a8b-b2c0-9f3e2d4c8a51./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 68
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 20
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 24
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 39
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 68
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证一个 UI bundle（ZIP 压缩包）是否满足任务产出的完整性与内容正确性要求。它从两个独立维度进行严格的二元判定（通过返回 1.0，不通过返回 0.0）：第一，检查 ZIP 内是否包含 rules 中指定的所有必需文件（required_files），确保文件无缺失；第二，对 ZIP 内指定的 HTML 文件执行细粒度的 DOM 结构与内容检查（html_checks），包括 CSS 选择器存在性、匹配元素数量、元素文本包含关系、元素属性精确相等，以及全文档文本包含关系。两个主函数各自内部均采用“全部满足才通过，任一失败即整体失败”的串联逻辑，且对空输入、空规则、文件缺失、解析异常等情况均有明确的容错返回。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 49,
+        "description": "该函数接收 actual（ZIP 文件路径字符串）与 rules（字典，内含 required_files 列表），用于验证 ZIP 中是否包含所有指定的必需文件。检查步骤如下：1）若 actual 为空字符串，直接返回 0.0；2）从 rules 中提取 required_files，若列表为空则直接返回 1.0；3）调用辅助函数 _load_ui_bundle_entries 打开 ZIP，获取规范化文件名到原始文件名的映射 normalized_to_raw；4）遍历 required_files 中的每条路径，先用 _normalize_ui_bundle_path 统一格式（去除前导“./”并将反斜杠转为正斜杠），再判断其是否作为键存在于 normalized_to_raw 中；5）若任一必需文件找不到，立即返回 0.0。若全部存在，最终返回 1.0。整个过程中若打开或读取 ZIP 抛出异常，也捕获并返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 68,
+        "description": "该函数接收 actual（ZIP 文件路径字符串）与 rules（字典，内含 html_checks 字典），用于验证 ZIP 内指定 HTML 文件的内容与结构是否符合规则。检查步骤如下：1）若 actual 为空，返回 0.0；2）若 html_checks 为空字典，返回 1.0；3）调用 _load_ui_bundle_entries 加载 ZIP 并提取文本文件内容；4）遍历 html_checks 中的每个 file_name 及其 checks 列表：先用 _normalize_ui_bundle_path 规范化文件名并确认其存在于 ZIP 中，不存在则返回 0.0；再调用 _get_ui_bundle_html_soup 获取 BeautifulSoup 解析对象，若解析失败返回 0.0；5）对每条 check 按 type 字段执行具体判断：selector_exists 要求 CSS 选择器至少匹配到一个元素；selector_count 要求选择器匹配的元素数量严格等于 count 字段的整数值；selector_text_contains 要求选择器匹配到的首个元素在去除首尾空格、以空格连接文本后，不区分大小写地包含 text 字段值；selector_attribute_equals 要求选择器匹配到的首个元素的 attribute 属性值严格等于 value 字段值（区分大小写）；text_present 要求整个 HTML 文档的纯文本中不区分大小写地包含 text 字段值；若遇到未定义的 type，直接返回 0.0。6）任一检查失败即返回 0.0，全部通过则返回 1.0。加载或解析过程中的异常同样捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 20,
+        "description": "路径规范化函数。对传入的 ZIP 内部文件路径执行两项处理：去除开头的“./”前缀，并将所有反斜杠“\\”替换为正斜杠“/”。其作用是消除不同打包环境或操作系统导致的路径格式差异，确保文件名比对时的一致性。该函数被 _load_ui_bundle_entries 建立文件名映射时调用，也被两个主函数在查找文件前调用。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 24,
+        "description": "ZIP 文件的核心读取与文本提取器。接收 actual（ZIP 路径），打开压缩包后：首先获取原始文件名列表 raw_names；然后利用 _normalize_ui_bundle_path 建立“规范化路径 → 原始路径”的映射字典 normalized_to_raw；同时记录每个规范化路径对应的 file_size；最后遍历所有条目，对扩展名为 .html、.css、.js、.json、.md、.txt、.svg 的文件，读取原始字节并以 UTF-8 编码（errors=\"ignore\"）解码为字符串，存入 text_contents 字典。返回三元组 (normalized_to_raw, file_sizes, text_contents)。该函数为文件存在性检查和 HTML 内容检查提供统一的 IO 与文本提取能力，避免主函数重复处理 ZIP 解析。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 39,
+        "description": "HTML 解析包装器。接收 text_contents（文本内容字典）与 file_name（目标文件名），先用 _normalize_ui_bundle_path 规范化文件名，再从字典中取出对应 HTML 文本；若文本不存在则返回 None，否则使用 BeautifulSoup 以 html.parser 模式解析并返回 soup 对象。该函数专门服务于 check_ui_bundle_html_checks，将 ZIP 中读取到的 HTML 文本转换为支持 CSS 选择器查询的 DOM 对象，供 selector_exists、selector_count 等检查复用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:48:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_7b23d8e5-5c42-4a8b-b2c0-9f3e2d4c8a51./evaluator_function_labels.json"
+}

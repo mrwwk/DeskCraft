@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_requirement_change_107./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_release_runbook_content",
+      "lineno": 10
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_release_runbook_content",
+      "lineno": 10
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务interactive_vscode_requirement_change_107的最终产出物release_runbook.md的内容是否与预期的最终版本完全一致。它通过读取从VM获取的本地文件，将其内容与传入的expected_rules字典中的\"expected\"字段进行比对。比对前会对双方文本进行平台无关的归一化处理：先将Windows风格换行符\\r\\n统一为\\n，再去除尾部所有空白字符（包括换行、空格等），以避免因操作系统或编辑器差异导致的尾部换行行为不同而产生误判。只有在归一化后两者逐字符完全相同时才判定为成功，返回1.0；任何不匹配或文件读取失败均返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_release_runbook_content",
+        "lineno": 10,
+        "description": "该函数接收result_path（从VM拉取到本地的release_runbook.md文件路径）和expected_rules（包含键\"expected\"的字典，其值为预期的规范文本）作为输入。依次执行以下检查：首先判断result_path是否为None，若是则直接返回0.0；接着检查该路径是否为真实存在的文件，若不存在返回0.0；然后尝试以utf-8编码打开并读取整个文件内容，若发生IOError或OSError则返回0.0。读取成功后，从expected_rules中提取\"expected\"对应的预期文本。对实际内容和预期内容均进行标准化处理：先将所有\"\\r\\n\"替换为\"\\n\"，再调用rstrip()去除尾部所有空白字符（包括尾部换行、空格、回车），以消除平台或编辑器依赖的尾部空白差异。最后比较归一化后的两个字符串，若完全一致则返回1.0，否则返回0.0。该函数未调用其他辅助函数，所有逻辑均在函数内部完成。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:40:23",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_requirement_change_107./evaluator_function_labels.json"
+}

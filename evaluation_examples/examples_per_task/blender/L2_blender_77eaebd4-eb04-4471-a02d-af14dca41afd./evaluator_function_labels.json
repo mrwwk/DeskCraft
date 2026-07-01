@@ -22,27 +22,27 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Blender 任务中指定物体的粒子系统参数是否符合预期。它读取外部检查脚本 check_particles.py 输出的 JSON 文本（command_output），并结合包含期望参数与匹配规则的 rule 字典进行判定。核心检查对象是 rule 中 object_name 所指定物体的第一个粒子系统，针对 count、lifetime、frame_start、frame_end、normal_factor 等数值字段逐一比对。比较方式采用容差近似匹配（默认容差 1.0），即实际值与期望值的绝对差不超过设定阈值即视为相等。判定逻辑为“全部满足”的二元打分：所有被 rule 要求的参数都必须通过容差检查，才返回 1.0（成功）；若 JSON 解析失败、找不到粒子系统、或任一参数超出容差，则立即返回 0.0（失败）。",
+    "overall_validation": "该evaluator用于验证Blender任务中指定物体的粒子系统参数是否符合预期。它通过解析外部检查脚本（如check_particles.py）输出的JSON数据，定位到指定物体上的第一个粒子系统，然后对count（粒子数量）、lifetime（生命周期）、frame_start（起始帧）、frame_end（结束帧）、normal_factor（法向因子）等关键参数进行逐项容差比较（默认容差为1.0）。只有当rule中指定的所有参数的实际值与预期值的偏差均在容差范围内时，才判定任务成功并返回1.0；若JSON解析失败、指定物体不存在粒子系统、或任一参数超出容差，则立即返回0.0。整体采用严格的“全部满足”二分判定逻辑。",
     "main_functions": [
       {
         "name": "check_blender_particle_params",
         "lineno": 40,
-        "description": "该函数接收 command_output（来自 check_particles.py 的 JSON 字符串）和 rule（字典，包含 object_name、可选的 tolerance 以及待验证的粒子参数如 count、lifetime、frame_start、frame_end、normal_factor）作为输入。执行步骤如下：1. 调用 _parse_blender_output 将 command_output 解析为 JSON 对象；若解析失败或为空，直接返回 0.0。2. 从 rule 中读取 object_name（默认空字符串）和 tolerance（默认 1.0）。3. 在解析结果中查找 object_name 对应的粒子系统列表；若列表为空，记录警告并返回 0.0。4. 仅取该物体的第一个粒子系统（particles[0]）作为检查目标。5. 遍历预定义参数列表 [\"count\", \"lifetime\", \"frame_start\", \"frame_end\", \"normal_factor\"]；对于每个存在于 rule 中的参数，从粒子系统提取实际值，并与 rule 中的期望值一起传入 _check_tolerance 进行容差比较。6. 若任一参数未通过容差检查，立即记录警告并返回 0.0。7. 若所有要求参数均通过检查，返回 1.0。整个判定逻辑为“全部满足”式，任一环节出错或参数不匹配即判定失败。"
+        "description": "该函数接收来自Blender检查脚本的命令行输出字符串（command_output）和评测规则字典（rule）。首先调用_parse_blender_output将输出解析为JSON对象；若解析失败则直接返回0.0。接着从rule中获取object_name（默认空字符串）和tolerance（默认1.0），并在解析结果中查找该物体名下的粒子系统列表。若列表为空，返回0.0。随后取该物体的第一个粒子系统（particles[0]），对checks列表中的参数（count、lifetime、frame_start、frame_end、normal_factor）进行遍历：仅当rule中显式包含某参数时，才从粒子系统数据中提取实际值，并调用_check_tolerance与预期值进行容差比较。若任一参数超出容差范围，立即记录警告并返回0.0。若所有指定参数均通过检查，最终返回1.0。整个流程采用“全部满足即成功，任一失败即整体失败”的严格判定策略，且所有异常均被捕获并返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 17,
-        "description": "该函数负责将外部 Blender 检查脚本输出的原始文本解析为 JSON 对象。它先检查输入是否为空或仅包含空白字符，若是则记录错误并返回 None；否则尝试使用 json.loads 进行解析。若遇到 JSONDecodeError 或 ValueError，会记录错误日志并输出原始内容调试信息，最终返回 None。该解析器是主评测函数获取粒子系统数据的前置步骤，解析失败将直接导致评测返回 0.0。"
+        "lineno": 16,
+        "description": "该辅助函数负责将Blender检查脚本输出的原始字符串解析为Python对象（通常为字典）。它首先检查输入是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试调用json.loads进行解析。若遇到JSONDecodeError或ValueError，则记录错误及原始输出内容，并返回None。该函数是主评测逻辑的数据入口，为check_blender_particle_params提供结构化的粒子系统数据，解析失败会直接导致评测返回0.0。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 30,
-        "description": "这是一个通用数值容差比较器。它接收 actual（实际值）、expected（期望值）和 tol（容差阈值）三个参数。首先对 actual 或 expected 为 None 的情况进行保护性返回 False；随后将两者转为浮点数，计算绝对差值，判断是否小于等于 tol。该函数被主函数用于对粒子系统的各个数值参数进行近似匹配，是实现“容差范围内视为相等”这一规则的核心工具。"
+        "lineno": 27,
+        "description": "该辅助函数是一个通用数值容差比较器。它接收实际值（actual）、预期值（expected）和容差阈值（tol）三个参数。若任一参数为None，直接返回False；否则将三者均转换为浮点数，计算实际值与预期值的绝对差，并判断是否小于等于给定容差。该函数被check_blender_particle_params用于逐项验证粒子系统参数（如count、lifetime等），是实现近似匹配而非精确相等判断的核心工具。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:09:38",
+  "created_at": "2026-07-01 14:37:40",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_77eaebd4-eb04-4471-a02d-af14dca41afd./evaluator_function_labels.json"
 }

@@ -1,0 +1,127 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00049-0049-4000-8000-000000000049./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 108
+    },
+    {
+      "name": "check_audio_channels",
+      "lineno": 129
+    },
+    {
+      "name": "check_audio_fade_in",
+      "lineno": 146
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 186
+    },
+    {
+      "name": "check_audio_silence_at",
+      "lineno": 226
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "_extract_time_range",
+      "lineno": 99
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 108
+    },
+    {
+      "name": "check_audio_channels",
+      "lineno": 129
+    },
+    {
+      "name": "check_audio_fade_in",
+      "lineno": 146
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 186
+    },
+    {
+      "name": "check_audio_silence_at",
+      "lineno": 226
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Audacity音频编辑任务输出的WAV文件是否符合特定规范。它直接通过标准库wave读取目标WAV文件的元数据与原始样本数据，对音频时长、通道数、淡入/淡出效果以及指定时段的静音状态进行独立检查。每个主函数对应一项独立指标，采用打分式逻辑返回1.0（该项达标）或0.0（该项不达标）。核心思路是将原始样本归一化为[-1.0, 1.0]的浮点数，计算各时段的RMS分贝值，再与rule中给定的阈值、容差或趋势要求进行比对。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 108,
+        "description": "接收待测WAV文件路径file_path和rule字典。首先检查文件是否存在，随后调用_read_wav_info读取音频时长。将实际时长与rule['expected_duration']比较，容差默认为0.5秒。若abs(实际时长 - 预期时长) <= 容差，返回1.0；否则返回0.0。任何异常也返回0.0。"
+      },
+      {
+        "name": "check_audio_channels",
+        "lineno": 129,
+        "description": "接收待测WAV文件路径file_path和rule字典。检查文件存在后，调用_read_wav_info获取通道数。将实际通道数与rule['expected_channels']进行精确相等比较。若一致返回1.0，否则返回0.0。异常时返回0.0。"
+      },
+      {
+        "name": "check_audio_fade_in",
+        "lineno": 146,
+        "description": "接收待测WAV文件路径file_path和rule字典，验证音频开头是否存在淡入效果。调用_get_mono_samples获取单声道样本及采样率。取音频开头fade_duration秒对应的样本，均分为num_windows个窗口（默认5个）。对每个窗口调用_rms_db计算音量。随后统计相邻窗口中后一个RMS严格大于前一个的次数。若递增次数 >= num_windows - 2（即允许最多出现1次非递增），返回1.0；否则返回0.0。若fade_duration超过音频总长度或窗口大小小于1，直接返回0.0。"
+      },
+      {
+        "name": "check_audio_fade_out",
+        "lineno": 186,
+        "description": "接收待测WAV文件路径file_path和rule字典，验证音频末尾是否存在淡出效果。调用_get_mono_samples获取单声道样本及采样率。取音频末尾fade_duration秒对应的样本，均分为num_windows个窗口（默认5个）。对每个窗口调用_rms_db计算音量。随后统计相邻窗口中后一个RMS严格小于前一个的次数。若递减次数 >= num_windows - 2（即允许最多出现1次非递减），返回1.0；否则返回0.0。若fade_duration超过音频总长度或窗口大小小于1，直接返回0.0。"
+      },
+      {
+        "name": "check_audio_silence_at",
+        "lineno": 226,
+        "description": "接收待测WAV文件路径file_path和rule字典，验证指定时段是否为静音。调用_get_mono_samples获取单声道样本及采样率，再通过_extract_time_range按rule['start_time']和rule['end_time']截取目标时段样本。对该区域调用_rms_db计算音量，若RMS <= rule.get('max_rms_db', -40) dB，返回1.0；否则返回0.0。若文件不存在或截取区域为空，返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 14,
+        "description": "使用标准库wave模块打开WAV文件，读取并返回包含channels、sample_rate、n_frames、sampwidth、duration的基础信息字典。duration由n_frames / sample_rate计算得出。供check_audio_duration、check_audio_channels等需要文件元数据的函数调用。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 27,
+        "description": "使用wave模块读取WAV全部原始帧数据，根据采样宽度（1/2/3/4字节）分别通过struct.unpack或int.from_bytes解析，将样本归一化为[-1.0, 1.0]范围的浮点数列表。多通道时返回交错排列的样本。为所有音频内容分析提供标准化样本数据。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 54,
+        "description": "对输入的浮点样本列表计算均方根（RMS）值，并转换为分贝（dB）。若样本为空或RMS小于1e-10，返回-100.0 dB。供fade_in、fade_out、silence等所有需要衡量音量大小的检查使用。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 64,
+        "description": "先调用_read_wav_info和_read_wav_samples读取WAV文件。若通道数大于1，将交错样本按帧取平均，转换为单声道样本列表。返回单声道样本列表与采样率。供fade和silence相关主函数统一调用，以避免通道差异对RMS计算的影响。"
+      },
+      {
+        "name": "_extract_time_range",
+        "lineno": 74,
+        "description": "根据给定的起始时间、结束时间（单位：秒）和采样率，计算对应的样本索引，截取并返回该时间范围内的样本子列表。索引会被裁剪到有效范围。专供check_audio_silence_at定位需要检测静音的精确区域。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:30:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00049-0049-4000-8000-000000000049./evaluator_function_labels.json"
+}

@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_010./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_supplier_audit_xlsx",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_supplier_audit_xlsx",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务最终生成的supplier_audit_log.xlsx文件是否在第2行包含完整且正确的审计数据字段。它通过读取从VM拉取到本地的xlsx文件，对指定单元格（如A2、B2、C2、D2等）进行逐格精确比对。核心检查采用单元格级完全匹配，其中对整数类型的期望值（例如D2的Overall Score）会做类型容错处理，允许数字与数字字符串视为等价。判定逻辑为“全或无”：只有当expected中声明的所有单元格值均匹配成功时，才返回1.0表示任务完成；若结果文件缺失、expected参数未提供、任一单元格不匹配或文件读取异常，均直接返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_supplier_audit_xlsx",
+        "lineno": 7,
+        "description": "该函数接收result_path（从VM拉取的supplier_audit_log.xlsx本地路径）和expected（期望的单元格值映射字典，如{\"A2\": \"...\", \"B2\": \"...\"}）作为输入。首先执行前置校验：若result_path为None或文件不存在，返回0.0；若expected为None，返回0.0。随后通过openpyxl.load_workbook(result_path, data_only=True)加载工作簿并获取活动工作表。接着遍历expected中的每一项，读取对应单元格引用的实际值。针对整数类型的期望值，会尝试将实际值转换为int后再比较，以兼容数字与数字字符串两种形式（如D2的Overall Score为90或\"90\"均视为通过）。若发现任一单元格实际值与期望值不匹配，立即记录警告、关闭工作簿并返回0.0。若全部单元格均匹配成功，关闭工作簿后返回1.0。整个读取与比较过程中若捕获到任何异常（如文件损坏、格式错误），同样返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:23",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_010./evaluator_function_labels.json"
+}

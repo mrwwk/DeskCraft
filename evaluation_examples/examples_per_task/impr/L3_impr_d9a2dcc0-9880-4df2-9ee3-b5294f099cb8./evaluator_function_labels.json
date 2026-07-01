@@ -1,0 +1,74 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_d9a2dcc0-9880-4df2-9ee3-b5294f099cb8./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_slide5_body_format",
+      "lineno": 29
+    },
+    {
+      "name": "check_slide4_title_format",
+      "lineno": 74
+    },
+    {
+      "name": "check_slide4_note_content",
+      "lineno": 116
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_find_shapes_by_keywords",
+      "lineno": 9
+    },
+    {
+      "name": "_all_text_runs",
+      "lineno": 21
+    },
+    {
+      "name": "check_slide5_body_format",
+      "lineno": 29
+    },
+    {
+      "name": "check_slide4_title_format",
+      "lineno": 74
+    },
+    {
+      "name": "check_slide4_note_content",
+      "lineno": 116
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对梵高（Van Gogh）演示文稿任务，仅验证第 4–5 张幻灯片上的 3 个特定条件，避免因 LibreOffice 格式伪影在不相关幻灯片上产生误判。它通过 python-pptx 库读取 .pptx 文件，利用关键词定位目标文本 Shape，再逐 text run 检查字体格式（颜色、斜体、粗体、下划线）或核对幻灯片备注内容。三个主检查各自独立运行，每个均返回 1.0（满足条件）或 0.0（不满足或异常），属于“全部满足”式判定：格式类检查要求同一 Shape 内的 text run 同时满足两项格式属性；备注类检查要求备注文本包含预期句子（不区分大小写）。",
+    "main_functions": [
+      {
+        "name": "check_slide5_body_format",
+        "lineno": 29,
+        "description": "该函数验证第 5 张幻灯片（0-indexed 索引 4）正文文本的格式。首先使用 Presentation(result_path) 打开 PPT 文件；若幻灯片数量不足 target_slide（默认 4）则直接返回 0.0。接着调用 _find_shapes_by_keywords，在目标幻灯片中搜索文本包含 body_text_keywords（默认 [\"decade of transformation\"]）的 Shape；若未找到匹配 Shape 也返回 0.0。随后遍历匹配 Shape 的所有 text run（通过 _all_text_runs），逐个检查两项属性：1）字体颜色 run.font.color.rgb 转为字符串后大写是否等于 target_color_rgb（默认 \"8B0000\"）；2）run.font.italic 是否为 True。只要分别找到至少一个 run 满足颜色、至少一个 run 满足斜体（可在不同 run 上），即同时满足两项条件，返回 1.0；否则返回 0.0。任何异常均捕获并返回 0.0。"
+      },
+      {
+        "name": "check_slide4_title_format",
+        "lineno": 74,
+        "description": "该函数验证第 4 张幻灯片（0-indexed 索引 3）标题的格式。首先使用 Presentation(result_path) 打开 PPT 文件；若幻灯片数量不足 target_slide（默认 3）则返回 0.0。接着调用 _find_shapes_by_keywords，在目标幻灯片中搜索文本包含 title_keywords（默认 [\"Zundert\", \"Canvas\"]）的 Shape；若未找到则返回 0.0。随后遍历匹配 Shape 的所有 text run（通过 _all_text_runs），逐个检查：1）run.font.bold 是否为 True；2）run.font.underline 是否为 True。只要分别找到至少一个 run 满足加粗、至少一个 run 满足下划线，即同时满足两项条件，返回 1.0；否则返回 0.0。任何异常均捕获并返回 0.0。"
+      },
+      {
+        "name": "check_slide4_note_content",
+        "lineno": 116,
+        "description": "该函数验证第 4 张幻灯片（0-indexed 索引 3）的备注内容。首先使用 Presentation(result_path) 打开 PPT 文件；若幻灯片数量不足 target_slide（默认 3）则返回 0.0。然后获取 slide.notes_slide；若该幻灯片没有备注页则返回 0.0。提取 notes_slide.notes_text_frame.text 并去除首尾空白，与 expected_note（默认 \"Van Gogh began his artistic career at 27 and produced over 860 oil paintings in just 10 years.\"）进行不区分大小写的包含匹配：若 actual_note.lower() 包含 expected_note.strip().lower()，则返回 1.0，否则返回 0.0。任何异常均捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_shapes_by_keywords",
+        "lineno": 12,
+        "description": "该辅助函数接收一个 Slide 对象和一组 keywords，遍历该幻灯片的所有 Shape，跳过没有文本框（has_text_frame 为 False）的 Shape。对每个 Shape 的文本进行不区分大小写的子串匹配：若 Shape 文本包含任一 keyword（kw.lower() in text.lower()），则将该 Shape 加入结果列表。最终返回所有匹配的 Shape 列表。该函数被主函数用于在目标幻灯片中定位包含特定关键词的文本 Shape，是后续格式或内容检查的前提定位步骤。"
+      },
+      {
+        "name": "_all_text_runs",
+        "lineno": 22,
+        "description": "该辅助函数接收一个 Shape 对象，遍历其 text_frame.paragraphs 下的所有 paragraph 与 run，仅产出（yield）那些 run.text 去除首尾空白后非空的文本 run。它是一个生成器，为主函数提供需要逐段检查字体属性（如 color、italic、bold、underline）的最小文本单元，避免对空 run 做无意义的格式判断。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:34:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_d9a2dcc0-9880-4df2-9ee3-b5294f099cb8./evaluator_function_labels.json"
+}

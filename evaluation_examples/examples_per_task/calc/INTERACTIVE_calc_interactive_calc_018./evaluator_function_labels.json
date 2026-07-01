@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于对任务产出的字符串结果进行内容合规性校验，核心验证目标是字符串 result 是否同时满足「必须包含指定内容」与「必须排除指定内容」的双重要求。检查对象为一个字符串及其对应的规则字典；主要比较方式为子串存在性检查（即判断指定字符串是否被包含于 result 中）；成功判定采用二元打分逻辑：只有当 result 包含 rules 中 include 列表的全部字符串、且不包含 exclude 列表中的任何字符串时，才返回 1.0（完全成功），其余情况（包含失败、排除失败或 result 为 None）均返回 0.0（失败）。",
+    "overall_validation": "该evaluator用于任务INTERACTIVE_calc_interactive_calc_018的结果判定，核心目标是验证程序输出或返回的文本字符串是否同时满足\"必须包含指定内容\"和\"必须排除指定内容\"的双重要求。最终产物要求为一个非None的字符串结果（result），核心检查对象是该字符串与规则字典（rules）中定义的include/exclude子串列表。主要比较方式为严格的子串存在性检查（in操作），即遍历检查所有必填子串是否全部出现、所有禁止子串是否全部未出现。成功判定的总体思路采用二元打分制：仅当result包含所有include规则项且不包含任何exclude规则项时，返回满分1.0；若result为None，或任一include项缺失，或任一exclude项存在，则直接返回0.0。不存在部分得分、阈值容错或近似匹配。",
     "main_functions": [
       {
         "name": "check_include_exclude",
         "lineno": 36,
-        "description": "该函数接收 result（待验证的字符串结果）与 rules（规则字典，预期包含 include 和 exclude 两个键，对应值为字符串列表）作为输入。检查步骤如下：第一步，若 result 为 None，直接返回 0.0；第二步，从 rules 中读取 include 列表（默认空列表）与 exclude 列表（默认空列表）；第三步，对 result 执行双重子串匹配检查，先验证 result 是否包含 include 中每一个字符串（要求全部满足），再验证 result 是否不包含 exclude 中任何一个字符串（要求全部不满足）；最终判定依据为：上述两个条件必须同时成立，若同时成立则返回 1.0，否则返回 0.0。此外，函数内部会通过 print 输出 result 与 rules 的内容，用于调试观察。"
+        "description": "该函数接收两个参数：result（待检查的字符串结果）和rules（包含include与exclude键的字典）。检查步骤如下：第一步，判断result是否为None，若为None直接返回0.0；第二步，打印result与rules内容用于调试；第三步，从rules中提取include列表（默认空列表）和exclude列表（默认空列表）；第四步，使用all()配合in操作符遍历include列表，检查result是否包含其中每一个子串；第五步，使用all()配合not in操作符遍历exclude列表，检查result是否不包含其中每一个子串。判定依据为：只有当\"所有include子串均存在\"与\"所有exclude子串均不存在\"两个条件同时满足时，才返回1.0表示成功；任一条件不满足即返回0.0表示失败。该逻辑为严格的通过与未通过二元判定，无加权或累计逻辑。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:20:38",
+  "created_at": "2026-07-01 14:44:52",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_018./evaluator_function_labels.json"
 }

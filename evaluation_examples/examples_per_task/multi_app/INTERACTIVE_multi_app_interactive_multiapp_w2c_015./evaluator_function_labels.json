@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_015./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对任务产出的字符串结果（result）进行二元制内容合规性检查。核心验证逻辑是：检查结果字符串是否同时满足「包含所有指定的include子串」且「不包含任何指定的exclude子串」。若待检查结果为None，则直接判定失败。只有当包含条件与排除条件全部满足时，才返回1.0表示任务成功；任一条件不满足则返回0.0表示失败。这是一种基于精确子串匹配的通过/不通过评分机制，不涉及近似匹配、正则匹配或累计加权。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收result（待检查的字符串结果）与rules（字典，包含可选键include和exclude，对应值为字符串列表）作为输入。检查步骤如下：第一步，判断result是否为None，若为None则直接返回0.0；第二步，从rules中提取include列表与exclude列表，若不存在则默认为空列表；第三步，通过all(r in result for r in include)检查result是否包含所有include中的字符串；第四步，通过all(r not in result for r in exclude)检查result是否不包含任何exclude中的字符串；第五步，若上述两个条件同时满足，则返回1.0，否则返回0.0。函数执行过程中会调用print输出result与rules的内容。该函数采用精确子串包含判断，无近似匹配阈值、无顺序要求、无文件读取操作，判定结果为严格的二元分数（1.0或0.0）。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_015./evaluator_function_labels.json"
+}

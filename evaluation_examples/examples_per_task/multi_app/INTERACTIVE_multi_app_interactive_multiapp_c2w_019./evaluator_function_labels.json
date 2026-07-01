@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_019./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于任务 INTERACTIVE_multi_app_interactive_multiapp_c2w_019，核心目的是验证某一步操作或应用产生的文本结果（result）是否同时满足正向包含与反向排除的字符串规则。检查对象为一个字符串输出；主要比较方式是子串存在性判断（all(r in result ...) 与 all(r not in result ...)）。成功判定采用二元打分逻辑：只有当结果非 None、且包含所有 include 列表中的字符串、且不包含任何 exclude 列表中的字符串时，才返回 1.0（完全成功）；任一条件不满足或结果为 None 时返回 0.0（完全失败）。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收一个字符串 result 和一个规则字典 rules 作为输入。首先进行空值守卫：若 result 为 None，直接返回 0.0。随后从 rules 中读取键名为 include 和 exclude 的字符串列表（若对应键不存在则默认为空列表）。检查前会先打印 result 与 rules 的内容。接着执行两步组合检查：第一步使用子串匹配（r in result）验证 result 是否包含 include 列表中的每一个字符串，要求全部满足；第二步使用反向子串匹配（r not in result）验证 result 是否不包含 exclude 列表中的任何一个字符串，要求全部满足。最终，仅当两项检查同时通过时返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:14:32",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_019./evaluator_function_labels.json"
+}

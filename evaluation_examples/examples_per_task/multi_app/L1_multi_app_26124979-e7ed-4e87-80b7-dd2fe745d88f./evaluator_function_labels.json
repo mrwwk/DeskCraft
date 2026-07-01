@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_26124979-e7ed-4e87-80b7-dd2fe745d88f./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对任务 L1_multi_app_26124979-e7ed-4e87-80b7-dd2fe745d88f 提供两条独立的二元判定路径（得分仅为 0.0 或 1.0），分别验证两类不同的任务产出：其一，检查某段文本输出是否同时满足\"必须包含全部指定子串\"与\"必须不包含任何禁用子串\"的精确字符串匹配规则；其二，检查指定路径的 JSON 配置文件是否完整包含预期字典中的全部键值对，且实际值与预期值必须完全相等（==）。两条路径各自独立运行，无加权累加或联合判定逻辑，任一检查项内部出现不满足条件的情况即直接返回 0 分，全部条件通过则返回 1 分。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "接收 result（待检查的字符串，可能为 None）与 rules（字典，内含可选键 include 与 exclude，对应值为字符串列表）。首先判断 result 是否为 None，若为 None 直接返回 0.0。随后从 rules 中分别提取 include 列表与 exclude 列表（缺省为空列表）。判定逻辑要求 result 必须同时满足两个条件：（1）包含 include 列表中的每一个字符串；（2）不包含 exclude 列表中的任何一个字符串。两个条件全部成立返回 1.0，否则返回 0.0。该函数执行严格的子串精确匹配，无近似匹配、无阈值容错、无视大小写转换。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 56,
+        "description": "接收 actual（字符串，表示待测 JSON 文件的绝对或相对路径）、expected（字典，必须包含键 'expected'，其值为待校验的键值对字典）以及可选的 options。首先判断 actual 是否为空，为空则返回 0.0。随后尝试以只读方式打开 actual 路径指向的文件，并用 json.load 解析为 Python 字典；若文件不存在、读取异常或 JSON 解析失败，均返回 0.0。接着提取 expected['expected'] 作为期望字典，遍历其中每一个键值对，检查该键是否存在于实际解析出的 data 中，且对应的值与期望值进行完全相等比较（==）。若所有键值对均匹配则返回 1.0，任一键缺失或值不相等则立即返回 0.0。该检查要求精确匹配，不支持类型隐式转换、部分匹配或对额外键值进行容错。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:16:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_26124979-e7ed-4e87-80b7-dd2fe745d88f./evaluator_function_labels.json"
+}

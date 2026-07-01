@@ -18,22 +18,22 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender场景中指定对象的材质是否被正确分配了指定的图像纹理，并且该纹理已连接到正确的材质输入接口（如Base Color）。它通过读取Blender检查脚本（check_material.py）输出的JSON数据，定位指定对象名下的材质列表，在其中检索图像纹理节点的filename字段是否与预期一致，同时验证该纹理节点的connected_to是否包含预期的输入接口名称。若找到完全匹配的记录则判定成功（返回1.0），否则判定失败（返回0.0）。检查逻辑包含对Base Color直接连接的向后兼容快速路径，也支持对任意输入接口的精确连接检查，属于“任一满足即成功”的单点判定模式。",
+    "overall_validation": "该evaluator总体验证的是：在Blender场景中，指定的物体（如\"Cube\"）是否被赋予了包含特定图像纹理文件（如\"texture_wood.jpg\"）的材质，并且该纹理是否被正确连接到了指定的材质输入接口（如\"Base Color\"）。它通过解析外部检查脚本check_material.py输出的JSON数据来进行判定。核心检查对象是JSON中按物体名组织的材质数组，以及每个材质下的image_textures节点列表。主要比较方式包括：1）对\"Base Color\"的向后兼容快速路径，直接比对材质顶层的texture_filename字段；2）详细路径，遍历image_textures节点，比对filename字段，并在指定了input_name时检查connected_to数组或字符串是否包含目标输入名。成功判定采用二元制：只要任一材质的任一纹理节点满足文件名匹配及连接要求，即返回1.0（成功）；若遍历所有材质后无匹配，或解析失败，则返回0.0（失败）。",
     "main_functions": [
       {
         "name": "check_blender_texture_assigned",
         "lineno": 33,
-        "description": "该函数接收command_output（Blender检查脚本输出的JSON字符串）和rule（包含object_name、texture_filename、input_name的字典）作为输入。首先调用_parse_blender_output将命令输出解析为JSON对象，若解析失败则直接返回0.0。接着从解析结果中获取指定object_name对应的材质列表obj_mats。遍历每个材质时，先执行向后兼容的快速路径：若input_name为None或\"Base Color\"，且材质顶层字段texture_filename与预期文件名一致，则直接返回1.0。若快速路径未命中，则遍历该材质的image_textures列表，对每个纹理节点检查其filename是否与texture_filename一致；若不一致则跳过。若rule中指定了input_name，则进一步检查该纹理节点的connected_to字段（若为字符串则自动转为列表），确认其中是否包含预期的输入接口名；若不包含则跳过。当文件名和连接目标均满足条件时，返回1.0。若遍历完所有材质和纹理节点均未找到匹配项，则记录警告日志并返回0.0。"
+        "description": "该函数接收两个参数：command_output为字符串类型，是外部Blender检查脚本（check_material.py）执行后输出的原始JSON文本；rule为字典，包含\"object_name\"（目标物体名称）、\"texture_filename\"（目标纹理文件名）和可选的\"input_name\"（目标材质输入接口名称，如\"Base Color\"）。执行步骤如下：首先调用辅助函数_parse_blender_output将command_output解析为Python对象，若解析失败或输出为空则直接返回0.0；接着从rule中提取目标物体名、期望文件名和期望输入名，并从解析结果字典中获取该物体对应的材质列表obj_mats（若获取结果非列表则包装为列表）；然后遍历每个材质，先走向后兼容快速路径——若未指定input_name或input_name为\"Base Color\"，且材质字典顶层的\"texture_filename\"字段直接等于期望文件名，则立即返回1.0；若快速路径未命中，则遍历该材质的\"image_textures\"数组，对每个纹理节点检查其\"filename\"是否等于期望文件名，不匹配则跳过；若指定了input_name，则进一步检查该纹理节点的\"connected_to\"字段（如果是字符串则转为单元素列表）是否包含该输入名，不包含则跳过；若通过上述所有检查则返回1.0。若遍历完所有材质和纹理节点均未命中，则记录warning日志说明具体原因（纹理未找到或未连接到指定输入），最终返回0.0。任何执行异常也会被捕获并返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 19,
-        "description": "该函数负责将Blender检查脚本的原始命令行输出解析为Python字典。它首先检查command_output是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试使用json.loads对输出内容进行解析并返回解析后的字典。如果解析过程中触发json.JSONDecodeError或ValueError，则记录错误日志及原始输出内容，并返回None。该函数是主评测函数的数据预处理入口，为后续的纹理分配与连接检查提供结构化的JSON数据。"
+        "description": "该辅助函数负责将Blender检查脚本输出的原始文本解析为Python对象。它接收command_output字符串，先判断其是否为空或仅包含空白字符，若是则记录error日志并返回None；否则尝试调用json.loads进行解析。若解析过程中抛出json.JSONDecodeError或ValueError，则记录error日志（包含异常信息）和debug日志（包含原始输出的repr形式），并返回None。解析成功则返回对应的Python对象（通常为字典）。该函数主要服务于check_blender_texture_assigned，为其提供安全的JSON预处理，主函数依赖其返回值是否为None来决定是否提前返回失败分数0.0。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:10:52",
+  "created_at": "2026-07-01 14:38:22",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_86766b15-f7a2-44f6-a5be-e4004ade98c0./evaluator_function_labels.json"
 }

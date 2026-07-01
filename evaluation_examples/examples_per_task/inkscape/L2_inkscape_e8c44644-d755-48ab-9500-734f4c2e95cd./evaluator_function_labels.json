@@ -1,0 +1,132 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_e8c44644-d755-48ab-9500-734f4c2e95cd./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_opacity",
+      "lineno": 136
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 162
+    },
+    {
+      "name": "check_inkscape_l2_blur_opacity",
+      "lineno": 209
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 40
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 59
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 67
+    },
+    {
+      "name": "_get_float",
+      "lineno": 75
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 86
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 95
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_opacity",
+      "lineno": 136
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 162
+    },
+    {
+      "name": "check_inkscape_l2_blur_opacity",
+      "lineno": 209
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape编辑任务完成后生成的SVG文件状态。核心检查对象是SVG XML中具有特定id的元素，验证其是否满足指定的视觉样式要求：填充颜色（fill）、主透明度（opacity）以及是否应用了特定类型的滤镜（如feGaussianBlur）。 evaluator通过解析SVG文件为XML树，遍历查找目标元素，读取其内联style或属性值，并与预期值进行比对。对于颜色检查采用精确匹配（经规范化后）；对于透明度检查采用容差范围内的近似匹配；对于滤镜检查则通过解析url(#id)引用，深入filter定义节点及其子原语（包括xlink:href链接的滤镜）进行查找。L2级别任务（check_inkscape_l2_blur_opacity）要求上述三项检查全部同时通过，任一失败即判定整体失败，返回0.0；全部通过则返回1.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 103,
+        "description": "验证SVG中指定id元素的填充颜色。接收svg_file_path和rule（含element_id、expected_fill）。首先调用_parse_svg解析SVG文件，失败则返回0.0；接着调用_find_element_by_id定位目标元素，未找到则返回0.0。通过_get_style_prop读取元素的fill值：优先从内联style字符串解析，其次读取fill属性。若元素是text标签且自身未找到fill，会递归遍历其tspan子节点继续查找。读取到的实际颜色经_normalize_color规范化（处理3位hex转6位、去除alpha通道、统一小写）后，与预期颜色进行精确字符串比对。若预期为'none'，则实际也必须为'none'；其他情况需完全相等才返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_opacity",
+        "lineno": 136,
+        "description": "验证SVG中指定id元素的主透明度。接收svg_file_path和rule（含element_id、expected_opacity、tolerance）。调用_parse_svg解析文件，失败返回0.0；通过_find_element_by_id查找元素，未找到或预期值缺失返回0.0。使用_get_style_prop读取opacity（优先style，其次属性），若未设置则默认视为1.0。利用_get_float将读值和预期值转为浮点数（自动去除px/mm等单位）。计算实际值与预期值的绝对差，若小于等于tolerance（默认0.05）则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_filter",
+        "lineno": 162,
+        "description": "验证SVG中指定id元素是否应用了特定类型的滤镜原语。接收svg_file_path和rule（含element_id、expected_filter_type）。解析SVG后定位目标元素，未找到返回0.0。通过_get_style_prop获取filter属性值（通常为url(#filterId)格式），利用正则r'url\\(#([^)]+)\\)'提取引用的filter ID。随后在SVG树中查找id匹配的filter标签，遍历其直接子元素（滤镜原语），使用_tag_local比对子标签名（不区分大小写）是否包含expected_filter_type（如feGaussianBlur、feDropShadow）。若当前filter通过xlink:href或href属性链接到另一个filter定义，会进一步解析链接ID并深入被链接的filter定义中重复上述检查。找到匹配的原语返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_l2_blur_opacity",
+        "lineno": 209,
+        "description": "L2任务组合检查：要求目标元素同时满足滤镜应用、透明度设置和填充颜色变更三项条件。接收svg_file_path和rule，rule内包含filter_check、opacity_check、fill_check三个子规则字典。依次调用check_inkscape_filter、check_inkscape_opacity、check_inkscape_fill_color进行判定，采用严格的串联逻辑：若任一子检查返回值小于1.0，立即返回0.0；仅当三项检查全部返回1.0时，才返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 24,
+        "description": "解析CSS风格的内联样式字符串（如'fill:#ff0000;stroke:#000'）。按分号分割后，再以冒号分隔键值对，去除空白后存入字典返回。用于将SVG元素的style属性转换为可查询的结构化数据，供_get_style_prop调用。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 33,
+        "description": "规范化颜色字符串：统一转小写；将3位hex（如#f00）扩展为6位（#ff0000）；若存在8位hex（#rrggbbaa）则截断为6位去除alpha通道；保留'none'关键字原样。返回规范化后的颜色字符串或None。专用于check_inkscape_fill_color中的颜色比对前预处理。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 48,
+        "description": "遍历SVG XML树的全部元素（root.iter()），比对元素的id属性是否与传入的element_id相等，返回匹配的元素节点或None。是所有主函数定位目标SVG元素的基础工具。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 55,
+        "description": "统一读取SVG元素的样式属性。先获取元素的style属性字符串，经_parse_style解析为字典后查找目标属性；若内联style中不存在，则回退读取元素的同名属性（如fill、opacity）。返回属性字符串或None。被check_inkscape_fill_color和check_inkscape_opacity用于提取样式值。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 63,
+        "description": "安全将字符串转为浮点数。若输入为None则返回default；否则使用正则re.sub(r'[a-zA-Z%]+$','',...)去除末尾的单位字符（如px、mm、%）后再转换。转换失败也返回default。主要用于check_inkscape_opacity中对opacity值和容差进行数值化。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 73,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，返回(tree, root)元组。若解析过程中发生任何异常，返回(None, None)。是所有主函数读取和进入SVG文档的入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 82,
+        "description": "去除XML命名空间前缀，返回元素的本地标签名。例如'{http://www.w3.org/2000/svg}text'转为'text'。被check_inkscape_filter用于比对filter原语标签名，也被check_inkscape_fill_color用于判断text/tspan元素类型。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:44:13",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_e8c44644-d755-48ab-9500-734f4c2e95cd./evaluator_function_labels.json"
+}

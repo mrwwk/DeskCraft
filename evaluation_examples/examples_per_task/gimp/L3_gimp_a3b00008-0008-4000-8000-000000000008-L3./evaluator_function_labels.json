@@ -1,0 +1,192 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00008-0008-4000-8000-000000000008-L3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 220
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 298
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 357
+    },
+    {
+      "name": "check_l3_dog_portrait_dual_output_complete",
+      "lineno": 424
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 176
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 205
+    },
+    {
+      "name": "_compute_sharpness_score",
+      "lineno": 212
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 220
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 298
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 357
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 387
+    },
+    {
+      "name": "_check_images_not_identical",
+      "lineno": 395
+    },
+    {
+      "name": "check_l3_dog_portrait_dual_output_complete",
+      "lineno": 424
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证L3级别GIMP双风格狗狗肖像工作流是否完整且符合规范。任务最终要求产出：一张自然风格JPEG图像、一张干净风格PNG图像、一个保留编辑历史的XCF源文件，且所有图像尺寸需接近1800×2400像素。评测采用严格的“全或无”二进制聚合模式：先验证文件存在性与格式合规性（JPEG/PNG）；再通过对比度与锐度指标验证自然风格图相对于原始素材确实经过了增强处理；接着通过区域边缘密度与OCR关键词验证自然风格图右下角包含署名文字（如“BY”）；同时确保两张风格图之间具有足够的视觉差异（差异比例≥6%）；最后解析XCF文件确认包含指定的五个图层（Dog_Subject、BG_Natural、BG_Clean、Detail_Enhance、Signature）。全部11项子检查必须同时通过，最终得分才为1.0，否则为0.0。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "计算单张图像的对比度数值，服务于check_contrast_increase。将输入图像转换为灰度模式（'L'），使用ImageStat.Stat统计像素值的标准差并返回浮点结果。该标准差越大，表示图像对比度越高。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "验证图像文件的宽高是否满足预期。使用PIL打开指定image_path，获取实际width与height；将width与expected_width比较，若expected_height不为None则同时比较height。允许tolerance像素级容差（默认5像素）。宽高均在容差范围内返回1，任一不满足或文件不存在/读取失败返回0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 67,
+        "description": "验证目标文件是否为有效PNG格式。通过PIL.Image.open打开图像，检查img.format是否等于'PNG'。文件不存在、无法读取或格式不符返回0，验证通过返回1。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 92,
+        "description": "验证目标图像相对于源图像的对比度是否显著提升。依次打开src_path与tgt_path，调用calculate_contrast分别获取两者灰度标准差；若源图对比度为0则直接返回0；否则计算百分比提升((tgt_contrast - src_contrast) / src_contrast) * 100，要求结果不低于min_increase_percent（默认10.0）。满足阈值返回1，否则返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 133,
+        "description": "基础文件存在性检查。使用os.path.isfile判断传入的file_path是否为真实文件。是则返回1，路径为None或文件不存在返回0。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 151,
+        "description": "验证目标文件是否为有效JPEG格式。通过PIL.Image.open打开图像，检查img.format是否等于'JPEG'。文件不存在、无法读取或格式不符返回0，验证通过返回1。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 220,
+        "description": "验证XCF源文件的图层结构是否符合rule要求。首先确认文件存在且二进制头以b'gimp xcf'开头；优先尝试用gimpformats库解析所有图层名，检查rule['layers']中的每个预期图层名是否都存在于解析结果中；若rule['ordered']为True，则进一步验证这些图层在列表中的索引位置呈严格递增顺序。若gimpformats解析失败，回退到二进制内容字符串搜索，定位每个图层名的字节偏移，并在ordered=True时检查偏移量是否递增。任一图层缺失、顺序错误或文件非法返回0，通过返回1。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 298,
+        "description": "在图像指定区域检测类文字边缘，并可选通过OCR验证关键词。首先将图像转为灰度numpy数组；对rule['regions']中的每个区域名称（如'bottom_right'），调用_resolve_region_bbox裁剪子图，再调用_edge_density计算边缘密度，要求不低于rule['min_edge_density']（默认0.008）。若rule中提供keywords列表，则尝试导入pytesseract进行OCR，将识别文本通过re.sub(r'\\s+', ' ', ...)归一化空白并转小写，检查每个keyword是否都被包含；若OCR模块缺失或识别过程抛异常，仅记录warning，不直接导致失败（只要边缘密度检查已通过）。任一区域边缘密度不足或关键词缺失返回0，否则返回1。"
+      },
+      {
+        "name": "check_sharpness_increase",
+        "lineno": 357,
+        "description": "验证目标图像相对于源图像的锐度是否显著提升。依次打开src_path与tgt_path，调用_compute_sharpness_score获取基于梯度幅值方差的锐度指标；若源图锐度≤1e-9返回0；否则计算百分比提升(tgt_sharp - src_sharp) * 100.0 / src_sharp，要求不低于min_increase_percent（默认5.0）。满足阈值返回1，否则返回0。"
+      },
+      {
+        "name": "check_l3_dog_portrait_dual_output_complete",
+        "lineno": 424,
+        "description": "复合主评测函数，整合全部子检查以判定任务整体是否完成。要求result_paths为长度≥4的列表，依次解包为natural_jpg、clean_png、xcf_path、src_path。随后顺序执行11项检查并收集得分：natural_jpg与clean_png的文件存在性；natural_jpg的JPEG格式与clean_png的PNG格式；两张图尺寸均为1800×2400（容差5像素）；源图到natural_jpg的对比度提升≥4.0%；源图到natural_jpg的锐度提升≥2.0%；natural_jpg右下角区域文字边缘密度≥0.005且OCR含关键词'BY'；natural_jpg与clean_png的视觉差异比例≥6%（通过_check_images_not_identical）；XCF包含Dog_Subject、BG_Natural、BG_Clean、Detail_Enhance、Signature五个图层且ordered=False。最终将scores列表传入_all_binary_checks_pass，仅当全部子项均≥1.0时返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 170,
+        "description": "将语义化区域名称解析为图像上的绝对像素包围盒。根据传入的width与height，把region_name（如'top_left'、'bottom_right'、'center'等）映射为(x0, y0, x1, y1)四元组。例如'bottom_right'对应图像右下三分之一区域，'center'对应中间四分之三区域。供check_text_in_region_keywords裁剪待检测区域使用。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 195,
+        "description": "计算灰度图像数组的边缘密度。对输入的gray_array分别沿x轴和y轴求梯度绝对值，合并为edges后统计超过edge_threshold（默认40.0）的像素所占比例。返回值越高表示该区域边缘或文字纹理越丰富。供check_text_in_region_keywords判断指定区域是否包含足够明显的类文字边缘。"
+      },
+      {
+        "name": "_compute_sharpness_score",
+        "lineno": 202,
+        "description": "计算图像锐度分数。将图像转为灰度numpy数组后，分别计算x方向与y方向的梯度，求梯度幅值（sqrt(gx*gx + gy*gy)），最终返回梯度幅值的方差。方差越大表示图像越锐利。供check_sharpness_increase量化图像锐度变化。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 390,
+        "description": "二进制检查聚合器。过滤scores列表中的None值，若全部有效得分均≥1.0则返回1.0，任一得分低于1.0或列表为空则返回0.0。供check_l3_dog_portrait_dual_output_complete实现“全部子检查通过才成功”的最终判定逻辑。"
+      },
+      {
+        "name": "_check_images_not_identical",
+        "lineno": 398,
+        "description": "验证两张图像是否具有足够的视觉差异。将两图均转为RGB数组，若尺寸不一致则通过Image.BICUBIC重采样统一为相同尺寸；计算对应像素绝对差的通道均值，统计差值大于12.0的像素比例；要求该diff_ratio不低于min_diff_ratio（默认0.03）。差异足够大返回1，过于相似或处理失败返回0。供check_l3_dog_portrait_dual_output_complete确保两种风格输出不是同一张图。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:19:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00008-0008-4000-8000-000000000008-L3./evaluator_function_labels.json"
+}

@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_ambiguous_106./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_handoff_workspace",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_handoff_workspace",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Agent是否已将工作区整理为适合交接的状态。它不依赖特定文件名或精确内容，而是通过检查工作区中文档文件（.txt/.md）的数量及内容总量是否达到合理阈值来进行判断。核心检查对象是vm_command_line命令返回的JSON数据，其中必须包含file_count（文件数量）和total_chars（字符总数）两个字段。主要比较方式是将这两个字段的实际值与rules传入的阈值（min_files和min_total_chars）进行硬性大小比较，默认阈值分别为2个文件和200个字符。成功判定的总体思路是：只有当文件数量不少于阈值且字符总数不少于阈值时，才判定交接整理工作完成并返回1.0；若输入为空、JSON解析失败或任一阈值未达标，则返回0.0。这是一种非此即彼的二元打分机制。",
+    "main_functions": [
+      {
+        "name": "check_handoff_workspace",
+        "lineno": 7,
+        "description": "该函数接收vm_command_line输出的JSON字符串（或已解析对象）作为参数result，并接收包含阈值的rules字典。检查步骤如下：1）首先判断result是否为None，若为None则直接返回0.0；2）尝试解析JSON，若result为字符串则调用json.loads进行反序列化，若解析过程中抛出JSONDecodeError、TypeError或ValueError则返回0.0；3）从rules字典中读取min_files（默认值为2）和min_total_chars（默认值为200）作为判定阈值；4）从解析后的数据中提取file_count和total_chars字段，缺失时默认为0；5）最终判定依据为：只有当file_count >= min_files且total_chars >= min_total_chars两个条件同时满足时，才返回1.0，否则返回0.0。该函数采用'全部满足'式的硬性阈值判定逻辑，无近似匹配、加权或累计机制。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:38:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_ambiguous_106./evaluator_function_labels.json"
+}

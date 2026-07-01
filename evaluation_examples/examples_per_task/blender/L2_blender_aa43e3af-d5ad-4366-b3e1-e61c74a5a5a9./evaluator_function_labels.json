@@ -26,32 +26,32 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Blender 场景中对象材质的 PBR 参数是否符合预期。它读取 Blender 检查脚本（check_material.py）输出的 JSON 数据，在指定对象（或按名称子串匹配、或全局搜索）的材质列表中，查找是否存在至少一个材质，其名称、基础颜色（base_color）、金属度（metallic）、粗糙度（roughness）同时满足 rule 中指定的条件。所有被指定的属性必须在给定的 tolerance 容差范围内同时匹配；一旦找到满足条件的材质即判定成功并返回 1.0，否则返回 0.0。",
+    "overall_validation": "该evaluator用于验证Blender场景中指定物体的PBR材质参数是否符合预期。它读取并解析Blender检查脚本（check_material.py）输出的JSON文档，从中获取各物体的材质列表。核心检查对象包括：材质名称（精确匹配）、基础颜色（base_color，RGBA向量）、金属度（metallic）和粗糙度（roughness）。评测时支持按物体精确名称、物体名称包含特定子串或不指定物体三种方式定位候选材质。对每一个候选材质，evaluator会逐项比对rule中被指定的字段，所有字段必须在给定tolerance容差范围内同时满足（标量使用绝对差值，向量使用逐分量绝对差值）。判定逻辑为“任一满足”：只要存在任何一个候选物体的任何一个材质通过全部检查，即判定任务成功并返回1.0；若全部候选均不满足，则返回0.0。",
     "main_functions": [
       {
         "name": "check_blender_material_pbr",
         "lineno": 50,
-        "description": "接收 command_output（来自 check_material.py 的 JSON 字符串）和 rule 字典。首先调用 _parse_blender_output 将命令输出解析为 JSON 对象。接着根据 rule 中的对象选择条件构建候选材质列表：若存在 object_name 则精确匹配该对象；否则若存在 object_name_contains 或 name_contains 则收集名称包含该子串的所有对象；若均无则全局遍历所有对象（忽略以 '_' 开头的键）。对每个候选对象，获取其材质列表（若不为列表则自动包装为列表）。遍历每个材质时，依次执行以下检查：若 rule 指定了 material_name，则要求材质 name 字段精确等于该值；若指定了 expected_color，则调用 _check_vector_tolerance 比较材质的 base_color 与预期颜色；若指定了 metallic，则调用 _check_tolerance 比较材质的 metallic 值；若指定了 roughness，则调用 _check_tolerance 比较材质的 roughness 值。所有在 rule 中声明的检查项必须全部通过，才视为该材质匹配成功并立即返回 1.0。若遍历完所有候选材质均无匹配，返回 0.0。默认 tolerance 为 0.05。"
+        "description": "接收command_output（来自check_material.py的JSON字符串）和rule字典。首先调用_parse_blender_output将JSON解析为Python对象。然后根据rule中的object_name（精确匹配）、object_name_contains或name_contains（名称包含子串）或无条件全局搜索三种方式，从解析结果中筛选候选物体的材质列表（跳过以“_”开头的内部键）。接着遍历每个候选物体的材质，若rule指定了material_name则精确匹配材质名；若指定expected_color则调用_check_vector_tolerance比对base_color各分量；若指定metallic或roughness则调用_check_tolerance比对对应数值。所有被指定的检查项必须同时满足（逻辑与）。只要在任一候选物体的任一材质上全部通过，立即返回1.0；若遍历完所有候选仍无匹配，返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 16,
-        "description": "解析 Blender 检查脚本输出的 JSON 字符串。先去除首尾空白，再调用 json.loads 转换为 Python 对象。若输出为空、仅含空白或 JSON 解析失败，则记录错误日志并返回 None。该函数为主函数提供结构化的材质检查数据。"
+        "description": "接收Blender检查脚本的命令行输出字符串，去除空白后尝试用json.loads解析为Python对象。如果输出为空或解析失败（JSONDecodeError/ValueError），则记录错误并返回None。该函数是主评测逻辑的入口数据解析器，为check_blender_material_pbr提供结构化的材质查询结果。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 27,
-        "description": "对两个标量值 actual 与 expected 进行容差比较。若任一值为 None 则返回 False；否则计算两者差的绝对值，判断是否小于等于 tol。该函数被主函数用于比较 metallic 和 roughness 等单浮点参数，返回布尔值。"
+        "lineno": 28,
+        "description": "接收actual（实际值）、expected（预期值）和tol（容差）。当任一参数为None时返回False；否则将两者转为浮点数，判断绝对差值是否小于等于容差。返回布尔值。该函数用于主函数中对metallic、roughness等标量材质属性的近似相等判定。"
       },
       {
         "name": "_check_vector_tolerance",
-        "lineno": 33,
-        "description": "对两个向量 actual 与 expected 进行逐分量容差比较。若任一向量为空或长度不一致则返回 False；否则逐对计算分量差的绝对值，要求所有分量均小于等于 tol。该函数被主函数用于比较 base_color（如 RGBA 四维数组）等向量型参数，返回布尔值。"
+        "lineno": 34,
+        "description": "接收actual（实际向量/列表）、expected（预期向量/列表）和tol（容差）。首先检查两者非空且长度相等，然后对每一对对应分量转为浮点数后计算绝对差值，要求所有分量均小于等于容差（使用all()）。返回布尔值。该函数用于主函数中对base_color等向量型材质属性的逐分量近似相等判定。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:11:57",
+  "created_at": "2026-07-01 14:38:46",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_aa43e3af-d5ad-4366-b3e1-e61c74a5a5a9./evaluator_function_labels.json"
 }

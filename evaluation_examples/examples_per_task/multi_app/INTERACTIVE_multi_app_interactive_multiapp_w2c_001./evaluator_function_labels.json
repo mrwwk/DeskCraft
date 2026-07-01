@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于对任务产出的文本结果进行二元判定，验证其是否同时满足「必须包含指定子串」与「必须排除指定子串」的两类规则。核心检查对象是一个字符串 result，评测逻辑通过精确子串匹配（in / not in）进行检验：只有当 result 包含 rules 中 include 列表的全部内容，且不包含 exclude 列表中的任何内容时，才视为任务成功并返回 1.0；若 result 为 None，或任一包含/排除条件未满足，则返回 0.0。这是一种非此即彼的打分方式，不涉及近似匹配或加权累计。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收两个参数：待检查的字符串 result，以及包含 include 和 exclude 键的规则字典 rules。执行步骤如下：1）若 result 为 None，直接返回 0.0；2）从 rules 中取出 include 列表（默认空列表）与 exclude 列表（默认空列表）；3）检查 result 是否包含 include 中每一个子串（all(r in result for r in include)）；4）检查 result 是否不包含 exclude 中任意一个子串（all(r not in result for r in exclude)）。当且仅当步骤 3 与步骤 4 同时成立时，返回 1.0，否则返回 0.0。该函数是评测闭环的最终判定节点，直接输出任务是否满分的二值分数。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:14:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_001./evaluator_function_labels.json"
+}

@@ -30,26 +30,26 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Chrome浏览器是否打开了任务预期的标签页。最终状态要求是：浏览器当前打开的标签页URL集合必须与期望URL集合一一对应。核心检查对象是两组URL列表——从评测规则中读取的期望URL列表和从浏览器状态中提取的实际打开标签页URL列表。主要比较方式分为两层：外层使用are_lists_equal对两个URL列表进行无序等价性比对（要求长度一致且每个期望URL都能在实际列表中找到唯一匹配）；内层使用compare_urls对单个URL进行深度规范化后比较。URL规范化包含多项容错规则：自动补全缺失的协议头（默认添加http://）、去除www子域名前缀、完全忽略顶级域名后缀（例如airbnb.com与airbnb.com.sg视为等价域名）、scheme与域名转小写、根路径“/”归一化为空字符串，并可选择保留或忽略URL参数、查询字符串和片段（由full参数控制，默认保留）。成功判定采用二元打分制：只有当实际标签页与期望标签页完全匹配时返回1分，任何不匹配（包括数量不符、URL对应不上、类型未知）均返回0分。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器中打开的标签页是否符合任务预期的配置。其核心检查对象是浏览器当前打开的所有标签页的URL列表。评测时，evaluator将实际打开的标签页URL与规则中指定的预期URL列表进行比对。URL比较采用自定义的规范化逻辑：自动为缺少scheme的URL补全http://、去除单独的www子域名、忽略顶级域名后缀差异（例如airbnb.com与airbnb.com.sg被视为相同主机）、并将根路径“/”归一化为空字符串。列表层面的比对采用无序包含检查，即要求两个列表长度相同，且预期列表中的每一个URL都能在实际列表中找到规范化后相等的匹配项。最终判定为二元分数：若标签页URL列表完全匹配则返回1，若列表不匹配、open_tabs为空或遇到未知规则类型则返回0。",
     "main_functions": [
       {
         "name": "is_expected_tabs",
         "lineno": 59,
-        "description": "主入口函数，接收当前Chrome打开的标签页列表open_tabs（元素为包含url等字段的字典）和评测规则rule。首先判空：若open_tabs为空列表，直接返回0分。随后读取rule['type']，当前仅支持“url”类型。在url模式下，从rule中提取期望URL列表expected_urls，从open_tabs中提取实际URL列表actual_urls，然后调用are_lists_equal(expected_urls, actual_urls, compare_urls)对两组URL进行无序等价性检查。若are_lists_equal返回False，则记录错误日志（打印期望与实际列表）并返回0；若返回True则返回1。若rule['type']为其他未知类型，记录错误日志后返回0。"
+        "description": "接收当前Chrome打开的标签页列表open_tabs和匹配规则字典rule。首先判断open_tabs是否为空，为空则直接返回0。随后读取rule['type']，当前仅支持\"url\"类型。在\"url\"模式下，从rule中提取预期URL列表expected_urls，从open_tabs各标签页字典中提取实际URL列表actual_urls，调用are_lists_equal并传入compare_urls作为元素级比较函数。若该函数返回False，则记录错误日志并返回0；若通过，则再次判断并返回1。若rule['type']不是\"url\"，记录未知类型错误并返回0。"
       },
       {
         "name": "are_lists_equal",
         "lineno": 82,
-        "description": "通用列表等价性检查器，服务于is_expected_tabs的列表层比对。接收两个列表list1、list2以及一个自定义元素比较函数comparison_func。检查步骤为：第一步先校验两列表长度是否相等，长度不同直接返回False；第二步遍历list1中的每个元素item1，使用any()配合comparison_func在list2中查找是否存在至少一个匹配项item2；若list1中存在任一元素在list2中找不到匹配，则返回False。只有当所有元素都能找到对应匹配且长度相同时，才返回True。该逻辑实现的是基于自定义比较函数的无序集合式等价判断（依赖长度相同来间接保证双向一一对应）。"
+        "description": "通用列表相等性判定函数，接收两个列表list1、list2以及一个元素级比较函数comparison_func。首先检查两列表长度是否一致，长度不同直接返回False。然后遍历list1中的每个元素，使用comparison_func检查该元素是否在list2中存在至少一个匹配项。若list1中存在任一元素在list2中找不到匹配，则返回False；全部匹配成功则返回True。在本evaluator中，该函数被is_expected_tabs调用，用于在忽略元素顺序的前提下，判定预期URL列表与实际URL列表是否由相同的URL元素构成（以长度一致为前提）。"
       },
       {
         "name": "compare_urls",
         "lineno": 97,
-        "description": "URL规范化比较器，服务于are_lists_equal的元素层比对。接收两个URL字符串url1、url2以及可选参数full（默认为True）。若任一URL为None，直接进行字符串相等性比较。否则执行多步规范化：首先通过内部嵌套函数parse_with_default_scheme检查URL是否包含协议头，若无则自动补全“http://”；随后通过内部嵌套函数normalize_url进行解析——使用tldextract提取域名各部分并转小写，丢弃单独的“www”子域名，完全忽略顶级域名后缀（如.com、.com.sg均不参与比较），将根路径“/”归一化为空字符串，scheme强制小写；对于params、query、fragment，仅在full为True时保留，否则设为空字符串。最终重新组装规范化URL并比较两个字符串是否完全相同，返回布尔值。"
+        "description": "接收两个待比较的URL字符串url1、url2以及可选参数full（默认为True）。若任一参数为None，直接进行等值比较。否则，对两个URL执行多步规范化：首先通过内部嵌套函数parse_with_default_scheme为无scheme的URL自动添加http://前缀；再通过normalize_url使用tldextract提取域名时丢弃顶级域名后缀（使不同国家/地区后缀的同一域名等价）、去除单独的www子域名、将根路径“/”置为空字符串，随后按scheme、netloc、path重新组装URL（当full为True时保留params、query、fragment，否则清空）。最终比较两个规范化后的URL字符串是否完全一致，返回布尔结果。该函数通常作为comparison_func被are_lists_equal调用。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:42:49",
+  "created_at": "2026-07-01 15:05:02",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_06fe7178-4491-4589-810f-2e2bc9502122./evaluator_function_labels.json"
 }

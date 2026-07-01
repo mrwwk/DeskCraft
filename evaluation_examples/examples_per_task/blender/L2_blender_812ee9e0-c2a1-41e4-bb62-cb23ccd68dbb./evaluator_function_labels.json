@@ -18,22 +18,22 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender场景中多个对象的约束（constraints）配置是否完全符合任务规则。它通过解析外部Blender检查脚本（如check_constraints.py）输出的JSON数据，检查指定对象上是否存在预期类型的约束，并逐一核对约束的关键属性（包括target、track_axis、up_axis等）。只有当rule中列出的所有约束条件都在对应对象上被找到且各项属性完全匹配时，任务才被判定为成功（返回1.0）；若任一约束缺失、类型不符或属性不匹配，则立即判定失败（返回0.0）。这是一种严格的“全部满足”式（AND逻辑）判定，无近似匹配或容错阈值。",
+    "overall_validation": "该 evaluator 用于验证 Blender 场景中多个对象上的约束（constraint）是否按照任务规则正确配置。它通过读取外部检查脚本 check_constraints.py 输出的 JSON 文本，解析出每个对象当前附加的约束列表，然后与规则中指定的预期约束进行逐一比对。比对内容包括约束类型（如 TRACK_TO），以及可选的目标对象（target）、跟踪轴（track_axis）和向上轴（up_axis）等属性。只有当规则中列出的所有预期约束都能在对应对象上找到完全匹配的项时，才判定任务成功并返回 1.0；若 JSON 解析失败、任一对象缺少指定约束、或任何一项属性不匹配，则立即返回 0.0。整体采用“全部满足”的硬判定逻辑。",
     "main_functions": [
       {
         "name": "check_blender_constraints_multi",
         "lineno": 33,
-        "description": "该函数接收Blender检查脚本输出的原始字符串command_output，以及包含预期约束规则的rule字典。首先调用辅助函数_parse_blender_output将原始输出解析为JSON对象；若解析失败（返回None）则直接返回0.0。随后遍历rule[\"constraints\"]中的每一条预期约束，根据object_name从解析结果中提取该对象的实际约束列表。对每条实际约束，依次比对type字段，以及可选的target、track_axis、up_axis字段（仅在规则中显式包含该键时才参与比较）。只要在同个对象的约束列表中找到一条所有字段均匹配的记录，即视为该预期约束满足。所有预期约束必须全部找到匹配项，函数才返回1.0；若任一预期约束未匹配成功，则立即返回0.0并记录警告日志。整个过程采用严格的“全部满足”（AND）逻辑，无加权、累计或近似匹配机制。"
+        "description": "接收 command_output（来自 check_constraints.py 的 JSON 字符串）和 rule（字典，其中包含 \"constraints\" 列表）。首先调用 _parse_blender_output 将命令输出解析为 Python 字典。随后遍历 rule[\"constraints\"] 中的每一条预期约束，根据 object_name 从解析结果中提取该对象的约束数组。对每条预期约束，在其对象约束数组中逐项查找匹配项：要求 con[\"type\"] 与预期 type 严格一致；若预期约束中包含 \"target\"、\"track_axis\" 或 \"up_axis\" 字段，则对应字段也必须完全相等。只有当前预期约束找到至少一个匹配项后，才继续检查下一条预期约束。若所有预期约束均成功匹配，则返回 1.0；若解析结果为空、任一约束未找到匹配项，或执行过程中发生异常，则返回 0.0。该函数采用“全部满足”的判定策略，不存在部分得分或加权逻辑。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 20,
-        "description": "该辅助函数负责将Blender检查脚本输出的原始字符串解析为JSON对象。它首先检查command_output是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试使用json.loads将内容解析为Python对象。若解析过程中触发JSONDecodeError或ValueError，则记录错误日志及原始输出内容（debug级别），并返回None。该函数为check_blender_constraints_multi提供数据预处理服务，是整个评测流程的输入解析入口；一旦解析失败，主函数将直接判定得分为0.0。"
+        "description": "接收 Blender 检查脚本输出的原始字符串（command_output），负责将其解析为可供后续比对的 Python 字典。首先检查输入是否为空或仅包含空白字符，若是则记录错误日志并返回 None；否则尝试使用 json.loads 对去除首尾空白后的内容进行解析。若抛出 json.JSONDecodeError 或 ValueError，则记录错误日志并在 debug 级别保留原始输出内容，然后返回 None。该函数是主评测函数的数据预处理入口，其返回值直接决定后续约束检查能否正常执行。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:10:10",
+  "created_at": "2026-07-01 14:37:43",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_812ee9e0-c2a1-41e4-bb62-cb23ccd68dbb./evaluator_function_labels.json"
 }

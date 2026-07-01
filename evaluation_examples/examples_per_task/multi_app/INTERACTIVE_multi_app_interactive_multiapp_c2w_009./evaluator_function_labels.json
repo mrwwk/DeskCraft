@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_009./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于INTERACTIVE_multi_app_interactive_multiapp_c2w_009任务，其核心判定逻辑是对某一文本结果（可能是应用输出、界面文本、文件内容或命令返回）执行严格的二值化子串检查。具体而言，evaluator会获取一个字符串形式的结果，并依据配置规则验证该结果是否同时满足两大条件：（1）包含所有预设的正向关键词（include列表中的每一个子串）；（2）不包含任何预设的负向关键词（exclude列表中的任何一个子串）。若结果本身为None，或未能同时满足上述全部条件，则判定为失败并返回0.0；仅当全部正向子串均出现且全部负向子串均未出现时，才判定为成功并返回1.0。该evaluator采用精确的子串匹配（Python in操作符），不支持近似匹配、正则匹配、部分得分或顺序要求，是一种严格的布尔式指标判定逻辑。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该主函数是评测的唯一判定入口，接收result（待检查的字符串）和rules（字典类型，预期包含include与exclude键）两个参数。其执行步骤如下：首先进行空值守卫，若result为None则直接返回0.0；随后通过rules.get()分别提取include列表与exclude列表，若键不存在则默认取空列表；接着执行核心组合条件判断——使用all(r in result for r in include)验证所有include子串均存在于result中，同时使用all(r not in result for r in exclude)验证所有exclude子串均不存在于result中；最后通过逻辑与（and）连接这两个条件，若同时满足则返回1.0，否则返回0.0。函数执行过程中会调用print()将result和rules输出至标准输出以便调试。该函数不涉及近似匹配、大小写转换、正则表达式或文件读取操作，完全依赖Python的in操作符进行精确子串查找，返回值为严格的0.0或1.0浮点数。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:13:16",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_009./evaluator_function_labels.json"
+}

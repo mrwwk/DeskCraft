@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_6d1f60ca-ea94-4a09-8886-ddef96f1fd8a./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json",
+      "lineno": 64
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 230
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json",
+      "lineno": 64
+    },
+    {
+      "name": "_multicellrange_containsby",
+      "lineno": 170
+    },
+    {
+      "name": "_match_value_to_rule",
+      "lineno": 174
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 230
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 总体用于验证任务产出的 JSON 或 YAML 配置文件内容是否符合预期规则。核心检查对象是配置文件内部按键路径定位到的字段值，通过与参考规则进行多模式比对来判定任务完成度。check_json 采用规则引擎模式，支持 expect（必须全部满足）与 unexpect（必须全部不满足）两类规则的联合判定，匹配方式涵盖正则、数值比较、近似相等、电子表格范围包含、区间判断、字符串列表/集合相等；check_json_settings 采用简单字典精确比对模式，要求 expected 下的所有键值对与目标文件完全一致。两种模式均为二元打分：所有条件同时满足时返回 1.0，任一条件失败即返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_json",
+        "lineno": 64,
+        "description": "接收 result（结果文件路径）、rules（包含 expect/unexpect 规则的字典）和 is_yaml（是否为 YAML 格式）作为输入。首先检查文件是否存在，不存在则返回 0.0；随后按 is_yaml 选择 yaml.safe_load 或 json.load 解析文件内容，解析失败或 YAML 文件为空也返回 0.0。接着分别处理 expect_rules 和 unexpect_rules：对每条规则，按照 rule['key'] 中的键列表逐层深入访问解析后的字典，若 expect 规则中遇到 KeyError 或 TypeError 则直接返回 0.0，若 unexpect 规则中遇到则视 value 为 None。随后调用 _match_value_to_rule 将最终获取到的 value 与规则进行匹配。expect 要求所有规则匹配结果为真（metric = metric and result），unexpect 要求所有规则匹配结果为假（metric = metric and not result）。最终返回 float(metric)，即全部满足为 1.0，任一失败为 0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 230,
+        "description": "接收 actual（结果文件路径）和 expected（包含 'expected' 键的字典）作为输入。若 actual 为空字符串直接返回 0.0。尝试打开 actual 路径的文件并解析为 JSON，解析失败返回 0.0。然后遍历 expected['expected'] 中的每一对 key 和 value，检查该 key 是否存在于解析后的 data 中且对应的值与 value 完全相等（使用 Python == 判断）。若所有键值对都完全匹配则返回 1.0，只要有一个 key 不存在或值不相等则立即返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_multicellrange_containsby",
+        "lineno": 157,
+        "description": "接收两个 MultiCellRange 对象 subset_candidate 与 superset_candidate，检查前者包含的所有单元格范围是否都存在于后者之中（通过遍历 subset_candidate 中的每个 range，判断其是否 in superset_candidate）。该函数服务于 check_json 中的 spreadsheet_range 匹配方法，用于判定电子表格的单元格范围是否被正确包含在指定上下界之间。"
+      },
+      {
+        "name": "_match_value_to_rule",
+        "lineno": 162,
+        "description": "核心规则匹配器，接收 value 和 rule（含 method 和 ref 字段），根据 method 字段执行不同类型比较并返回布尔结果。具体支持：1) 以 're' 开头的正则匹配（如 re.IGNORECASE），使用 re.search 在 value 中搜索 rule['ref']；2) 比较运算符 eq/ne/le/lt/ge/gt，直接调用 operator 模块对应函数比较 value 与 rule['ref']；3) approx:THRESHOLD 近似匹配，将 value 转为浮点数后检查与 rule['ref'] 的绝对差是否不超过 threshold；4) spreadsheet_range 电子表格范围检查，利用 _multicellrange_containsby 验证 value 是否介于 rule['ref'][0] 和 rule['ref'][1] 两个 MultiCellRange 之间；5) range.xx 区间检查，method 第 6、7 字符分别表示左右端点开闭情况（如 te 表示左开右闭），结合 operator 的 lt/le 判断 value 是否在 rule['ref'] 区间内；6) str_list_eq/str_set_eq，将 value 与 ref 按逗号分割并去除引号后，分别转为 list 或 set 进行相等比较。若 method 未实现则抛出 NotImplementedError。该函数被 check_json 的 expect 和 unexpect 规则循环调用，是字段级判定的核心依赖。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:16:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_6d1f60ca-ea94-4a09-8886-ddef96f1fd8a./evaluator_function_labels.json"
+}

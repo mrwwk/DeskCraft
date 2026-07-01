@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_03354b44-fefb-46a8-90a5-bb683fd488b3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_config",
+      "lineno": 42
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 25
+    },
+    {
+      "name": "compare_config",
+      "lineno": 42
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证VSCode任务产生的配置文件内容是否满足预期要求。核心检查对象是实际生成的配置文件（通常为JSON格式），将其与预设的期望文本进行比对。评测采用二元打分机制（返回1.0表示通过，0.0表示失败），并支持两种比较语义：默认的松散包含模式（containment_ok=True）允许实际配置在包含期望内容的基础上拥有额外字段或内容；严格模式（containment_ok=False）则要求文本或JSON完全相等。成功判定的总体思路是：先读取实际文件，再依据选项选择子集检查、字符串包含检查或严格相等检查，任一检查通过即得满分，否则零分。",
+    "main_functions": [
+      {
+        "name": "compare_config",
+        "lineno": 42,
+        "description": "该函数接收实际文件路径actual（字符串）、包含期望内容的rules字典，以及可选的options参数。执行步骤如下：1）若actual为空或rules中不存在expected字段，直接返回0.0；2）以utf-8编码读取actual路径对应的文件全文；3）从options中获取containment_ok参数，默认为True。若启用松散模式：先尝试将实际文本与期望文本解析为JSON对象，调用_is_subset检查期望JSON是否为实际JSON的子集（期望的键值对必须全部存在，允许实际有额外字段），若成立则返回1.0；若JSON解析失败，则回退到字符串包含检查，判断expected_text.strip()是否为actual_text的子串，是则返回1.0，否则返回0.0。若处于严格模式（containment_ok=False）：先判断文本完全相等；若不等，再尝试JSON解析后比较是否完全相等（此时不允许额外键），满足则返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 30,
+        "description": "这是一个递归辅助函数，用于判断expected是否为actual的子集。具体逻辑为：若两者均为字典，则递归检查expected中的每一个键是否都存在于actual中，且对应值也满足子集关系；若两者为列表，则要求严格相等（==）；对于其他基本类型，同样要求严格相等。该函数服务于compare_config的松散JSON比较分支，使得评测可以容忍实际配置文件中存在期望之外的额外字段，只要期望的字段和结构都被完整包含即可。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:52:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_03354b44-fefb-46a8-90a5-bb683fd488b3./evaluator_function_labels.json"
+}

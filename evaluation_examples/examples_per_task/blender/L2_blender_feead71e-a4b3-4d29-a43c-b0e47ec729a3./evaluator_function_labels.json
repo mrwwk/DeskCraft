@@ -22,27 +22,27 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender场景中指定文本对象（text object）的样式配置是否符合预期。它通过读取外部检查脚本（如check_text.py）输出的JSON数据，定位指定名称的文本对象，并对其body（文本内容）、size（尺寸）、extrude（挤出厚度）、bevel_depth（倒角深度）、align_x（水平对齐方式）等属性进行逐项核查。其中字符串类属性采用精确匹配，数值类属性采用容差范围内的近似匹配。只有当所有在rule中指定的属性全部满足对应条件时，才判定任务完成并返回1.0；若解析失败、对象不存在或任一属性不匹配，则立即返回0.0。",
+    "overall_validation": "该 evaluator 用于验证 Blender 场景中指定文本对象（text object）的样式属性是否符合任务预期。它通过解析外部检查脚本（check_text.py）输出的 JSON 数据，获取目标文本对象的实际属性值，并与 rule 中给定的期望值逐项比对。检查涵盖文本内容（body）、尺寸（size）、挤出厚度（extrude）、倒角深度（bevel_depth）及水平对齐方式（align_x）等字段，其中字符串类属性采用精确匹配，数值类属性采用容差范围内的近似匹配（默认容差 0.05）。所有在 rule 中指定的字段必须全部满足预期，函数才返回 1.0（成功）；若 JSON 解析失败、找不到目标对象、或任一属性不匹配，则立即返回 0.0（失败）。总体判定思路为“全或无”的严格通过制。",
     "main_functions": [
       {
         "name": "check_blender_text_styling",
         "lineno": 40,
-        "description": "该函数接收来自Blender检查脚本的command_output（JSON字符串）和包含预期规则的rule字典。首先调用_parse_blender_output将命令输出解析为JSON对象；若解析失败或结果为空则直接返回0.0。接着通过rule.get(\"object_name\")获取目标对象名称，并从解析结果中提取该对象的文本数据；若对象不存在则返回0.0。随后按顺序执行以下检查：若rule中包含\"body\"，则要求text_data[\"body\"]与rule[\"body\"]精确相等；若rule中包含\"size\"、\"extrude\"或\"bevel_depth\"，则调用_check_tolerance进行数值容差比较，容差值取自rule.get(\"tolerance\", 0.05)；若rule中包含\"align_x\"，则要求精确匹配。以上所有检查必须全部通过才返回1.0，任一检查失败立即返回0.0。若执行过程中发生异常，也返回0.0。"
+        "description": "该函数接收 command_output（来自 check_text.py 的 JSON 字符串输出）和 rule（包含目标对象名与预期属性的字典）作为输入。执行步骤如下：首先调用 _parse_blender_output 将原始命令输出解析为 Python 字典，若解析失败则直接返回 0.0；接着以 rule[\"object_name\"] 为键从结果中提取对应文本对象数据 text_data，若该对象不存在也返回 0.0。随后按 rule 中实际存在的字段依次进行严格检查：若包含 \"body\"，要求 text_data[\"body\"] 与 rule[\"body\"] 精确相等；若包含 \"size\"、\"extrude\" 或 \"bevel_depth\"，则调用 _check_tolerance 进行容差比较，容差值取 rule.get(\"tolerance\", 0.05)；若包含 \"align_x\"，要求 text_data[\"align_x\"] 与 rule[\"align_x\"] 精确匹配。以上所有检查项必须全部通过，函数最终才返回 1.0；任何一项不匹配都会立即返回 0.0。整个逻辑由 try-except 包裹，捕获异常后同样返回 0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 16,
-        "description": "负责将Blender检查脚本输出的原始字符串解析为Python字典。它先检查command_output是否为空或仅包含空白字符，若为空则记录错误并返回None；否则尝试使用json.loads进行解析。若遇到JSONDecodeError或ValueError，则记录错误及原始输出内容，并返回None。该函数是主评测逻辑的数据入口，为后续所有属性检查提供结构化数据。"
+        "lineno": 19,
+        "description": "接收 Blender 检查脚本的原始命令行输出字符串 command_output。先判断输出是否为空或仅含空白字符，若是则记录错误并返回 None；否则尝试使用 json.loads 将其解析为 Python 字典。若遇到 json.JSONDecodeError 或 ValueError，记录错误及原始输出内容后返回 None。该函数是主评测逻辑的数据入口，负责将外部脚本打印的文本输出转换为结构化字典，供后续按对象名和属性名查询使用。"
       },
       {
         "name": "_check_tolerance",
-        "lineno": 28,
-        "description": "用于判断实际数值是否在预期数值的容差范围内。它接收actual（实际值）、expected（预期值）和tol（容差值）三个参数，首先检查actual和expected是否均为非None，然后计算两者差值的绝对值是否小于等于tol，返回布尔结果。该函数主要服务于主函数中对size、extrude、bevel_depth等浮点属性的近似匹配检查。"
+        "lineno": 32,
+        "description": "接收 actual（实际值）、expected（期望值）和 tol（容差值）三个参数。首先检查 actual 或 expected 是否为 None，若是则直接返回 False；否则将三者转换为浮点数，计算 actual 与 expected 的绝对差值，并判断是否小于等于 tol。该函数专门服务于主函数中对 size、extrude、bevel_depth 等数值型样式属性的近似相等判定，用于消除浮点数精度带来的严格相等误判。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:13:24",
+  "created_at": "2026-07-01 14:40:20",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_feead71e-a4b3-4d29-a43c-b0e47ec729a3./evaluator_function_labels.json"
 }

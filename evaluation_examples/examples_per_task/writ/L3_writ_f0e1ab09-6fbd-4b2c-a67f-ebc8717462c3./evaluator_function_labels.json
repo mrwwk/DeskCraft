@@ -1,0 +1,81 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_f0e1ab09-6fbd-4b2c-a67f-ebc8717462c3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 23
+    },
+    {
+      "name": "check_title_formatting",
+      "lineno": 67
+    },
+    {
+      "name": "check_section_heading_format",
+      "lineno": 98
+    },
+    {
+      "name": "check_body_text_font_size",
+      "lineno": 139
+    },
+    {
+      "name": "check_week4_body_italic",
+      "lineno": 179
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_docx_files",
+      "lineno": 23
+    },
+    {
+      "name": "check_title_formatting",
+      "lineno": 67
+    },
+    {
+      "name": "check_section_heading_format",
+      "lineno": 98
+    },
+    {
+      "name": "check_body_text_font_size",
+      "lineno": 139
+    },
+    {
+      "name": "check_week4_body_italic",
+      "lineno": 179
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证在 LibreOffice Writer 中对 Guide_L3_05.docx 进行格式化和编辑的任务结果。它通过 5 个独立指标分别检查最终生成的 .docx 文件：指标 0 由 compare_docx_files 负责，将结果文件与参考文件进行文本内容比对（覆盖要求 1 的替换文本和要求 6 的添加 Questions 行，不检查格式属性）；指标 1 至 4 直接解析结果文件，依次验证标题段落是否居中且 24pt 粗体（要求 2）、以 Week <N> 开头的章节标题是否粗体且深绿色 #006400（要求 3）、正文段落字体大小是否为 11pt（要求 4，对未显式设置 font.size 的继承情况予以宽容）、以及 Week 4: Integration 标题后的正文段落是否整体为斜体（要求 5）。每个指标独立返回 0（失败）或 1（成功），代码中未明确体现最终总分计算或联合判定逻辑，但各指标分别对应任务的不同要求。",
+    "main_functions": [
+      {
+        "name": "compare_docx_files",
+        "lineno": 23,
+        "description": "接收两个 .docx 文件路径 file1 与 file2，以及可选参数字典 options（支持 ignore_blanks，默认为 True；ignore_case，默认为 False）。使用 python-docx 的 Document 打开两个文件并提取全部段落文本。若 ignore_blanks 为 True，先将各段落文本用换行符连接，再通过 re.sub(r'\\s+', ' ', ...) 将连续空白字符压缩为单个空格并去除首尾空白，若 ignore_case 为 True 则统一转为小写后进行整体字符串相等比较；若 ignore_blanks 为 False，则要求两文档段落数量必须相同，并逐段进行字符串相等比较（同样受 ignore_case 控制）。文本完全一致返回 1，任何差异返回 0。若文件路径为空或打开失败也返回 0。"
+      },
+      {
+        "name": "check_title_formatting",
+        "lineno": 67,
+        "description": "接收结果文件路径 result_file。使用 Document 打开文档，取 paragraphs[0] 作为标题段落。首先检查 paragraph_format.alignment 是否等于 WD_PARAGRAPH_ALIGNMENT.CENTER；然后遍历该段落的所有 run，寻找至少一个 text.strip() 非空且 bold 为真、同时 font.size 存在且 font.size.pt 等于 24 的 run。两项条件均满足返回 1，任一项不满足或文件无法打开返回 0。"
+      },
+      {
+        "name": "check_section_heading_format",
+        "lineno": 98,
+        "description": "接收结果文件路径 result_file。使用 Document 打开文档，遍历所有段落，通过正则 r'^Week\\s+\\d' 识别章节标题。要求文档中至少存在一个此类标题；对每个匹配到的标题段落，遍历其 runs，检查至少存在一个 text.strip() 非空且 bold 为真、同时 font.color 存在且 font.color.rgb 等于 RGBColor(0x00, 0x64, 0x00)（即 #006400）的 run。若所有找到的标题段落均满足粗体加深绿色则返回 1；若未找到任何标题、或任一段落不满足、或文件无法打开则返回 0。"
+      },
+      {
+        "name": "check_body_text_font_size",
+        "lineno": 139,
+        "description": "接收结果文件路径 result_file。使用 Document 打开文档，遍历 paragraphs，通过索引 i==0 跳过标题，通过正则 r'^Week\\s+\\d' 跳过章节标题，通过 text 为空跳过无内容段落。对其余正文段落的每个 run，若 run.text.strip() 非空且 run.font.size 被显式设置（不为 None），则要求其 font.size.pt 必须等于 11；若 font.size 为 None（可能继承段落样式）则予以宽容通过。若发现任何显式设置且不等于 11pt 的 run，立即返回 0；全部通过返回 1。文件无法打开或路径为空返回 0。"
+      },
+      {
+        "name": "check_week4_body_italic",
+        "lineno": 179,
+        "description": "接收结果文件路径 result_file。使用 Document 打开文档，先遍历 paragraphs 定位同时包含 Week 4 与 Integration 文本的段落索引；若未找到该标题，默认返回 1（由文本内容指标负责检测章节缺失）。从该标题的下一段开始，向后遍历直到遇到下一个匹配 r'^Week\\s+\\d' 的标题或文档末尾。对此区间内的每个非空正文段落，检查其 runs 中至少存在一个 text.strip() 非空且 italic 为真的 run；若某段落无任何斜体 run 则返回 0。若 Week 4 标题后不存在任何正文段落，默认返回 1。全部满足返回 1，文件无法打开返回 0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 17:01:12",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_f0e1ab09-6fbd-4b2c-a67f-ebc8717462c3./evaluator_function_labels.json"
+}

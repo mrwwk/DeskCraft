@@ -1,0 +1,123 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_f11a0c21-75cc-4d13-8a91-1c01b4d51004./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 75
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 94
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 116
+    },
+    {
+      "name": "check_ui_bundle_css_declarations",
+      "lineno": 176
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 20
+    },
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 37
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 41
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 56
+    },
+    {
+      "name": "_extract_css_blocks",
+      "lineno": 66
+    },
+    {
+      "name": "_normalize_compact_text",
+      "lineno": 71
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 75
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 94
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 116
+    },
+    {
+      "name": "check_ui_bundle_css_declarations",
+      "lineno": 176
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个UI Bundle（以zip文件形式存在，通常为VS Code相关扩展或前端应用打包产物）的内容完整性与正确性。它通过四个独立维度进行“全有或全无”（返回1.0或0.0）的严格检查：第一，检查zip中是否包含所有rules指定的必需文件；第二，检查manifest.json的内容是否包含预期的键值子集；第三，检查HTML文件是否满足一系列DOM结构要求，包括选择器存在性、元素数量、文本包含、属性值匹配、全文文本包含；第四，检查CSS文件中特定选择器是否声明了预期的CSS属性及属性值。四个主函数各自独立运行，每个函数内部要求所有子检查全部通过才返回1.0，任一子检查失败即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 75,
+        "description": "该函数检查UI Bundle zip中是否包含rules指定的所有必需文件。首先，若actual路径为空则直接返回0.0；若rules中required_files为空列表则直接返回1.0。随后调用_load_ui_bundle_entries加载zip文件，获取所有条目的标准化路径集合。遍历required_files列表，将每个需求路径通过_normalize_ui_bundle_path标准化后，检查其是否存在于zip条目中。若有任何一个必需文件缺失，立即返回0.0；若全部存在，则返回1.0。"
+      },
+      {
+        "name": "check_ui_bundle_manifest_subset",
+        "lineno": 94,
+        "description": "该函数检查zip中的manifest.json是否包含预期的键值子集。首先，若actual为空返回0.0；若rules中expected_manifest为None则返回1.0。调用_load_ui_bundle_entries加载zip，检查标准化后的\"manifest.json\"是否存在，若不存在返回0.0。若存在，则读取其文本内容并用json.loads解析为字典。随后调用_is_subset，验证expected_manifest是否为实际manifest对象的子集（即expected的所有键值对都必须在实际manifest中存在且匹配，其中列表要求完全相等，字典递归检查）。若子集检查失败返回0.0，通过则返回1.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 116,
+        "description": "该函数对zip中的HTML文件执行一系列DOM与文本检查。首先，若actual为空返回0.0；若rules中html_checks为空字典则返回1.0。调用_load_ui_bundle_entries加载zip。遍历html_checks字典，键为文件名，值为检查列表。对每个文件，先确认其标准化路径存在于zip中，再调用_get_ui_bundle_html_soup解析为BeautifulSoup对象。遍历该文件的checks列表，根据check_type执行不同检查：selector_exists要求soup.select_one(selector)非None；selector_count要求soup.select(selector)返回的元素长度等于int(expected_count)；selector_text_contains要求选择器匹配到的元素文本（get_text(\" \", strip=True)）必须包含expected_text（不区分大小写）；selector_attribute_equals要求选择器匹配到的元素的attribute属性值必须严格等于expected_value；text_present要求整个HTML文档的完整文本中必须包含expected_text（不区分大小写）。若遇到未知的check_type也返回0.0。所有检查中任一失败即返回0.0，全部通过返回1.0。"
+      },
+      {
+        "name": "check_ui_bundle_css_declarations",
+        "lineno": 176,
+        "description": "该函数检查zip中CSS文件是否包含特定选择器及对应的样式声明。首先，若actual为空返回0.0；若rules中css_declarations为空字典则返回1.0。调用_load_ui_bundle_entries加载zip。遍历css_declarations，键为CSS文件名，值为selector_rules列表。对每个文件确认存在后读取css_text。遍历selector_rules，每个规则包含selector和properties字典。调用_extract_css_blocks使用正则提取该selector对应的所有花括号内的声明内容。对每个提取到的block，使用_normalize_compact_text去除空白并转小写，然后检查是否包含所有预期的property：首先检查属性名（prop_name）的紧凑形式是否存在于block中；若prop_value不为None，则进一步检查\"prop_name:prop_value\"的紧凑形式是否完整存在。只要有一个block能同时满足该selector_rule下的所有properties要求，即视为该selector_rule匹配成功。若某个selector_rule的所有block都不匹配，立即返回0.0。所有规则全部匹配成功则返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 20,
+        "description": "递归子集比较器。用于验证expected是否为actual的子集。若expected为字典，则递归检查expected中的每个键是否都存在于actual中，且对应的值也满足子集关系；若expected为列表，则要求expected与actual完全相等；若为标量，则要求严格相等。返回布尔值。该函数被check_ui_bundle_manifest_subset调用，用于判断manifest.json的结构是否符合预期。"
+      },
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 37,
+        "description": "路径标准化函数。将输入路径去除开头的\"./\"，并将所有反斜杠\"\\\\\"替换为正斜杠\"/\"。返回标准化后的路径字符串。被所有需要比对zip内部文件路径的函数调用，用于统一不同操作系统或打包方式产生的路径差异。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 41,
+        "description": "UI Bundle（zip文件）加载器与文本提取器。接收zip文件路径actual，打开后读取所有条目名称，建立标准化路径到原始路径的映射，计算每个条目的file_size，并读取特定文本类型文件（后缀为.html、.css、.js、.json、.md、.txt、.svg）的UTF-8文本内容（解码错误时忽略）。返回三个字典：normalized_to_raw（标准化路径到原始路径）、file_sizes（标准化路径到文件大小）、text_contents（标准化路径到文本内容）。该函数是四个主函数共同依赖的基础数据加载入口。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 57,
+        "description": "HTML解析包装器。接收text_contents字典和file_name，先对文件名进行标准化，然后从text_contents中获取对应HTML文本，使用BeautifulSoup以\"html.parser\"解析为soup对象返回。若文件不存在或内容缺失则返回None。专供check_ui_bundle_html_checks使用，用于支持CSS选择器查询和文本提取。"
+      },
+      {
+        "name": "_extract_css_blocks",
+        "lineno": 66,
+        "description": "CSS声明块提取器。接收css_text和selector，使用正则表达式rf\"{re.escape(selector)}\\s*\\{{(.*?)\\}}\"（带有re.IGNORECASE | re.DOTALL标志）提取该选择器对应的所有花括号内的声明内容。返回所有匹配到的声明块字符串列表。被check_ui_bundle_css_declarations调用，用于获取待检查的CSS属性集合。"
+      },
+      {
+        "name": "_normalize_compact_text",
+        "lineno": 71,
+        "description": "文本紧凑归一化函数。将输入字符串中的所有空白字符（\\s+）去除，并转换为小写。返回处理后的字符串。被check_ui_bundle_css_declarations调用，用于在忽略空白和大小写差异的情况下比较CSS属性名和属性值对。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:51:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_f11a0c21-75cc-4d13-8a91-1c01b4d51004./evaluator_function_labels.json"
+}

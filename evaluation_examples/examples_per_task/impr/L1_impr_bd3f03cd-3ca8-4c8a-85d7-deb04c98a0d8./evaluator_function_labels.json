@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_bd3f03cd-3ca8-4c8a-85d7-deb04c98a0d8./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_transition",
+      "lineno": 23
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_transition",
+      "lineno": 23
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户生成的PowerPoint文件（.pptx）中，指定幻灯片是否成功应用了特定的切换效果（slide transition）。它不依赖Microsoft PowerPoint应用程序接口，而是直接将.pptx视为ZIP压缩包，读取其中ppt/slides/目录下的单个幻灯片OOXML文件，解析其XML结构。核心检查逻辑是：在目标幻灯片的XML中，通过OpenXML命名空间（presentationml和drawingml）定位到p:transition元素，并进一步检查该元素下是否存在与rules中指定的transition_type名称完全匹配的子元素（如dissolve等）。判定方式为二值打分：仅当指定幻灯片存在、且其transition节点下包含预期的切换类型时返回1.0；若幻灯片不存在、无transition节点、或transition节点下无指定类型，则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_transition",
+        "lineno": 23,
+        "description": "该函数接收pptx_file（PowerPoint文件路径）和rules（规则字典，必须包含slide_idx和transition_type两个键）作为输入。首先，它将slide_idx（0-based索引）转换为1-based的文件名，构造出ppt/slides/slide{slide_idx+1}.xml的路径，并使用zipfile模块打开.pptx文件检查该slide XML是否存在；若不存在直接返回0.。随后，使用xml.etree.ElementTree解析该slide XML，在OpenXML命名空间（'p': 'http://schemas.openxmlformats.org/presentationml/2006/main'）下，通过root.find('.//p:transition', namespaces)查找transition元素。若找到transition，则进一步通过transition.find('.//p:{}'.format(transition_type), namespaces)查找与rules指定名称一致的切换类型子节点。若该子节点存在，返回1.；若transition元素不存在或指定类型子节点不存在，均返回0.。整个判定为严格的精确匹配，无近似或阈值容错。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:24:32",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_bd3f03cd-3ca8-4c8a-85d7-deb04c98a0d8./evaluator_function_labels.json"
+}

@@ -1,0 +1,122 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00009-0009-4000-8000-000000000009-L2./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "check_l2_beach_event_poster_complete",
+      "lineno": 284
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 103
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 132
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 276
+    },
+    {
+      "name": "check_l2_beach_event_poster_complete",
+      "lineno": 284
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于评测 L2-9 海滩活动海报任务（beach event poster task）。任务最终必须产出两个文件：一个 PNG 图片与一个 XCF 源文件。评测采用严格的“全或无”二进制逻辑：对 PNG 依次检查文件存在性、格式是否为 PNG、尺寸是否接近 1200×1800（容差 5 像素）、以及三个指定区域（top_center、center、bottom_center）是否具备足够的文本边缘密度（min_edge_density 为 0.006），同时通过 OCR 验证图中是否包含 \"BEACH PARTY\"、\"2026.08.16\"、\"SANYA COAST\" 三个关键词；对 XCF 检查文件是否包含 BG_Group、Photo_Group、Text_Group、Deco_Group 四个图层（ordered 为 False，不限制顺序）。以上所有子检查必须全部通过（每项返回 1），最终得分才为 1.0，任一失败即整体返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_image_dimensions",
+        "lineno": 23,
+        "description": "该函数检查单张图片的像素尺寸是否符合预期。它接收 image_path（图片路径）、expected_width（期望宽度）、expected_height（期望高度，若为 None 则只检查宽度）以及 tolerance（容差像素，默认 5）。检查步骤为：先验证文件是否存在；再用 PIL.Image.open 打开图片读取 width 与 height；计算实际宽高与期望值的绝对差，判断是否均不超过 tolerance。判定依据：宽度（以及可选的高度）差值均在容差范围内则返回 1，任一超出或文件不存在/打开失败则返回 0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 60,
+        "description": "该函数检查目标文件是否为有效 PNG 格式。它接收 image_path。检查步骤为：验证文件是否存在；用 PIL.Image.open 打开后读取 img.format 属性。判定依据：img.format 精确等于 'PNG' 时返回 1，否则返回 0；文件不存在或读取异常也返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 85,
+        "description": "该函数执行最基础的文件存在性检查。它接收 file_path。检查步骤为：直接调用 os.path.isfile(file_path)。判定依据：文件存在且为普通文件返回 1，路径为 None 或文件不存在返回 0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 139,
+        "description": "该函数检查 GIMP XCF 源文件的图层结构。它接收 xcf_path 和 rule 字典，rule 中必须包含 layers（期望图层名称列表），可选 ordered（是否要求顺序，默认 False）。检查步骤为：验证文件存在性；读取文件头确认以 b'gimp xcf' 开头；优先尝试用 gimpformats 库解析出所有图层名称列表，检查是否包含全部 expected_layers；若 ordered 为 True，还要求这些图层在解析列表中的出现位置按索引递增（即保持给定顺序）。若 gimpformats 解析失败，回退到二进制字节串搜索：在文件内容中查找每个图层名对应的 UTF-8 字节串位置，若 ordered 为 True 则要求各位置按从小到大排列。判定依据：所有图层名均存在且顺序要求满足时返回 1，任一图层缺失、顺序错误或文件非法则返回 0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 217,
+        "description": "该函数检查图片指定区域内是否包含足够密集的类文本边缘，并可选择通过 OCR 验证关键词。它接收 image_path 和 rule 字典，rule 可包含 regions（区域名称列表，默认 [\"center\"]）、keywords（关键词列表）、min_edge_density（最小边缘密度，默认 0.008）、edge_threshold（边缘阈值，默认 40.0）。检查步骤为：验证文件存在性；将图片转为灰度图；对每个 region 调用 _resolve_region_bbox 得到像素坐标并裁剪，再调用 _edge_density 计算该区域的边缘密度；若任一区域密度低于 min_edge_density 则判定失败。若 rule 提供了 keywords，进一步使用 pytesseract.image_to_string 对全图进行 OCR，将结果通过正则 r'\\s+' 合并空白并转小写，检查每个关键词的小写形式是否都出现在归一化文本中；若 OCR 库不可用或报错，仅记录 warning，不直接判失败。判定依据：所有指定区域边缘密度达标且关键词（如有）全部命中则返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_l2_beach_event_poster_complete",
+        "lineno": 284,
+        "description": "这是 L2-9 海滩活动海报任务的复合评测主入口。它接收 result_paths 列表，要求至少包含两个元素，依次取前两项作为 png_path 和 xcf_path。检查步骤严格按顺序执行 5 项子检查：1）调用 check_file_exists 确认 PNG 存在；2）调用 check_png_format 确认 PNG 格式；3）调用 check_image_dimensions 检查 PNG 尺寸是否为 1200×1800（默认容差 5 像素）；4）调用 check_text_in_region_keywords 检查 PNG 的 top_center、center、bottom_center 三个区域边缘密度不低于 0.006，且 OCR 识别结果包含 \"BEACH PARTY\"、\"2026.08.16\"、\"SANYA COAST\"；5）调用 check_xcf_layers_structure 检查 XCF 包含 BG_Group、Photo_Group、Text_Group、Deco_Group 四个图层（ordered 为 False，不限制顺序）。将 5 项得分汇总后传入 _all_binary_checks_pass。判定依据：所有子检查得分均必须大于等于 1.0，最终返回 1.0（完全成功），否则返回 0.0（失败）。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 108,
+        "description": "该辅助函数将语义化的区域名称转换为图片上的像素级包围框坐标。它接收图片 width、height 和 region_name（如 \"top_left\"、\"center\"、\"bottom\" 等），通过比例分割返回 (x0, y0, x1, y1)。例如 \"center\" 返回 (w//4, h//4, 3*w//4, 3*h//4)。它服务于 check_text_in_region_keywords，用于把人类可读的区域描述映射为可裁剪的数组索引。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 133,
+        "description": "该辅助函数量化灰度图像区域的边缘密集程度。它接收 gray_array（二维 numpy 灰度数组）和 edge_threshold（默认 40.0），分别计算 x、y 方向的梯度绝对值并相加得到边缘强度图，最后返回强度超过 edge_threshold 的像素所占比例。返回值越高代表区域越可能存在文字或锐利图形。它被 check_text_in_region_keywords 调用，用于判断指定区域是否“看起来像有文字”。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 278,
+        "description": "该辅助函数是严格的二进制聚合器。它接收 scores 列表，过滤掉 None 后检查所有有效分数是否都大于等于 1.0。若全部满足返回 1.0，否则返回 0.0。它封装了“全部通过才成功”的判定逻辑，专供 check_l2_beach_event_poster_complete 作为最终得分计算使用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:15:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00009-0009-4000-8000-000000000009-L2./evaluator_function_labels.json"
+}

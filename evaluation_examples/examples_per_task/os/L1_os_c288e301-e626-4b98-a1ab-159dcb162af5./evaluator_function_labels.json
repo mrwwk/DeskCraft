@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_c288e301-e626-4b98-a1ab-159dcb162af5./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_python_alias",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_python_alias",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统中python与pip的别名配置是否被正确设置。它读取shell收集器输出的key=value格式文本，检查其中三个状态标志python_ok、pip_ok、file_ok是否全部严格等于\"true\"。只有当别名在功能层面（python命令可用、pip命令可用）和文件层面（配置文件状态正确）同时满足要求时，才返回1.0；任一条件不满足或解析异常即返回0.0。总体判定逻辑为\"全部满足\"式的硬性通过/不通过。",
+    "main_functions": [
+      {
+        "name": "check_os_python_alias",
+        "lineno": 31,
+        "description": "该函数接收shell收集器输出的字符串result和规则字典rules。首先调用_parse_kv将result按行解析为键值对字典。随后依次执行三项严格相等检查：1）kv.get(\"python_ok\")必须等于\"true\"，用于验证python别名是否生效；2）kv.get(\"pip_ok\")必须等于\"true\"，用于验证pip别名是否生效；3）kv.get(\"file_ok\")必须等于\"true\"，用于验证相关配置文件状态是否正确。只有当这三个字段全部同时满足时，才返回1.0；若任一字段不等于\"true\"、字段缺失，或解析过程中发生Exception，均返回0.0。该逻辑为全或无的硬性判定，不存在部分得分或加权计算。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该函数接收shell输出字符串output，将其按换行符分割为行列表。对每一行去除首尾空白后，若包含\"=\"字符，则以第一个\"=\"为界，左侧作为键、右侧作为值（均去除首尾空白）存入字典。若input为空或None，直接返回空字典。该函数负责将shell命令的key=value文本输出转换为结构化字典，供check_os_python_alias进行后续的条件判定。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:31",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_c288e301-e626-4b98-a1ab-159dcb162af5./evaluator_function_labels.json"
+}

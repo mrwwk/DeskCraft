@@ -26,27 +26,27 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Audacity任务最终导出的WAV音频文件是否满足指定的技术规格。它独立地对音频文件进行两项核心检查：一是音频总时长必须在给定容差范围内匹配预期值，二是音频采样率必须精确匹配预期值。每项检查各自调用统一的WAV信息读取器获取实际参数，然后分别采用“绝对误差≤阈值”和“精确相等”两种比较方式进行判定。每个主函数独立返回1.0表示该项检查通过，返回0.0表示不通过或发生异常；任务完成度由调用方根据这些独立评分项分别判定，evaluator内部不存在多指标联合加权或组合逻辑。",
+    "overall_validation": "该 evaluator 用于验证 Audacity 任务最终导出的 WAV 音频文件是否符合指定的时长与采样率要求。它通过标准库 wave 模块读取目标音频文件的头部信息，提取实际时长（duration）和采样率（sample_rate），再与任务规则中给定的预期值进行比对。其中，时长检查采用近似匹配策略，允许在默认 0.5 秒的容差范围内浮动；采样率检查则采用精确匹配策略，要求实际值与预期值完全一致。每个检查项独立返回 1.0（通过）或 0.0（不通过），evaluator 整体通过分别调用这两个主函数对音频文件进行逐项验证。",
     "main_functions": [
       {
         "name": "check_audio_duration",
         "lineno": 41,
-        "description": "该函数接收file_path（待测音频文件路径）和rule字典作为输入。rule中必须包含键expected_duration（预期时长，浮点数），并可包含键tolerance（容差秒数，默认为0.5）。检查步骤如下：首先判断file_path对应的文件是否存在，不存在则直接返回0.0；若存在，则调用辅助函数_read_wav_info读取WAV头信息，提取实际duration；随后计算实际时长与expected_duration的绝对差值；判定依据为：若绝对差值小于等于tolerance，则返回1.0，否则返回0.0。若读取或计算过程中发生任何异常，也会捕获异常、记录错误日志并返回0.0。"
+        "description": "该函数负责检查指定 WAV 音频文件的时长是否满足任务要求。接收参数 file_path（待测音频路径）和 rule（字典，必须包含键 'expected_duration' 表示预期时长，可选键 'tolerance' 表示容差，默认值为 0.5）。执行步骤如下：1）使用 os.path.isfile 确认文件存在，若不存在则记录错误并返回 0.0；2）调用辅助函数 _read_wav_info 解析音频头信息，获取实际时长 actual；3）从 rule 中读取 expected_duration 和 tolerance；4）判定依据：若 |actual - expected| <= tolerance，则返回 1.0，否则返回 0.0。任何异常（如文件损坏或读取失败）均会被捕获并返回 0.0。"
       },
       {
         "name": "check_audio_sample_rate",
         "lineno": 62,
-        "description": "该函数接收file_path（待测音频文件路径）和rule字典作为输入。rule中必须包含键expected_sr（预期采样率，整数）。检查步骤如下：首先判断file_path对应的文件是否存在，不存在则直接返回0.0；若存在，则调用辅助函数_read_wav_info读取WAV头信息，提取实际sample_rate；判定依据为：将实际采样率与expected_sr进行精确相等比较，若完全一致则返回1.0，否则返回0.0。若读取过程发生异常，会捕获异常、记录错误日志并返回0.0。"
+        "description": "该函数负责检查指定 WAV 音频文件的采样率是否满足任务要求。接收参数 file_path（待测音频路径）和 rule（字典，必须包含键 'expected_sr' 表示预期采样率）。执行步骤如下：1）使用 os.path.isfile 确认文件存在，若不存在则返回 0.0；2）调用辅助函数 _read_wav_info 解析音频头信息，获取实际采样率 actual；3）从 rule 中读取 expected_sr；4）判定依据：若 actual == expected_sr，则返回 1.0，否则返回 0.0。任何异常均会被捕获并返回 0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_read_wav_info",
         "lineno": 22,
-        "description": "该函数使用Python标准库wave模块以二进制只读模式（'rb'）打开指定file_path的WAV文件，解析其头部信息。具体提取的字段包括：声道数channels、采样率sample_rate、总帧数n_frames、采样宽度sampwidth，并通过n_frames / sample_rate计算音频duration。函数将这些值封装为字典返回。它是底层通用读取器，被check_audio_duration和check_audio_sample_rate复用，为时长和采样率检查提供统一的WAV元数据解析能力。"
+        "description": "该辅助函数使用 Python 标准库 wave 模块打开并读取指定 WAV 文件的基本音频参数。具体操作为：以只读二进制模式打开 file_path，依次提取声道数（channels）、采样率（sample_rate）、总帧数（n_frames）、采样宽度（sampwidth），并计算时长 duration = n_frames / sample_rate。最终返回包含上述字段的字典。该函数被 check_audio_duration 和 check_audio_sample_rate 复用，为两者提供统一的音频元数据读取与解析能力。"
       }
     ]
   },
-  "created_at": "2026-06-30 20:56:09",
+  "created_at": "2026-07-01 14:26:36",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00038-0038-4000-8000-000000000038./evaluator_function_labels.json"
 }

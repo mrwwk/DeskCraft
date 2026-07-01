@@ -14,16 +14,16 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器任务的完成状态，核心检查对象是浏览器当前激活标签页的 URL 地址。评测逻辑要求该 URL 必须同时满足一组预期的正则表达式模式（全部匹配）。函数首先会从评测结果中提取目标 URL（支持字符串格式或包含 'url' 字段的字典格式），然后依次使用 re.search 检查 rules['expected'] 中的每个正则模式是否都能在 URL 中找到匹配。只有当所有模式全部命中时，才判定任务成功并返回 1.0；若 result 为空、格式非法或任一模式未匹配，则立即返回 0.0。这是一种严格的“全满足”式二值判定逻辑。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器任务完成后，当前活动标签页或浏览器访问树返回的URL是否完全符合预期的正则模式集合。它从任务结果中提取目标URL（支持直接传入字符串URL，或传入包含'url'字段的字典），然后对rules配置中指定的每一个正则表达式模式进行逐一匹配检查。只有当所有预期模式都在提取到的URL中成功匹配时，才判定任务成功并返回1.0；若结果为空、URL格式非法、或任一模式未能在URL中找到匹配，则立即返回0.0。这是一种严格的“全部满足”式分数判定逻辑，最终产出为二元分数而非部分得分。",
     "main_functions": [
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 33,
-        "description": "该函数接收 result（来自 activate_tab_info 或 get_active_url_from_accessTree 的返回值）和 rules（包含预期正则规则的字典）作为输入。检查步骤如下：1）先判空，若 result 为空则直接返回 0.；2）解析 result 格式，若为字符串则直接作为 URL，若为字典则提取其 'url' 字段，其他格式记录错误并返回 0.；3）从 rules['expected'] 获取正则模式列表，遍历每个 pattern；4）对每个 pattern 使用 re.search 在提取出的 URL 中搜索。判定依据为“所有预期正则模式必须在 URL 中全部找到”，若任一 pattern 未匹配成功则立即返回 0.，仅当全部匹配成功时才返回 1.。属于严格的全满足逻辑。"
+        "description": "该函数接收两个参数：result（表示活动标签页信息，可以是字符串URL，也可以是包含'url'键的字典）和rules（包含'expected'键的配置字典，其中'expected'对应一个正则模式列表）。执行步骤如下：1）若result为空，直接返回0.0；2）提取URL：若result为字符串则直接使用，若为字典则读取'url'字段，否则记录错误并返回0.0；3）从rules['expected']获取模式列表，遍历其中每一个pattern；4）对每个pattern使用re.search在result_url中搜索匹配；5）若所有pattern均匹配成功，最终返回1.0；若任一pattern未匹配，立即返回0.0。判定依据是“全部正则模式必须在URL中都能找到匹配”，属于严格的合取判定，无近似匹配或阈值容错。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:47:13",
+  "created_at": "2026-07-01 15:08:44",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_a728a36e-8bf1-4bb6-9a03-ef039a5233f0./evaluator_function_labels.json"
 }

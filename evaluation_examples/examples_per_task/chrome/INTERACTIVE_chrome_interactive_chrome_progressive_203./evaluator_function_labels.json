@@ -154,107 +154,107 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 主要验证 Chrome 浏览器及关联桌面任务的完成状态与产物正确性。核心检查对象涵盖：浏览器标签页（当前活动页、全部打开页）、书签栏（文件夹名称、网址、“Liked Authors”收藏夹）、已安装扩展、搜索查询 URL、Cookie 与历史记录删除状态、浏览器实验功能与字体设置、桌面快捷方式（Name/Exec 匹配），以及 Steam 购物车内容。此外提供多种文档级比较能力：PDF 文本（基于 rapidfuzz 模糊相似度）、PDF 内嵌图片（基于感知哈希 phash）、压缩归档包（按 file_type 分发到对应比较器逐文件比对）、HTML 结构（递归比较标签名、文本、属性）。判定思路以二元判定（0/1）为主，部分比较器返回 0~1 连续分数；多数检查先做空值/存在性校验，再按 type 分发到具体匹配逻辑，支持精确匹配、正则匹配、集合相等、忽略查询参数的近似匹配、双向子串包含、scheme 修正容错等多种方式。",
+    "overall_validation": "本 evaluator 用于验证 Chrome 浏览器相关任务及关联文件操作的完成状态。核心检查对象包括：1) Chrome 浏览器内部状态，如当前活动标签页 URL、全部打开标签页、书签栏文件夹与网址、已安装扩展、chrome://flags 实验功能、默认字体大小、地址栏搜索关键词、Steam 购物车内容；2) 浏览器数据清理状态，如指定域名 Cookie 是否删除、历史记录是否删除或是否同时满足“某些关键词不存在、某些关键词仍存在”；3) 桌面快捷方式（.desktop 文件）的 Name 与 Exec 字段是否符合预期；4) 文件级比较，包括 PDF 文本相似度、PDF 内嵌图像 perceptual hash 比对、压缩包（支持 text/pdf/docx/ppt/image/csv/table/audio/video 等多种内部文件类型）的逐文件比对、以及 HTML 文档结构的递归元素级比对。判定方式以二元判定（返回 1.0 或 0.）为主，文件比较类函数则返回 0~1 的连续分数；状态类检查通常要求精确匹配、子集包含或正则全匹配，文件类检查通常要求逐对比较后取平均分。",
     "main_functions": [
       {
         "name": "is_expected_active_tab",
         "lineno": 36,
-        "description": "接收 active_tab_info（字典或字符串）与 rule（type 为 \"url\"）。先提取 expected_url 与 actual_url；首先直接调用 compare_urls 做精确比较；若失败，则调用 _normalize_url 对两者进行 scheme 修正（处理 https:/// 误报为 file:/// 的 getter bug），再次用 compare_urls 比较。任一环节匹配成功返回 1，否则返回 0。"
+        "description": "接收 Chrome 当前活动标签页信息 active_tab_info（字典或字符串）与规则 rule。当 rule['type'] 为 'url' 时，先提取 expected_url 与 actual_url，调用 compare_urls 进行精确比对；若失败，则调用 _normalize_url 对双方 URL 进行归一化（修复 https:/// 误写为 file:/// 的 getter 问题），再次通过 compare_urls 比对。任一环节匹配成功返回 1，否则返回 0。"
       },
       {
         "name": "is_expected_active_tab_approximate",
         "lineno": 70,
-        "description": "接收 active_tab_info 与 rule（type 为 \"url\"）。提取 expected_url 与 actual_url 后，使用 urlparse 去掉查询参数（query 置空），再比较无参 URL 是否完全一致。一致返回 1，否则返回 0。"
+        "description": "接收活动标签页信息与规则。当 rule['type'] 为 'url' 时，提取 expected_url 与 actual_url，使用 urlparse 去除 URL 的 query 参数部分后再进行字符串相等比较。忽略查询参数后一致返回 1，否则返回 0。"
       },
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 99,
-        "description": "接收 result（字符串 URL 或含 'url' 字段的字典）与 rules（含 \"expected\" 正则模式列表）。提取 result_url 后，遍历 patterns 列表，要求每个 pattern 都必须通过 re.search 在 result_url 中匹配到；若任一 pattern 未匹配则立即返回 0，全部通过返回 1。"
+        "description": "接收 result（可以是字符串 URL 或含 'url' 字段的字典）与规则 rules。先从 result 中提取目标 URL；然后遍历 rules['expected'] 中的每一个正则 pattern，使用 re.search 在 URL 上逐一匹配。要求所有 pattern 都必须匹配成功，任一不匹配即返回 0，全部通过返回 1。"
       },
       {
         "name": "is_expected_installed_extensions",
         "lineno": 131,
-        "description": "接收 installed_extensions（列表）与 expected（字典，其 \"expected\" 为扩展列表）。将实际与预期扩展转为 set，判断预期集合是否为实际集合的子集（issubset）。是则返回 1，否则返回 0。"
+        "description": "接收已安装扩展列表 installed_extensions 与期望规则 expected。将实际安装扩展与 expected['expected'] 均转为集合，判断期望集合是否为实际集合的子集。若全部期望扩展均已安装返回 1，否则返回 0。"
       },
       {
         "name": "is_expected_tabs",
         "lineno": 149,
-        "description": "接收 open_tabs（标签页字典列表）与 rule（type 为 \"url\"）。提取所有 tab 的 url 组成 actual_urls，调用 are_lists_equal(expected_urls, actual_urls, compare_urls) 判断两列表是否相等（顺序与内容均要求一致，由 compare_urls 判定元素相等）。相等返回 1，否则返回 0。"
+        "description": "接收 Chrome 打开的标签页列表 open_tabs（每个元素为含 'url' 的字典）与规则 rule。当 rule['type'] 为 'url' 时，提取所有标签页的 actual_urls 列表，与 rule['urls'] 列表通过 are_lists_equal（以 compare_urls 作为元素比较函数）进行比对。列表一致返回 1，否则返回 0。"
       },
       {
         "name": "is_expected_bookmarks",
         "lineno": 172,
-        "description": "接收 bookmarks（字典）与 rule（含 type 字段）。按 type 分发：bookmark_bar_folders_names 提取 bookmark_bar 下 type 为 folder 的 name 列表，与 rule['names'] 做集合相等比较；bookmark_bar_websites_urls 提取 bookmark_bar 下 type 为 url 的 url 列表，经 _normalize_url 规范化后做集合相等比较；liked_authors_websites_urls 查找 bookmark_bar 下名为 \"Liked Authors\" 的 folder，若存在则提取其下所有 url，rule['urls'] 中每项可为字符串或列表，使用 itertools.product 生成所有组合，检查是否有任一组合与实际 url 集合相等。存在匹配返回 1，否则 0。"
+        "description": "接收书签数据 bookmarks 与规则 rule，按三种类型分别检查：1) 'bookmark_bar_folders_names'：提取书签栏中 type 为 'folder' 的 name 列表，与 rule['names'] 做集合相等比较；2) 'bookmark_bar_websites_urls'：提取书签栏中 type 为 'url' 的 url 列表，经 _normalize_url 归一化后与 rule['urls'] 的归一化集合比较；3) 'liked_authors_websites_urls'：在书签栏中查找名为 'Liked Authors' 的文件夹，若存在则提取其内部网址，并将 rule['urls'] 中每个元素（支持单字符串或字符串列表表示多选一）用 itertools.product 展开成所有组合，检查是否有任一组合的集合与文件夹内网址集合相等。匹配成功返回 1，否则返回 0。"
       },
       {
         "name": "is_expected_search_query",
         "lineno": 220,
-        "description": "接收 active_tab_info（字典）与 rules（含 expect.pattern）。在 active_tab_info['url'] 中用 re.search 匹配 pattern；匹配成功返回 1，否则返回 0。"
+        "description": "接收活动标签页信息 active_tab_info 与规则 rules。在 active_tab_info['url'] 中使用 re.search 查找 rules['expect']['pattern'] 指定的正则模式。匹配成功返回 1，否则返回 0。"
       },
       {
         "name": "compare_pdfs",
         "lineno": 232,
-        "description": "接收 pdf1_path 与 pdf2_path（均可为字符串或列表）。若不为列表则包装为单元素列表。对每一对路径，使用 fitz 提取全部页面文本并拼接，用 rapidfuzz.fuzz.ratio 计算文本相似度并除以 100 归一化；累加后取平均返回 0~1 分数。若某对处理异常则该对得 0 分。"
+        "description": "比较两份 PDF 的文本内容相似度。输入 pdf1_path 与 pdf2_path 可以是字符串或字符串列表；若为单路径则包装为列表。对每一对路径，使用 fitz 逐页提取文本并拼接，通过 rapidfuzz.fuzz.ratio 计算文本相似度（0~100），累加后除以 100 转为 0~1 分数。若某对提取或比对过程中发生异常，该对得 0 分。最终返回所有对的平均分。"
       },
       {
         "name": "compare_pdf_images",
         "lineno": 269,
-        "description": "接收 pdf1_path 与 pdf2_path。先检查文件存在性；创建临时目录复制 PDF；用 fitz 逐页提取内嵌图片并转为 PIL Image；清理临时目录。若图片数量不一致返回 0；均无图片返回 1.0。逐对计算 imagehash.phash，哈希差值 <= 5 视为同一张图；返回匹配图片数占总图片数的比例。"
+        "description": "比较两份 PDF 中内嵌图像的 perceptual hash 相似度。先检查文件是否存在，然后将 PDF 复制到临时目录，使用 fitz 提取每一页中的每一张图片并转为 PIL Image。若两份 PDF 提取到的图片数量不同直接返回 0；若均无图片返回 1.0。对每一对同位置图片计算 imagehash.phash 的汉明距离，阈值设为 5，差值小于等于 5 认为该图片匹配。最终返回匹配图片数占总图片数的比例。"
       },
       {
         "name": "compare_archive",
         "lineno": 339,
-        "description": "接收 pred_path、gold_path 与 **kwargs（含 file_path、file_type 等）。将两个压缩包分别解压到 _pred 与 _gold 目录；比较 file_path 子目录下的文件名列表（sorted 后必须完全一致）。根据 file_type（text/pdf/docx/ppt/image/csv/table/audio/video）动态导入并获取对应比较函数；逐对比较文件，返回平均分。若文件名不一致直接返回 0。"
+        "description": "比较两个压缩包（pred_path 与 gold_path）的内容一致性。通过 shutil.unpack_archive 分别解压到 pred_folder 与 gold_folder（gold 有缓存机制）。取 kwargs['file_path'] 指定子目录下的文件列表，排序后若文件名不一致直接返回 0。根据 kwargs['file_type']（默认 'text'）动态导入并选择对应文件比较函数（支持 text/pdf/docx/ppt/image/csv/table/audio/video）。对 pred 与 gold 中排序后一一对应的文件逐对调用比较函数并累加分数，最终返回平均分。"
       },
       {
         "name": "compare_htmls",
         "lineno": 405,
-        "description": "接收 html_path1、html_path2 与 **options（如 ignore_sdnum）。用 BeautifulSoup 解析后，通过 recursiveChildGenerator 递归遍历所有节点。内部 compare_elements 依次比较：节点类型、标签名（name）、文本内容（strip 后）、属性（attrs）；若启用 ignore_sdnum 则比较属性时忽略 sdnum 键。任一节点不匹配返回 0，全部匹配返回 1。"
+        "description": "比较两个 HTML 文件的结构与内容一致性。使用 BeautifulSoup 以 'lxml' 解析双方文档，通过 recursiveChildGenerator 递归遍历所有子元素。对每一对元素调用内部比较逻辑：Tag 类型比较 name、text.strip() 与 attrs；若 options 中设置 ignore_sdnum 为真，则比较 attrs 时忽略 'sdnum' 属性；非 Tag 类型直接比较值。任一对应位置元素不一致即返回 0，全部一致返回 1。"
       },
       {
         "name": "is_cookie_deleted",
         "lineno": 444,
-        "description": "接收 cookie_data 与 rule（type 为 \"domains\"）。提取 cookie_data 中每条 cookie 的 domain（索引 1）。遍历 rule['domains']，若任一预期 domain 通过 compare_urls 与实际 cookie domain 匹配，说明 Cookie 仍存在，返回 0；全部未匹配到则返回 1。"
+        "description": "检查指定域名的 Cookie 是否已被删除。接收 cookie_data 与规则 rule。当 rule['type'] 为 'domains' 时，提取 cookie_data 中每个 cookie 的域名（取 cookie[1]），遍历 rule['domains']，使用 compare_urls 与实际 Cookie 域名进行比对。若任一期望删除的域名仍在 Cookie 列表中存在，返回 0；全部不存在则返回 1。"
       },
       {
         "name": "is_shortcut_on_desktop",
         "lineno": 460,
-        "description": "接收 shortcuts（字典，键为路径，值为文件内容字符串）与 rule。按 type 分发：name 类型在 shortcut_content 中先查找 \"Name=\" + expected_name + \"\\n\" 精确匹配；否则逐行提取 Name= 后的实际名称，进行精确匹配或双向不区分大小写的子串包含匹配（expected 在 actual 中，或 actual 在 expected 中）。exec 类型类似地查找 Exec= 行，支持精确匹配或双向子串包含匹配。匹配成功返回 1，遍历结束未找到返回 0。"
+        "description": "检查桌面快捷方式（.desktop 文件）是否符合预期。接收 shortcuts 字典（路径到文件内容的映射）与规则 rule。当 rule['type'] 为 'name' 时，在快捷方式内容中查找 'Name=' 行，先尝试整行精确匹配，再提取 Name 值进行精确匹配、expected 包含于 actual（不区分大小写）或 actual 包含于 expected（不区分大小写）的容错匹配。当 rule['type'] 为 'exec' 时，类似地检查 'Exec=' 行，支持精确匹配、expected_exec 包含于 actual_exec、actual_exec 包含于 expected_exec 三种判定。找到匹配返回 1.0，否则返回 0.0。'url' 与 'id' 类型目前不支持，会抛出 TypeError。"
       },
       {
         "name": "check_history_deleted",
         "lineno": 551,
-        "description": "接收 history_data 与 rule（type 为 \"keywords\"）。提取每条历史的 domain（索引 0）。遍历 rule['keywords']，若任一 keyword 出现在任一 history_domain 中，说明历史未删净，返回 0；全部未出现则返回 1。"
+        "description": "检查浏览器历史记录是否已删除特定关键词。接收 history_data 与规则 rule。当 rule['type'] 为 'keywords' 时，提取每条历史记录的域名（history[0]），遍历 rule['keywords']，检查关键词是否仍存在于任一历史域名中。若存在则返回 0，全部不存在返回 1。"
       },
       {
         "name": "check_history_keywords_absent_and_present",
         "lineno": 567,
-        "description": "接收 history_data 与 rule（type 必须为 \"keywords_absent_present\"）。提取所有历史 URL 并转小写。absent_keywords 中每个词都不得出现在任何 URL 中（出现则返回 0）；present_keywords 中每个词都必须在至少一个 URL 中出现（未出现则返回 0）。两组条件均满足返回 1。"
+        "description": "同时检查历史记录中“某些关键词必须不存在、某些关键词必须仍存在”。接收 history_data 与规则 rule，要求 rule['type'] 为 'keywords_absent_present'。提取所有历史记录 URL 并转为小写。对 absent_keywords 中每个关键词，若其在任一 URL 中出现则返回 0；对 present_keywords 中每个关键词，若其在所有 URL 中均未出现则返回 0。两类关键词均满足条件时返回 1。"
       },
       {
         "name": "check_enabled_experiments",
         "lineno": 593,
-        "description": "接收 enabled_experiments（列表）与 rule（type 为 \"names\"）。对每个实验项按 \"@\" 分割取前半部分得到实验名，与 rule['names'] 做列表精确相等比较。相等返回 1，否则返回 0。"
+        "description": "检查 Chrome 实验功能（chrome://flags）是否启用正确。接收 enabled_experiments 列表与规则 rule。将每个实验项按 '@' 分割取前半部分作为实验名。当 rule['type'] 为 'names' 时，比较实验名列表与 rule['names'] 是否精确相等。相等返回 1，否则返回 0。"
       },
       {
         "name": "check_font_size",
         "lineno": 605,
-        "description": "接收 font_size（字典，含 default_font_size）与 rule。type 为 \"value\" 时要求精确等于 rule['value']；type 为 \"range\" 时要求在开区间 (rule['min'], rule['max']) 内。满足返回 1，否则返回 0。"
+        "description": "检查 Chrome 默认字体大小是否符合预期。接收 font_size 字典（含 'default_font_size'）与规则 rule。当 rule['type'] 为 'value' 时，精确比较 default_font_size 与 rule['value']；为 'range' 时，检查 default_font_size 是否严格介于 rule['min'] 与 rule['max'] 之间。满足条件返回 1，否则返回 0。"
       },
       {
         "name": "is_added_to_steam_cart",
         "lineno": 619,
-        "description": "接收 active_tab_info（字典，含 content 字段）与 rule（含 items 列表）。检查 content 字符串中是否包含 items 中的每一个子串；全部包含返回 1，任一缺失返回 0。"
+        "description": "检查 Steam 购物车中是否已添加指定商品。接收 active_tab_info（含页面 'content' 文本）与规则 rule。遍历 rule['items'] 中的每个商品名称，检查其是否均存在于 active_tab_info['content'] 中。全部存在返回 1，任一缺失返回 0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_normalize_url",
-        "lineno": 23,
-        "description": "接收 url 字符串。若为空返回空字符串；否则使用正则将前缀 ^https:/// 替换为 file:///，用于修正 active_url_from_accessTree 等 getter 在本地文件场景下错误返回 https:/// 的 bug。返回规范化后的 URL。被 is_expected_active_tab 与 is_expected_bookmarks 调用，用于消除 scheme 不匹配导致的假阴性。"
+        "lineno": 24,
+        "description": "对 URL 进行归一化处理，专门用于修复 active_url_from_accessTree 等 getter 在获取本地文件路径时，将 file:/// 错误返回为 https:/// 的 scheme 错位问题。函数通过正则替换将开头的 https:/// 修正为 file:///，空值返回空字符串。该辅助函数被 is_expected_active_tab 与 is_expected_bookmarks 调用，作为 URL 精确比对前的容错预处理步骤。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:39:19",
+  "created_at": "2026-07-01 15:02:29",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_progressive_203./evaluator_function_labels.json"
 }

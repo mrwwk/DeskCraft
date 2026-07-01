@@ -26,27 +26,27 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器在任务执行后的标签页状态是否符合预期。它从外部状态读取两类信息：当前活动标签页的信息（可能为字典或字符串形式）以及所有打开标签页的列表（每个元素为包含 'url' 键的字典）。检查分为两条独立路径：一是验证当前活动标签页的 URL 是否与规则指定的预期 URL 匹配（is_expected_active_tab）；二是验证浏览器中所有打开标签页的 URL 集合是否与规则指定的 URL 列表完全一致（is_expected_tabs）。在比较前，会先调用 _normalize_access_tree_url 对实际 URL 进行预处理，修复因 accessibility tree getter 错误添加 https:// 前缀而导致损坏的本地文件路径（如将 https:///home/user/... 恢复为 file:///home/user/...）。随后使用外部工具函数 compare_urls 进行 URL 等价性比较。对于活动标签页，单个 URL 匹配即返回 1.0；对于多标签页检查，通过 are_lists_equal 将预期 URL 列表与实际 URL 列表进行整体比对（其内部是否要求顺序代码中未明确体现），通过则返回 1.0。任一检查失败、输入为空或规则类型未知时均返回 0.0。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器标签页状态是否达到任务预期。它核心检查两类对象：一是当前活动标签页的URL（通过active_tab_info获取），二是当前所有打开标签页的URL列表（通过open_tabs获取）。评测时，将实际获取的URL与规则（rule）中指定的期望URL进行比对：对于活动标签页，使用compare_urls进行单URL等价比较；对于标签页集合，使用are_lists_equal结合compare_urls进行列表级匹配。由于accessibility tree获取URL时可能错误地给本地文件路径添加https://前缀，evaluator会先通过_normalize_access_tree_url将形如https:///path的损坏URL修复为file:///path。判定采用二元打分制：URL（或URL列表）完全匹配则返回1，否则返回0；若规则类型不支持，同样返回0。",
     "main_functions": [
       {
         "name": "is_expected_active_tab",
         "lineno": 33,
-        "description": "接收 active_tab_info（当前活动标签页信息，类型可能为 Dict[str, str] 或 str）和 rule（包含匹配规则的字典）。首先判断 active_tab_info 是否为空，为空则直接返回 0.0。随后读取 rule['type']，目前仅支持 'url' 类型。在 'url' 分支下，从 rule['url'] 获取预期 URL；从 active_tab_info 中提取实际 URL：若输入为字典则取 'url' 键对应的值，否则将输入本身视为 URL 字符串。接着调用 _normalize_access_tree_url 对实际 URL 进行规范化，修复 accessibility tree 错误添加的 https:// 前缀。最后调用外部工具函数 compare_urls(expected_url, actual_url) 进行等价性判断：若返回 True 则返回 1.0，否则返回 0.0。若 match_type 不是 'url'，记录错误日志并返回 0.0。"
+        "description": "检查Chrome当前活动标签页的URL是否与规则期望一致。接收active_tab_info（通常为包含'url'键的字典，也可能直接是URL字符串）和rule（包含'type'和'url'字段的规则字典）。首先判断active_tab_info是否为空，为空则直接返回0。随后解析rule['type']，目前仅支持'url'类型：提取rule['url']作为期望URL，从active_tab_info中解析实际URL（字典则取'url'键值，否则视为URL本身）；若实际URL非空，先调用_normalize_access_tree_url对其进行规范化以修复可能的https:///前缀错误；最后调用compare_urls(expected_url, actual_url)进行比较，若返回True则得1分，否则得0分。若rule['type']不是'url'，则记录错误日志并返回0。"
       },
       {
         "name": "is_expected_tabs",
         "lineno": 62,
-        "description": "接收 open_tabs（当前 Chrome 中所有打开标签页的列表，元素为包含 'url' 键的字典）和 rule（包含匹配规则的字典）。首先判断 open_tabs 是否为空，为空则直接返回 0.0。随后读取 rule['type']，目前仅支持 'url' 类型。在 'url' 分支下，从 rule['urls'] 获取预期 URL 列表；遍历 open_tabs，从每个标签页字典中提取 'url' 字段，组成实际 URL 列表 actual_urls。然后调用外部工具函数 are_lists_equal(expected_urls, actual_urls, compare_urls)，以 compare_urls 作为元素级比较函数，对两个列表进行整体比对（其内部是否要求顺序代码中未明确体现）。若列表比较通过则返回 1.0，否则记录错误日志并返回 0.0。若 match_type 不是 'url'，记录错误日志并返回 0.0。"
+        "description": "检查Chrome当前所有打开标签页的URL列表是否与规则期望完全一致。接收open_tabs（标签页字典列表，每个字典应包含'url'键）和rule（包含'type'和'urls'字段的规则字典）。首先判断open_tabs是否为空，为空则直接返回0。解析rule['type']，目前仅支持'url'类型：提取rule['urls']作为期望URL列表，并从open_tabs的每个元素中抽取'url'组成实际URL列表actual_urls；然后调用are_lists_equal(expected_urls, actual_urls, compare_urls)进行列表比对，其中compare_urls作为元素级比较函数。若列表不匹配，记录错误日志并返回0；若匹配则返回1。若rule['type']不是'url'，则记录错误日志并返回0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_normalize_access_tree_url",
-        "lineno": 20,
-        "description": "对可能被 accessibility tree 的 get_active_url_from_accessTree getter 损坏的 URL 进行修复。该 getter 会默认给无 scheme 的 URL 添加 https:// 前缀，导致本地文件路径出现 https:///home/user/... 这类错误形式。本函数使用正则表达式 ^https://(/[^/].*)$ 检测以 https:// 开头后紧跟单个斜杠和绝对路径的字符串，若匹配则将其替换为 file:// 前缀并返回修复后的 URL；若输入为空或不匹配该模式，则直接返回原值。该函数主要为 is_expected_active_tab 中的实际 URL 提供预处理，避免因 accessibility tree 的 scheme 误加而导致后续 URL 比较失败。"
+        "lineno": 12,
+        "description": "修复因accessibility tree getter错误添加前缀而损坏的本地文件URL。输入为url字符串，若为空则原样返回。使用正则表达式 '^https://(/[^/].*)$' 检测'https://'后紧跟单斜杠与绝对路径的模式（例如https:///home/user/foo.html），若匹配则将其替换为'file://'前缀并返回修复后的URL；若不匹配则返回原始URL。该函数在is_expected_active_tab中被调用，用于预处理从accessibility tree获取的实际URL，防止本地文件路径因错误前缀导致与期望URL比较失败。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:40:48",
+  "created_at": "2026-07-01 15:03:22",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_requirement_change_102./evaluator_function_labels.json"
 }

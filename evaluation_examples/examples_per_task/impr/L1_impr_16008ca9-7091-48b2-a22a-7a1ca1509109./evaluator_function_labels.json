@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_16008ca9-7091-48b2-a22a-7a1ca1509109./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_title_font_size",
+      "lineno": 69
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_find_title_shapes",
+      "lineno": 16
+    },
+    {
+      "name": "_get_font_size_from_placeholder",
+      "lineno": 49
+    },
+    {
+      "name": "check_title_font_size",
+      "lineno": 69
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator验证agent是否成功将输出PPTX文件中所有幻灯片的标题字体大小修改为指定目标值（默认36pt）。它不依赖golden文件对比，而是直接读取agent产出的PPTX，逐张幻灯片识别标题形状（优先通过placeholder类型TITLE/CENTER_TITLE识别，若失败则回退到\"位于幻灯片上三分之一区域且有文本\"的位置启发式），然后对标题形状内每个paragraph的每个run检查其实际字体大小。若run.font.size为None（表示继承自版式或母版），则进一步尝试从slide layout的对应placeholder定义中解析继承值。所有可解析的标题文字run的字体大小必须与目标值（默认36pt，容差±0.5pt）在EMU单位下保持一致；只要任一run超出容差即判定失败（0.0），全部通过则判定成功（1.0）。若某张幻灯片完全无标题则跳过，但若整份演示文稿均无标题则也判失败。",
+    "main_functions": [
+      {
+        "name": "check_title_font_size",
+        "lineno": 69,
+        "description": "接收result_path（agent输出的PPTX文件路径）和**options参数（target_size默认36，size_tolerance默认0.5）。首先尝试打开PPTX文件，失败或无幻灯片时直接返回0.0。接着遍历每张幻灯片，调用_find_title_shapes识别当前页的标题形状列表；若某页无标题则跳过（如纯图片页）。对找到的每个标题形状，遍历其text_frame下的所有paragraph与run，读取run.font.size。若该值为None，则调用_get_font_size_from_placeholder尝试从幻灯片版式（slide layout）的对应placeholder中解析继承的字体大小；若解析后仍为None则跳过该run。将实际大小（EMU）与target_size_pt×12700比较，容差为size_tolerance_pt×12700。若任一run的绝对差值超过容差，立即记录日志并返回0.0。若所有幻灯片的所有可解析run均通过检查，且至少有一处标题被找到，则返回1.0；若遍历完全部幻灯片却未找到任何标题形状，也返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_title_shapes",
+        "lineno": 16,
+        "description": "接收slide和prs对象，负责在单张幻灯片上定位标题形状并返回列表。采用两级策略：第一级遍历slide.shapes，筛选is_placeholder为真、placeholder_format.type属于PP_PLACEHOLDER.TITLE或PP_PLACEHOLDER.CENTER_TITLE、且具备text_frame的形状；第二级作为fallback，当第一级未找到任何标题时，将top_threshold设为幻灯片高度的三分之一（prs.slide_height // 3），再遍历所有具备text_frame且text非空的形状，把top坐标小于该阈值（即位于页面上部）的形状视为标题。该列表供主函数逐run进行字体大小检查。"
+      },
+      {
+        "name": "_get_font_size_from_placeholder",
+        "lineno": 44,
+        "description": "接收一个shape对象，专门用于解析\"继承自幻灯片版式/母版\"的字体大小。仅当该shape是placeholder时生效：通过shape.part.slide_layout获取当前幻灯片所使用的版式，然后在版式的placeholders中查找placeholder_format.idx与当前shape的idx相同的那个placeholder定义。随后遍历该版式placeholder的text_frame.paragraphs和runs，返回第一个遇到的非None的run.font.size（单位为EMU）。如果shape不是placeholder、查找失败或遍历后未找到有效size，则返回None。主函数在run.font.size为None时调用此函数，以判断继承值是否满足目标大小要求。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:23:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_16008ca9-7091-48b2-a22a-7a1ca1509109./evaluator_function_labels.json"
+}

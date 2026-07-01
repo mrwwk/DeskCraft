@@ -30,26 +30,26 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator服务于INTERACTIVE_chrome_interactive_chrome_correction_114任务，用于对任务执行结果进行离散式打分判定。核心验证对象包括三类：一是Chrome浏览器当前活动标签页的URL是否正确（忽略查询参数）；二是任务返回结果是否与预期值严格相等；三是预期元素是否存在于任务返回的列表或集合中。每个主函数独立执行单一检查，成功返回1.0（或1），失败返回0.0（或0），代码中未体现多指标联合、加权累计或顺序依赖的复合判定逻辑。",
+    "overall_validation": "该 evaluator 是针对 Chrome 浏览器交互类任务的评分器，核心目标是验证任务执行后的三类状态或结果：第一，Chrome 当前活动标签页是否打开了指定的页面（通过比对 URL，并忽略查询参数）；第二，实际结果是否与预期值完全相等；第三，预期值是否被包含在实际结果列表（或字符串、可迭代对象）中。每个主函数均为独立的评分单元，采用 0/1 打分制：检查通过返回 1.0，不通过返回 0.0。标注人员应将其理解为一套基于规则匹配的离散指标集合，分别服务于标签页状态校验、精确值校验和包含关系校验。",
     "main_functions": [
       {
         "name": "is_expected_active_tab_approximate",
         "lineno": 50,
-        "description": "接收Chrome活动标签页信息active_tab_info和匹配规则rule。首先判断active_tab_info是否为空，为空直接返回0。当rule['type']为'url'时，从rule取出expected_url，从active_tab_info字典中取出actual_url（若active_tab_info本身不是字典则直接将其视为actual_url）。内部定义strip_query函数，使用urlparse解析URL并去除query查询参数后，通过urlunparse重组，仅比较协议、域名和路径部分。若处理后的预期URL与实际URL一致返回1，不一致返回0。若rule['type']为其他未知类型，记录error日志并返回0。"
+        "description": "接收 active_tab_info（当前 Chrome 活动标签页信息，可以是包含 url 字段的字典，也可能是直接的 URL 字符串）和 rule（匹配规则字典）。首先判断 active_tab_info 是否为空，为空则直接返回 0.0。随后读取 rule['type']，当前仅支持 'url' 类型。在该类型下，从 rule['url'] 提取期望地址 expected_url，从 active_tab_info 中提取实际地址 actual_url。函数内部使用 urlparse 将两个 URL 的查询参数（query）剥离，仅对协议、域名、路径等部分进行比对。若剥离后的期望 URL 与实际 URL 完全一致，返回 1.0；否则返回 0.0。若 rule['type'] 为不支持的类型，则记录错误日志并返回 0.0。"
       },
       {
         "name": "exact_match",
         "lineno": 78,
-        "description": "接收任务结果result和规则rules。从rules字典中提取键'expected'得到预期值expect，并通过print输出result与expect的值供调试。使用'=='进行严格相等比较，若result与expect完全一致则返回1.0，否则返回0.0。该函数为通用精确匹配器，不做类型转换、大小写忽略或近似匹配。"
+        "description": "接收 result（实际结果）和 rules（规则字典）。从 rules['expected'] 中提取期望值 expect，并在控制台打印 result 与 expect 的值。使用 Python 的 == 运算符对两者进行完全相等比较。若完全一致，返回 1.0；否则返回 0.0。"
       },
       {
         "name": "is_in_list",
         "lineno": 88,
-        "description": "接收任务结果result和规则rules。从rules中提取'expected'作为预期值expect，使用Python的'in'操作符判断expect是否存在于result中（适用于列表、元组等容器类型，若result为字符串则表现为子串检查）。若存在返回1.0，不存在返回0.0。"
+        "description": "接收 result（实际结果，通常为列表、字符串或其他可迭代对象）和 rules（规则字典）。从 rules['expected'] 中提取期望值 expect。使用 Python 的 in 运算符检查 expect 是否存在于 result 中。若存在，返回 1.0；否则返回 0.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:36:11",
+  "created_at": "2026-07-01 14:59:41",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_114./evaluator_function_labels.json"
 }

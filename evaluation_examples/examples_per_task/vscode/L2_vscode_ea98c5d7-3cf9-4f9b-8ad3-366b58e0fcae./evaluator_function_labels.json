@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_ea98c5d7-3cf9-4f9b-8ad3-366b58e0fcae./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 78
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证VSCode键盘快捷键配置文件（keybindings.json）在任务执行后是否达到预期状态。它读取Agent生成的实际keybindings文件，将其解析为JSON数组，然后检查数组中是否包含预期的快捷键绑定项。核心比较方式为\"子集匹配\"：只要实际绑定字典包含预期绑定中定义的所有键值对（允许实际项存在额外字段），即视为匹配成功。评测支持两种预期模式：一是验证单一预期绑定是否存在；二是通过'all_of'与'none_of'组合验证多个绑定是否全部必须存在且某些绑定必须不存在。评分采用二元制，所有条件满足得1.0分，任一条件不满足即得0.0分。",
+    "main_functions": [
+      {
+        "name": "check_json_keybindings",
+        "lineno": 25,
+        "description": "接收actual（实际结果文件的路径字符串）和expected（预期配置字典）。首先依次调用内部函数direct_load_json和skip_first_line_load_json尝试解析实际文件：先直接按JSON加载，若失败或结果非列表，则跳过第一行后再加载（用于兼容带首行注释或特殊标记的keybindings文件）。若两种解析方式均失败或解析结果不是list类型，直接返回0.0。解析成功后，定义内部函数contains_binding，遍历实际数据中的所有字典项，调用_is_subset判断是否有某项包含预期绑定的全部键值。随后分两支判断：若expected中包含'all_of'或'none_of'键，则要求'all_of'列表内的每一个绑定项都必须在实际文件中找到匹配，且'none_of'列表内的每一个绑定项都必须在实际文件中找不到任何匹配，两者同时满足返回1.0，否则返回0.0；若不存在上述组合键，则检查expected['expected']指定的单一绑定项是否存在，存在返回1.0，不存在返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 87,
+        "description": "递归子集/等价比较器，服务于check_json_keybindings中的绑定匹配逻辑。当expected为字典时，要求actual也为字典，且expected中的每一个键都必须存在于actual中，对应的值递归调用本函数验证；当expected为列表时，要求actual与expected完全相等（==）；对于其他基本类型，同样要求精确相等（==）。该函数实现了\"预期字典是实际字典的子集\"这一语义，使得实际keybindings项只要包含预期项定义的全部字段即视为匹配，不排斥实际项中存在额外字段。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:50:45",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_ea98c5d7-3cf9-4f9b-8ad3-366b58e0fcae./evaluator_function_labels.json"
+}

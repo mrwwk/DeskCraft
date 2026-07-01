@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_88d64722-8a52-4a19-bcd8-3e02ad61fcfb./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对多应用任务提供三种相互独立的判定能力，分别验证不同维度的最终产物或状态：第一，验证 Chrome 浏览器当前活动标签页的 URL 是否与预期一致，比较时会去除查询参数，要求基础 URL 精确匹配；第二，验证某段文本结果是否同时满足「必须包含指定字符串列表」且「必须不包含排除字符串列表」的规则；第三，验证指定 JSON 配置文件中是否完整包含预期的键值对，要求键存在且值精确相等。每项检查均采用二元打分机制，完全满足返回 1.0，任一条件不满足即返回 0.0，用于判定对应子任务是否成功完成。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 57,
+        "description": "接收活动标签页信息 active_tab_info 和匹配规则 rule。首先判空：若 active_tab_info 不存在直接返回 0。随后读取 rule['type']，仅当类型为 \"url\" 时执行核心检查：从 rule['url'] 获取预期 URL，从 active_tab_info（若为字典则取 'url' 键，否则直接使用）获取实际 URL。通过 urlparse 与 urlunparse 去除双方 URL 的查询参数后，进行精确字符串比对。去除查询参数后的 URL 完全一致则返回 1，否则返回 0；若 rule['type'] 为其他未知类型，则记录错误日志并返回 0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 85,
+        "description": "接收待检查文本 result 和规则字典 rules。若 result 为 None 直接返回 0。从 rules 中分别提取 include 列表与 exclude 列表（缺省为空列表）。使用 all() 遍历检查：要求 result 必须包含 include 中每一个字符串，且必须不包含 exclude 中任何一个字符串。两项条件同时满足返回 1.0，否则返回 0.0。检查前会将 result 与 rules 打印输出。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 98,
+        "description": "接收实际文件路径 actual（字符串）和预期配置 expected（字典）。若 actual 为空直接返回 0。尝试以 JSON 格式读取 actual 指向的文本文件；若文件不存在、读取失败或解析异常，返回 0.0。成功解析后，提取 expected['expected'] 作为预期键值对字典。遍历该字典中的每一对 key 与 value，检查实际 JSON 数据中是否存在该键且对应值精确相等。若所有预期键值对均完全匹配返回 1.0，任一键缺失或值不匹配立即返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:22:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_88d64722-8a52-4a19-bcd8-3e02ad61fcfb./evaluator_function_labels.json"
+}

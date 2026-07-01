@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_5811683a-fd91-418a-9c59-e9f306764875./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 15
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 37
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 70
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 15
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 37
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 70
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 deploy_config_full_pipeline_os_vscode_chrome 任务的最终部署与配置状态。根据代码注释，任务成功需要同时满足四个条件（逻辑与）：/tmp/fastapi_logs/ 目录必须存在；~/Desktop/env_summary.txt 文件内容必须同时包含 project=FastAPI Service 和 author=dev_team；VS Code: 的 settings.json 必须精确配置 editor.tabSize=2、editor.rulers=[88] 以及 files.exclude 排除 __pycache__/.env/venv 等项；Chrome 当前活动标签页 URL 必须是 https://fastapi.tiangolo.com/（忽略查询参数）。代码中实现了三个主检查函数分别对应文本子串包含/排除匹配、JSON 键值对精确匹配、URL 去查询参数匹配，各函数返回 1.0 表示通过、0.0 表示失败。但需注意，代码片段中未体现 /tmp/fastapi_logs/ 目录存在性的具体检查实现。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 15,
+        "description": "该函数检查一段文本输出（如文件内容或命令输出）是否满足同时包含所有指定子串且不包含任何禁止子串的规则。输入参数 result 为待检查的字符串，rules 为包含 include（必需子串列表）和 exclude（禁止子串列表）的字典。若 result 为 None 直接返回 0.0。随后检查 result 是否包含 rules['include'] 中的每一个子串，且不含 rules['exclude'] 中的任何一个子串。两项均满足返回 1.0，否则返回 0.0。该函数通常用于验证 env_summary.txt 等文本文件的内容合规性。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 37,
+        "description": "该函数检查指定 JSON 文件是否完整包含预期的键值对。输入参数 actual 为 JSON 文件的路径字符串，expected 为字典，其 'expected' 键对应的值为待匹配的键值对字典。若 actual 为空字符串，或文件读取/JSON 解析失败，或 expected 为空，均直接返回 0.0。成功解析后，遍历 expected['expected'] 中的每一对 key 和 value：若 key 在实际 JSON 中不存在，或 data[key] 与预期 value 不相等（精确比较），则返回 0.0。全部匹配成功返回 1.0。该函数用于验证 VS Code: settings.json 等配置文件的精确配置。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 70,
+        "description": "该函数检查 Chrome 浏览器活动标签页的 URL 是否与预期 URL 一致，比较时忽略查询参数。输入参数 active_tab_info 可以是包含 'url' 键的字典或纯 URL 字符串；rule 为规则字典，需包含 'type': 'url' 和 'url' 预期地址。若 active_tab_info 为空，或 rule['type'] 不是 'url'，返回 0.0。函数内部通过 urlparse 解析 URL 并将 query 部分置空后重新组装，得到去除查询参数的 URL。若处理后的预期 URL 与实际 URL 完全相等，返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:25:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_5811683a-fd91-418a-9c59-e9f306764875./evaluator_function_labels.json"
+}

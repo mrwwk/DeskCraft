@@ -34,32 +34,32 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器在任务执行后的最终状态，核心检查三类对象：打开的标签页（tabs）、当前活动标签页（active tab）以及书签（bookmarks）。对于标签页和活动标签页，主要检查其 URL 是否与预期完全一致；对于书签，则支持检查书签栏文件夹名称、书签栏网站 URL，以及名为 \"Liked Authors\" 的特定文件夹下的网站 URL。比较方式以列表或集合的完全匹配为主，URL 级别使用 compare_urls 进行比较。针对 Chrome accessibility tree 会将本地 file:// URL 报告为 https:///（空主机）的已知问题，evaluator 内置了 URL scheme 归一化容错机制：当严格比较失败时，调用 _normalize_local_file_url 将 https:/// 前缀替换为 file:/// 后重新比较。三个主函数各自独立判定，成功时返回 1 或 1.0，失败时返回 0 或 0.0，属于各指标必须完全满足的判定逻辑。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器在任务执行后的状态是否符合预期，核心检查对象包括：打开的标签页集合、当前活动标签页、以及书签结构（书签栏文件夹名称、书签栏网址、名为\"Liked Authors\"的文件夹内的网址）。由于Chrome accessibility tree存在将本地file:// URL报告为https:///（空host）的已知问题，evaluator内置了URL scheme归一化机制，在严格匹配失败后会将https:///前缀替换为file:///重新比较，以避免因scheme差异导致的误判。评测采用逐项独立打分模式，每个主函数根据匹配情况返回1.0（完全匹配）或0.0（不匹配），各检查项之间不存在加权累计关系，任一单项检查失败即该项得分为零。",
     "main_functions": [
       {
         "name": "is_expected_tabs",
         "lineno": 25,
-        "description": "接收 open_tabs（Chrome 当前打开标签页列表，每个元素为包含 \"url\" 字段的字典）和 rule（配置字典，其中 \"type\" 字段指定匹配类型）。当 match_type 为 \"url\" 时，从 open_tabs 提取所有 tab 的 \"url\" 组成 actual_urls 列表，将 rule[\"urls\"] 作为 expected_urls，调用 are_lists_equal(expected_urls, actual_urls, compare_urls) 进行列表级完全匹配比较。该比较会逐对使用 compare_urls 判断 URL 是否相等，并考虑列表顺序。若两个列表完全匹配则返回 1；若 open_tabs 为空、match_type 未知、或列表不匹配则返回 0。"
+        "description": "检查Chrome中当前打开的标签页集合是否与预期一致。接收open_tabs（标签页信息字典列表，每个字典通常包含url字段）和rule（评测规则字典）。当rule[\"type\"]为\"url\"时，先从open_tabs中提取所有标签页的url字段组成actual_urls列表，再调用are_lists_equal并传入compare_urls作为比较函数，将actual_urls与rule[\"urls\"]预期列表进行顺序与内容双重比较。若open_tabs为空直接返回0；若列表完全匹配则返回1，否则返回0。该函数不支持除\"url\"外的其他match_type，遇到未知类型会记录错误日志并返回0。"
       },
       {
         "name": "is_expected_active_tab",
         "lineno": 48,
-        "description": "接收 active_tab_info（当前活动标签页信息，可以是字典或字符串）和 rule（配置字典）。当 match_type 为 \"url\" 时，从 active_tab_info 中获取 actual_url：若输入为字典则取 \"url\" 键的值，否则直接将输入视为 URL 字符串。随后与 rule[\"url\"] 进行两步比较：第一步直接使用 compare_urls 进行严格 URL 比较；若失败，第二步对 expected_url 和 actual_url 同时调用 _normalize_local_file_url，将可能的 https:/// 前缀转换为 file:/// 后再次使用 compare_urls 比较。两步中任一步匹配成功即返回 1；若均失败、输入为空、或 match_type 未知则返回 0。"
+        "description": "检查Chrome中当前活动标签页是否与预期一致。接收active_tab_info（活动标签页信息，可能是字典或字符串）和rule（评测规则字典）。当rule[\"type\"]为\"url\"时，先从active_tab_info中提取actual_url（若为字典则取url键，否则直接视为URL字符串），与rule[\"url\"]进行两轮比较：第一轮直接调用compare_urls进行严格比较；若失败，第二轮对expected_url和actual_url均调用_normalize_local_file_url，将可能的https:///前缀转换为file:///，再次调用compare_urls比较。任一轮比较通过即返回1，均不通过返回0。若active_tab_info为空则直接返回0。不支持\"url\"以外的match_type。"
       },
       {
         "name": "is_expected_bookmarks",
         "lineno": 93,
-        "description": "接收 bookmarks（Chrome 书签树字典）和 rule（配置字典），依据 rule[\"type\"] 分三个分支处理。1) \"bookmark_bar_folders_names\"：遍历 bookmarks[\"bookmark_bar\"][\"children\"] 中 type 为 \"folder\" 的节点，提取 \"name\" 字段组成集合，与 rule[\"names\"] 集合做完全相等比较，匹配返回 1.0，否则 0.0。2) \"bookmark_bar_websites_urls\"：遍历 bookmark_bar 子节点中 type 为 \"url\" 的节点，提取 \"url\" 组成集合；先与 rule[\"urls\"] 直接进行集合比较，若不等则对两边所有 URL 调用 _normalize_local_file_url 做 scheme 归一化后再次比较集合，匹配返回 1.0，否则 0.0。3) \"liked_authors_websites_urls\"：在 bookmark_bar 子节点中查找 type 为 \"folder\" 且 \"name\" 为 \"Liked Authors\" 的文件夹；若存在，提取其 children 中 type 为 \"url\" 的 \"url\" 列表。将 rule[\"urls\"] 中每个元素若为字符串则包装为单元素列表，随后使用 itertools.product 生成所有可能的 URL 组合，逐一检查是否有某个组合与提取的 URL 列表在集合意义上相等，有则返回 1.0，无则返回 0.0；若 \"Liked Authors\" 文件夹不存在则返回 0.0。"
+        "description": "检查Chrome书签结构是否符合预期。接收bookmarks（书签层级字典）和rule（评测规则字典），根据rule[\"type\"]分三条分支独立判定：1) bookmark_bar_folders_names：遍历bookmarks[\"bookmark_bar\"][\"children\"]中type为\"folder\"的节点，提取name字段组成集合，与rule[\"names\"]集合做精确相等比较，匹配返回1.0否则0.0；2) bookmark_bar_websites_urls：遍历bookmarks[\"bookmark_bar\"][\"children\"]中type为\"url\"的节点，提取url字段组成集合，先与rule[\"urls\"]做精确集合比较，若失败则对双方所有URL调用_normalize_local_file_url归一化后再比较，匹配返回1.0否则0.0；3) liked_authors_websites_urls：在bookmark_bar的children中查找name为\"Liked Authors\"且type为\"folder\"的文件夹，若不存在返回0.0；若存在则提取其内部所有type为\"url\"的url列表。将rule[\"urls\"]中每个元素若为字符串则包装为单元素列表，随后使用itertools.product生成所有可能的URL组合，逐一将组合转为集合与\"Liked Authors\"文件夹内的url集合比较，任一组合完全匹配即返回1.0，全部不匹配返回0.0。若rule[\"type\"]不属于上述三种，抛出TypeError。"
       }
     ],
     "helper_functions": [
       {
         "name": "_normalize_local_file_url",
-        "lineno": 12,
-        "description": "接收单个 url 字符串，针对 Chrome accessibility tree 的已知问题做 scheme 归一化：若 URL 非空且以 \"https:///\" 开头（即本地文件被错误报告为带空主机的 https），则将其替换为 \"file:///\" 前缀；否则原样返回。该函数为纯字符串转换工具，被 is_expected_active_tab 和 is_expected_bookmarks 调用，用于在严格 URL 比较失败时提供第二次容错比较的机会，避免本地文件页面因 scheme 差异导致误判。"
+        "lineno": 13,
+        "description": "针对Chrome accessibility tree的scheme异常进行URL归一化。若传入的url非空且以\"https:///\"开头，则将其替换为\"file:///\"前缀；否则原样返回。该函数被is_expected_active_tab和is_expected_bookmarks调用，用于在严格URL比较失败后消除本地文件路径因被误报为https scheme而产生的假阴性，确保file://localhost/path与https:///path被识别为同一本地资源。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:38:53",
+  "created_at": "2026-07-01 15:01:25",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_208./evaluator_function_labels.json"
 }

@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_ambiguous_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_title_text",
+      "lineno": 157
+    },
+    {
+      "name": "check_kdenlive_render_title_video_title",
+      "lineno": 231
+    },
+    {
+      "name": "check_kdenlive_transition",
+      "lineno": 289
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 23
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 46
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 63
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 131
+    },
+    {
+      "name": "check_kdenlive_title_text",
+      "lineno": 157
+    },
+    {
+      "name": "check_kdenlive_render_title_video_title",
+      "lineno": 231
+    },
+    {
+      "name": "check_kdenlive_transition",
+      "lineno": 289
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 agent 是否成功在 Kdenlive 中制作了一个专业的开场视频。它采用组合式、全满足（必须全部通过）的判定逻辑，核心验证三条：第一，渲染输出的 MP4 文件必须真实存在、非空，且经 ffprobe 检测包含视频流，视频编码名称中必须包含预期的编码类型（如 h264），时长不得低于设定的最小阈值（默认 1.0 秒）；第二，Kdenlive 项目文件（.kdenlive）中必须存在类型为 kdenlivetitle 的标题片段（<producer> 或 <chain>），其 xmldata 属性（内嵌 SVG XML）中必须包含所有预期的标题文本（大小写不敏感子串匹配，若直接匹配失败还会解析 SVG 后在元素文本及 tail 中二次查找）；第三，项目 XML 中必须存在片段间的过渡效果，通过在 <transition> 或 <link> 节点中匹配 mlt_service 或 kdenlive_id 属性来确认（如 luma 溶解过渡）。任何一项检查失败即判定任务未完成。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_title_text",
+        "lineno": 157,
+        "description": "接收项目文件路径 project_file_path 和 rule 字典（需包含 expected_text）。首先检查文件是否存在，然后使用 ET.parse 解析 .kdenlive 的 MLT XML。遍历所有 <producer> 节点，通过 _get_mlt_service 获取服务类型，筛选出 mlt_service 为 kdenlivetitle 的节点；再使用 _get_property_value 提取 xmldata 属性。对 xmldata 先进行大小写不敏感的子串匹配；若未命中，则尝试将 xmldata 作为 SVG XML 用 ET.fromstring 解析，遍历所有 SVG 元素，检查 elem.text 和 elem.tail 是否包含预期文本。若 producer 中未找到，再遍历所有 <chain> 节点执行同样的 kdenlivetitle 筛选和 xmldata 子串匹配。任一环节找到即返回 1.0，全部遍历后仍未找到则返回 0.0。过程中 XML 解析错误或异常均捕获并返回 0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_title_video_title",
+        "lineno": 231,
+        "description": "复合评测函数，接收 result_paths（multi:true 时为 [output.mp4, project.kdenlive] 列表，单文件时为字符串）和 expected 规则字典（含 min_duration、expected_codec、expected_titles）。首先调用 _extract_result_paths 分离出渲染文件路径和项目文件路径。第一步调用 _verify_render_output 对 MP4 进行存在性、非空性、ffprobe 编码与时长验证，若失败直接返回 0.0。第二步从 expected_titles 列表中逐个取出标题文本，对每个文本调用 check_kdenlive_title_text 检查项目文件，若任一标题未找到即返回 0.0。仅当渲染输出与所有标题文本均验证通过时，才返回 1.0。属于严格的全满足（AND）逻辑。"
+      },
+      {
+        "name": "check_kdenlive_transition",
+        "lineno": 289,
+        "description": "接收项目文件路径 project_file_path 和规则字典（需包含 transition_type，如 \"luma\"）。检查文件存在后，解析 MLT XML。先遍历所有 <transition> 节点，通过 _get_mlt_service 获取 service 并与 transition_type 进行大小写不敏感比较；若未命中，则通过 _get_property_value 读取该 transition 的 kdenlive_id 属性，检查其是否包含 transition_type（大小写不敏感）。若 transition 中仍未找到，则遍历所有 <link> 节点，同样比较其 mlt_service。任一节点匹配成功即返回 1.0；全部遍历无匹配则返回 0.0。XML 解析错误或异常均返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 22,
+        "description": "从 MLT XML 元素（xml.etree.ElementTree.Element）中提取 mlt_service 值。优先读取元素的直接属性 element.get(\"mlt_service\")；若不存在，则遍历该元素的所有子 <property> 节点，查找 name 属性为 \"mlt_service\" 的 property，返回其文本内容。若均未找到则返回 None。该函数被主函数用于识别标题片段（kdenlivetitle）和过渡片段（luma）的类型标识。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 45,
+        "description": "从 MLT XML 元素的子 <property> 节点中，按 name 属性精确查找指定属性名（如 \"xmldata\"、\"kdenlive_id\"），返回对应 property 的文本值；未找到返回 None。是解析 Kdenlive 项目文件内部属性的通用提取器，被标题检查和过渡检查复用。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 62,
+        "description": "对渲染出的 MP4 文件进行媒体级验证。首先检查文件路径存在且文件大小不为 0；然后构建 ffprobe 命令（-print_format json -show_streams -show_format）并执行，超时时间为 30 秒。解析 ffprobe 输出的 JSON，查找 codec_type 为 video 的流，确认 codec_name（转小写后）包含 expected_codec（默认 h264）；再提取 duration（优先取视频流 duration，其次取 format 层的 duration），验证其不小于 min_duration（默认 1.0 秒）。任一条件失败返回 (False, error_msg)，全部通过返回 (True, \"\")。专供 check_kdenlive_render_title_video_title 调用。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 130,
+        "description": "处理评测框架返回的 result_paths 格式：若输入为列表（对应 multi:true 配置），取索引 0 作为渲染文件路径 render_path，索引 1 作为项目文件路径 project_path；若输入为字符串（单文件结果），则整个字符串作为 render_path，project_path 置为 None。返回 (render_path, project_path) 元组。用于适配不同结果配置，供 check_kdenlive_render_title_video_title 在评测开始时统一解析路径。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:50:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_ambiguous_001./evaluator_function_labels.json"
+}

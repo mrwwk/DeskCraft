@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于评测 Chrome 浏览器相关任务的完成状态，核心验证目标分为两类：一是检查当前激活标签页的页面文本内容（如 Steam 购物车页面）中是否完整包含所有预期的商品或文本项；二是检查当前页面或操作结果的 URL 是否同时满足一组预期的正则表达式模式。评测采用二元打分机制（返回 1.0 表示完全通过，0.0 表示失败），两类检查内部均遵循\"全部满足\"的严格逻辑——即所有预期条件必须同时成立，任一缺失或不匹配即判定失败。 evaluator 直接读取 active_tab_info 中的 content 字段或 result 中的 URL 字符串进行比对，不涉及文件系统读写或图像解析。",
+    "overall_validation": "该evaluator用于验证Chrome浏览器环境下任务执行后的页面状态与导航结果。它通过检查浏览器活动标签页（active_tab_info）的两类核心信息来判定任务是否完成：一是页面文本内容（content字段）中是否完整包含指定的商品名称或关键词条目（主要用于验证Steam购物车等场景），二是当前页面URL是否完全匹配一组预期的正则表达式模式。两个检查维度均采用严格的0/1评分机制，即所有指定条件必须全部满足才能返回1.0（成功），任一条件不满足即返回0.0（失败）。检查对象直接依赖于外部传入的活动标签页信息字典或URL字符串，无需额外读取本地文件。",
     "main_functions": [
       {
         "name": "is_added_to_steam_cart",
         "lineno": 7,
-        "description": "该函数接收 active_tab_info（当前激活标签页的信息字典）和 rule（规则字典）作为输入。检查步骤如下：1）存在性校验：若 active_tab_info 为空，直接返回 0.；从 rule 中提取 items 列表，若为空则返回 0.。2）内容提取：从 active_tab_info 中读取 'content' 字段（页面文本内容），若该字段不存在或为空，记录警告日志并返回 0.。3）循环逐项检查：遍历 items 中的每一个预期文本项，使用 Python 原生字符串包含判断（item not in content）验证该项是否出现在页面内容中。4）判定依据：若发现任一 item 未在 content 中出现，立即返回 0.；仅当所有 items 全部命中时，才返回 1.。该函数未调用其他辅助函数，直接基于字符串包含操作完成判定。"
+        "description": "该函数接收active_tab_info（当前活动标签页信息字典）和rule（评测规则字典）作为输入。首先检查active_tab_info是否存在且有效；随后从rule中提取items列表（预期应出现在页面中的商品或文本条目）；接着从active_tab_info中读取content字段（即页面文本内容）。函数通过遍历items列表，逐一检查每个item字符串是否都存在于content中。判定依据为：若所有item均在页面内容中找到，则返回1.0；若active_tab_info缺失、content为空、items为空，或任一item未在content中出现，则立即返回0.0。该函数用于验证Steam购物车等页面是否成功添加了指定商品，采用“全部满足”的硬性判定逻辑，无近似匹配或容错阈值。"
       },
       {
         "name": "is_expected_url_pattern_match",
         "lineno": 31,
-        "description": "该函数接收 result（待检查的 URL，类型可为字符串或包含 'url' 键的字典）和 rules（规则字典）作为输入。检查步骤如下：1）存在性校验：若 result 为空，直接返回 0.。2）URL 解析与格式转换：若 result 为字符串则直接作为 result_url；若为字典则提取其 'url' 字段；若格式不符合上述两种，记录错误日志并返回 0.。3）模式提取：从 rules 中读取 'expected' 正则模式列表，若为空则记录警告日志并返回 0.。4）循环正则匹配：遍历每一个 pattern，调用 re.search 在 result_url 中搜索匹配。5）判定依据：若任一 pattern 未匹配成功，立即返回 0.；仅当所有正则模式均匹配成功时，才返回 1.。该函数依赖 re.search 完成核心正则匹配逻辑。"
+        "description": "该函数接收result（当前页面URL信息，可以是字符串URL或包含'url'键的字典）和rules（评测规则字典）作为输入。首先对result进行格式校验与URL提取：若result为字符串则直接使用，若为字典则提取其'url'字段，否则返回0.0。随后从rules的\"expected\"键中获取正则表达式模式列表。函数遍历所有pattern，使用re.search逐一检查每个正则模式是否在结果URL中匹配。判定依据为：只有当所有预期正则模式均能在URL中找到匹配时，才返回1.0；若result为空、格式非法、expected模式列表为空，或任一pattern匹配失败，则立即返回0.0。该函数采用严格的“全部满足”逻辑，要求URL必须同时通过所有正则规则的检验。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:44:17",
+  "created_at": "2026-07-01 15:07:12",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_121ba48f-9e17-48ce-9bc6-a4fb17a7ebba./evaluator_function_labels.json"
 }

@@ -22,21 +22,21 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于Blender牛油果光照任务，对渲染输出进行两个独立指标的验证：第一，检查渲染输出文件（avocado_a.png）是否存在，并验证其图像尺寸（宽度、高度）和格式（PNG）是否与给定规则精确匹配，任一规格不符即判该指标失败；第二，检查渲染图像是否包含足够的像素变化，避免输出为空白、纯背景或仅HDRI环境的无效图像，通过像素标准差（默认阈值15.0）和唯一颜色数（默认阈值100）双重阈值进行判定。两个指标由各自的主函数独立执行，各自返回1.0（通过）或0.0（失败），evaluator内部不做加权累计，由上层框架分别调用并汇总结果。",
+    "overall_validation": "该evaluator用于验证Blender牛油果光照任务的最终渲染产物。它针对一张预期的渲染输出图像（如avocado_a.png）执行两类独立检查：第一类是输出文件规格验证，通过PIL读取图像，校验其实际宽高是否严格匹配规则指定的尺寸（默认1600×1600），以及图像格式是否为PNG（支持JPG/JPEG别名等价）；第二类是图像内容可见性验证，通过将图像转为RGB numpy数组，计算全图像素标准差（阈值默认15.0）和唯一颜色数量（阈值默认100），确保渲染结果不是空白、纯背景或低变化的无效图像。两个主函数各自独立返回0.0（失败）或1.0（通过），代码中未体现二者如何加权或组合成最终任务得分。",
     "main_functions": [
       {
         "name": "check_blender_render_output",
         "lineno": 18,
-        "description": "接收file_path（渲染输出文件路径）和rule（规格字典，通常包含width、height、format字段）。首先检查文件是否存在，不存在直接返回0.0；随后使用PIL.Image打开图像，获取实际宽度、高度与格式。依次进行精确匹配：若rule中包含width，则比较实际宽度与rule['width']，不符返回0.0；若rule中包含height，则比较实际高度与rule['height']，不符返回0.0；若rule中包含format，则比较图像格式（不区分大小写，并处理JPG到JPEG的别名映射），不符返回0.0。全部通过返回1.0。若PIL未安装，回退为仅检查文件是否存在（存在返回1.0，否则0.0）；其他异常也返回0.0。"
+        "description": "该函数接收渲染输出文件路径file_path和规则字典rule，验证输出文件的规格。首先检查file_path是否为None或文件是否真实存在，若不存在则直接返回0.0。接着尝试用PIL.Image打开图像并读取实际宽高。依次执行三项精确匹配检查：1）若rule中包含width字段，比较actual_width是否严格等于rule['width']；2）若rule中包含height字段，比较actual_height是否严格等于rule['height']；3）若rule中包含format字段，将期望格式rule['format']与实际img.format均转为大写后进行比较，若不一致则通过别名映射表fmt_map（如JPG映射为JPEG）进行二次等价判断，仍不等价则判定失败。以上任一检查不通过即返回0.0并记录warning日志。若触发ImportError（PIL未安装），回退为仅检查文件是否存在，存在则返回1.0，否则返回0.0；其他异常均返回0.0。"
       },
       {
         "name": "check_image_has_content",
         "lineno": 69,
-        "description": "接收file_path（渲染PNG路径）、unused的expected参数以及options关键字参数。首先检查文件是否存在，不存在返回0.0；随后用PIL打开图像并转为RGB模式，再转为numpy float64数组。执行两项内容检测：1）计算全图像素标准差(std)，与options中的min_std（默认15.0）比较，若std低于阈值说明图像过于均匀，返回0.0；2）计算三维颜色空间中不重复颜色的数量(unique_colors)，与options中的min_unique_colors（默认100）比较，若低于阈值说明颜色过于单一，返回0.0。两项均通过返回1.0。若PIL或numpy未安装，回退为仅检查文件是否存在；其他异常返回0.0。"
+        "description": "该函数接收图像文件路径file_path和可选参数options，验证渲染图像是否包含可见内容而非均匀空白。首先检查file_path是否为None或文件是否真实存在，若不存在则返回0.0。尝试用PIL打开图像并强制转换为RGB模式，再转为numpy float64数组。随后执行两项内容丰富度检查：1）计算全数组像素标准差std，与options中的min_std（默认15.0）比较，若std小于该阈值说明图像变化不足（接近均匀背景或空白），返回0.0；2）将数组reshape为(-1, 3)后通过np.unique按行计算唯一颜色数量unique_colors，与options中的min_unique_colors（默认100）比较，若唯一颜色过少也返回0.0。两项均通过则返回1.0。若触发ImportError（PIL或numpy未安装），回退为仅检查文件是否存在，存在则返回1.0；其他异常返回0.0。"
       }
     ],
     "helper_functions": []
   },
-  "created_at": "2026-06-30 21:03:35",
+  "created_at": "2026-07-01 14:32:16",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib08_avocado_lighting_ab_001./evaluator_function_labels.json"
 }

@@ -1,0 +1,66 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00006-0006-4000-8000-000000000006./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 99
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 99
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 任务生成的音频文件是否在末尾指定时长内完成了淡出（fade-out）处理。它读取目标 WAV 文件，将其转换为单声道样本序列，提取音频末尾一段由 fade_duration 指定的数据，并将其切分为 num_windows 个等长窗口；通过计算每个窗口的 RMS（均方根）能量并转换为 dB，检查这些窗口的能量是否总体呈递减趋势。判定采用打分式逻辑：若相邻窗口间 RMS 下降的次数不少于 num_windows - 2 次，则返回 1.0（成功），否则返回 0.0（失败）。检查过程对文件存在性、音频长度、采样位深等均做了容错处理。",
+    "main_functions": [
+      {
+        "name": "check_audio_fade_out",
+        "lineno": 98,
+        "description": "该函数接收 file_path（待测 WAV 文件路径）和 rule 字典（必须包含 fade_duration 字段，可选 num_windows 字段，默认值为 5）。首先检查文件是否存在，不存在直接返回 0.0。接着调用 _get_mono_samples 读取音频并转换为单声道样本列表及采样率 sr。根据 fade_duration 与 sr 计算淡出所需样本数 fade_samples，若其超过音频总长度，或计算出的窗口大小小于 1，则返回 0.0。随后定位到音频末尾 fade_samples 处，将其均分为 num_windows 个窗口，对每个窗口调用 _rms_db 计算 RMS 能量（dB），得到窗口能量序列。最后统计相邻窗口间能量下降的次数：若下降次数大于等于 num_windows - 2，则认为淡出趋势成立，返回 1.0；否则返回 0.0。任何异常均捕获后返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 22,
+        "description": "使用标准库 wave 模块打开指定 WAV 文件，读取并返回包含 channels（通道数）、sample_rate（采样率）、n_frames（总帧数）、duration（时长）和 sampwidth（采样位宽）的字典。该函数为后续音频信息获取和样本解析提供基础元数据，被 _get_mono_samples 间接调用。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 40,
+        "description": "使用 wave 模块读取 WAV 文件的全部原始帧数据，根据 sampwidth（支持 1/2/3/4 字节，即 8/16/24/32 位）将其解析为归一化到 [-1.0, 1.0] 范围的浮点样本列表。对于多通道音频，返回交错排列（interleaved）的样本序列。该函数是音频数据提取的核心解析器，被 _get_mono_samples 调用。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 74,
+        "description": "接收浮点样本列表，计算其 RMS（均方根）值并转换为分贝（dB）。若样本为空或 RMS 小于 1e-10，则返回 -100.0 作为下限值。该函数提供能量度量，被 check_audio_fade_out 用于评估每个窗口的音量水平。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 85,
+        "description": "整合 _read_wav_info 与 _read_wav_samples，先读取 WAV 元数据和样本；若通道数大于 1，则对交错样本按帧取平均，转换为单声道样本序列。最终返回单声道样本列表和采样率。该函数是主评测函数获取标准化音频数据的统一入口。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:20:00",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00006-0006-4000-8000-000000000006./evaluator_function_labels.json"
+}

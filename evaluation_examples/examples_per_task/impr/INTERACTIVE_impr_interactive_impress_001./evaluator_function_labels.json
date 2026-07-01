@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_pptx_title_changed",
+      "lineno": 6
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_pptx_title_changed",
+      "lineno": 6
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户是否成功修改了PPTX文件的标题。它通过检查从PPTX中提取出的文本内容来判定任务完成度：首先确保文本提取成功（结果为非空字符串），然后核对配置中指定的原始标题子串是否已完全从文本中消失。核心检查对象是PPTX文本字符串与原始标题模式列表，采用串联判定逻辑——只要文本提取失败或任一原始标题残留，即判定失败（0.0）；只有文本提取成功且所有原始标题均被清除时，才判定成功（1.0）。",
+    "main_functions": [
+      {
+        "name": "check_pptx_title_changed",
+        "lineno": 6,
+        "description": "该函数接收从PPTX文件中提取出的文本result和包含排除规则的字典rules，依次执行以下检查：第一步，验证文本提取是否成功，检查result是否为非None的字符串类型且去除空白后不为空，若失败则返回0.0；第二步，从rules中安全获取exclude列表（若rules为None则默认为空字典）；第三步，遍历exclude列表中的每个原始标题子串pattern，检查该子串是否仍然存在于提取的PPTX文本result中，若发现任一原始标题残留则立即返回0.0；若全部通过，即文本提取成功且所有原始标题子串均已被移除，则返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:21:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_001./evaluator_function_labels.json"
+}

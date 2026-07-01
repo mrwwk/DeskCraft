@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_002./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 8
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 8
+    },
+    {
+      "name": "_extract_pptx_text",
+      "lineno": 47
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个PPTX文件（或回退情况下的原始文本）是否满足特定的内容包含与排除规则。它通过python-pptx库读取PPTX文件，遍历所有幻灯片、形状、段落和文本运行以提取全部文本内容，然后检查提取的文本中是否同时包含rules中\"include\"列表指定的所有必需字符串，并且不包含\"exclude\"列表指定的任何禁止字符串。如果PPTX文件读取或解析失败，evaluator会回退到将输入result直接视为纯文本字符串进行同样的规则检查。成功判定采用非0即1的硬阈值：只有当所有包含规则全部满足且所有排除规则全部满足时，才返回1.0表示任务成功；任一条件不满足即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 8,
+        "description": "该函数接收两个参数：result（来自vm_file getter的PPTX文件本地路径，或在PPTX提取失败时作为回退的原始文本字符串）和rules（包含\"include\"和\"exclude\"键的字典，值为字符串列表）。其检查步骤如下：1）若result为None，直接返回0.0；2）从rules中分别获取include和exclude列表；3）调用_extract_pptx_text尝试从文件路径提取PPTX中的全部文本；4）若辅助函数返回None（文件不存在或解析失败），则将result强制转换为字符串作为待检查的text；5）使用all()组合条件判断text是否同时满足\"包含所有include字符串\"且\"不包含任何exclude字符串\"；6）若组合条件为真则返回1.0，否则记录包含规则、排除规则和文本前200字预览的日志并返回0.0。判定依据是严格的逻辑与关系，不存在部分得分。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_extract_pptx_text",
+        "lineno": 50,
+        "description": "该辅助函数接收一个文件路径字符串，负责从PPTX文件中提取全部文本内容以服务主评测逻辑。具体流程为：先检查文件是否存在，不存在则记录警告并返回None；若存在则使用python-pptx库的Presentation打开文件，依次遍历所有slide、slide.shapes、shape.text_frame.paragraphs、para.runs，收集每个run.text中的非空文本片段，最后用空格将所有片段连接成一个完整字符串返回。如果在导入pptx模块或解析文件过程中发生任何异常，会捕获异常、记录警告日志并返回None。该函数的返回值语义明确：成功时返回提取到的全部文本，失败时返回None，从而触发主函数check_include_exclude的回退逻辑（将输入视为纯文本）。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:21:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_002./evaluator_function_labels.json"
+}

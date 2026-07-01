@@ -1,0 +1,83 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_2a4c8e19-6f31-45d1-bc88-9f42a1d7e5b3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 68
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 92
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 20
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 24
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 39
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 68
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 92
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个UI bundle（ZIP压缩包）是否满足任务要求。它通过三个独立的检查维度对ZIP包进行严格判定：第一，检查包内是否包含指定的必需文件；第二，检查指定文本文件中是否包含所有必需关键词；第三，对HTML文件进行结构化DOM检查（包括CSS选择器存在性、元素数量、文本包含、属性值精确匹配、全文文本包含等）。三个主函数各自独立评分，每个函数内部采用\"全部满足即返回1.0，任一不满足即返回0.0\"的硬阈值通过与失败逻辑，不存在加权或累计打分。最终任务完成度取决于rules中配置了哪些检查项以及这些检查项是否全部被满足。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 49,
+        "description": "接收actual（ZIP文件路径字符串）和rules（字典，内含required_files列表）。首先判断actual是否为空，为空直接返回0.0；若required_files为空列表则直接返回1.0。随后调用_load_ui_bundle_entries加载ZIP包，获取规范化路径到原始路径的映射。遍历required_files中的每个文件路径，先经_normalize_ui_bundle_path规范化，再判断其是否存在于ZIP条目中。只要有一个必需文件缺失，立即返回0.0；全部存在则返回1.0。若加载ZIP过程中发生任何异常，也返回0.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_keywords",
+        "lineno": 68,
+        "description": "接收actual（ZIP文件路径字符串）和rules（字典，内含required_file_keywords字典，键为文件名，值为关键词列表）。首先判断actual是否为空，为空返回0.0；若required_file_keywords为空则返回1.0。调用_load_ui_bundle_entries加载ZIP包并提取文本内容。遍历每个指定的文件：先检查规范化后的文件名是否存在于ZIP中，不存在则返回0.0；存在则获取其文本内容并整体转为小写。再遍历该文件对应的所有关键词，将关键词也转为小写后检查是否被文件内容包含。只要有一个关键词未命中，立即返回0.0；所有文件的所有关键词全部命中则返回1.0。加载或解析异常时返回0.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 92,
+        "description": "接收actual（ZIP文件路径字符串）和rules（字典，内含html_checks字典，键为HTML文件名，值为检查规则列表）。首先判断actual是否为空，为空返回0.0；若html_checks为空则返回1.0。调用_load_ui_bundle_entries加载ZIP包，再对每个指定的HTML文件调用_get_ui_bundle_html_soup解析为BeautifulSoup对象；若文件不存在或解析失败返回0.0。对每个文件的checks列表逐项执行：type为selector_exists时，要求CSS选择器必须能匹配到至少一个元素；type为selector_count时，要求选择器匹配的元素数量必须严格等于count预期值；type为selector_text_contains时，要求选择器匹配的第一个元素的get_text(\" \", strip=True)结果（转小写）必须包含预期text（转小写）；type为selector_attribute_equals时，要求选择器匹配的第一个元素的指定attribute属性值必须严格等于预期value；type为text_present时，要求整个HTML文档的get_text(\" \", strip=True)结果（转小写）必须包含预期text（转小写）。遇到未知的check_type也直接返回0.0。任一检查失败立即返回0.0，全部通过返回1.0。异常时返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 20,
+        "description": "对传入的路径字符串进行规范化处理：去除开头的\"./\"，并将所有反斜杠\"\\\"替换为正斜杠\"/\"，用于统一ZIP包内文件路径的格式，确保跨平台路径一致性。被所有需要比对ZIP内文件路径的函数复用。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 24,
+        "description": "打开actual指定的ZIP文件，读取其所有条目（namelist）。构建两个字典：normalized_to_raw（规范化路径到原始路径的映射）和file_sizes（规范化路径到文件大小的映射）。随后对后缀为.html、.css、.js、.json、.md、.txt、.svg的文件，读取其原始二进制内容并以utf-8解码（忽略错误），存入text_contents字典。最终返回(normalized_to_raw, file_sizes, text_contents)三元组。该函数是文件存在性检查、关键词检查和HTML结构检查的共同数据加载入口。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 40,
+        "description": "接收text_contents字典和file_name文件名。先调用_normalize_ui_bundle_path规范化文件名，再从text_contents中查找对应文本。若找不到返回None；找到则使用BeautifulSoup以html.parser解析并返回文档对象。该函数专供check_ui_bundle_html_checks使用，用于将ZIP中的HTML文本转换为可进行选择器查询的DOM对象。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:41:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_2a4c8e19-6f31-45d1-bc88-9f42a1d7e5b3./evaluator_function_labels.json"
+}

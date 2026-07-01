@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_2593a83c-f6b7-484e-91ad-3b0743c3058e./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定 PowerPoint 编辑任务是否按预期完成。其核心思路是将「待评测 PPTX 文件」与「参考答案 PPTX 文件」进行逐页、逐形状、逐段落、逐文本运行（run）的精细化比对。检查范围覆盖幻灯片总数、每页背景色（含母版继承逻辑）、演讲者备注、形状（含组合形状内部）的位置与尺寸、文本内容、字体名称/大小/颜色/粗体/斜体/下划线/删除线、段落对齐方式与缩进级别、表格行列结构及单元格格式、项目符号等。比较采用严格的「一票否决」机制：在任意启用的检查项中，只要出现一处不一致即立即返回 0（失败）；仅当所有启用的检查项全部通过时才返回 1（成功）。形状的位置与尺寸使用近似相等判断（默认相对容差 0.5%），部分格式属性（如粗体、斜体）将 None 与 False 视为等价，段落对齐将 None 视为左对齐，项目符号的级别将 None 与 '0' 视为等价。",
+    "main_functions": [
+      {
+        "name": "enable_debug_logging",
+        "lineno": 26,
+        "description": "配置并启用详细的调试日志记录，服务于人工排查比对失败原因。它检查全局 debug_logger 的日志级别是否已为 DEBUG，若无则设置；再检查该 logger 是否已存在 Handler，若无则添加一个 StreamHandler 并设置包含时间、logger 名称、日志级别和消息的格式化字符串。该函数不执行任何评测判定逻辑，仅在 compare_pptx_files 的 enable_debug 选项为 True 时被调用，用于在比对过程中输出文件路径、幻灯片数量、各形状的类型/位置/尺寸/文本、以及具体哪一项检查不匹配等追踪信息。"
+      },
+      {
+        "name": "get_all_text_shapes",
+        "lineno": 36,
+        "description": "递归提取单张幻灯片中所有包含文本的形状对象，重点解决 GROUP（组合）形状内部文本容易被遗漏的问题。它在内部定义了 extract_text_shapes 递归函数：对每个传入的 shape，先判断其是否同时具备 text 和 text_frame 属性，若有则加入结果列表；再判断该 shape 是否具有 shapes 属性（即 GROUP 类型），若有则对其内部每个子形状递归调用自身，将结果展平合并。最终返回该幻灯片下所有层级文本形状的扁平化列表。该函数被 compare_pptx_files 调用，用于在常规逐形状比对之外，额外进行一次针对所有文本形状（尤其是组合内文本）的文本内容和对齐方式一致性校验。"
+      },
+      {
+        "name": "compare_pptx_files",
+        "lineno": 60,
+        "description": "核心评测函数，接收两个 PPTX 文件路径（file1_path 为参考答案，file2_path 为待评测文件）及可变选项 options。首先使用 python-pptx 加载两个演示文稿，从 options 中读取近 20 个布尔型检查开关（默认大部分为 True）和近似容差 approximately_tolerance（默认 0.005）。内部嵌套定义了 is_approximately_equal（基于相对误差判断数值近似相等）和 nonempty_runs（过滤掉仅含格式无实际文本的 run）。完整检查流程如下：1) 若启用 examine_number_of_slides，先比较幻灯片总数，不等则直接返回 0；2) 按页序逐对比较幻灯片：① 背景色，通过内部逻辑 get_slide_background_color 读取 slide.background.fill，区分直接填充（type=1）与母版继承（type=5），颜色不一致则返回 0；② 备注文本，通过内部逻辑 get_slide_notes 读取 notes_slide.notes_text_frame.text 并 strip() 比较，不一致则返回 0；③ 调用 get_all_text_shapes 获取双方所有文本形状备用；④ 比较每页形状总数，不等则返回 0；⑤ 按顺序逐对比较形状：若开启 examine_title_bottom_position 且文本为 \"Product Comparison\"，要求 shape1.top 必须大于 shape2.top 且不小于 3600000；若开启 examine_table_bottom_position，要求第 3 页表格（shape_type=19）顶部必须下移且不小于 3600000；若开启 examine_right_position，要求第 2 页非文本对象左侧不小于 4320000；若开启 examine_top_position，要求第 2 页图片（shape_type=13）顶部必须上移且不大于 1980000；若开启 examine_shape，对 left/top/width/height 进行近似比较，任一维度不匹配即返回 0（此检查优先级高于 examine_modify_height，若二者同时开启，后者将被短路）；若开启 examine_image_size，仅对图片类型（shape_type=13）比较宽高，其他形状仍比较全部四维；若开启 examine_modify_height，对无文本形状或 FREEFORM（type=5）仅比较 height，其余比较全部四维；若形状为 TABLE（MSO_SHAPE_TYPE.TABLE），先比较行列数，再逐单元格比较段落数、run 数，以及每个 run 的字体颜色、粗体（None 与 False 等价）、斜体（None 与 False 等价）、下划线（None 与 True 视为不同）；对普通文本形状，比较 shape 文本 strip() 后是否一致；比较段落数量；逐段落比较对齐方式（None 视为 PP_ALIGN.LEFT）、文本内容、缩进级别（level）、run 数量（空段落时过滤无文本 run）；逐 run 比较字体名称、大小、粗体、斜体、RGB 颜色、下划线、删除线（strike 属性）；若开启 examine_bullets，通过内部函数 _extract_bullets 解析 run 所在 XML 提取 bullet 级别、字符、文本和颜色，再由 _compare_bullets_with_tolerance 比较，其中 level 的 None 与 '0' 等价，颜色差异被忽略，文本或字符不一致则返回 0；⑥ 额外文本形状检查：若开启 examine_alignment 且双方文本形状数量相同，再次逐对比较这些文本形状的文本内容、段落数及每段对齐方式。全部检查通过后返回 1，任何中途不匹配立即返回 0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:31:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_2593a83c-f6b7-484e-91ad-3b0743c3058e./evaluator_function_labels.json"
+}

@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_c425a255-7bcd-4840-a1c7-042ca352d969./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定 PowerPoint 演示文稿（PPTX）编辑任务是否被正确完成。它通过 python-pptx 库同时加载预期结果文件（file1_path）与 agent 输出文件（file2_path），采用全量逐层比对策略：先比较幻灯片总数，再按页比较背景色、备注、形状数量与类型；对每个形状检查位置与尺寸（支持 approximately_tolerance 相对容差，默认 0.005）、文本内容、段落结构、对齐方式（None 视为 PP_ALIGN.LEFT）、缩进级别、字体名称/大小/颜色/粗体/斜体/下划线/删除线；对表格类型形状逐单元格比对行列数、段落数、run 数及字体属性；对项目符号通过解析 XML 比对符号字符、层级与文本。所有检查项通过 options 中的 examine_* 开关控制，默认大部分开启。比对过程中任一维度不匹配即立即返回 0，全部通过则返回 1。特别地，当 examine_shape=True（默认）时，形状尺寸不匹配会提前终止流程，导致 examine_modify_height 等后续逻辑无法执行；而 examine_shape_for_shift_size 则对特定文本（Elaborate on what you want to discuss.）的形状尺寸差异予以豁免。",
+    "main_functions": [
+      {
+        "name": "enable_debug_logging",
+        "lineno": 26,
+        "description": "该函数无输入参数，专为 compare_pptx_files 的调试模式服务。它将 debug_logger 的日志级别设为 DEBUG，并添加一个 StreamHandler，格式化字符串为 %(asctime)s - %(name)s - %(levelname)s - %(message)s。当 compare_pptx_files 的 enable_debug 选项为 True 时，该函数被调用，用于输出两张 PPTX 的幻灯片数、形状数、文本内容、位置尺寸、字体属性等详细比对日志。该函数本身不执行任何判定逻辑，仅用于辅助人工或自动化追踪不匹配点。"
+      },
+      {
+        "name": "get_all_text_shapes",
+        "lineno": 36,
+        "description": "接收一个 slide 对象，递归提取该幻灯片中所有包含文本的 shape，包括嵌套在 GROUP 内部的 shape。内部定义 extract_text_shapes 辅助逻辑：若当前 shape 存在 text 与 text_frame 属性，则将其加入结果列表；若 shape 具有 shapes 属性（即 GROUP 类型），则对其内部每个 sub_shape 递归调用。最终返回所有文本 shape 的扁平化列表。在 compare_pptx_files 中，该函数被用于获取完整的文本 shape 集合，以在常规 shape 遍历之外额外检查文本对齐等属性，确保 GROUP 嵌套内容不被遗漏。"
+      },
+      {
+        "name": "compare_pptx_files",
+        "lineno": 60,
+        "description": "接收 file1_path、file2_path 及 **options，是核心评测函数。逻辑如下：1) 使用 Presentation 加载两个文件；若 enable_debug=True 则调用 enable_debug_logging 输出元信息。2) 若 examine_number_of_slides=True 且幻灯片数量不同，立即返回 0。3) 逐页比对：背景色通过内部逻辑获取（fill.type 为 1 或继承 master 的纯色填充），若不同且 examine_background_color=True 则返回 0；备注通过内部逻辑获取并去除首尾空白比对，若不同且 examine_note=True 则返回 0；使用 get_all_text_shapes 提取两组文本 shape 备用；若当前页 shapes 数量不同，返回 0。4) 逐 shape 比对：特殊位置规则包括 examine_title_bottom_position（对文本为 Product Comparison 的 shape 要求 top 下移且大于 3600000）、examine_table_bottom_position（第 3 页 TABLE 类型 shape_type==19 要求 top 下移且大于 3600000）、examine_right_position（第 2 页非文本 shape 要求 left 右移且大于 4320000）、examine_top_position（第 2 页 PICTURE 类型 shape_type==13 要求 top 上移且小于 1980000）。尺寸与位置默认通过内部闭包 is_approximately_equal（相对容差默认 0.005）比较 left、top、width、height；若 examine_shape=True，任何维度不匹配立即返回 0；若 examine_shape_for_shift_size=True，仅当文本不是 Elaborate on what you want to discuss. 时才因尺寸差异返回 0。图片尺寸 examine_image_size 对 shape_type==13 仅比较 width 与 height。修改高度 examine_modify_height 对无文本或 FREEFORM（shape_type==5）shape 仅比较 height，其余比较全部四维，但仅在 examine_shape=False 时生效。表格类型（MSO_SHAPE_TYPE.TABLE）先比对行列数，再逐单元格比对段落数、run 数（空段落时过滤无文本 run），并比较字体颜色、粗体（None 与 False 等价）、斜体（None 与 False 等价）、下划线（区分 None 与 True）。文本内容在 examine_text=True 时比对 shape.text.strip()。段落与 run 层级比较段落数量；逐段落比较对齐（examine_alignment 时 None 视为 PP_ALIGN.LEFT）、文本、缩进（examine_indent）、run 数（空段落归一化）；逐 run 比较字体名称、大小、颜色、粗体、斜体、下划线、删除线（通过 XML strike 属性）。项目符号 examine_bullets 通过内部函数 _extract_bullets 解析 XML 提取层级、字符、文本、颜色，再通过 _compare_bullets_with_tolerance 比对（文本与字符必须完全一致，层级 None 与 '0' 等价，颜色不比较）。5) 额外文本 shape 对齐检查：若 examine_alignment=True 且两组文本 shape 数量一致，逐 shape 比较文本内容与段落对齐；若数量不一致，返回 0。6) 全部通过返回 1，任一失败返回 0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:34:10",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_c425a255-7bcd-4840-a1c7-042ca352d969./evaluator_function_labels.json"
+}

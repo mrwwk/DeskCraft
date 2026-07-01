@@ -1,0 +1,289 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_014./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 29
+    },
+    {
+      "name": "exact_match",
+      "lineno": 42
+    },
+    {
+      "name": "match_in_list",
+      "lineno": 51
+    },
+    {
+      "name": "literal_match",
+      "lineno": 60
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 77
+    },
+    {
+      "name": "diff_text_file",
+      "lineno": 85
+    },
+    {
+      "name": "fuzzy_match",
+      "lineno": 96
+    },
+    {
+      "name": "fuzzy_place_math",
+      "lineno": 102
+    },
+    {
+      "name": "check_csv",
+      "lineno": 123
+    },
+    {
+      "name": "check_list",
+      "lineno": 152
+    },
+    {
+      "name": "check_accessibility_tree",
+      "lineno": 217
+    },
+    {
+      "name": "run_sqlite3",
+      "lineno": 274
+    },
+    {
+      "name": "check_json",
+      "lineno": 280
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 383
+    },
+    {
+      "name": "compare_time_in_speedtest_results",
+      "lineno": 484
+    },
+    {
+      "name": "is_included_all_json_objects",
+      "lineno": 509
+    },
+    {
+      "name": "is_gold_text_included_in_pdf",
+      "lineno": 528
+    },
+    {
+      "name": "file_contains",
+      "lineno": 555
+    },
+    {
+      "name": "check_line_number",
+      "lineno": 572
+    },
+    {
+      "name": "compare_terminal_and_txt",
+      "lineno": 591
+    },
+    {
+      "name": "compare_python_pure_text",
+      "lineno": 602
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 29
+    },
+    {
+      "name": "exact_match",
+      "lineno": 42
+    },
+    {
+      "name": "match_in_list",
+      "lineno": 51
+    },
+    {
+      "name": "literal_match",
+      "lineno": 60
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 77
+    },
+    {
+      "name": "diff_text_file",
+      "lineno": 85
+    },
+    {
+      "name": "fuzzy_match",
+      "lineno": 96
+    },
+    {
+      "name": "fuzzy_place_math",
+      "lineno": 102
+    },
+    {
+      "name": "check_csv",
+      "lineno": 123
+    },
+    {
+      "name": "check_list",
+      "lineno": 152
+    },
+    {
+      "name": "check_accessibility_tree",
+      "lineno": 217
+    },
+    {
+      "name": "run_sqlite3",
+      "lineno": 274
+    },
+    {
+      "name": "check_json",
+      "lineno": 280
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 383
+    },
+    {
+      "name": "compare_time_in_speedtest_results",
+      "lineno": 484
+    },
+    {
+      "name": "is_included_all_json_objects",
+      "lineno": 509
+    },
+    {
+      "name": "is_gold_text_included_in_pdf",
+      "lineno": 528
+    },
+    {
+      "name": "file_contains",
+      "lineno": 555
+    },
+    {
+      "name": "check_line_number",
+      "lineno": 572
+    },
+    {
+      "name": "compare_terminal_and_txt",
+      "lineno": 591
+    },
+    {
+      "name": "compare_python_pure_text",
+      "lineno": 602
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是一个通用多模态桌面任务评测库，核心目标是验证智能体在桌面环境中完成各类任务后，其产出物（文件、终端输出、界面状态、数据库查询结果等）是否满足预期要求。评测对象涵盖纯文本、CSV、JSON/YAML、Word 文档、PDF、Python 源码、SQLite 数据库、无障碍树 XML 以及终端回显等多种数据形态。评测逻辑采用分层组合策略：对于结构化数据（CSV、JSON）采用“全量规则满足”式判定，即所有期望规则必须命中且所有排除规则必须未命中；对于文本内容支持精确匹配、模糊匹配（rapidfuzz）、差异比率（difflib）以及子串包含判定；对于界面无障碍树则通过 XPath/CSS 选择器定位元素并累积匹配得分；对于文件级任务则直接比较文件内容或提取关键字段（如时间戳、行数）进行校验。成功判定依据任务配置而定，既有二元通过/失败（返回 1.0/0.0），也有连续得分（返回 0~1 之间的相似度或匹配率），总体上以“任务产出的内容、结构或状态与预设规则一致”作为最终通过标准。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 29,
+        "description": "检查对象为一个字符串 result。首先判断 result 是否为 None，若为 None 直接返回 0。随后从 rules 中读取 include 列表与 exclude 列表，检查 result 是否同时满足“包含所有 include 中的子串”且“不包含任何 exclude 中的子串”。若两项同时满足则返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 42,
+        "description": "检查对象为 result 与 rules[\"expected\"] 的精确相等性。将 result 与 expect 进行 == 比较，完全一致返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "match_in_list",
+        "lineno": 51,
+        "description": "检查对象为一个值 result 与一个期望列表 rules[\"expected\"]。判断 result 是否存在于 expect 列表中，存在返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "literal_match",
+        "lineno": 60,
+        "description": "检查对象为 result 与 expected 两个字面量。依据 options 中的 type 字段分支处理：若 type 为 'str'，则将双方转为字符串后进行相等比较，支持 ignore_case 选项忽略大小写；若 type 为 'list'，则要求双方均为 list 或 tuple 且长度相同，将每个元素转为字符串后逐元素比较（同样支持 ignore_case），完全相等返回 1.0，否则返回 0.0；其他类型抛出 NotImplementedError。"
+      },
+      {
+        "name": "is_in_list",
+        "lineno": 77,
+        "description": "检查对象为 result（应为可迭代对象）与 rules[\"expected\"]（单个期望值）。判断 expect 是否被包含在 result 中，包含返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "diff_text_file",
+        "lineno": 85,
+        "description": "检查对象为两个文本文件路径 result 与 expect。分别打开两个文件并按行读取内容，使用 difflib.SequenceMatcher 计算两行列表之间的相似度比率，返回 0.0 到 1.0 之间的浮点数。若 result 为 None 则返回 0。"
+      },
+      {
+        "name": "fuzzy_match",
+        "lineno": 96,
+        "description": "检查对象为 result 字符串与 rules[\"expected\"] 字符串。调用 rapidfuzz.fuzz.ratio 计算二者的模糊相似度，将得分除以 100 归一化后返回，范围为 0.0 到 1.0。"
+      },
+      {
+        "name": "fuzzy_place_math",
+        "lineno": 102,
+        "description": "检查对象为一个 Word 文档路径 result_file_path 与 rules[\"expected\"]（可能答案列表）。使用 python-docx 读取文档中所有段落文本，按空白字符分割为单词列表 words_list；对每个单词计算其与 expected 中所有候选答案的 fuzz.ratio 并取最大值；最终要求 words_list 长度必须恰好为 3，否则返回 0；若长度为 3，则返回三个最大模糊得分的平均值。"
+      },
+      {
+        "name": "check_csv",
+        "lineno": 123,
+        "description": "检查对象为一个 CSV 文件路径 result 与 rules（含 expect 与 unexpect 规则列表，每条规则为字典）。使用 csv.DictReader 逐行读取 CSV；对 expect 中的每条规则，调用辅助函数 _match_record 判断当前行是否匹配，要求所有 expect 规则在文件中至少被满足一次；对 unexpect 中的每条规则，要求没有任何一行与之匹配。所有 expect 命中且所有 unexpect 未命中时返回 1.0，否则返回 0.0。若 result 为 None 返回 0。"
+      },
+      {
+        "name": "check_list",
+        "lineno": 152,
+        "description": "检查对象为一个文本文件路径 result 与 rules（含 expect 与 unexpect 正则字符串列表）。逐行读取文件，将 expect 与 unexpect 分别编译为正则表达式；要求所有 expect 正则至少在文件的某一行中被匹配到，且所有 unexpect 正则在所有行中均不被匹配。两项同时满足返回 1.0，否则返回 0.0。若 result 为 None 返回 0。"
+      },
+      {
+        "name": "check_accessibility_tree",
+        "lineno": 217,
+        "description": "检查对象为一个无障碍树 XML 字符串 result、规则列表 rules 以及操作系统名 osname（ubuntu/windows/macos）。根据 osname 选取对应的命名空间映射 _accessibility_ns_map，用 lxml.etree.fromstring 解析 XML。对 rules 中的每条规则，优先使用 xpath 定位元素，否则使用 CSSSelector（多个 selector 用逗号拼接）；若未找到任何元素则返回 0。若规则包含 text 字段，则根据 exact 标志选择精确匹配（operator.eq）或模糊匹配（fuzz.ratio/100），并在所有匹配元素中取最高匹配分；若不含 text 则该规则得分为 1。最终将所有规则的匹配得分累乘，返回总得分。"
+      },
+      {
+        "name": "run_sqlite3",
+        "lineno": 274,
+        "description": "检查对象为一个 SQLite 数据库文件路径 result 与 rules[\"sql\"] 中的 SQL 查询语句。连接数据库并执行 SQL，取 cursor.fetchone()[0] 的结果，将其转为 float 返回；若查询结果为 None 或 Falsy 则返回 0。"
+      },
+      {
+        "name": "check_json",
+        "lineno": 280,
+        "description": "检查对象为一个 JSON 或 YAML 文件路径 result 与 rules（含 expect/unexpect 规则列表）。首先检查文件是否存在，若不存在返回 0；根据 is_yaml 标志使用 yaml.safe_load 或 json.load 解析文件，解析失败或文件为空返回 0。对 expect 规则，按 r[\"key\"] 列表逐层深入字典取值，若 Key 缺失或类型错误返回 0，随后调用辅助函数 _match_value_to_rule 进行值匹配，要求所有 expect 规则均满足；对 unexpect 规则同样逐层取值，但要求所有 unexpect 规则均不满足。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 383,
+        "description": "检查对象为一个 JSON 对象 result（或 JSON 字符串）与 rules。若 result 为字符串，先去除首尾空白、将单引号替换为双引号，再用 json.loads 解析。若 result 为 None 返回 0。检查 rules[\"expected\"] 中是否存在值为 \"__EVALUATION_FAILED__\" 的键，若存在直接返回 0。若 rules[\"expect_in_result\"] 为 False，则对 expected 中的每个 key 进行精确值比较，支持 ignore_list_order 选项（对列表排序后比较），任一 key 不匹配返回 0；若 expect_in_result 为 True，则检查 result 中是否包含 expected 的值：若 expected 值为列表，要求 result 对应字段（列表或字符串）至少包含其中一个元素；若 expected 值为字符串，要求其为 result 对应字段的子串。全部通过返回 1.0，否则返回 0。"
+      },
+      {
+        "name": "compare_time_in_speedtest_results",
+        "lineno": 484,
+        "description": "检查对象为一个 speedtest 结果 CSV 文件路径 speedtest_result_path 与分钟阈值 time_diff。打开 CSV 文件读取第 2 行（索引 1），取第 2 列（split(',')[1]）的时间字符串，提取最后 5 位作为 HH:MM 格式时间，与当前系统时间的 HH:MM 比较。若两者时间差的绝对值小于 time_diff 分钟，返回 1，否则返回 0。文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "is_included_all_json_objects",
+        "lineno": 509,
+        "description": "检查对象为两个 JSON 文件路径 gold_file_path（标准答案）与 result_file_path（任务产出）。分别读取并解析两个 JSON 对象，遍历 gold_json 的所有 key，要求每个 key 都必须存在于 result_json 中且对应值完全相等。全部满足返回 1，任一不满足返回 0。"
+      },
+      {
+        "name": "is_gold_text_included_in_pdf",
+        "lineno": 528,
+        "description": "检查对象为一个 PDF 文件路径 pdf_file_path 与一个 JSON 文件路径 gold_text_path。读取 gold_text_path 中的 JSON，提取所有 value；使用 pdfplumber 打开 PDF 并提取全部页面文本拼接为一个大字符串。要求 gold_json 中的所有 value 都必须出现在 PDF 文本中，全部包含返回 1，任一缺失返回 0。"
+      },
+      {
+        "name": "file_contains",
+        "lineno": 555,
+        "description": "检查对象为一个文本文件路径 file_path 与 config[\"expected\"] 文本列表。读取整个文件内容，检查 expected 中的每一个文本片段是否都出现在文件内容中，全部包含返回 1.0，任一缺失返回 0.0。文件不存在或不可读返回 0。"
+      },
+      {
+        "name": "check_line_number",
+        "lineno": 572,
+        "description": "检查对象为一个文本文件路径 file_path 与 line_number[\"expected\"]（期望行数）。逐行读取文件，使用正则 `([01]\\d|2[0-3]):[0-5]\\d:([0-5]\\d|60)` 匹配时间格式，统计匹配行数。若统计结果等于 expected 则返回 1，否则返回 0。文件不存在返回 0。"
+      },
+      {
+        "name": "compare_terminal_and_txt",
+        "lineno": 591,
+        "description": "检查对象为一个 txt 文件路径 txt_file_path 与终端输出字符串 terminal_output。读取 txt 文件全部内容，与 terminal_output 进行精确字符串比较，完全一致返回 1，否则返回 0。"
+      },
+      {
+        "name": "compare_python_pure_text",
+        "lineno": 602,
+        "description": "检查对象为两个 Python 文件路径 py_file_path（用户产出）与 gold_file_path（标准答案）。读取两个文件内容后，应用内部规范化逻辑 _normalize：跳过文件头最多 3 行的 shebang 或 encoding 注释（如 #!、# -*- coding: 等），将 tab 展开为 4 个空格，去除行尾空白，并删除空行。对规范化后的两份文本进行精确字符串比较，完全一致返回 1.0，否则返回 0.0。文件读取失败或编码错误返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:55:20",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_014./evaluator_function_labels.json"
+}

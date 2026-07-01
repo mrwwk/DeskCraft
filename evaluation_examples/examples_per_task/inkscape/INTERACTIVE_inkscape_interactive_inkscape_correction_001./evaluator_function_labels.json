@@ -1,0 +1,123 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_correction_001./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_element_deleted",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 129
+    },
+    {
+      "name": "check_interactive_inkscape_ii04",
+      "lineno": 166
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 66
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 75
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_element_deleted",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 129
+    },
+    {
+      "name": "check_interactive_inkscape_ii04",
+      "lineno": 166
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户对Inkscape SVG文件执行的一系列编辑操作是否达到预期结果。它通过解析任务完成后的SVG文件，针对特定图形元素进行三项核心检查：填充颜色是否被正确修改、指定元素是否已被删除、以及目标元素在同级视觉元素中的层级顺序（z-order）是否位于最顶层或最底层。检查方式是将SVG中实际解析出的样式属性、元素存在性状态和文档节点顺序，与rule参数中给定的期望值进行精确匹配（颜色经规范化后严格相等，层级按过滤后的子元素列表首位或末位判定）。对于组合任务（如ii04），采用多指标联合的“全部满足”逻辑：依次执行颜色、删除、层级检查，每一项若存在则必须获得满分1.0，任一子项失败即整体返回0.0；单项检查同样采用二元打分（1.0为完全符合，0.0为不符合），不存在部分得分或近似容差。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 83,
+        "description": "接收参数 svg_file_path 与 rule（字典，需包含键 \"element_id\" 和 \"expected_fill\"）。首先调用 _parse_svg 读取并解析 SVG 文件，若解析失败则返回 0.0；接着通过 _find_element_by_id 在整棵树中查找对应 id 的元素，若找不到则返回 0.0。随后使用 _get_style_prop 获取该元素的 fill 属性；若该元素为 text 类型且自身 fill 为 None，则进一步遍历其子 tspan 元素尝试获取 fill。将实际获取到的颜色与期望值均经 _normalize_color 规范化（处理 3 位/8 位十六进制、大小写及 none）后进行严格比较：若期望为 \"none\"，则实际必须为 \"none\" 才返回 1.0；否则实际颜色必须等于期望颜色才返回 1.0，其余情况均返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_element_deleted",
+        "lineno": 116,
+        "description": "接收参数 svg_file_path 与 rule（字典，需包含键 \"deleted_element_id\"）。调用 _parse_svg 加载 SVG 文件，解析失败返回 0.0。使用 _find_element_by_id 查找该 id 对应的元素：若元素已不存在（返回 None），说明删除成功，返回 1.0；若元素仍然存在，返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_zorder",
+        "lineno": 129,
+        "description": "接收参数 svg_file_path 与 rule（字典，需包含键 \"element_id\" 与 \"expected_position\"，后者取值为 \"top\" 或 \"bottom\"）。调用 _parse_svg 加载 SVG，失败返回 0.0。通过 _find_element_by_id 定位目标元素，找不到返回 0.0。构建 parent_map 查找其父节点，无父节点返回 0.0。随后过滤父节点的子元素，排除标签为 defs、metadata、namedview、title、desc 的非视觉节点，得到 visual_children 列表。若 expected_position 为 \"top\"，判定目标元素是否为 visual_children 的最后一个节点；若为 \"bottom\"，判定是否为第一个节点。符合预期返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_interactive_inkscape_ii04",
+        "lineno": 166,
+        "description": "接收参数 svg_file_path 与 rule（字典，可选包含 \"fill_check\"、\"delete_check\"、\"zorder_check\" 三个子规则）。采用“全部满足”的联合判定逻辑：若 rule 中存在 \"fill_check\"，则调用 check_inkscape_fill_color 进行检查，若返回值小于 1.0 则立即返回 0.0；若存在 \"delete_check\"，则调用 check_inkscape_element_deleted，若返回值小于 1.0 则立即返回 0.0；若存在 \"zorder_check\"，则调用 check_inkscape_zorder，若返回值小于 1.0 则立即返回 0.0。只有当所有存在的子检查均通过（均返回 1.0）时，才返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 17,
+        "description": "接收 CSS 样式字符串（如 'fill:#ff0000;stroke:#000'），按分号分割为若干声明，再按冒号分割为键值对并去除空白，返回字典。用于解析 SVG 元素内联 style 属性，主要被 _get_style_prop 调用。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 30,
+        "description": "接收颜色字符串，进行规范化处理：去除空白并转小写；保留 \"none\"；将 3 位十六进制（如 #f00）扩展为 6 位（#ff0000）；将 8 位十六进制（#rrggbbaa）截断为前 6 位。返回规范化后的颜色字符串。供 check_inkscape_fill_color 在比较前统一实际颜色与期望颜色的格式。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 49,
+        "description": "接收 XML 根节点与 element_id，遍历整棵树的所有元素，匹配 id 属性并返回该元素；找不到则返回 None。被所有主函数用于定位目标 SVG 元素。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 57,
+        "description": "接收 XML 元素与属性名 prop。先通过 _parse_style 解析该元素 style 属性中的键值对，若找到 prop 则返回对应值；否则返回该元素的直接 XML 属性值。被 check_inkscape_fill_color 用于获取 fill 样式。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 65,
+        "description": "接收 svg_file_path，使用 ET.parse 解析 SVG 文件并返回 (tree, root) 元组；若发生任何异常则返回 (None, None)。作为所有主函数的文件读取与 XML 解析入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 74,
+        "description": "接收 XML 元素，去除 tag 中的命名空间前缀（如将 '{http://www.w3.org/2000/svg}text' 转为 'text'），返回本地标签名。被 check_inkscape_fill_color 用于识别 text/tspan 元素，被 check_inkscape_zorder 用于过滤非视觉子元素。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:35:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_correction_001./evaluator_function_labels.json"
+}

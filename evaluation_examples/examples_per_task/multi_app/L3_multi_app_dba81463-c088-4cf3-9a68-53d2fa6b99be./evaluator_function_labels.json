@@ -1,0 +1,87 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_dba81463-c088-4cf3-9a68-53d2fa6b99be./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 78
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 106
+    },
+    {
+      "name": "check_json",
+      "lineno": 119
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 285
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 78
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 106
+    },
+    {
+      "name": "check_json",
+      "lineno": 119
+    },
+    {
+      "name": "_multicellrange_containsby",
+      "lineno": 225
+    },
+    {
+      "name": "_match_value_to_rule",
+      "lineno": 229
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 285
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 为多应用任务提供四种独立的验证能力，分别对应不同的任务产物或状态检查场景：1）验证 Chrome 浏览器当前激活标签页的 URL 是否与预期一致（去除查询参数后做字符串精确匹配）；2）验证一段文本输出是否同时包含所有指定关键词且不包含任何禁用词；3）验证 JSON 或 YAML 文件中的嵌套字段值是否满足一系列预期规则（如精确相等、正则匹配、数值近似、区间范围、电子表格区域包含等），且不满足任何非预期规则，所有规则需同时成立；4）通过动态加载外部 Python 测试文件并执行其中的指定测试函数，依据其返回值判定代码正确性。各主函数独立服务于不同检查场景，返回值统一为 0.0（失败）到 1.0（成功）之间的浮点数，核心思路是将任务产物或状态与预设规则进行逐项比对，任一检查不通过即得 0 分，全部通过则得 1 分（或按测试函数返回值归一化）。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 78,
+        "description": "检查 Chrome 当前激活标签页是否匹配预期 URL（忽略查询参数）。接收 active_tab_info 字典和 rule 字典。若 active_tab_info 为空直接返回 0。当 rule['type'] 为 \"url\" 时，从 rule 取出 expected_url，从 active_tab_info 取出 actual_url（若 active_tab_info 非字典则直接将其作为 actual_url）。通过内部 strip_query 函数（使用 urlparse 和 urlunparse）去除两个 URL 的 query 部分后进行字符串精确比较，相等返回 1，否则返回 0。若 match_type 不是 \"url\" 则记录错误并返回 0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 106,
+        "description": "检查一段文本结果是否同时满足包含指定字符串且不包含禁用字符串。接收 result 字符串和 rules 字典。若 result 为 None 返回 0。从 rules 解析出 include 列表和 exclude 列表。要求 result 必须包含所有 include 中的字符串，且必须不包含任何 exclude 中的字符串。两个条件同时满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_json",
+        "lineno": 119,
+        "description": "检查 JSON 或 YAML 文件内容是否满足一系列预期规则且不满足非预期规则。接收 result（文件路径字符串）、rules（含 expect 和 unexpect 规则列表的字典）、is_yaml 标志（默认 False）。首先检查文件是否存在，不存在返回 0。按 is_yaml 选择 yaml.safe_load 或 json.load 读取文件，解析失败或 YAML 文件为空返回 0。对 rules[\"expect\"] 中的每条规则，按 rule[\"key\"] 列表逐级访问嵌套字典，若某级 Key 不存在或值非字典则返回 0；到达目标值后调用 _match_value_to_rule 进行匹配，所有 expect 规则必须同时满足（逻辑与）。对 rules[\"unexpect\"] 中的每条规则，同样逐级访问，Key 缺失时 value 置 None 并中断访问；要求目标值不能匹配该规则（即 not _match_value_to_rule），所有 unexpect 规则也必须同时满足（逻辑与）。最终返回 float(metric)，即全部满足为 1.0，任一失败为 0.0。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 285,
+        "description": "通过加载并执行外部 Python 测试文件中的指定函数来验证代码。接收 actual_files（待检查文件，本实现中主要作为上下文传入）、test_file（测试文件路径）、options（可指定 test_function_name，默认为 'test'）。首先验证 test_file 存在且为文件。创建唯一模块名，保存原始工作目录和 sys.path。切换到 test_file 所在目录并将该目录加入 sys.path。使用 importlib.util.spec_from_file_location 加载模块并执行，随后获取 options 中指定的测试函数（默认名为 'test'）。执行该函数并根据返回值类型判定：bool 类型 True 返回 1.0、False 返回 0.0；数值类型裁剪到 [0.0, 1.0]；其他类型按 Python 真值判断。加载、执行过程中任何异常（语法错误、导入错误、函数不存在、执行报错等）均返回 0.0。最后在 finally 块中清理临时模块、恢复原始工作目录和 sys.path。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_multicellrange_containsby",
+        "lineno": 248,
+        "description": "判断一个 MultiCellRange 是否被另一个 MultiCellRange 完全包含。接收 subset_candidate 和 superset_candidate 两个 MultiCellRange 对象。通过遍历 subset_candidate 中的所有 range，检查每个 range 是否都在 superset_candidate 中，返回布尔值。该函数专用于电子表格范围包含性检查，被 _match_value_to_rule 在 method 为 \"spreadsheet_range\" 时调用。"
+      },
+      {
+        "name": "_match_value_to_rule",
+        "lineno": 252,
+        "description": "将单个值与规则进行匹配，支持多种比较方法，返回 bool。接收 value 和 rule 字典（含 \"method\" 和 \"ref\"）。根据 rule[\"method\"] 分发：以 \"re\" 开头时按 rule[\"ref\"] 编译正则，支持通过点号分隔传递 re 模块 flags（如 re.IGNORECASE），使用 re.search 匹配；\"eq\"/\"ne\"/\"le\"/\"lt\"/\"ge\"/\"gt\" 使用 operator 对应方法直接比较 value 和 rule[\"ref\"]；以 \"approx\" 开头时提取阈值 threshold，将 value 转为 float，检查与 rule[\"ref\"] 的绝对差是否 ≤ threshold；\"spreadsheet_range\" 时 rule[\"ref\"] 为 [下限, 上限] 两个 MultiCellRange 字符串，将 value 转为 MultiCellRange，检查其被下限包含且被上限包含（调用 _multicellrange_containsby）；以 \"range.\" 开头时 method 第 6、7 字符表示左右端点开闭情况（如 \"te\" 表示左开右闭），检查 value 是否在 rule[\"ref\"] 指定的区间内；\"str_list_eq\"/\"str_set_eq\" 时将 value 和 ref 按逗号分割并去除引号后转为 list 或 set 比较相等性。若 method 不匹配则抛出 NotImplementedError。通常被 check_json 用于字段级断言。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:26:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_dba81463-c088-4cf3-9a68-53d2fa6b99be./evaluator_function_labels.json"
+}

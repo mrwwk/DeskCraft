@@ -42,37 +42,37 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Blender 交互任务中的多项产出与状态，核心围绕渲染管线配置、世界环境 HDRI 设置、渲染输出文件属性以及通用文本内容展开检查。具体而言，它通过读取 Blender 检查脚本（如 check_render.py、check_world.py）输出的 JSON 字符串，对渲染引擎、分辨率、帧率、采样数、图像格式、活动相机等参数进行精确相等比对；对世界环境是否挂载指定 HDRI 文件进行存在性与文件名匹配检查；对最终下载到本地的渲染图像文件（PNG/EXR 等）通过 PIL 读取其实际宽高与格式，并与预期进行精确比对（格式检查兼容 JPG/JPEG 别名）；此外还提供通用文本包含/排除规则检查。每个主检查函数独立返回 1.0（全部条件满足）或 0.0（任一条件失败或异常），内部采用“全部满足”的与逻辑，任一指标不匹配即判定失败。",
+    "overall_validation": "该evaluator用于验证Blender交互式渲染任务的多项产出与状态。核心检查对象包括：1) Blender场景渲染参数（引擎、分辨率X、分辨率Y、帧率、采样数、图像格式、活动相机）；2) 世界环境光照的HDRI文件配置；3) 最终渲染输出图像文件的物理存在性、尺寸精度与格式合规性；4) 通用文本输出的包含与排除规则。评测逻辑采用逐项严格匹配（完全相等或子串包含），各检查维度分别由独立主函数承担，每个主函数内部采用“全部满足即得1.0，任一不满足即得0.0”的硬阈值判定，不存在加权累计。",
     "main_functions": [
       {
         "name": "check_blender_render_settings",
         "lineno": 50,
-        "description": "接收 command_output（来自 check_render.py 的 JSON 字符串）与 rule 字典。首先调用 _parse_blender_output 将命令输出解析为 Python 对象；若解析失败或为空，直接返回 0.0。随后针对 rule 中可能出现的 engine、resolution_x、resolution_y、fps、samples、image_format、active_camera 六个键，依次用 lambda 函数将解析结果中的对应字段值与 rule 期望值进行精确相等（==）比较。遍历过程中，只要 rule 指定了某键且实际值与预期不符，立即记录警告并返回 0.0。仅当 rule 中所有指定键全部精确匹配时，才返回 1.0。异常捕获后同样返回 0.0。"
+        "description": "接收Blender检查脚本输出的JSON字符串command_output，以及一个规则字典rule。首先调用辅助函数_parse_blender_output将JSON字符串解析为Python字典。随后针对rule中实际存在的键，依次检查以下字段是否与解析结果严格相等（==）：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。只有当rule中指定的所有键都完全匹配时，才返回1.0；若解析失败、结果为空，或任一指定字段不匹配，立即返回0.0并记录警告日志。"
       },
       {
         "name": "check_blender_world_hdri",
         "lineno": 85,
-        "description": "接收 command_output（来自 check_world.py 的 JSON 字符串）与 rule 字典。首先调用 _parse_blender_output 解析 JSON；解析失败返回 0.0。接着从 rule 取出 hdri_filename 作为预期文件名，并检查解析结果中的 has_hdri 字段：若为假，说明世界环境未挂载 HDRI，返回 0.0。若已挂载，则取实际 hdri_filename，判定通过的条件是“实际文件名等于预期文件名”或“预期文件名是实际文件名的子串”。满足则返回 1.0，否则记录不匹配警告并返回 0.0。异常捕获后返回 0.0。"
+        "description": "接收Blender检查脚本输出的JSON字符串command_output，以及包含期望hdri_filename的rule字典。首先调用_parse_blender_output解析JSON。然后分两步判定：第一步确认解析结果中的has_hdri为真，若否则直接返回0.0；第二步比较实际HDRI文件名与期望值，采用“期望值被包含于实际文件名”或“完全相等”的宽松匹配策略。两步均通过返回1.0，否则返回0.0。"
       },
       {
         "name": "check_blender_render_output",
         "lineno": 114,
-        "description": "接收 file_path（本地渲染输出文件路径，通常为 PNG/EXR）与 rule 字典。第一步检查 file_path 是否为 None 或文件不存在，若不存在直接返回 0.0。第二步尝试用 PIL.Image 打开图像，获取实际宽高（img.size）与格式（img.format）。若 rule 指定了 width 或 height，分别与 actual_width、actual_height 做精确数值比对，任一不符即返回 0.0。若 rule 指定了 format，先将预期格式与实际格式统一转大写，再进行比较；若直接比较不等，则通过 fmt_map 处理 JPG/JPEG 别名后再比较，仍不匹配则返回 0.0。若本地未安装 PIL，则退化为仅判断文件是否存在：存在返回 1.0，否则 0.0。其他异常同样返回 0.0。"
+        "description": "接收渲染产物文件路径file_path和规则字典rule。首先验证文件是否真实存在。若存在，尝试使用PIL.Image打开图像文件并读取实际宽高。若rule指定了width或height，要求与实际尺寸严格相等；若rule指定了format，要求图像格式（img.format）与期望值统一转换为大写后一致，并兼容JPG到JPEG的别名映射。若PIL未安装，则退化为仅检查文件存在性（存在返回1.0，否则0.0）。任一硬性条件不满足即返回0.0。"
       },
       {
         "name": "check_include_exclude",
         "lineno": 158,
-        "description": "接收 result（待检查的字符串）与 rules 字典。若 result 为 None，直接返回 0.0。从 rules 中取出 include 列表与 exclude 列表（缺省为空列表），判定通过的条件是：result 同时包含 include 中所有字符串，并且不包含 exclude 中任何一个字符串。两个条件同时满足返回 1.0，否则返回 0.0。该函数为通用文本检查器，不调用其他辅助函数。"
+        "description": "接收一个待检查的字符串result和规则字典rules。从rules中提取include列表与exclude列表。判定条件为：result必须同时包含include中所有字符串，且必须不包含exclude中任何字符串。两个条件同时满足返回1.0，否则返回0.0。该函数为通用文本检查器，不局限于Blender场景。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 24,
-        "description": "接收 command_output（命令行原始输出字符串）。先判断输出是否为空或仅含空白，若是则记录错误并返回 None。否则尝试执行 json.loads 去除首尾空白后的内容，将 Blender 检查脚本的 JSON 输出转换为 Python 对象（通常为 dict）。若触发 json.JSONDecodeError 或 ValueError，则记录错误与原始输出调试信息，返回 None。该函数为 check_blender_render_settings 与 check_blender_world_hdri 提供统一的 JSON 解析入口，解析失败会导致调用方直接判 0.0。"
+        "description": "接收Blender相关检查脚本输出的原始字符串command_output，负责将其解析为Python字典。先检查输入是否为空或仅含空白，若是则返回None；否则尝试使用json.loads解析。若解析失败（如JSONDecodeError），记录错误并返回None。该函数为check_blender_render_settings和check_blender_world_hdri提供统一的前置解析服务，解析失败会导致调用方直接判0.0。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:03:21",
+  "created_at": "2026-07-01 14:31:55",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib07_bottle_multidelivery_001./evaluator_function_labels.json"
 }

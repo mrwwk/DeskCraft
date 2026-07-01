@@ -22,27 +22,27 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该 evaluator 用于验证 Blender 场景中指定对象的视口可见性状态。它接收来自 Blender 检查脚本 check_object.py 输出的 JSON 文本，从中提取对象列表，按照规则中给定的 object_name 精确匹配目标对象，随后比对对象在视口中的隐藏/显示状态（hide_viewport 字段）。若规则通过 hide_viewport 直接指定预期隐藏状态，或借助 expected_visible 间接指定预期可见状态，只要实际状态与预期完全一致，即判定为成功并返回 1.0；若对象不存在、解析失败或状态不匹配，则返回 0.0。整个评测逻辑为单指标硬匹配，不存在加权或累计打分。",
+    "overall_validation": "该evaluator用于验证Blender场景中指定对象的视口可见性（viewport visibility）状态。它通过解析外部检查脚本（check_object.py）输出的JSON数据，在objects列表中按精确名称定位目标对象，然后比对对象的hide_viewport字段值。支持两种规则表达：直接声明hide_viewport的期望布尔值，或通过expected_visible间接断言对象应当可见或不可见。判定为严格的二元打分制，只有对象存在且可见性状态与规则完全一致时才返回1.0（成功），任何解析失败、对象缺失或状态不符均返回0.0（失败）。",
     "main_functions": [
       {
         "name": "check_blender_object_visibility",
         "lineno": 41,
-        "description": "该函数负责校验单个 Blender 对象的视口可见性。输入包括 command_output（来自 check_object.py 的 JSON 字符串）和 rule（字典，必须包含 object_name，并包含 hide_viewport 或 expected_visible 二者之一）。执行步骤如下：1）调用 _parse_blender_output 将命令输出解析为字典，若解析失败或输出为空则直接返回 0.0；2）从 rule 中取出 object_name，调用 _find_object 在解析结果的 objects 列表中按 name 字段精确查找目标对象，若未找到则返回 0.0；3）分支判断：若 rule 中存在 hide_viewport 键，则将对象实际 hide_viewport 值与预期值做等值比较，相等返回 1.0；若 rule 中存在 expected_visible 键，则取对象实际 hide_viewport（默认为 False），判断 expected_visible 与实际隐藏状态是否相反（即 expected_visible != actual_hidden），成立返回 1.0；4）若以上分支均未命中或状态不一致，记录警告并返回 0.0。任何异常均捕获后返回 0.0。"
+        "description": "接收来自check_object.py的命令输出字符串（JSON格式）以及一条规则字典。首先调用_parse_blender_output将字符串解析为JSON对象，若解析失败或输出为空则直接返回0.0。接着从rule中提取object_name，调用_find_object在JSON的objects数组中按精确名称查找目标对象，若未找到则返回0.0。随后进入分支判断：若rule中包含hide_viewport键，则直接比较obj['hide_viewport']是否与期望值相等，相等返回1.0；若rule中包含expected_visible键，则取obj的hide_viewport实际值（默认为False），当expected_visible与实际隐藏状态不一致时返回1.0（即期望可见时实际未隐藏，或期望不可见时实际已隐藏）。若以上条件均不满足，则记录警告并返回0.0。函数全程有异常捕获，任何异常均返回0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
-        "lineno": 16,
-        "description": "解析来自 Blender 检查脚本的标准输出字符串。首先检查输出是否为空或仅含空白，若是则记录错误并返回 None；随后尝试使用 json.loads 将输出反序列化为 Python 字典。若遇到 JSONDecodeError 或 ValueError，记录错误及原始输出内容后返回 None。该函数是主评测流程的数据入口，负责将原始命令输出转换为可供后续查找与比对的结构化数据。"
+        "lineno": 14,
+        "description": "负责将Blender检查脚本输出的原始字符串解析为Python对象（通常为字典）。先检查输入是否为空或仅包含空白字符，若是则记录错误并返回None。随后尝试使用json.loads进行解析，若遇到JSONDecodeError或ValueError则记录错误及原始输出内容，并返回None。该函数是主评测函数的数据入口，为后续对象查找和字段比对提供结构化数据，解析失败会导致评测直接判为0.0。"
       },
       {
         "name": "_find_object",
-        "lineno": 29,
-        "description": "在已解析的 Blender 检查结果中按对象名称进行精确查找。接收 result（字典，预期包含 objects 列表）和 name（目标对象名字符串）两个参数，遍历 result[\"objects\"] 中每个对象字典，匹配 obj.get(\"name\") == name 时立即返回该对象字典；若遍历结束未命中则返回 None。该函数被 check_blender_object_visibility 调用，用于定位待检测可见性的具体对象。"
+        "lineno": 25,
+        "description": "在已解析的Blender输出结果中，按精确字符串匹配查找指定名称的对象。遍历result字典中objects列表（默认为空列表），逐一比对每个对象的name字段与传入的name参数，返回第一个匹配的对象字典；若遍历结束未找到则返回None。该函数要求对象名称完全相等，不支持模糊或部分匹配，通常被可见性检查函数用于定位待验证的目标对象，查找失败会导致评测直接判为0.0。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:06:15",
+  "created_at": "2026-07-01 14:34:02",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_16787234-af24-4f13-9ee8-b34a6442c9e2./evaluator_function_labels.json"
 }

@@ -1,0 +1,109 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_c862b70f-9b34-4d47-aeba-19bf1f578af5./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 169
+    },
+    {
+      "name": "check_blender_scene_objects",
+      "lineno": 208
+    },
+    {
+      "name": "check_blender_material_color",
+      "lineno": 262
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 40
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 169
+    },
+    {
+      "name": "check_blender_scene_objects",
+      "lineno": 208
+    },
+    {
+      "name": "check_blender_material_color",
+      "lineno": 262
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于评测 Blender 相关任务，核心思路是通过读取 Blender 检查脚本（如 check_render.py、check_material.py、check_animation.py、check_object.py）输出的 JSON 文本，对场景中的渲染设置、材质 PBR 参数、动画关键帧、场景对象存在性进行逐项检查。检查方式分为两类：一是精确相等匹配（如渲染引擎、分辨率、对象名、材质名、灯光类型等），二是带容差的数值或向量近似匹配（如 base_color、metallic、roughness）。每个主函数内部采用“全部满足即通过”的二值逻辑：所有指定规则均符合时返回 1.0，任一环节失败立即返回 0.0。因此，任务完成的判定标准是：Blender 场景状态经外部脚本导出为 JSON 后，evaluator 解析该 JSON 并确认各维度指标与预期 rule 完全一致或在容差范围内。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 50,
+        "description": "接收 command_output（来自 Blender 检查脚本的 JSON 字符串）和 rule 字典。首先调用 _parse_blender_output 将 JSON 解析为字典。随后按顺序检查 rule 中可能出现的以下字段：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。每个字段均采用精确相等比较（==），要求实际值与预期值完全一致。若 rule 中指定了某字段但实际值不匹配，立即记录警告并返回 0.0；全部通过则返回 1.0。该函数不涉及容差，是严格的精确匹配。"
+      },
+      {
+        "name": "check_blender_material_pbr",
+        "lineno": 85,
+        "description": "接收 command_output（来自 check_material.py 的 JSON 字符串）和 rule 字典，用于验证指定对象的材质 PBR 属性。首先调用 _parse_blender_output 解析 JSON。接着按优先级确定候选对象：1) 若 rule 提供 object_name，精确取该键对应的材质列表；2) 否则若提供 object_name_contains（或 name_contains），遍历结果中所有非下划线开头的键，收集名称包含该子串的对象；3) 若两者皆无，则全局遍历所有非下划线开头的键作为候选。然后遍历每个候选对象的材质列表，对 rule 中指定的条件逐一过滤：若指定 material_name，要求材质 name 字段精确相等；若指定 expected_color，调用 _check_vector_tolerance 比较 base_color 与预期颜色（默认容差 0.05，可通过 rule['tolerance'] 覆盖）；若指定 metallic 或 roughness，调用 _check_tolerance 进行标量容差比较。只要任一候选材质满足全部指定条件，即返回 1.0；若遍历完所有候选仍无匹配，返回 0.0。"
+      },
+      {
+        "name": "check_blender_animation_keyframes",
+        "lineno": 169,
+        "description": "接收 command_output（来自 check_animation.py 的 JSON 字符串）和 rule 字典，验证特定对象的动画关键帧。首先调用 _parse_blender_output 解析 JSON。然后按 rule['object_name'] 提取对应动画数据。若 rule 包含 min_keyframe_count，检查实际 keyframe_count 是否大于等于该值，不足则返回 0.0；若 rule['has_location_keys'] 为真，检查 keyframes 字典中是否存在包含 \"location\" 子串的键，若不存在则返回 0.0。所有检查通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_scene_objects",
+        "lineno": 208,
+        "description": "接收 command_output（来自 check_object.py 的 JSON 字符串）和 rule 字典，验证场景中是否存在所需对象。首先调用 _parse_blender_output 解析 JSON，获取 objects 列表和 object_names 列表。随后依次执行以下检查，任一失败即返回 0.0：1) has_objects 列表中的每个名称必须出现在 object_names 中；2) has_light_type 要求 objects 中存在 type 为 LIGHT 且 light_type 匹配的项；3) has_plane 要求存在 type 为 MESH 的对象；4) min_mesh_count 要求 MESH 类型对象数量不低于该值；5) has_cylinder 要求 MESH 类型对象的 name 中包含 \"Cylinder\" 或 \"cylinder\"（不区分大小写）。全部满足返回 1.0。"
+      },
+      {
+        "name": "check_blender_material_color",
+        "lineno": 262,
+        "description": "该函数是 check_blender_material_pbr 的薄封装，直接以相同的 command_output 和 rule 调用 check_blender_material_pbr 并返回其结果。用于在语义上强调“验证材质基础颜色”的场景，但底层执行逻辑与 PBR 材质检查完全一致，同样支持 object_name、expected_color、metallic、roughness、tolerance、material_name 等规则。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "接收 Blender 检查脚本输出的命令行文本 command_output，尝试将其解析为 JSON 字典。若输入为空或仅含空白，或发生 JSONDecodeError/ValueError，则记录错误并返回 None。该函数是所有主函数的入口预处理步骤，负责将外部脚本的原始字符串输出转换为结构化数据，供后续字段比对使用。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 28,
+        "description": "接收 actual、expected 和 tol 三个参数，检查实际标量值是否在预期值的容差范围内。公式为 abs(float(actual) - float(expected)) <= float(tol)。若 actual 或 expected 为 None，直接返回 False。该函数被 check_blender_material_pbr 用于 metallic 和 roughness 的数值近似匹配。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 34,
+        "description": "接收 actual 向量、expected 向量和 tol 参数，检查 actual 的每个分量是否都在 expected 对应分量的容差范围内。首先判断两者非空且长度相等，然后逐分量计算 abs(float(a) - float(e)) <= float(tol)，全部满足才返回 True。该函数被 check_blender_material_pbr 用于 base_color（RGBA）等向量型属性的近似匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:42:30",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_c862b70f-9b34-4d47-aeba-19bf1f578af5./evaluator_function_labels.json"
+}

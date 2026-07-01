@@ -1,0 +1,171 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_4300db79-4191-4a16-bf6d-c12e6070b3e7./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 136
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 170
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 235
+    },
+    {
+      "name": "check_inkscape_gradient",
+      "lineno": 273
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 336
+    },
+    {
+      "name": "check_inkscape_dual_export_poster",
+      "lineno": 347
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 40
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 59
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 67
+    },
+    {
+      "name": "_get_float",
+      "lineno": 75
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 86
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 95
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 136
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 170
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 235
+    },
+    {
+      "name": "check_inkscape_gradient",
+      "lineno": 273
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 336
+    },
+    {
+      "name": "check_inkscape_dual_export_poster",
+      "lineno": 347
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Inkscape 任务完成后产出的 SVG 文件及导出文件是否满足一系列样式与结构要求。核心检查对象包括：指定 id 的图形元素的填充颜色（fill）、描边颜色与宽度（stroke / stroke-width）、文本字体属性（大小、粗细、样式、族名、填充）、文档画布尺寸（width / height）、渐变引用类型（linearGradient / radialGradient）及其色标（stop）数量，以及导出文件是否存在。评测以二进制分数（1.0 或 0.0）为主，流程上先通过 XML 解析读取 SVG，再提取目标元素的 inline style 或直接 XML 属性，经规范化（颜色转小写、3 位 hex 补全为 6 位、8 位 hex 截断为 6 位、去除单位后转浮点数）后与 rule 中的期望值进行严格匹配或容差比较。对于组合型任务（如 dual_export_poster），采用多指标串联判定：所有子项必须全部通过才返回 1.0，任一子项失败即整体返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 103,
+        "description": "接收 svg_file_path 与 rule（需包含 element_id 和 expected_fill）。首先调用 _parse_svg 解析 SVG，若解析失败返回 0.0；再调用 _find_element_by_id 定位目标元素，若找不到返回 0.0。随后通过 _get_style_prop 获取该元素的 fill 属性；若元素本地标签为 text 且自身无 fill，则遍历其子元素中本地标签为 tspan 的节点继续获取 fill。实际值与期望值均经 _normalize_color 规范化后比较：若 expected_fill 为 'none'，则要求 actual_fill 严格等于 'none'；其他情况要求严格相等。满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_stroke",
+        "lineno": 136,
+        "description": "接收 svg_file_path 与 rule（需包含 element_id，可选 expected_stroke 与 expected_stroke_width）。先调用 _parse_svg 解析 SVG 并调用 _find_element_by_id 定位元素，任一环节失败返回 0.0。若 rule 包含 expected_stroke，则对实际值与期望值做 _normalize_color 规范化：当期望为 'none' 时，实际值必须是 'none' 或 None；否则要求严格相等，不满足即返回 0.0。若 rule 包含 expected_stroke_width，则通过 _get_float 去除单位（如 px、mm）后转为浮点数，默认容差为 0.5（rule 可传 tolerance 覆盖），若 |actual - expected| 超过容差返回 0.0。全部通过返回 1.0。"
+      },
+      {
+        "name": "check_inkscape_text_style",
+        "lineno": 170,
+        "description": "接收 svg_file_path 与 rule（需包含 element_id，可选 expected_font_size、expected_font_weight、expected_font_style、expected_font_family、expected_fill）。先调用 _parse_svg 与 _find_element_by_id 定位文本元素，失败返回 0.0。内部定义嵌套逻辑 _get_text_style：优先从元素自身通过 _get_style_prop 读取属性，若为空则遍历子元素中本地标签为 tspan 的节点继续读取。各项检查如下：font-size 经 _get_float 去单位后浮点比较，容差为 2；font-weight 转小写后，期望 'bold' 时接受 'bold' 或 '700'，期望 'normal' 时接受 'normal'、'400'、空字符串或 None；font-style 转小写后严格相等；font-family 去除两端引号并转小写后，检查期望值是否为实际值的子串；fill 经 _normalize_color 规范化后严格相等。任一条件失败返回 0.0，全部满足返回 1.0。"
+      },
+      {
+        "name": "check_inkscape_document_properties",
+        "lineno": 235,
+        "description": "接收 svg_file_path 与 rule（可选 expected_width 与 expected_height）。调用 _parse_svg 获取 root，失败返回 0.0。对于 width，优先读取 root 的 width 属性；若缺失，则读取 viewBox 属性并按空白分割，取第 3 项（索引 2）作为 width。对于 height，优先读取 root 的 height 属性；若缺失，则从 viewBox 取第 4 项（索引 3）作为 height。数值均经 _get_float 去单位转换，容差为 5，任一维度差值超过容差或读取失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_inkscape_gradient",
+        "lineno": 273,
+        "description": "接收 svg_file_path 与 rule（需包含 element_id、expected_gradient_type 默认为 'linearGradient'，可选 min_stops）。调用 _parse_svg 与 _find_element_by_id 定位元素，失败返回 0.0。从元素的 fill 样式中通过正则 r'url\\(#([^)]+)\\)' 提取引用的渐变 ID；若未匹配返回 0.0。内部定义 _find_gradient 按 id 在整棵 SVG 树中查找渐变定义，并支持通过 xlink:href 或 href 属性链式跟随（深度上限 5）找到基础渐变。类型检查时，expected_gradient_type 转小写后需出现在 grad 或 base_grad 的本地标签名中。若 rule 指定 min_stops > 0，先统计 base_grad 下本地标签为 stop 的子元素数量；若 base_grad 中无色标，则回退统计 grad 中的 stop 数量；少于 min_stops 返回 0.0。全部通过返回 1.0。"
+      },
+      {
+        "name": "check_inkscape_export_file_exists",
+        "lineno": 336,
+        "description": "接收 result_str（通常为命令行检查文件存在性的 stdout）与 rule（含 expected，默认值为 'OK'）。对 result_str 与 expected 分别去除两端空白后进行字符串严格相等比较，相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_dual_export_poster",
+        "lineno": 347,
+        "description": "接收 svg_file_path 与 rule（可包含 gradient_check、text_checks 列表、fill_checks 列表、stroke_check、doc_check）。采用“全部满足”的串联判定逻辑：若存在 gradient_check，调用 check_inkscape_gradient，返回值 < 1.0 则整体返回 0.0；遍历 text_checks 逐项调用 check_inkscape_text_style，任一失败返回 0.0；遍历 fill_checks 逐项调用 check_inkscape_fill_color，任一失败返回 0.0；若存在 stroke_check，调用 check_inkscape_stroke，失败返回 0.0；若存在 doc_check，调用 check_inkscape_document_properties，失败返回 0.0。所有子检查均通过才返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 28,
+        "description": "解析类 CSS 样式字符串（如 'fill:#ff0000;stroke:#000'），按分号分割后再按冒号拆分为键值对，返回字典。被 _get_style_prop 调用，用于从 SVG 元素的 inline style 属性中提取单个样式项。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 41,
+        "description": "规范化颜色值以便统一比较：空值返回 None；'none' 保持 'none'；十六进制颜色转小写，3 位缩写补全为 6 位（如 #f00 → #ff0000），8 位（#rrggbbaa）截断为前 6 位；命名颜色原样返回小写。被 fill、stroke、text、gradient 等主函数用于消除大小写与简写差异。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 60,
+        "description": "遍历 SVG root 下的所有元素，匹配元素的 id 属性与传入的 element_id，返回该元素或 None。是各主函数定位目标 SVG 元素的基础入口。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 68,
+        "description": "先从元素的 style 属性中解析目标属性名，若不存在则回退读取该属性名的直接 XML 属性值。被 fill、stroke、text、gradient 等检查复用，是获取 SVG 元素样式属性的通用接口。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 76,
+        "description": "安全地将字符串转为浮点数：若值为 None 返回 default；否则使用正则 r'[a-zA-Z%]+$' 去除尾部单位（如 px、mm、%）后再转换，失败返回 default。被 stroke-width、font-size、document width/height 等数值检查广泛使用。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 86,
+        "description": "使用 xml.etree.ElementTree.parse 读取 svg_file_path，成功返回 (tree, root)，异常时返回 (None, None)。是所有基于 SVG 内容检查的主函数的统一文件读取与解析入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 95,
+        "description": "去除 XML 标签的命名空间前缀（如 '{http://www.w3.org/2000/svg}text' → 'text'），返回本地标签名。被 fill、text、gradient 等检查用于判断元素类型（text、tspan、stop、linearGradient 等）。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:46:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_4300db79-4191-4a16-bf6d-c12e6070b3e7./evaluator_function_labels.json"
+}

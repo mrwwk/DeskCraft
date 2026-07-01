@@ -98,72 +98,72 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证GIMP交互式任务中\"白底标准手表图片\"的制作是否完成。最终要求产出两类文件：一张1600×1600像素的JPEG输出图，以及一个保留特定图层结构的XCF源文件。evaluator对JPEG进行多维度质量检查（文件存在性、格式、尺寸、文件大小上限、白色背景占比、底部柔和阴影存在性、对比度相比原始图是否提升），同时对XCF进行图层结构检查（必须包含Watch_Main、Shadow_Soft、BG_White三个图层，顺序不限）。所有子检查项均采用二元通过/不通过评分，最终通过_all_binary_checks_pass聚合：只有当全部检查都返回1时，总得分才为1.0，否则为0.0。",
+    "overall_validation": "该evaluator用于验证GIMP交互式任务中对\"白色背景手表标准图\"的处理是否完成。最终要求同时满足两类产物规范：一是输出一张1600×160像素的JPEG产品图，且文件大小不超过460800字节，该图需具备纯白背景（占比≥90%）、主体下方带有柔和阴影、整体对比度相比原始素材提升至少8%；二是保留GIMP源文件（XCF），且其中必须包含名为\"Watch_Main\"、\"Shadow_Soft\"、\"BG_White\"的三个图层（不强制顺序）。评测逻辑采用严格的\"全或无\"二进制聚合：对JPEG依次进行存在性、格式、尺寸、文件大小、背景色、阴影、对比度共7项检查，对XCF进行图层结构检查，共计8项。所有单项检查必须全部返回1，最终才得1.0（成功）；任一单项失败即整体返回0.0（失败）。",
     "main_functions": [
       {
         "name": "calculate_contrast",
         "lineno": 23,
-        "description": "接收一个PIL Image对象，将其转换为灰度模式('L')后，使用ImageStat.Stat计算像素值的标准差，并将该标准差作为图像对比度数值返回。该函数为check_contrast_increase提供核心的对比度量化能力。"
+        "description": "接收一个PIL Image.Image对象作为输入，先将图像转换为灰度模式('L')，再通过ImageStat.Stat计算像素值的标准差（stddev[0]），返回该浮点数值作为图像对比度量化指标。该值越大表示对比度越高，主要被check_contrast_increase复用以比较源图与目标图的对比度差异。"
       },
       {
         "name": "check_image_dimensions",
         "lineno": 30,
-        "description": "接收图像路径、预期宽度、预期高度（可选，None时只检查宽度）及容差像素值（默认5）。先用PIL打开图像获取实际宽高，然后判断实际宽度与预期宽度的绝对差是否在容差内；若提供了预期高度，则高度也需满足同样容差。两项均满足返回1，否则返回0。文件不存在或打开失败也返回0。"
+        "description": "接收image_path、expected_width、expected_height（可选，默认为None）和tolerance（默认5像素）。尝试用PIL打开图像获取实际宽高，判定实际宽度与expected_width的绝对差是否不超过tolerance；若指定了expected_height，则同样判定高度。宽度和高度（如指定时）均满足容差则返回1，否则返回0。若文件不存在或读取异常也返回0。"
       },
       {
         "name": "check_contrast_increase",
         "lineno": 67,
-        "description": "接收源图路径src_path、目标图路径tgt_path和最小增幅百分比（默认10.0）。先检查两文件是否均存在，再分别调用calculate_contrast计算两图对比度。若源图对比度为0则直接返回0；否则计算百分比增幅：((tgt_contrast - src_contrast) / src_contrast) * 100。当增幅大于等于min_increase_percent时返回1，否则返回0。"
+        "description": "接收src_path（源图路径）、tgt_path（目标图路径）和min_increase_percent（默认10.0）。分别打开两张图像并调用calculate_contrast获取对比度值。若源图对比度为0则直接返回0；否则计算对比度提升百分比：((tgt_contrast - src_contrast) / src_contrast) × 100。当提升百分比≥min_increase_percent时返回1，否则返回0。任一路径不存在或处理异常也返回0。"
       },
       {
         "name": "check_file_exists",
         "lineno": 108,
-        "description": "接收文件路径，使用os.path.isfile判断该路径是否为真实存在的文件。存在返回1，不存在或路径为None返回0。"
+        "description": "接收file_path，使用os.path.isfile判断该路径是否为真实存在的文件。存在返回1，不存在或路径为None返回0。"
       },
       {
         "name": "check_jpeg_format",
         "lineno": 126,
-        "description": "接收图像路径，先检查文件是否存在，再用PIL打开图像并读取其format属性。仅当format严格等于'JPEG'时返回1，其他格式或读取失败返回0。"
+        "description": "接收image_path，尝试使用PIL.Image.open打开文件并读取其format属性。若format等于'JPEG'则返回1，否则返回0。文件不存在、无法打开或读取异常均返回0。"
       },
       {
         "name": "check_image_file_size_range",
         "lineno": 151,
-        "description": "接收图像路径和rule字典（可选字段min_size、max_size，默认分别为0和10**18字节）。使用os.path.getsize获取实际文件大小，判断其是否落在闭区间[min_size, max_size]内。在区间内返回1，否则返回0。文件不存在或读取失败返回0。"
+        "description": "接收image_path和rule字典（可选字段min_size、max_size，默认值分别为0和10^18字节）。使用os.path.getsize获取文件字节数，检查该大小是否落在[min_size, max_size]闭区间内。满足返回1，不满足或异常返回0。"
       },
       {
         "name": "check_xcf_layers_structure",
         "lineno": 178,
-        "description": "接收XCF文件路径和rule字典（必须包含layers列表，ordered默认为False）。首先检查文件存在且文件头以b'gimp xcf'开头。优先尝试导入gimpformats库解析XCF，提取所有图层名称；检查预期图层名是否全部存在于解析结果中。若ordered为True，则进一步要求这些图层在解析列表中的出现顺序与rule中layers的顺序一致（通过比较各图层索引是否严格递增判断）。若gimpformats解析失败或无图层名，则回退到二进制字符串搜索：在文件字节流中查找每个图层名UTF-8编码的位置，确认全部存在；若ordered为True，则要求这些字节位置按升序排列。所有条件满足返回1，任一失败返回0。"
+        "description": "接收xcf_path和rule字典（必须包含layers列表，可选ordered布尔值，默认False）。首先验证文件存在且文件头以b'gimp xcf'开头。优先尝试导入gimpformats库解析XCF并提取所有图层名称；若gimpformats不可用或解析失败，则回退到二进制字节搜索，在文件内容中查找每个图层名的UTF-8编码。检查所有expected_layers是否都被找到；若ordered为True，还需检查这些图层在解析出的名称列表（或二进制内容中的出现位置）是否按预期顺序递增。全部满足返回1，任一图层缺失或顺序错误返回0。"
       },
       {
         "name": "check_soft_shadow_presence",
         "lineno": 256,
-        "description": "接收图像路径和rule字典（默认min_shadow_ratio=0.01，alpha_low=20，alpha_high=220）。将图像转为RGBA并转为numpy数组。通过alpha>180定位前景主体，计算其包围盒底部坐标。在主体正下方划定一条搜索带（高度约h//5且不少于8像素，横向向左右扩展约主体宽度1/8且不少于10像素）。首先检查该搜索带内半透明像素（alpha在[alpha_low, alpha_high]之间）的占比。若占比不足，则执行回退逻辑：检查搜索带内\"非纯白（RGB均值<245）、整体偏暗（均值<220）、低饱和度（通道极差<20）\"的灰色像素占比。任一方式得到的阴影比例大于等于min_shadow_ratio则返回1，否则返回0。"
+        "description": "接收image_path和rule字典（可选min_shadow_ratio默认0.01，alpha_low默认20，alpha_high默认220）。将图像转为RGBA模式，提取alpha通道。通过alpha>180确定前景主体区域，计算其最小和最大x坐标以及最大y坐标。在主体正下方建立搜索带：垂直范围从y1+1到y1+max(8, h//5)，水平范围向左右各扩展max(10, (x1-x0)//8)。统计该搜索带内alpha值位于[alpha_low, alpha_high]的像素比例。若该比例低于min_shadow_ratio，则回退到RGB分析：在相同区域检查非纯白（RGB均≥245）、偏暗（均值<220）、低饱和（极差<20）的像素比例。最终比例≥min_shadow_ratio返回1，否则返回0。"
       },
       {
         "name": "check_white_background_ratio",
         "lineno": 323,
-        "description": "接收图像路径和rule字典（默认white_threshold=245，min_ratio=0.9）。将图像转为RGB模式后转为numpy数组，统计所有三个通道值均大于等于white_threshold的像素比例。若该比例大于等于min_ratio则返回1，否则返回0。"
+        "description": "接收image_path和rule字典（可选white_threshold默认245，min_ratio默认0.9）。将图像转换为RGB模式后，统计三个通道值均≥white_threshold的像素占比。若占比≥min_ratio则返回1，否则返回0。文件不存在或处理异常返回0。"
       },
       {
         "name": "check_l2_watch_white_standard_complete",
         "lineno": 362,
-        "description": "接收result_paths列表，要求至少包含3个元素，依次解包为jpg_path、xcf_path、src_path。对任务结果执行8项严格检查，全部必须同时通过：1）jpg文件存在（check_file_exists）；2）jpg为JPEG格式（check_jpeg_format）；3）jpg尺寸为1600×1600像素（容差5，check_image_dimensions）；4）jpg文件大小不超过460800字节（check_image_file_size_range）；5）jpg白色背景占比≥0.9（阈值245，check_white_background_ratio）；6）jpg底部存在柔和阴影，阴影比例≥0.004（check_soft_shadow_presence）；7）jpg对比度相比src_path提升≥8%（check_contrast_increase）；8）xcf包含图层[\"Watch_Main\", \"Shadow_Soft\", \"BG_White\"]，顺序不限（check_xcf_layers_structure）。将8项得分传入_all_binary_checks_pass，仅当全部≥1.0时返回1.0，否则返回0.0。"
+        "description": "接收result_paths列表，要求为长度至少3的列表，依次取jpg_path、xcf_path、src_path。对产物执行8项严格检查：1) jpg文件存在性（check_file_exists）；2) jpg为JPEG格式（check_jpeg_format）；3) jpg尺寸为1600×1600像素（容差5像素，check_image_dimensions）；4) jpg文件大小≤460800字节（check_image_file_size_range）；5) 白色背景占比≥90%（check_white_background_ratio）；6) 存在柔和阴影（check_soft_shadow_presence）；7) 对比度相比源图提升≥8%（check_contrast_increase）；8) XCF包含\"Watch_Main\"、\"Shadow_Soft\"、\"BG_White\"三个图层且不要求顺序（check_xcf_layers_structure）。将8个0/1结果传入_all_binary_checks_pass，仅当全部通过时整体返回1.0，任一失败即返回0.0。"
       },
       {
         "name": "check_interactive_gimp_watch_white_standard_complete",
         "lineno": 386,
-        "description": "接收result_paths列表，作为交互式任务的入口包装器。内部直接调用check_l2_watch_white_standard_complete并透传参数与返回值，本身不增加额外检查逻辑。"
+        "description": "接收result_paths列表，作为交互式任务的入口包装器。内部直接透传参数给check_l2_watch_white_standard_complete并返回其结果，本身不增加任何额外检查逻辑或分支判断。"
       }
     ],
     "helper_functions": [
       {
         "name": "_all_binary_checks_pass",
-        "lineno": 347,
-        "description": "接收scores列表，过滤掉None值后转为浮点数。若列表为空则返回0.0；仅当列表中所有值都大于等于1.0时返回1.0，否则返回0.0。该函数是check_l2_watch_white_standard_complete的最终聚合器，实现\"全票通过\"的硬判定逻辑。"
+        "lineno": 349,
+        "description": "接收scores列表，过滤掉None值并将其转为浮点数。若过滤后列表为空则返回0.0；仅当所有有效分数均≥1.0时返回1.0，否则返回0.0。该函数为check_l2_watch_white_standard_complete提供\"全或无\"的最终聚合逻辑：所有子检查必须全部通过，整体任务才算成功。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:53:35",
+  "created_at": "2026-07-01 15:12:29",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_watch_white_standard_interruption_001./evaluator_function_labels.json"
 }

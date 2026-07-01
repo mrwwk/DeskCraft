@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_005./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证某个程序或命令输出的文本结果（如标准输出stdout）是否同时满足\"必须包含\"和\"不得包含\"两类子字符串规则。核心检查对象是一行或多行文本字符串；主要比较方式为子字符串的精确包含与不包含判断；成功判定的总体思路是：当且仅当结果字符串中同时出现所有在rules['include']中列出的必填子串，且完全不出现任何在rules['exclude']中列出的禁用子串时，任务被视为成功并返回1.0；若结果为空（None）、缺少任一必填子串、或出现任一禁用子串，则判定失败并返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 7,
+        "description": "该函数接收两个参数：result（待检查的字符串输出，例如虚拟机命令的stdout）和rules（字典，预期包含键'include'和'exclude'，对应值均为字符串列表）。检查步骤如下：1）首先判断result是否为None，若为None直接返回0.0；2）从rules中提取include列表（默认空列表）和exclude列表（默认空列表）；3）使用all(r in result for r in include)检查所有必填子串是否全部出现在result中；4）使用all(r not in result for r in exclude)检查所有禁用子串是否全部未出现在result中；5）仅当步骤3和步骤4同时成立时返回1.0，否则返回0.0。判定依据是严格的逻辑与组合：全部包含且全部排除，无近似匹配、无阈值、无顺序要求。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:05",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_005./evaluator_function_labels.json"
+}

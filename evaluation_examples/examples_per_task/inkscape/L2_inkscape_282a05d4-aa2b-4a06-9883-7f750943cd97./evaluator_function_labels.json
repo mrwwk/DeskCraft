@@ -1,0 +1,132 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_282a05d4-aa2b-4a06-9883-7f750943cd97./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 94
+    },
+    {
+      "name": "check_inkscape_stroke_dasharray",
+      "lineno": 128
+    },
+    {
+      "name": "check_inkscape_object_to_path",
+      "lineno": 149
+    },
+    {
+      "name": "check_inkscape_l2_path_stroke",
+      "lineno": 168
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_get_float",
+      "lineno": 66
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 77
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 86
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 94
+    },
+    {
+      "name": "check_inkscape_stroke_dasharray",
+      "lineno": 128
+    },
+    {
+      "name": "check_inkscape_object_to_path",
+      "lineno": 149
+    },
+    {
+      "name": "check_inkscape_l2_path_stroke",
+      "lineno": 168
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 Inkscape 编辑任务产生的 SVG 文件是否满足特定编辑要求。它通过解析 SVG 文件，定位具有指定 id 的元素，检查其描边颜色（stroke）、描边宽度（stroke-width）、描边虚线样式（stroke-dasharray）以及元素标签类型（例如是否从矩形等形状转换为 path）。核心检查方式是将 SVG 元素的实际样式属性与 rule 中预期的值进行比对：颜色值会被规范化（处理 3 位/6 位/8 位十六进制、统一小写、处理 none），数值会去除末尾单位后按浮点数比较并允许容差。对于组合任务 check_inkscape_l2_path_stroke，要求对象转路径、虚线描边、描边颜色三个子检查全部通过才判定成功，任一失败则整体失败。所有检查函数返回 1.0 表示完全通过，0.0 表示失败。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_stroke",
+        "lineno": 94,
+        "description": "验证指定 id 的 SVG 元素的描边颜色和/或描边宽度。接收 svg_file_path 和 rule 字典（需包含 element_id，可选 expected_stroke、expected_stroke_width、tolerance）。执行步骤：1）调用 _parse_svg 解析 SVG 文件，解析失败返回 0.0；2）调用 _find_element_by_id 按 element_id 查找目标元素，未找到返回 0.0；3）若 rule 包含 expected_stroke，使用 _normalize_color 规范化预期颜色和通过 _get_style_prop 获取的实际 stroke 颜色，若预期为 'none' 则实际必须为 'none' 或 None，否则必须严格相等，不满足返回 0.0；4）若 rule 包含 expected_stroke_width，使用 _get_float 去除单位后转换预期值和实际值，若任一转换失败返回 0.0，否则读取 tolerance（默认 0.5），计算实际值与预期值的绝对差，超过容差返回 0.0；5）全部条件满足返回 1.0。"
+      },
+      {
+        "name": "check_inkscape_stroke_dasharray",
+        "lineno": 128,
+        "description": "验证指定 id 的 SVG 元素是否具有虚线描边样式。接收 svg_file_path 和 rule 字典（需包含 element_id，可选 expect_dash，默认为 True）。执行步骤：1）调用 _parse_svg 解析 SVG 文件，失败返回 0.0；2）调用 _find_element_by_id 查找元素，未找到返回 0.0；3）通过 _get_style_prop 获取 stroke-dasharray 属性的实际值；4）判断 has_dash：实际值存在且经 lower() 后不为 'none'、空字符串、'0'；5）若 has_dash 与 expect_dash 一致返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_object_to_path",
+        "lineno": 149,
+        "description": "验证指定 id 的元素是否已被转换为特定标签类型（默认为 path）。接收 svg_file_path 和 rule 字典（需包含 original_id，可选 expected_tag，默认为 \"path\"）。执行步骤：1）调用 _parse_svg 解析 SVG 文件，失败返回 0.0；2）调用 _find_element_by_id 按 original_id 查找元素，未找到返回 0.0；3）调用 _tag_local 获取该元素的本地标签名（去除 XML 命名空间）；4）若实际标签名等于 expected_tag 则返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_l2_path_stroke",
+        "lineno": 168,
+        "description": "L2 组合任务验证：要求目标对象必须同时满足\"转为路径\"、\"设置虚线描边\"、\"设置描边颜色\"三项要求。接收 svg_file_path 和 rule 字典（包含 path_check、dash_check、stroke_check 三个子规则）。执行步骤：1）调用 check_inkscape_object_to_path 并传入 path_check，若返回值小于 1.0 则立即返回 0.0；2）调用 check_inkscape_stroke_dasharray 并传入 dash_check，若返回值小于 1.0 则立即返回 0.0；3）调用 check_inkscape_stroke 并传入 stroke_check，若返回值小于 1.0 则立即返回 0.0；4）三项全部通过返回 1.0。判定逻辑为\"全部满足\"，无加权或累计。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 18,
+        "description": "解析 CSS 样式字符串（如 \"fill:#ff0000;stroke:#000\"）为字典。按分号分割条目，再按冒号分割键值并去除首尾空白。主要用于 _get_style_prop 解析元素内联 style 属性。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 31,
+        "description": "规范化颜色值以便比对：空值返回 None；'none' 保持 'none'；# 开头的十六进制统一转换为 6 位小写（3 位短码展开为 6 位，8 位带 alpha 码截断前 6 位）；其他命名颜色原样返回小写形式。主要用于 check_inkscape_stroke 中的 stroke 颜色比对。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 50,
+        "description": "遍历 SVG 根节点下的所有元素（root.iter()），查找并返回 id 属性等于传入 element_id 的元素，未找到返回 None。是所有主函数定位目标 SVG 元素的核心方法。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 58,
+        "description": "获取元素的指定样式属性：先读取元素的 style 属性字符串，通过 _parse_style 解析为字典，若字典中存在该属性则返回；否则回退到读取该属性的直接 XML 属性值（elem.get(prop)）。用于兼容 SVG 中内联 style 和直接属性两种写法。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 66,
+        "description": "安全将字符串转换为 float：若值为 None 返回 default；否则使用正则表达式 r'[a-zA-Z%]+$' 去除末尾的单位字符（如 px、mm、% 等）后再转换；转换失败返回 default。主要用于解析 stroke-width 等可能带单位的数值。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 77,
+        "description": "使用 xml.etree.ElementTree.parse 解析指定路径的 SVG 文件，成功返回 (tree, root)，任何异常返回 (None, None)。是所有主函数的入口文件读取器。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 86,
+        "description": "提取元素的本地标签名：若 elem.tag 包含 XML 命名空间分隔符 '}'，则取后半部分；否则原样返回。用于 check_inkscape_object_to_path 判断元素实际类型是否为 path。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:42:45",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_282a05d4-aa2b-4a06-9883-7f750943cd97./evaluator_function_labels.json"
+}

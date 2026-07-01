@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_progressive_116./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是针对 INTERACTIVE_vscode_interactive_vscode_progressive_116 任务的逐任务评估器。在提供的代码范围内，其核心评测逻辑仅体现为对任务输出与预期答案进行严格精确匹配的二元判定。具体而言，评估器通过 exact_match 函数将任务返回结果（result）与评测规则中指定的预期值（rules[\"expected\"]）进行完全相等的比较，若两者在值和类型上完全一致则判定成功并返回分数 1.0，否则返回 0.0。尽管文件头部导入了大量用于文档解析（pdfplumber、docx、lxml）、数据处理和模糊匹配（rapidfuzz）的第三方库，但在当前代码中未明确体现对这些库的实际调用，也未体现对文件系统、页面状态、图像或复杂文档结构的检查逻辑。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数是唯一的评测入口，接收任务输出 result 和评测规则 rules 两个参数。检查步骤如下：首先从 rules 字典中提取键名为 expected 的预期值；随后通过 print 输出 result 和 expect 供调试查看；最后使用严格相等运算符（==）将 result 与 expect 进行比较。判定依据为：若两者完全一致，则返回浮点数 1.0 表示完全匹配；若存在任何差异（包括数据类型、大小写、空格、顺序等），则返回 0.0 表示不匹配。代码中未体现对 result 的预处理、类型转换、文件读取、正则匹配、近似匹配或阈值判断逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:39:52",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_progressive_116./evaluator_function_labels.json"
+}

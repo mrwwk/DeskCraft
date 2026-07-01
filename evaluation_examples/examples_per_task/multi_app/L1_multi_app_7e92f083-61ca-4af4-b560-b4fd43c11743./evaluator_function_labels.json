@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_7e92f083-61ca-4af4-b560-b4fd43c11743./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_bookmark_contains_url",
+      "lineno": 56
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 93
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_bookmark_contains_url",
+      "lineno": 56
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 93
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于多应用任务的自动化评分，总体采用二元打分机制（仅返回0.0或1.0）。它通过三种独立且互异的检查场景验证任务完成度：一是对程序输出或文本结果进行包含/排除规则检查，要求结果必须同时包含所有指定子串且不得出现任何禁用子串；二是对Chrome浏览器书签数据进行递归树遍历，验证书签URL中是否存在包含特定子串的条目；三是对JSON配置文件进行严格的键值对精确比对，要求结果文件必须存在且其解析后的字典与预期字典在键和值上完全相等。三个主函数各自独立服务于不同的检查对象（文本字符串、浏览器书签状态、JSON配置文件），核心比较方式涵盖子串包含匹配与字典键值严格相等匹配，成功判定思路均为\"全部条件满足得1.0分，任一条件不满足即得0.0分\"。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "接收一个结果字符串result和一个规则字典rules。首先判断result是否为None，若为None直接返回0.0。随后从rules中提取include列表（预期必须出现的子串集合）和exclude列表（预期必须禁止出现的子串集合）。检查逻辑要求result必须同时满足两个条件：①包含include列表中的每一个子串；②不包含exclude列表中的任何一个子串。两个条件同时满足返回1.0，否则返回0.0。该函数为严格的包含-排除匹配器，无近似匹配、无阈值容错、无顺序要求。"
+      },
+      {
+        "name": "check_bookmark_contains_url",
+        "lineno": 56,
+        "description": "接收Chrome书签JSON的roots部分（bookmarks_roots）和一个规则字典rule。首先进行空值防御：若bookmarks_roots为空或rule中url_pattern为空字符串，直接返回0.0。核心检查通过内部递归逻辑深度遍历书签树：对每个节点，若其type字段为url，则检查url字段是否包含rule指定的url_pattern子串；若不是url节点，则递归遍历其children列表。函数会遍历roots下的所有顶级分区（如bookmark_bar、other等）。判定方式为\"任一满足\"——只要任意一个书签URL包含指定子串即返回1.0，全部遍历后未找到则返回0.0。匹配方式为子串包含，而非精确相等或正则匹配。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 93,
+        "description": "接收actual（字符串，表示结果JSON文件的路径）和expected（字典，其中必须包含键名为expected的子字典）。首先，若actual为空字符串直接返回0.0。随后尝试打开actual路径指向的文件并使用json.load解析，若文件不存在、读取失败或JSON解析异常，均返回0.0。接着从expected['expected']中提取预期字典，遍历其中所有键值对。对每一对key-value，检查实际解析后的data字典中：①是否存在该key；②该key对应的value是否与预期完全相等（使用!=判断）。所有键值对都完全匹配则返回1.0，任何一项缺失或值不匹配立即返回0.0。采用精确相等比较，不涉及近似匹配、类型转换或额外容错。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:17:09",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_7e92f083-61ca-4af4-b560-b4fd43c11743./evaluator_function_labels.json"
+}

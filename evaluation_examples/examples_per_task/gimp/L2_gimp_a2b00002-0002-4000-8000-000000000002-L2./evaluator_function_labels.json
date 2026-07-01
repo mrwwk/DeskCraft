@@ -1,0 +1,156 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00002-0002-4000-8000-000000000002-L2./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 151
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 178
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 256
+    },
+    {
+      "name": "check_white_background_ratio",
+      "lineno": 323
+    },
+    {
+      "name": "check_l2_watch_white_standard_complete",
+      "lineno": 362
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 151
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 178
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 256
+    },
+    {
+      "name": "check_white_background_ratio",
+      "lineno": 323
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 354
+    },
+    {
+      "name": "check_l2_watch_white_standard_complete",
+      "lineno": 362
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于评测 GIMP L2 级任务（任务标识涉及 watch white-background standard），核心目标是验证用户是否成功将源图像处理为一张符合展示标准的白色背景手表图片，并保留可编辑的图层记录。最终必须同时满足两项产物要求：1) 一张 1600×1600 像素的 JPEG 输出图，具备纯白背景（白色像素占比不低于 90%）、主体下方带有柔和阴影、文件大小不超过 460800 字节，且对比度相比源图提升至少 8%；2) 一个 XCF 源文件，内部必须包含名为 Watch_Main、Shadow_Soft、BG_White 的三个图层（顺序不限）。评测采用严格的“全或无”逻辑：上述 8 项子检查必须全部通过，任一失败则整体任务判为 0 分。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "检查对象：单张图像的对比度数值。检查步骤：先将图像转换为灰度模式（'L'），再利用 ImageStat.Stat 计算灰度图像素值的标准差。判定依据：返回该标准差浮点值，作为后续 check_contrast_increase 的量化比较基准；该函数本身不直接判定通过或失败，仅提供对比度数值。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "检查对象：单张图像文件的宽高尺寸。检查步骤：使用 PIL.Image.open 打开图像，读取其 size 属性得到 width 与 height；将实际宽度与 expected_width 比较，若 expected_height 不为 None 则再比较高度。判定依据：实际尺寸与预期尺寸的绝对误差必须在 tolerance 像素（默认 5 像素）以内，宽高均满足则返回 1，否则返回 0；文件不存在或读取异常也返回 0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 67,
+        "description": "检查对象：目标图像相对于源图像的对比度提升幅度。检查步骤：分别打开 src_path 与 tgt_path，调用 calculate_contrast 获取两者的灰度标准差；若源图对比度为 0 则直接返回 0；否则按公式 ((tgt - src) / src) × 100 计算提升百分比。判定依据：提升百分比必须大于等于 min_increase_percent（默认 10.0%，在主评测流程中被调用时传入 8.0），满足返回 1，否则返回 0；任一路径为空或文件不存在也返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 108,
+        "description": "检查对象：指定路径的文件存在性。检查步骤：直接调用 os.path.isfile 判断路径是否为文件。判定依据：文件存在且为普通文件返回 1，路径为 None 或不存在返回 0。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 126,
+        "description": "检查对象：图像文件的实际编码格式。检查步骤：使用 PIL.Image.open 打开图像，读取其 format 属性。判定依据：format 必须严格等于 'JPEG'，满足返回 1，否则返回 0；文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 151,
+        "description": "检查对象：图像文件的字节大小。检查步骤：通过 os.path.getsize 获取文件字节数；从 rule 字典中读取可选的 min_size（默认 0）与 max_size（默认 10^18）。判定依据：文件大小必须在 [min_size, max_size] 闭区间内，满足返回 1，否则返回 0；文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 178,
+        "description": "检查对象：XCF 文件的图层名称及顺序。检查步骤：首先验证文件头是否以 b'gimp xcf' 开头；优先尝试使用 gimpformats 库解析图层名称列表，若失败则回退到字节级字符串搜索定位各图层名位置。判定依据：expected_layers 中的所有图层名必须在 XCF 中全部找到；若 rule 中 ordered 为 True，则这些图层名在解析出的列表（或二进制内容）中的出现顺序必须保持升序位置关系。全部满足返回 1，任一图层缺失或顺序错误返回 0；文件不存在、非 XCF 格式或解析异常返回 0。"
+      },
+      {
+        "name": "check_soft_shadow_presence",
+        "lineno": 256,
+        "description": "检查对象：图像主体下方是否存在柔和阴影。检查步骤：将图像转为 RGBA 模式并转为 numpy 数组；通过 alpha > 180 确定前景主体，计算其水平外接范围 [x0, x1] 与底部纵坐标 y1；在 y1 下方划定搜索带（高度为 max(8, h//5)，水平外扩 max(10, (x1-x0)//8)），统计该带内 alpha 值位于 [alpha_low, alpha_high]（默认 20~220）的半透明像素比例。若该比例不足 min_shadow_ratio，则启用回退逻辑：在搜索带内寻找非纯白、偏暗且低饱和的灰阴影像素并重新计算比例。判定依据：最终阴影像素比例必须大于等于 min_shadow_ratio（默认 0.01，主流程中传入 0.004），满足返回 1，否则返回 0；无前景或区域计算异常返回 0。"
+      },
+      {
+        "name": "check_white_background_ratio",
+        "lineno": 323,
+        "description": "检查对象：图像中白色背景的占比。检查步骤：将图像转为 RGB 模式并转为 numpy 数组；统计所有三个通道值均大于等于 white_threshold（默认 245）的像素比例。判定依据：白色像素比例必须大于等于 min_ratio（默认 0.9，即 90%），满足返回 1，否则返回 0；文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "check_l2_watch_white_standard_complete",
+        "lineno": 362,
+        "description": "检查对象：L2 手表白底标准图任务的完整产物集合。检查步骤：接收 result_paths 列表，要求至少包含 3 个元素，依次解包为 jpg_path、xcf_path、src_path；然后按顺序执行 8 项子检查：1) JPEG 文件存在性（check_file_exists）；2) JPEG 格式验证（check_jpeg_format）；3) 图像尺寸 1600×1600（check_image_dimensions，容差 5 像素）；4) 文件大小不超过 460800 字节（check_image_file_size_range）；5) 白色背景占比不低于 90%（check_white_background_ratio，white_threshold=245, min_ratio=0.9）；6) 柔和阴影存在（check_soft_shadow_presence，min_shadow_ratio=0.004）；7) 对比度相比源图提升不低于 8%（check_contrast_increase，min_increase_percent=8.0）；8) XCF 图层结构包含 Watch_Main、Shadow_Soft、BG_White（check_xcf_layers_structure，ordered=False）。判定依据：将 8 项得分传入 _all_binary_checks_pass，采用“全部满足”逻辑，仅当所有子检查均返回 1（或 >=1.0）时整体返回 1.0，任一失败则整体返回 0.0；若 result_paths 格式非法也直接返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 349,
+        "description": "该辅助函数服务于组合式主评测逻辑，用于判定一组二进制检查是否全部通过。检查步骤：过滤掉 scores 列表中的 None 值，将其余结果转为浮点数；若列表为空则返回 0.0。判定依据：仅当所有有效得分均大于等于 1.0 时返回 1.0，否则返回 0.0。该函数被 check_l2_watch_white_standard_complete 调用，确保多指标联合判定时执行严格的“全或无”策略。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:14:30",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00002-0002-4000-8000-000000000002-L2./evaluator_function_labels.json"
+}

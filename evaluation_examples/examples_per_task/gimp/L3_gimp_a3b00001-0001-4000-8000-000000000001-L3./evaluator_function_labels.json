@@ -1,0 +1,174 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00001-0001-4000-8000-000000000001-L3./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 212
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 239
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 317
+    },
+    {
+      "name": "check_l3_city_music_poster_complete",
+      "lineno": 384
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 176
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 205
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 212
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 239
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 317
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 376
+    },
+    {
+      "name": "check_l3_city_music_poster_complete",
+      "lineno": 384
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证L3级别GIMP任务「城市音乐海报（city music poster）」的完整交付结果。任务要求产出双格式图像（PNG与JPEG）并保留XCF源文件。验证逻辑覆盖四大维度：文件交付完整性（PNG/JPG/XCF存在性与格式正确性）、图像规格（尺寸2400×3200像素、JPG不超过1MB）、视觉质量（相比源图对比度提升至少6%）、内容结构（XCF包含指定7个图层、海报特定区域包含指定文本关键词）。evaluator采用严格的「全通过或零通过」二元判定：由check_l3_city_music_poster_complete串联10项独立检查，仅当所有检查均返回1时，最终得分才为1.0，否则为0.0。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "接收一个PIL.Image.Image对象，将其转换为灰度图（'L'模式），通过ImageStat.Stat计算像素值的标准差，并将该标准差作为图像对比度值返回。该数值越高表示图像对比度越大，专供check_contrast_increase调用以量化对比度变化。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "检查对象：单张图像文件的宽高尺寸。检查步骤：1) 验证image_path非空且文件存在；2) 使用PIL.Image.open打开图像获取width与height；3) 计算实际宽度与expected_width的绝对差，判断是否在tolerance（默认5像素）以内；4) 若expected_height不为None，则同样检查高度。判定依据：宽度必须在容差内，且若指定了高度则高度也必须在容差内，全部满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 67,
+        "description": "检查对象：单个图像文件的格式是否为PNG。检查步骤：1) 验证image_path非空且文件存在；2) 使用PIL.Image.open打开图像并读取img.format属性。判定依据：仅当img.format严格等于'PNG'时返回1，否则返回0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 92,
+        "description": "检查对象：目标图像相对于源图像的对比度提升幅度。检查步骤：1) 验证src_path与tgt_path均非空且存在；2) 分别打开两张图像并调用calculate_contrast获取对比度数值；3) 计算提升百分比：((tgt_contrast - src_contrast) / src_contrast) * 100；4) 将该百分比与min_increase_percent（默认10.0）比较。判定依据：提升百分比必须大于等于阈值，且源图对比度不能为0（避免除零），满足则返回1，否则返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 133,
+        "description": "检查对象：指定路径的文件是否存在。检查步骤：直接调用os.path.isfile判断。判定依据：文件存在返回1，不存在或路径为None返回0。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 151,
+        "description": "检查对象：单个图像文件的格式是否为JPEG。检查步骤：1) 验证image_path非空且文件存在；2) 使用PIL.Image.open打开图像并读取img.format属性。判定依据：仅当img.format严格等于'JPEG'时返回1，否则返回0。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 212,
+        "description": "检查对象：单个图像文件的字节大小。检查步骤：1) 验证image_path非空且存在；2) 从rule字典读取min_size（默认0）与max_size（默认10^18）；3) 调用os.path.getsize获取实际大小。判定依据：实际大小必须在[min_size, max_size]闭区间内，满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 239,
+        "description": "检查对象：XCF源文件的图层名称集合及可选顺序。检查步骤：1) 验证xcf_path存在且文件头以b'gimp xcf'开头；2) 优先尝试使用gimpformats库解析出所有图层名称列表；3) 若gimpformats解析失败或无图层名，回退到二进制内容中逐层搜索expected_layers的UTF-8字节串位置；4) 验证所有expected_layers均存在；5) 若rule中ordered为True，则检查各图层在解析列表（或二进制内容）中的出现位置是否按预期顺序递增。判定依据：所有指定图层必须存在，且若要求ordered则顺序必须一致，满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 317,
+        "description": "检查对象：图像指定区域的文本特征（边缘密度）及可选OCR关键词。检查步骤：1) 验证image_path存在，读取图像并转灰度为numpy数组；2) 对rule.regions中每个区域（如'top_center'、'center'、'bottom_center'），通过_resolve_region_bbox裁剪对应区域，调用_edge_density计算边缘密度；3) 若任一区域边缘密度低于min_edge_density（默认0.008），直接返回0；4) 若rule提供了keywords，尝试使用pytesseract.image_to_string进行OCR，将结果去除多余空白并转小写；5) 检查所有keywords是否都出现在OCR文本中。判定依据：所有区域边缘密度达标，且若提供关键词则OCR必须包含全部关键词（OCR异常时仅记录warning，不直接判负，但区域密度失败会直接判负），全部满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_l3_city_music_poster_complete",
+        "lineno": 384,
+        "description": "检查对象：L3城市音乐海报任务的完整交付物组合。检查步骤：要求result_paths为长度至少4的列表，依次提取png_path、jpg_path、xcf_path、src_path，然后按顺序执行10项二元检查：1) PNG文件存在；2) JPG文件存在；3) PNG格式正确；4) JPEG格式正确；5) PNG尺寸为2400×3200（容差5像素）；6) JPG尺寸为2400×3200（容差5像素）；7) JPG文件大小不超过1048576字节（1MB）；8) PNG在top_center、center、bottom_center区域包含文本特征且OCR含'CITY MUSIC FEST'、'LIVE'、'NIGHT'（min_edge_density=0.006）；9) JPG相比src_path对比度提升至少6.0%；10) XCF包含BG_Base、FX_Gradient、FX_Texture、Title_Main、Title_Sub、CTA、Frame共7个图层（ordered=False）。判定依据：将10项得分传入_all_binary_checks_pass，仅当所有检查均返回1时最终得分为1.0，任一失败则为0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 169,
+        "description": "接收图像宽高（width, height）和区域名称字符串（如'top_left'、'center'、'bottom'等），将语义化区域映射为绝对像素坐标(x0, y0, x1, y1)。例如'top_center'返回横向1/3到2/3、纵向0到1/3的区域。若传入未知区域，默认返回整图范围(0, 0, w, h)。该函数专供check_text_in_region_keywords使用，用于把人类可读的区域描述转换为可裁剪的矩形框。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 197,
+        "description": "接收灰度numpy数组和edge_threshold（默认40.0），计算图像边缘密度。具体步骤：分别沿x轴和y轴计算绝对梯度（np.gradient），相加得到边缘强度图，统计强度大于edge_threshold的像素占比。返回值是0到1之间的浮点数，表示边缘像素的平均密度。该函数被check_text_in_region_keywords调用，用于判断裁剪区域是否含有足够丰富的文本/图案边缘特征。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 378,
+        "description": "接收一个得分列表scores，过滤掉None值后转换为浮点数。判定逻辑：若列表为空返回0.0；若所有有效得分均大于等于1.0则返回1.0，否则返回0.0。该函数是check_l3_city_music_poster_complete的最终聚合器，实现「全部满足才通过」的严格二元判定策略。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:17:09",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00001-0001-4000-8000-000000000001-L3./evaluator_function_labels.json"
+}

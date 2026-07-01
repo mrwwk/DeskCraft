@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_ambiguous_111./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_favorite_apps",
+      "lineno": 17
+    },
+    {
+      "name": "check_battery_percentage",
+      "lineno": 49
+    },
+    {
+      "name": "check_station_prep_file",
+      "lineno": 78
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_favorite_apps",
+      "lineno": 17
+    },
+    {
+      "name": "check_battery_percentage",
+      "lineno": 49
+    },
+    {
+      "name": "check_station_prep_file",
+      "lineno": 78
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 对应 interactive_os_ambiguous_111 任务的 station preparation check，通过读取从 VM 经 postconfig dump 抓取的三个独立结果文件，分别验证三项配置/文件状态：(1) GNOME Shell 的 favorite-apps 是否被设置为预期的三个应用（比对 gsettings 输出，移除所有空白字符后精确匹配）；(2) GNOME 的 show-battery-percentage 是否被设为 true（比对 gsettings 输出，经 strip 与 lower 转换后精确匹配）；(3) station_prep.txt 是否存在且其完整内容（去除首尾空白后）与预期一致（注释提及内容应为 4 行，但函数内未显式校验行数）。三项检查相互独立，每个主函数各自返回 1.0（满足）或 0.0（不满足）， evaluator 文件内部未体现最终的加权、累计或联合汇总逻辑。",
+    "main_functions": [
+      {
+        "name": "check_favorite_apps",
+        "lineno": 17,
+        "description": "验证 GNOME Shell favorite-apps 的设置值。接收 result_file（本地文件路径，内容为 gsettings get 输出）与 rules（字典，含键 expected）。依次执行：判断 result_file 是否为 None；判断文件是否存在；读取文件全部内容；通过 \"\".join(content.split()) 移除所有空白字符（含空格、换行、逗号后空格等）；对 rules[\"expected\"] 执行同样的去空白处理；比较处理后的实际值与预期值，完全一致返回 1.0，否则返回 0.0。任何异常（如读文件失败）均返回 0.0。"
+      },
+      {
+        "name": "check_battery_percentage",
+        "lineno": 49,
+        "description": "验证 GNOME show-battery-percentage 是否启用。接收 result_file（本地文件路径，内容为 gsettings get 输出）与 rules（字典，含键 expected，默认值为 \"true\"）。依次执行：判断 result_file 是否为 None；判断文件是否存在；读取文件全部内容并执行 strip().lower()；对 rules.get(\"expected\", \"true\") 同样执行 strip().lower()；比较处理后的实际字符串与预期字符串，完全一致返回 1.0，否则返回 0.0。任何异常均返回 0.0。"
+      },
+      {
+        "name": "check_station_prep_file",
+        "lineno": 78,
+        "description": "验证 station_prep.txt 文件内容是否符合预期。接收 result_file（从 VM 拉取到本地的 station_prep.txt 路径）与 rules（字典，含键 expected_content）。依次执行：判断 result_file 是否为 None；判断文件是否存在；读取文件全部内容并执行 strip() 去除首尾空白；对 rules[\"expected_content\"] 同样执行 strip()；比较处理后的实际内容与预期内容，完全一致返回 1.0，否则返回 0.0。任何异常均返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:30:58",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_ambiguous_111./evaluator_function_labels.json"
+}

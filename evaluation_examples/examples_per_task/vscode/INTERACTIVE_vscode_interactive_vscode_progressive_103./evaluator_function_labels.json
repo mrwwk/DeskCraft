@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_progressive_103./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "file_contains",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "file_contains",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证指定本地文本文件的内容完整性。其核心任务是检查目标文件是否存在于文件系统中，并且文件内容是否完整包含所有预设的期望文本片段。评测采用二值化打分机制：只有当文件存在、可正常读取，且 config 中 \"expected\" 列表里的每一个字符串都作为子串出现在文件内容中时，才判定为任务成功（返回 1.0）；若文件缺失、路径为空、读取异常，或任意一个期望文本未被找到，则判定为失败（返回 0.0）。比较方式为精确的字符串包含匹配，不涉及正则、近似匹配或顺序约束，要求所有预期文本全部命中。",
+    "main_functions": [
+      {
+        "name": "file_contains",
+        "lineno": 7,
+        "description": "该函数接收一个本地文件路径 file_path 和一个配置字典 config 作为输入。首先检查 file_path 是否为空或 None，若是则直接返回 0.0；接着使用 os.path.isfile 验证文件是否真实存在于磁盘上，若不存在也返回 0.0。随后函数尝试以 utf-8 编码打开并读取整个文件内容。之后遍历 config[\"expected\"] 中的每一个预期字符串，逐一检查该字符串是否为文件内容的子串。只要发现任意一个预期字符串缺失，立即返回 0.0；若全部预期字符串都被找到，则返回 1.0。整个读取和检查过程被 try-except 包裹，任何读取异常（如编码错误、权限问题）都会捕获并返回 0.0。该函数是严格的“全部满足”逻辑，所有期望项必须同时命中才视为成功。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:39:30",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_progressive_103./evaluator_function_labels.json"
+}

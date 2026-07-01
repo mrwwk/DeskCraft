@@ -1,0 +1,123 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_cd8b1536-0d23-4ffc-b4d1-2e534ac4bf9e./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_title_format",
+      "lineno": 75
+    },
+    {
+      "name": "check_body_font",
+      "lineno": 135
+    },
+    {
+      "name": "check_section4_bold",
+      "lineno": 189
+    },
+    {
+      "name": "compare_docx_text_normalized",
+      "lineno": 252
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_dash",
+      "lineno": 27
+    },
+    {
+      "name": "_normalize_ws",
+      "lineno": 35
+    },
+    {
+      "name": "_normalize_text",
+      "lineno": 40
+    },
+    {
+      "name": "_is_heading",
+      "lineno": 45
+    },
+    {
+      "name": "_is_special",
+      "lineno": 50
+    },
+    {
+      "name": "_is_body_paragraph",
+      "lineno": 59
+    },
+    {
+      "name": "check_title_format",
+      "lineno": 75
+    },
+    {
+      "name": "check_body_font",
+      "lineno": 135
+    },
+    {
+      "name": "check_section4_bold",
+      "lineno": 189
+    },
+    {
+      "name": "compare_docx_text_normalized",
+      "lineno": 252
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator专门用于验证Policy_L3_04.docx任务（cd8b1536）生成的Word文档是否符合6项格式与内容要求：（1）标题必须居中、22pt、粗体；（2）章节标题（如\"1. PURPOSE\"）必须全大写；（3）正文必须使用Times New Roman 11pt字体；（4）第4节\"EQUIPMENT AND SECURITY\"下的正文段落必须全部粗体；（5）文档第一段必须是\"CONFIDENTIAL - Internal Use Only\"；（6）文档最后一段必须包含\"Document Control: Version 3.0\"。evaluator通过4个独立的主指标函数分别检查这些条件，每个函数返回0.0到1.0之间的分数（其中大部分为硬性的0.0/1.0判定，compare_docx_text_normalized返回模糊相似度）。代码中未明确体现上层框架如何将这些指标联合为最终任务结果（例如是否要求全部满足或加权累计），但每个指标各自覆盖了指定的格式或内容条件。",
+    "main_functions": [
+      {
+        "name": "check_title_format",
+        "lineno": 75,
+        "description": "接收result_path（结果文档路径）和options配置。使用python-docx打开文档后，遍历所有段落，查找包含options中title_keywords（默认\"REMOTE WORK POLICY\"）的标题段落。找到后依次检查三项格式属性：段落对齐方式必须为WD_PARAGRAPH_ALIGNMENT.CENTER（居中）；该段落至少存在一个非空run且其中某个run设置了bold（粗体）；所有非空run的字体大小必须在expected_size_pt（默认22.0pt）的±0.5pt误差范围内。三项全部通过返回1.0，任一失败或找不到标题段落返回0.0。"
+      },
+      {
+        "name": "check_body_font",
+        "lineno": 135,
+        "description": "接收result_path和options配置。使用python-docx打开文档后，遍历所有段落，通过_is_body_paragraph过滤出正文段落（排除空段落、章节标题和特殊标记段落）。对每个正文段落中的非空run，检查其显式字体属性：若run.font.name非None且不等于expected_font（默认\"Times New Roman\"），或run.font.size非None且与expected_size_pt（默认11.0pt）的绝对差大于0.5pt，则计为失败run。统计总run数和失败run数，计算合规比例 = 1 - failed/total。若正文中无任何run（total_runs为0），为避免假阴性直接返回1.0；若合规比例大于等于body_font_threshold（默认0.80）返回1.0，否则返回该比例值。"
+      },
+      {
+        "name": "check_section4_bold",
+        "lineno": 189,
+        "description": "接收result_path和options配置。使用python-docx打开文档后，先按options中section4_marker（默认\"4. EQUIPMENT AND SECURITY\"）定位第4节标题的段落索引；若未找到则直接返回1.0。随后从该标题之后开始查找下一个章节标题（通过_is_heading判断），确定第4节的作用域范围（从第4节标题后到下一个章节标题前，若后续无章节标题则到文档末尾）。提取该范围内的非空且非特殊标记段落作为待检查正文。若范围内无正文段落返回1.0。否则遍历每个正文段落，要求每个段落至少包含一个非空且run.bold为True的run；若任一正文段落不满足粗体要求返回0.0，全部满足返回1.0。"
+      },
+      {
+        "name": "compare_docx_text_normalized",
+        "lineno": 252,
+        "description": "接收result_path（结果文档）、expected_path（预期文档）和options配置。使用python-docx打开两份文档，通过_normalize_text对所有段落文本进行标准化（将Unicode dash替换为ASCII连字符并折叠空白字符），过滤空段落后得到两份段落列表。依次执行三项内容检查：首先验证结果文档第一段标准化后必须严格等于\"CONFIDENTIAL - Internal Use Only\"（条件5）；其次验证结果文档最后一段标准化后必须包含\"Document Control: Version 3.0\"（条件6）；然后遍历结果文档所有段落，对匹配_HEADING_RE的章节标题，提取其标题主体（m.group(1)）并检查是否全为大写（条件2），若存在非大写则返回0.0。最后将两份文档的标准化段落文本以换行符连接成整体字符串，使用rapidfuzz.fuzz.ratio计算模糊相似度，若相似度低于text_similarity_threshold（默认0.85）返回0.0，否则返回该相似度值（0.0~1.0）。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_dash",
+        "lineno": 25,
+        "description": "将输入字符串中的EN DASH（\\u2013）、EM DASH（\\u2014）、HORIZONTAL BAR（\\u2015）三种Unicode横线字符统一替换为ASCII连字符\"-\"。该转换用于消除不同dash字符对文本比对的影响，主要被_normalize_text调用。"
+      },
+      {
+        "name": "_normalize_ws",
+        "lineno": 33,
+        "description": "使用正则表达式\\s+将输入字符串中所有连续空白字符（包括空格、制表符、换行等）折叠为单个空格，并去除首尾空白。该转换用于文本标准化，主要被_normalize_text调用。"
+      },
+      {
+        "name": "_normalize_text",
+        "lineno": 38,
+        "description": "组合调用_normalize_dash和_normalize_ws，对输入字符串执行完整的文本标准化：先统一dash字符，再折叠空白。返回标准化后的字符串，供compare_docx_text_normalized在比对两份文档段落前调用。"
+      },
+      {
+        "name": "_is_heading",
+        "lineno": 43,
+        "description": "使用预编译正则_HEADING_RE（匹配以数字编号开头、后跟全大写英文的章节标题格式，允许包含空格、&、/、,、-）判断输入文本是否为章节标题。返回布尔值，被check_section4_bold用于定位下一章节边界，也被_is_body_paragraph用于排除标题段落。"
+      },
+      {
+        "name": "_is_special",
+        "lineno": 48,
+        "description": "将输入文本转小写后，检查是否包含_SPECIAL_MARKERS列表中的任一标记（包括\"CONFIDENTIAL\"、\"Document Control\"、\"COMPANY REMOTE WORK POLICY\"、\"EFFECTIVE DATE\"）。返回布尔值，被_is_body_paragraph用于识别并排除非正文段落。"
+      },
+      {
+        "name": "_is_body_paragraph",
+        "lineno": 57,
+        "description": "综合判断段落是否为正文内容：要求文本strip后非空、且不是章节标题（调用_is_heading）、且不是特殊标记段落（调用_is_special）。返回布尔值，供check_body_font和check_section4_bold过滤出需要检查字体或粗体属性的目标段落。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 17:00:24",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L3_writ_cd8b1536-0d23-4ffc-b4d1-2e534ac4bf9e./evaluator_function_labels.json"
+}

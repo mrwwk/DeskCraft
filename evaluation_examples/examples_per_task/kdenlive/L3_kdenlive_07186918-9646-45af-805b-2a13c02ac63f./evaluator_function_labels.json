@@ -1,0 +1,101 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_07186918-9646-45af-805b-2a13c02ac63f./evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_grayscale_effect",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_volume_adjustment",
+      "lineno": 125
+    },
+    {
+      "name": "check_kdenlive_render_effects_composite",
+      "lineno": 338
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_grayscale_effect",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_volume_adjustment",
+      "lineno": 125
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 225
+    },
+    {
+      "name": "_load_project_xml",
+      "lineno": 295
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 314
+    },
+    {
+      "name": "check_kdenlive_render_effects_composite",
+      "lineno": 338
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Kdenlive 视频编辑任务的完成质量，核心检查对象是 `.kdenlive` 项目文件（MLT XML 格式）以及渲染输出的 MP4 视频文件。对于项目文件，evaluator 通过解析 XML 遍历所有 `<filter>` 节点，验证是否应用了指定的视频效果（如灰度/黑白效果）以及音频属性调整（如音量 `level`/`gain` 是否达到目标值并处于容差范围内）。对于渲染输出文件，evaluator 调用外部命令 `ffprobe` 检测文件的实际编码格式（默认要求包含 `h264`）和时长（默认至少 `1.0` 秒）。在组合检查场景（`check_kdenlive_render_effects_composite`）下，必须同时满足“渲染文件合格”、“项目文件中存在指定效果”、“音量调整达标”等多个条件，才会判定任务成功。所有检查均为硬阈值判定，通过返回 `1.0`，任一关键条件失败即返回 `0.0`。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_grayscale_effect",
+        "lineno": 65,
+        "description": "接收 `project_file_path`（从 VM 获取的 `.kdenlive` 文件路径）和 `rule`（此任务中可为空字典 `{}`）。检查步骤为：首先确认文件存在；随后使用 `ET.parse` 解析 MLT XML，并通过 `root.iter(\"filter\")` 遍历所有 `<filter>` 节点；对每个 filter 调用 `_get_mlt_service` 提取服务名，与预定义的灰度服务列表（`grayscale`、`greyscale`、`avfilter.colorchannelmixer`、`frei0r.colorize`、`charcoal`、`frei0r.bw0r`）进行不区分大小写的等值匹配；若未命中，再调用 `_get_property_value` 读取 `kdenlive_id` 属性，检查其中是否包含子串 `\"grey\"` 或 `\"gray\"`（不区分大小写）。判定依据：任一 filter 满足上述两类条件之一即返回 `1.0`；若遍历结束仍未找到匹配项，或文件不存在、XML 解析失败，则返回 `0.0`。"
+      },
+      {
+        "name": "check_kdenlive_volume_adjustment",
+        "lineno": 125,
+        "description": "接收 `project_file_path` 和 `rule`，其中 `rule` 必须包含键 `expected_volume`（目标线性音量值，如 `0.5`），可选键 `tolerance`（默认值为 `0.05`）。检查步骤为：确认文件存在后解析 MLT XML；遍历所有 `<filter>` 节点，通过 `_get_mlt_service` 筛选出 `mlt_service` 为 `\"volume\"` 的 filter；对匹配到的 filter，依次读取 `level` 和 `gain` 两个属性值；属性值支持关键帧格式（如 `\"00:00:00.000=0.5\"`），若包含 `\"=\"` 则按换行符 `\\n` 分割后取最后一行，再按 `\"=\"` 分割取最右侧的数值转为 `float`，否则直接整体转为 `float`。判定依据：若 `level` 或 `gain` 中任一解析后的数值与 `expected_volume` 的绝对差小于等于 `tolerance`，返回 `1.0`；若遍历完所有 volume filter 均无匹配，或缺少 `expected_volume`、文件不存在、解析失败，返回 `0.0`。"
+      },
+      {
+        "name": "check_kdenlive_render_effects_composite",
+        "lineno": 338,
+        "description": "接收 `result_paths`（从 VM 下载的本地路径；当结果配置为 `multi:true` 时，格式为 `[output.mp4, project.kdenlive]` 列表；单文件时为字符串）和 `rule`。检查步骤依次为：① 调用 `_extract_result_paths` 分离出渲染文件路径与项目文件路径；② 调用 `_verify_render_output` 验证 MP4 文件存在、非空、视频流编码名包含 `expected_codec`（默认 `h264`，不区分大小写）、时长不小于 `min_duration`（默认 `1.0`）；③ 调用 `_load_project_xml` 加载项目文件；④ 若 `rule.get(\"require_grayscale\", False)` 为真，调用 `check_kdenlive_grayscale_effect` 检查灰度效果，要求必须返回 `1.0`；⑤ 若 `rule` 中存在 `expected_volume`，读取 `volume_tolerance`（默认 `0.05`），调用 `check_kdenlive_volume_adjustment` 检查音量，要求必须返回 `1.0`。判定依据：以上所有步骤必须全部通过，最终返回 `1.0`；任一步骤失败（渲染验证不通过、项目加载失败、灰度或音量检查未达标）立即返回 `0.0`。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 18,
+        "description": "从单个 MLT XML 元素（通常为 `<filter>`）中提取 `mlt_service` 值。逻辑为：优先读取元素的直接属性 `mlt_service`；若不存在，则遍历其子 `<property>` 节点，查找 `name=\"mlt_service\"` 的 property 并返回其 text。被 `check_kdenlive_grayscale_effect` 和 `check_kdenlive_volume_adjustment` 复用，用于识别 filter 的类型标识。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 47,
+        "description": "从 MLT XML 元素的子 `<property>` 节点中按名称提取属性值。逻辑为：遍历该元素下所有 `<property>`，匹配 `name` 属性等于传入的 `property_name`，返回对应节点的 text。被 `check_kdenlive_grayscale_effect`（提取 `kdenlive_id`）和 `check_kdenlive_volume_adjustment`（提取 `level`、`gain`）复用。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 233,
+        "description": "通过 `ffprobe` 验证渲染出的 MP4 文件是否符合基本要求。逻辑为：检查文件存在且大小非零；构造并执行命令 `ffprobe -v quiet -print_format json -show_streams -show_format <文件>`（超时 30 秒）；解析 JSON 输出，定位 `codec_type` 为 `\"video\"` 的流，比较 `codec_name` 是否包含 `expected_codec`（默认 `h264`，不区分大小写）；从视频流或 format 信息中读取 `duration`，确认其不小于 `min_duration`（默认 `1.0`）。返回 `(bool, str)` 元组，被 `check_kdenlive_render_effects_composite` 调用作为渲染质量的门控检查。"
+      },
+      {
+        "name": "_load_project_xml",
+        "lineno": 289,
+        "description": "加载并解析 `.kdenlive` 项目文件为 XML 元素树。逻辑为：检查路径存在后，使用 `ET.parse` 解析并返回根元素 `root`；若文件不存在或 XML 解析错误，返回 `(None, 错误信息)`。被 `check_kdenlive_render_effects_composite` 调用，为后续基于 XML 的效果检查提供根节点。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 305,
+        "description": "统一处理 `result_paths` 的两种输入形态。逻辑为：若输入为列表，则第 0 项作为渲染文件路径（`render_path`）、第 1 项作为项目文件路径（`project_path`）；若为字符串，则视为单一路径（渲染文件），项目路径为 `None`。被 `check_kdenlive_render_effects_composite` 调用，用于适配 `multi:true` 与单文件两种结果配置。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:09:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_07186918-9646-45af-805b-2a13c02ac63f./evaluator_function_labels.json"
+}

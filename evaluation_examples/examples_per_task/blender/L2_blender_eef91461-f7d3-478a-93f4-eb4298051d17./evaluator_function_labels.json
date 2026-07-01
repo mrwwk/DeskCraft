@@ -30,32 +30,32 @@
   ],
   "source_was_condensed": false,
   "label": {
-    "overall_validation": "该evaluator用于验证Blender场景中的对象层级结构与集合组织关系。它通过读取外部Blender检查脚本（check_object.py与check_collection.py）输出的JSON数据，解析场景中的对象父子关系与集合成员信息，并与任务规则进行精确比对。核心检查包括：验证指定父对象是否包含预期的子对象、验证子对象的父对象是否正确（以及是否错误关联了禁止的父对象）、验证是否存在拥有足够数量子对象的对象，以及验证指定集合是否包含所有预期的成员对象。判定采用二元制（1.0表示完全满足，0.0表示不满足），要求所有检查条件精确匹配，不支持模糊或近似匹配。",
+    "overall_validation": "该 evaluator 用于验证 Blender 3D 场景中的对象层级结构与集合归属关系。它读取 Blender 检查脚本（如 check_object.py 与 check_collection.py）输出的 JSON 数据，核心检查对象包括：对象间的父子绑定关系（指定父对象是否包含特定子对象、特定子对象的 parent 字段是否指向正确父对象、是否错误绑定了禁止的父对象、以及是否存在拥有足够子对象数量的对象）和集合（Collection）的成员完整性（指定集合是否包含所有预期对象）。比较方式以精确匹配为主：对象名称精确匹配、集合名称精确匹配、parent 字段精确匹配、children 列表与 expected_members 的集合包含关系检查。判定采用二元制，所有被检查的条件必须全部满足，任一条件不满足或 JSON 解析失败即返回 0.0（失败），全部通过返回 1.0（成功）。",
     "main_functions": [
       {
         "name": "check_blender_parent_child",
         "lineno": 41,
-        "description": "接收command_output（来自check_object.py的JSON字符串）与rule（规则字典），依次执行以下检查：首先调用_parse_blender_output将JSON文本解析为Python字典，若解析失败或输出为空则直接返回0.0。随后按顺序进入三种可选模式：模式一，若rule包含parent与expected_children键，则通过_find_object按精确名称定位父对象，若找不到返回0.0；若找到，则将该父对象的children列表转为集合，检查expected_children集合是否为其子集，若不是返回0.0，若是返回1.0。模式二，若rule包含parent_map，则遍历其中每条子对象-预期父对象映射，通过_find_object查找子对象并严格比对obj['parent']字段，任一不匹配返回0.0；若rule同时包含not_parent，则遍历其中子对象-禁止父对象映射，若子对象存在且其parent字段等于该禁止值，返回0.0。模式三，若rule中parent_has_children为真，则遍历所有对象的children列表，检查是否存在任意对象的子对象数量大于等于min_children_count（默认值为1），若存在返回1.0，否则返回0.0。若上述所有分支均通过且未触发提前返回，最终返回1.0。"
+        "description": "接收来自 check_object.py 的 JSON 字符串（command_output）与规则字典（rule），用于验证 Blender 场景中对象的父子关系。首先调用 `_parse_blender_output` 将原始输出解析为字典；若解析失败直接返回 0.0。随后按三种互斥或顺序模式执行检查：① 若 rule 包含 \"parent\" 与 \"expected_children\"，通过 `_find_object` 定位父对象，检查其 \"children\" 列表是否完整包含所有预期子对象（集合子集判断），缺漏即返回 0.0，通过则返回 1.0；② 若 rule 包含 \"parent_map\"，遍历其中每对 child_name→expected_parent，通过 `_find_object` 找到子对象并严格比对 \"parent\" 字段，不匹配则返回 0.0；若 rule 包含 \"not_parent\"，遍历其中每对 child_name→wrong_parent，检查子对象 \"parent\" 字段是否等于该错误值，等于则返回 0.0；③ 若 rule 包含 \"parent_has_children\"，遍历全部对象的 \"children\" 列表长度，检查是否有任意对象大于等于 min_children_count（默认 1），若无则返回 0.0。模式②与模式③顺序执行，全部通过最终返回 1.0；任一环节失败立即返回 0.0。异常捕获后也返回 0.0。"
       },
       {
         "name": "check_blender_collection_members",
         "lineno": 100,
-        "description": "接收command_output（来自check_collection.py的JSON字符串）与rule（规则字典），验证指定集合是否包含所有预期成员。首先调用_parse_blender_output解析JSON，失败则返回0.0。接着提取collection_name与expected_members。检查分为两条路径：主路径遍历result['collections']列表，按name字段精确匹配目标集合；若找到该集合，将其objects列表转为集合，判断expected_members是否为actual_members的子集，若是返回1.0，若找到集合但成员缺失则直接返回0.0，不再走备用路径。备用路径仅在collections列表中完全找不到同名集合时触发：通过result['object_collections']字典反向核查，确认每个expected_member对应的所属集合列表中是否包含coll_name，任一成员缺失返回0.0，全部存在返回1.0。"
+        "description": "接收来自 check_collection.py 的 JSON 字符串（command_output）与规则字典（rule），用于验证指定 Blender 集合的成员完整性。首先调用 `_parse_blender_output` 解析 JSON，失败则返回 0.0。接着执行两步检查：第一步在解析结果的 \"collections\" 数组中按 \"collection_name\" 精确查找目标集合，若找到则将其 \"objects\" 列表与 \"expected_members\" 做集合包含判断，全部包含返回 1.0，否则记录缺失成员并返回 0.0；第二步仅在 \"collections\" 数组中未找到目标集合时触发，退而检查 \"object_collections\" 映射表，确认每个预期成员对象是否都关联了目标集合名称，任一成员缺失即返回 0.0，全部关联则返回 1.0。异常捕获后返回 0.0。"
       }
     ],
     "helper_functions": [
       {
         "name": "_parse_blender_output",
         "lineno": 17,
-        "description": "对Blender检查脚本输出的原始字符串进行预处理与JSON解析。具体行为：先检查输入是否为空或仅含空白，若是则记录错误并返回None；否则对字符串执行strip后调用json.loads转换为Python字典。若解析过程中抛出json.JSONDecodeError或ValueError，同样记录错误并返回None。该函数是主函数的数据预处理入口，为check_blender_parent_child与check_blender_collection_members提供结构化的场景数据。"
+        "description": "接收 Blender 检查脚本输出的原始字符串（command_output），去除首尾空白后使用 `json.loads` 解析为 Python 字典或列表。若输入为空字符串/仅空白，或 JSON 解码失败，则记录错误日志并返回 None。该函数为主评测函数提供统一的数据预处理入口，解析失败会导致主函数直接判定为 0 分。"
       },
       {
         "name": "_find_object",
         "lineno": 30,
-        "description": "在check_object.py输出的对象列表中按精确名称检索目标对象。具体行为：遍历result['objects']，逐一比对obj['name']与传入的name参数，返回第一个匹配的对象字典；若遍历结束未找到，返回None。该函数被check_blender_parent_child复用，用于定位需要验证的父对象或子对象，要求对象名称完全相等，不支持部分匹配或忽略大小写。"
+        "description": "接收已解析的 Blender 输出字典（result）与目标对象名称（name），在 result[\"objects\"] 列表中遍历每个对象字典，对其 \"name\" 字段与传入名称进行精确字符串匹配。返回匹配到的完整对象字典，未找到则返回 None。该函数被 `check_blender_parent_child` 多次调用，用于定位特定父对象或子对象，以便进一步读取其 \"children\" 或 \"parent\" 字段进行关系校验。"
       }
     ]
   },
-  "created_at": "2026-06-30 21:13:18",
+  "created_at": "2026-07-01 14:40:00",
   "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_eef91461-f7d3-478a-93f4-eb4298051d17./evaluator_function_labels.json"
 }
