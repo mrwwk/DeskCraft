@@ -1,0 +1,2658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyVis DeskCraft - Task Visualizer</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header .title h1 { font-size: 18px; font-weight: 600; }
+header .title p { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+.header-controls { display: flex; align-items: center; gap: 12px; }
+header .lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+header .lang-selector label { font-size: 12px; opacity: 0.9; }
+header .lang-selector select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 12px;
+  outline: none;
+}
+header .lang-selector select option { color: #333; background: white; }
+.llm-settings-btn {
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.llm-settings-btn:hover { background: rgba(255,255,255,0.3); }
+/* LLM Settings Panel */
+.llm-panel {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 12px 24px;
+}
+.llm-panel-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.llm-field { display: flex; flex-direction: column; gap: 3px; }
+.llm-field label { font-size: 10px; font-weight: 600; color: #666; text-transform: uppercase; }
+.llm-field select, .llm-field input {
+  padding: 5px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  min-width: 140px;
+}
+.llm-field input[type="number"] { width: 90px; min-width: 90px; }
+.llm-field select:focus, .llm-field input:focus { border-color: #667eea; }
+.llm-panel-actions { display: flex; align-items: center; gap: 10px; }
+.llm-status { font-size: 11px; color: #666; }
+.container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+/* Sidebar */
+.sidebar-shell {
+  display: flex;
+  flex-shrink: 0;
+  position: relative;
+}
+.sidebar {
+  width: 320px;
+  min-width: 320px;
+  background: white;
+  border-right: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.25s ease, min-width 0.25s ease;
+}
+.sidebar-shell.collapsed .sidebar {
+  width: 0;
+  min-width: 0;
+  border-right: none;
+}
+.sidebar-toggle {
+  width: 20px;
+  flex-shrink: 0;
+  align-self: stretch;
+  border: none;
+  border-right: 1px solid #e8e8e8;
+  background: #fafafa;
+  color: #667eea;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s;
+}
+.sidebar-toggle:hover { background: #f0f0ff; }
+.sidebar-shell.collapsed .sidebar-toggle { border-right: none; }
+.sidebar-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+.sidebar-header input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.sidebar-header input:focus { border-color: #667eea; }
+.domain-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.domain-group { margin-bottom: 4px; }
+.domain-header {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #667eea;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: background 0.15s;
+}
+.domain-header:hover { background: #f5f5ff; }
+.domain-header .badge {
+  background: #667eea;
+  color: white;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.domain-header .arrow { transition: transform 0.2s; font-size: 10px; }
+.domain-header.expanded .arrow { transform: rotate(90deg); }
+.task-list { display: none; padding: 0 8px; }
+.task-list.show { display: block; }
+.task-item {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #555;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.task-item:hover { background: #f0f0ff; color: #333; }
+.task-item.active { background: #667eea; color: white; }
+/* Main content */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.main-header {
+  padding: 12px 24px;
+  border-bottom: 1px solid #e8e8e8;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.main-header .task-id {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+.main-header .task-domain {
+  font-size: 12px;
+  background: #f0f0ff;
+  color: #667eea;
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  font-size: 16px;
+}
+/* Card styles */
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.card h3 {
+  font-size: 14px;
+  color: #667eea;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.card-field {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+}
+.card-field .label {
+  font-size: 12px;
+  color: #999;
+  min-width: 100px;
+  font-weight: 500;
+}
+.card-field .value {
+  font-size: 13px;
+  color: #333;
+  word-break: break-all;
+}
+.instruction-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background: #f8f9fa;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+}
+/* JSON viewer */
+pre.json-view {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre.json-view .key { color: #89b4fa; }
+pre.json-view .string { color: #a6e3a1; }
+pre.json-view .number { color: #fab387; }
+pre.json-view .boolean { color: #f38ba8; }
+pre.json-view .null { color: #6c7086; }
+/* Config steps */
+.config-step {
+  background: #f8f9fa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+.config-step .step-type {
+  font-size: 12px;
+  font-weight: 600;
+  color: #667eea;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.config-step .step-params {
+  font-size: 12px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #555;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+/* Evaluator detail */
+.eval-detail-block {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+.eval-detail-block h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #764ba2;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.eval-sub-collapsible {
+  margin-top: 8px;
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.eval-sub-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  user-select: none;
+}
+.eval-sub-header:hover { background: #f0f2f5; }
+.eval-sub-body {
+  padding: 10px 12px 12px;
+  border-top: 1px solid #ececec;
+  background: #fff;
+}
+.eval-sub-body pre.json-view { margin: 0; }
+.eval-overall-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #444;
+  background: linear-gradient(135deg, #f8f5ff 0%, #f5f8ff 100%);
+  padding: 14px 16px;
+  border-radius: 8px;
+  border-left: 3px solid #764ba2;
+}
+.eval-func-card {
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.eval-func-card:last-child { margin-bottom: 0; }
+.eval-func-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.eval-func-name {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #667eea;
+  background: #eef0ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.eval-func-lineno {
+  font-size: 11px;
+  color: #888;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+.eval-func-desc {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #555;
+}
+.reward-score-summary {
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: #f8fafc;
+}
+.reward-score-summary.has-score {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+.reward-score-summary-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+.reward-score-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.reward-score-summary-item {
+  background: rgba(255,255,255,0.8);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.reward-score-summary-item .k {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 4px;
+}
+.reward-score-summary-item .v {
+  font-weight: 600;
+  color: #333;
+}
+.reward-score-summary-item .v.ok { color: #166534; }
+.reward-score-summary-item .v.bad { color: #991b1b; }
+.reward-score-progress {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.reward-score-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.reward-score-hint {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #e5e7eb;
+}
+.eval-score-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.eval-score-badge.pass {
+  background: #dcfce7;
+  color: #166534;
+}
+.eval-score-badge.fail {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.eval-score-value {
+  font-size: 11px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #555;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.eval-func-card.has-score.pass {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+.eval-func-card.has-score.fail {
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+.eval-score-detail {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #444;
+  border-left: 3px solid #fca5a5;
+}
+.eval-func-card.has-score.pass .eval-score-detail {
+  border-left-color: #86efac;
+}
+.eval-helper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+.eval-helper-item {
+  background: #f8f9fa;
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.eval-helper-name {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+.eval-helper-desc {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #666;
+}
+.eval-detail-source {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #aaa;
+  font-family: 'Monaco', 'Menlo', monospace;
+  word-break: break-all;
+}
+/* Stats bar */
+.stats-bar {
+  padding: 8px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  gap: 16px;
+}
+.stats-bar span { font-weight: 500; color: #333; }
+/* Load panel */
+.load-panel {
+  padding: 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+.load-panel .input-group { margin-bottom: 10px; }
+.load-panel .input-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.load-panel .input-group input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.load-panel .input-group input:focus { border-color: #667eea; }
+.load-btn {
+  width: 100%;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.load-btn:hover { opacity: 0.9; }
+.load-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.load-status {
+  margin-top: 8px;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  display: none;
+}
+.load-status.success { display: block; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.load-status.error { display: block; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+/* Collapsible sections */
+.collapsible-card { padding: 0; }
+.collapsible-header {
+  padding: 14px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  transition: background 0.15s;
+}
+.collapsible-header:hover { background: #f8f9fa; }
+.collapsible-arrow {
+  font-size: 11px;
+  color: #667eea;
+  width: 14px;
+  transition: transform 0.2s;
+}
+.collapsible-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+.collapsible-body {
+  padding: 0 20px 20px 20px;
+  border-top: 1px solid #f0f0f0;
+}
+/* Trajectory player */
+.traj-summary {
+  display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;
+  padding: 10px 14px; background: #f8f9fa; border-radius: 6px; font-size: 13px;
+}
+.traj-summary span { color: #666; }
+.traj-summary strong { color: #333; }
+.traj-status-done { color: #166534; }
+.traj-status-error { color: #991b1b; }
+.traj-status-running { color: #b45309; }
+.traj-empty { color: #999; font-size: 13px; padding: 16px 0; }
+.traj-nav-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; background: #fff; border-radius: 8px;
+  border: 1px solid #e8e8e8; margin-bottom: 10px;
+}
+.traj-nav-btn {
+  padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px;
+  background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; color: #555;
+}
+.traj-nav-btn:hover:not(:disabled) { border-color: #667eea; color: #667eea; background: #f5f5ff; }
+.traj-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.traj-step-info { font-size: 13px; font-weight: 600; color: #333; min-width: 72px; text-align: center; }
+.traj-action-toggle { margin-left: auto; font-size: 12px; color: #555; display: flex; align-items: center; gap: 6px; }
+.traj-slider-bar {
+  display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+  background: #fff; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 12px;
+}
+.traj-slider-bar .slider-label { font-size: 12px; font-weight: 600; color: #888; min-width: 32px; text-align: center; }
+.traj-slider-bar input[type="range"] {
+  flex: 1; height: 6px; border-radius: 3px; background: #e0e4ee;
+  -webkit-appearance: none; appearance: none; outline: none; cursor: pointer;
+}
+.traj-slider-bar input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer; box-shadow: 0 1px 4px rgba(102,126,234,0.4);
+}
+.traj-screenshot-area {
+  background: #1a1a2e; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.traj-screenshot-wrapper {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  min-height: 240px; max-height: 65vh;
+}
+.traj-screenshot-wrapper img {
+  display: block; max-width: 100%; max-height: 65vh; width: auto; height: auto; object-fit: contain;
+}
+.traj-screenshot-wrapper .action-overlay-svg {
+  position: absolute; top: 0; left: 0; pointer-events: none;
+}
+.traj-no-image {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 240px; color: #888; font-size: 14px;
+}
+.traj-action-panel {
+  background: #fff; padding: 14px 18px; border-top: 1px solid #e8e8e8;
+}
+.traj-action-desc {
+  font-size: 14px; line-height: 1.6; color: #333; margin-bottom: 8px;
+}
+.traj-action-desc:empty { display: none; }
+.traj-action-code {
+  background: #1e1e2e; color: #a6e3a1; padding: 10px 12px; border-radius: 6px;
+  font-size: 11px; overflow-x: auto; margin: 0; white-space: pre-wrap; word-break: break-all;
+}
+/* Trajectory AI label */
+.traj-ai-panel {
+  background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+  margin-bottom: 14px; overflow: hidden;
+}
+.traj-ai-header {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  padding: 12px 16px; background: linear-gradient(135deg, #f5f5ff 0%, #faf5ff 100%);
+  border-bottom: 1px solid #e8e8e8;
+}
+.traj-ai-header h4 { font-size: 14px; font-weight: 600; color: #333; margin: 0; flex: 1; }
+.traj-ai-badge {
+  padding: 4px 12px; border-radius: 14px; font-size: 12px; font-weight: 600;
+}
+.traj-ai-badge.success { background: #dcfce7; color: #166534; }
+.traj-ai-badge.failure { background: #fee2e2; color: #991b1b; }
+.traj-ai-badge.neutral { background: #f3f4f6; color: #555; }
+.traj-ai-confidence { font-size: 12px; color: #666; }
+.traj-ai-body { padding: 14px 16px; }
+.traj-ai-section { margin-bottom: 16px; }
+.traj-ai-section:last-child { margin-bottom: 0; }
+.traj-ai-section-title {
+  font-size: 12px; font-weight: 700; color: #667eea; text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0;
+}
+.traj-ai-summary {
+  font-size: 13px; line-height: 1.7; color: #333; background: #f8f9fa;
+  padding: 10px 14px; border-radius: 6px; border-left: 3px solid #667eea; margin-bottom: 10px;
+}
+.traj-ai-kv { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; }
+.traj-ai-kv .k { color: #888; min-width: 72px; flex-shrink: 0; }
+.traj-ai-kv .v { color: #333; }
+.traj-ai-kv .v.ok { color: #166534; font-weight: 600; }
+.traj-ai-kv .v.bad { color: #991b1b; font-weight: 600; }
+.traj-ai-list { margin: 6px 0 0 0; padding: 0; list-style: none; }
+.traj-ai-list li {
+  font-size: 13px; line-height: 1.6; color: #444; padding: 4px 0 4px 18px;
+  position: relative;
+}
+.traj-ai-list li::before {
+  content: "•"; position: absolute; left: 4px; color: #667eea; font-weight: bold;
+}
+.traj-ai-list.steps li::before { content: counter(step); counter-increment: step; font-size: 11px; left: 0; }
+.traj-ai-list.steps { counter-reset: step; }
+.traj-ai-list.steps li { padding-left: 22px; }
+.traj-ai-subtitle { font-size: 12px; font-weight: 600; color: #666; margin: 10px 0 6px; }
+.traj-ai-empty { font-size: 13px; color: #999; padding: 12px 16px; }
+/* Score vs AI consistency */
+.traj-consistency-panel {
+  border: 1px solid #e8e8e8; border-radius: 10px; margin-bottom: 14px;
+  padding: 12px 16px; background: #f8fafc;
+}
+.traj-consistency-panel.inconsistent {
+  border-color: #fca5a5; background: #fef2f2;
+}
+.traj-consistency-panel.consistent {
+  border-color: #86efac; background: #f0fdf4;
+}
+.traj-consistency-title {
+  font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px;
+}
+.traj-consistency-panel.inconsistent .traj-consistency-title { color: #991b1b; }
+.traj-consistency-panel.consistent .traj-consistency-title { color: #166534; }
+.traj-consistency-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;
+  font-size: 13px;
+}
+.traj-consistency-item { background: rgba(255,255,255,0.7); padding: 8px 12px; border-radius: 6px; }
+.traj-consistency-item .k { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
+.traj-consistency-item .v { font-weight: 600; color: #333; }
+.traj-consistency-item .v.ok { color: #166534; }
+.traj-consistency-item .v.bad { color: #991b1b; }
+.traj-consistency-verdict {
+  margin-top: 10px; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 6px;
+}
+.traj-consistency-panel.inconsistent .traj-consistency-verdict {
+  background: #fee2e2; color: #991b1b;
+}
+.traj-consistency-panel.consistent .traj-consistency-verdict {
+  background: #dcfce7; color: #166534;
+}
+.traj-consistency-panel.neutral .traj-consistency-verdict {
+  background: #f3f4f6; color: #666;
+}
+/* Task labeling */
+.label-card { border-left: 4px solid #667eea; }
+.label-card h3 { color: #333; }
+.label-options { display: flex; gap: 20px; margin-bottom: 14px; }
+.label-option {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  padding: 10px 18px; border: 2px solid #e8e8e8; border-radius: 8px;
+  font-size: 14px; font-weight: 500; transition: all 0.15s; user-select: none;
+}
+.label-option input { width: 16px; height: 16px; cursor: pointer; pointer-events: none; }
+.label-option.selected-usable { border-color: #22c55e; background: #f0fdf4; color: #166534; }
+.label-option.selected-unusable { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+.label-reason-wrap { margin-bottom: 14px; display: none; }
+.label-reason-wrap.show { display: block; }
+.label-reason-wrap label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px; }
+.label-reason-types { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.label-reason-type {
+  display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
+  padding: 9px 10px; border: 1px solid #e8e8e8; border-radius: 6px;
+  font-size: 13px; color: #555; line-height: 1.35; transition: all 0.15s;
+}
+.label-reason-type input { margin-top: 2px; pointer-events: none; }
+.label-reason-type.selected { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+.label-reason-wrap textarea {
+  width: 100%; min-height: 80px; padding: 10px 12px; border: 1px solid #d9d9d9;
+  border-radius: 6px; font-size: 13px; resize: vertical; outline: none; font-family: inherit;
+}
+.label-reason-wrap textarea:focus { border-color: #ef4444; }
+.label-actions { display: flex; align-items: center; gap: 12px; }
+.label-save-btn {
+  padding: 8px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;
+}
+.label-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.label-save-status { font-size: 12px; color: #666; }
+.label-save-status.ok { color: #166534; }
+.label-save-status.err { color: #991b1b; }
+.task-item .label-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  margin-right: 6px; flex-shrink: 0;
+}
+.task-item { display: flex; align-items: center; }
+.task-item .label-dot.usable { background: #22c55e; }
+.task-item .label-dot.unusable { background: #ef4444; }
+.task-item .label-dot.unlabeled { background: #d9d9d9; }
+.task-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.task-badge.int { background: #fef3c7; color: #b45309; }
+.task-badge.l1 { background: #dcfce7; color: #15803d; }
+.task-badge.l2 { background: #dbeafe; color: #1d4ed8; }
+.task-badge.l3 { background: #ede9fe; color: #6d28d9; }
+.task-item span.task-label-text { word-break: break-all; }
+.interaction-log-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.interaction-log-item {
+  border-left: 3px solid #f59e0b;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: #fffbeb;
+  border-radius: 0 6px 6px 0;
+}
+.interaction-log-item .meta { font-size: 11px; color: #92400e; margin-bottom: 6px; }
+.interaction-log-item .msg { font-size: 13px; line-height: 1.5; color: #333; white-space: pre-wrap; }
+.traj-phase-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #b45309;
+}
+.traj-phase-marker {
+  font-size: 11px;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+}
+.traj-response-wrap { margin-top: 10px; }
+.traj-response-wrap summary { cursor: pointer; font-size: 12px; color: #667eea; font-weight: 600; }
+.traj-response-pre {
+  margin-top: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 11px;
+  line-height: 1.4;
+  background: #f8f9fc;
+  padding: 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.eval-audit-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.eval-audit-summary .item {
+  background: #f8f9fc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 12px;
+}
+.eval-audit-summary .item .k { color: #888; display: block; margin-bottom: 4px; }
+.eval-audit-summary .item .v { font-weight: 600; color: #333; }
+.eval-coverage-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+.eval-coverage-table th, .eval-coverage-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.eval-coverage-table th { background: #f3f4f6; }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>EasyVis DeskCraft - Task Visualizer</h1>
+    <p>Browse DeskCraft standard &amp; interactive task results</p>
+  </div>
+  <div class="header-controls">
+    <div class="lang-selector">
+      <label>AI Language:</label>
+      <select id="langSelect">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <button class="llm-settings-btn" onclick="toggleLlmPanel()">⚙ LLM Settings</button>
+    <button class="llm-settings-btn" onclick="toggleHelpPanel()">❓ Help</button>
+  </div>
+</header>
+<!-- LLM Settings Panel -->
+<div class="llm-panel" id="llmPanel" style="display:none;">
+  <div class="llm-panel-inner">
+    <div class="llm-field">
+      <label>Provider</label>
+      <select id="llmProvider">
+        <option value="openai">openai (蒸馏平台 GPT)</option>
+        <option value="kimi">kimi (Kimi-K2.6)</option>
+        <option value="vllm">vllm (Custom OpenAI-compatible)</option>
+      </select>
+    </div>
+    <div class="llm-field" id="llmFieldModel">
+      <label>Model</label>
+      <input type="text" id="llmModel" placeholder="model name or marker">
+    </div>
+    <div class="llm-field" id="llmFieldUrl" style="display:none;">
+      <label>API URL</label>
+      <input type="text" id="llmUrl" placeholder="http://host:port/v1">
+    </div>
+    <div class="llm-field">
+      <label>Max Tokens</label>
+      <input type="number" id="llmMaxTokens" value="4096" min="256" max="32768" step="256">
+    </div>
+    <div class="llm-field">
+      <label>Temperature</label>
+      <input type="number" id="llmTemperature" value="0.3" min="0" max="1" step="0.1">
+    </div>
+    <div class="llm-panel-actions">
+      <button class="load-btn" onclick="applyLlmSettings()" style="width:auto;padding:6px 20px;">Apply</button>
+      <span class="llm-status" id="llmStatus"></span>
+    </div>
+  </div>
+</div>
+<div class="container">
+<!-- Help Panel -->
+<div class="llm-panel" id="helpPanel" style="display:none;position:absolute;z-index:100;left:0;right:0;background:white;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:20px 32px;max-height:60vh;overflow-y:auto;">
+  <div style="font-size:13px;line-height:2;color:#555;">
+    <h3 style="color:#667eea;margin-bottom:12px;">How to Use / 使用说明</h3>
+    <p><strong>1.</strong> Fill in <em>Config JSON Path</em> and <em>Examples Directory</em> in the left panel, click <strong>Load Data</strong></p>
+    <p style="color:#999;font-size:12px;margin-left:16px;">在左侧填入 Config 路径和 Examples 目录，点击 Load Data 加载</p>
+    <p><strong>2.</strong> Click a <strong>task ID</strong> in the sidebar to view its details</p>
+    <p style="color:#999;font-size:12px;margin-left:16px;">点击左侧 task ID 查看详情</p>
+    <p><strong>3.</strong> Click <strong>▶ Config / Evaluator</strong> to expand sections</p>
+    <p style="color:#999;font-size:12px;margin-left:16px;">点击折叠标题展开对应内容</p>
+    <p><strong>4.</strong> Click any <strong>✨ button</strong> to trigger AI analysis (select language in top-right)</p>
+    <p style="color:#999;font-size:12px;margin-left:16px;">点击 ✨ 按钮触发 AI 分析（右上角选语言）</p>
+    <p><strong>5.</strong> Click <strong>⚙ LLM Settings</strong> to switch AI model/provider, then <strong>Apply</strong></p>
+    <p style="color:#999;font-size:12px;margin-left:16px;">点击 ⚙ LLM Settings 切换 AI 模型，点 Apply 确认</p>
+    <p><strong>6.</strong> Share the browser URL to let others see the same task view</p>
+    <p style="color:#999;font-size:12px;margin-left:16px;">复制浏览器地址栏链接可分享当前视图</p>
+  </div>
+</div>
+  <div class="sidebar-shell" id="sidebarShell">
+  <div class="sidebar" id="sidebar">
+    <div class="load-panel" id="loadPanel">
+      <div class="input-group">
+        <label>Config JSON Path</label>
+        <input type="text" id="configPathInput" value="/apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/taiji_task/test_all_with_interactive.json">
+      </div>
+      <div class="input-group">
+        <label>Examples Directory</label>
+        <input type="text" id="examplesDirInput" value="/apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task">
+      </div>
+      <div class="input-group">
+        <label>Cache Directory (DeskCraft 可留空)</label>
+        <input type="text" id="cacheDirInput" value="" placeholder="optional">
+      </div>
+      <div class="input-group">
+        <label>Results Directory (Trajectory)</label>
+        <input type="text" id="resultsDirInput" value="/apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/results/replay_full/kimi-replay-full/pyautogui/screenshot/Kimi-K2.6">
+      </div>
+      <button class="load-btn" id="loadBtn" onclick="loadData()">Load Data</button>
+      <div class="load-status" id="loadStatus"></div>
+    </div>
+    <div class="sidebar-header" id="searchBar" style="display:none;">
+      <input type="text" id="searchInput" placeholder="Search task ID or domain...">
+    </div>
+    <div class="stats-bar" id="statsBar" style="display:none;"></div>
+    <div class="domain-list" id="domainList"></div>
+  </div>
+  <button type="button" class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="折叠/展开侧栏">‹</button>
+  </div>
+  <div class="main">
+    <div class="main-header" id="mainHeader" style="display:none;">
+      <span class="task-domain" id="taskDomain"></span>
+      <span class="task-id" id="taskIdDisplay"></span>
+    </div>
+    <div class="content" id="content">
+      <div style="max-width:600px;margin:40px auto;padding:0 20px;">
+        <h2 style="color:#667eea;margin-bottom:16px;">How to Use / 使用说明</h2>
+        <div style="font-size:13px;line-height:2;color:#555;">
+          <p><strong>1.</strong> Fill in <em>Config JSON Path</em> and <em>Examples Directory</em> in the left panel, then click <strong>Load Data</strong></p>
+          <p style="color:#999;font-size:12px;margin-left:16px;">在左侧填入 Config 路径和 Examples 目录，点击 Load Data 加载</p>
+          <p><strong>2.</strong> Click a <strong>task ID</strong> in the sidebar to view its details</p>
+          <p style="color:#999;font-size:12px;margin-left:16px;">点击左侧 task ID 查看详情</p>
+          <p><strong>3.</strong> Click <strong>▶ Config / Evaluator</strong> to expand sections</p>
+          <p style="color:#999;font-size:12px;margin-left:16px;">点击折叠标题展开对应内容</p>
+          <p><strong>4.</strong> Click any <strong>✨ button</strong> to trigger AI analysis (select language in top-right)</p>
+          <p style="color:#999;font-size:12px;margin-left:16px;">点击 ✨ 按钮触发 AI 分析（右上角选语言）</p>
+          <p><strong>5.</strong> Click <strong>⚙ LLM Settings</strong> to switch AI model/provider</p>
+          <p style="color:#999;font-size:12px;margin-left:16px;">点击 ⚙ LLM Settings 切换 AI 模型</p>
+          <p><strong>6.</strong> Share the browser URL to let others see the same task view</p>
+          <p style="color:#999;font-size:12px;margin-left:16px;">复制浏览器地址栏链接可分享当前视图</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/action_visualizer.js"></script>
+<script>
+// State — client-side only (multi-user safe)
+let taskConfig = {};
+let currentTask = null;
+let currentTaskKey = '';
+let currentDomain = '';
+let examplesDir = '';
+let resultsDir = '';
+let cacheDir = '';
+let trajectoryData = null;
+let trajCurrentStep = 0;
+let trajVisualizer = null;
+let trajActionVizEnabled = true;
+let taskLabels = {};
+let labelSaveSeq = 0;
+let evaluatorPy = null;
+let evaluatorPyPath = null;
+let evaluatorDetail = null;
+let evaluatorDetailPath = null;
+let initialSetupPy = null;
+let initialSetupPyPath = null;
+let rewardLabel = null;
+let rewardLabelPath = null;
+let rewardComponents = null;
+let rewardComponentsPath = null;
+let evaluatorAudit = null;
+let evaluatorAuditPath = null;
+let evaluatorManifest = null;
+let evaluatorManifestPath = null;
+
+
+function getTaskKey() {
+  return currentTaskKey || (currentTask && currentTask.task_key) || (currentTask && currentTask.id) || '';
+}
+
+function taskTypeBadge(taskId) {
+  if (taskId.startsWith('INTERACTIVE_')) return '<span class="task-badge int">INT</span>';
+  if (taskId.startsWith('L1_')) return '<span class="task-badge l1">L1</span>';
+  if (taskId.startsWith('L2_')) return '<span class="task-badge l2">L2</span>';
+  if (taskId.startsWith('L3_')) return '<span class="task-badge l3">L3</span>';
+  return '';
+}
+async function applyServerDefaults() {
+  try {
+    const resp = await fetch('/api/defaults');
+    const data = await resp.json();
+    if (!resp.ok || !data || !data.config_path) return;
+    if (data.title) {
+      document.title = data.title;
+      const h1 = document.querySelector('header .title h1');
+      if (h1) h1.textContent = data.title;
+    }
+    if (data.config_path) document.getElementById('configPathInput').value = data.config_path;
+    if (data.examples_dir) document.getElementById('examplesDirInput').value = data.examples_dir;
+    if (data.cache_dir) document.getElementById('cacheDirInput').value = data.cache_dir;
+    if (data.results_dir) document.getElementById('resultsDirInput').value = data.results_dir;
+  } catch (e) {
+    console.warn('Failed to load server defaults', e);
+  }
+}
+
+// ─── Load Data ────────────────────────────────────────────────────────────
+async function loadData() {
+  const configPath = document.getElementById('configPathInput').value.trim();
+  const exDir = document.getElementById('examplesDirInput').value.trim();
+  const resDir = document.getElementById('resultsDirInput').value.trim();
+  const cacheDirInput = document.getElementById('cacheDirInput').value.trim();
+  const statusEl = document.getElementById('loadStatus');
+  const btn = document.getElementById('loadBtn');
+
+  if (!configPath || !exDir) {
+    statusEl.className = 'load-status error';
+    statusEl.textContent = 'Both fields are required';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  statusEl.className = 'load-status';
+  statusEl.style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/load', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config_path: configPath, examples_dir: exDir, results_dir: resDir, cache_dir: cacheDirInput })
+    });
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      statusEl.className = 'load-status error';
+      statusEl.textContent = data.error || 'Failed to load';
+      return;
+    }
+
+    taskConfig = data.config;
+    examplesDir = data.examples_dir;
+    resultsDir = data.results_dir || resDir || '';
+    cacheDir = data.cache_dir || cacheDirInput || '';
+
+    await loadAllLabels();
+
+    statusEl.className = 'load-status success';
+    const totalTasks = Object.values(taskConfig).reduce((s, arr) => s + arr.length, 0);
+    statusEl.textContent = `Loaded ${Object.keys(taskConfig).length} domains, ${totalTasks} tasks`;
+
+    document.getElementById('searchBar').style.display = '';
+    document.getElementById('statsBar').style.display = '';
+    renderSidebar();
+
+    currentTask = null;
+    document.getElementById('mainHeader').style.display = 'none';
+    document.getElementById('content').innerHTML = '<div class="placeholder">Select a task from the sidebar</div>';
+  } catch (e) {
+    statusEl.className = 'load-status error';
+    statusEl.textContent = `Request failed: ${e.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Load Data';
+  }
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const container = document.getElementById('domainList');
+  const totalTasks = Object.values(taskConfig).reduce((s, arr) => s + arr.length, 0);
+  const labeled = Object.keys(taskLabels).length;
+  const usable = Object.values(taskLabels).filter(l => l.status === 'usable').length;
+  const unusable = Object.values(taskLabels).filter(l => l.status === 'unusable').length;
+  document.getElementById('statsBar').innerHTML =
+    `Domains: <span>${Object.keys(taskConfig).length}</span> | Tasks: <span>${totalTasks}</span> | 已标注: <span>${labeled}</span> (可用 <span>${usable}</span> / 不可用 <span>${unusable}</span>)`;
+
+  let html = '';
+  for (const [domain, tasks] of Object.entries(taskConfig)) {
+    html += `<div class="domain-group" data-domain="${domain}">
+      <div class="domain-header" onclick="toggleDomain(this)">
+        <span><span class="arrow">&#9654;</span> ${domain}</span>
+        <span class="badge">${tasks.length}</span>
+      </div>
+      <div class="task-list">
+        ${tasks.map(id => {
+          const lb = taskLabels[id];
+          const dotCls = lb ? (lb.status === 'usable' ? 'usable' : 'unusable') : 'unlabeled';
+          const safeId = id.replace(/'/g, "\\'");
+          return `<div class="task-item" data-id="${escapeHtml(id)}" data-domain="${domain}" onclick="selectTask('${safeId}','${domain}')"><span class="label-dot ${dotCls}"></span>${taskTypeBadge(id)}<span class="task-label-text">${escapeHtml(id)}</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function toggleDomain(el) {
+  el.classList.toggle('expanded');
+  el.nextElementSibling.classList.toggle('show');
+}
+
+async function selectTask(taskId, domain) {
+  document.querySelectorAll('.task-item.active').forEach(el => el.classList.remove('active'));
+  const el = document.querySelector(`.task-item[data-id="${CSS.escape(taskId)}"]`);
+  if (el) el.classList.add('active');
+
+  currentTaskKey = taskId;
+  currentDomain = domain;
+  document.getElementById('mainHeader').style.display = 'flex';
+  document.getElementById('taskDomain').textContent = domain;
+  document.getElementById('taskIdDisplay').textContent = taskId;
+
+  const resp = await fetch('/api/task', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      task_id: taskId,
+      examples_dir: examplesDir,
+      cache_dir: cacheDir,
+      results_dir: resultsDir || undefined,
+      domain: domain || undefined,
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    document.getElementById('content').innerHTML = `<div class="placeholder">${err.error || 'Task not found'}</div>`;
+    return;
+  }
+  const taskData = await resp.json();
+  evaluatorPy = taskData.evaluator_py || null;
+  evaluatorPyPath = taskData.evaluator_py_path || null;
+  evaluatorDetail = taskData.evaluator_detail || null;
+  evaluatorDetailPath = taskData.evaluator_detail_path || null;
+  evaluatorAudit = taskData.evaluator_audit || null;
+  evaluatorAuditPath = taskData.evaluator_audit_path || null;
+  evaluatorManifest = taskData.evaluator_manifest || null;
+  evaluatorManifestPath = taskData.evaluator_manifest_path || null;
+  initialSetupPy = taskData.initial_setup_py || null;
+  initialSetupPyPath = taskData.initial_setup_py_path || null;
+  rewardLabel = taskData.reward_label || null;
+  rewardLabelPath = taskData.reward_label_path || null;
+  delete taskData.evaluator_py;
+  delete taskData.evaluator_py_path;
+  delete taskData.evaluator_detail;
+  delete taskData.evaluator_detail_path;
+  delete taskData.evaluator_audit;
+  delete taskData.evaluator_audit_path;
+  delete taskData.evaluator_manifest;
+  delete taskData.evaluator_manifest_path;
+  delete taskData.initial_setup_py;
+  delete taskData.initial_setup_py_path;
+  delete taskData.reward_label;
+  delete taskData.reward_label_path;
+  currentTask = taskData;
+  trajectoryData = null;
+  rewardComponents = null;
+  rewardComponentsPath = null;
+  renderTaskPage();
+  if (resultsDir) loadTrajectory();
+}
+
+// ─── Single Page Rendering (collapsible sections) ─────────────────────────
+function renderTaskPage() {
+  const content = document.getElementById('content');
+  if (!currentTask) { content.innerHTML = '<div class="placeholder">Select a task</div>'; return; }
+
+  const t = currentTask;
+  let html = '';
+
+  // ── Instruction (always visible) ──
+  const instructionZhBlock = t.instruction_zh
+    ? `<div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:600;color:#999;margin-bottom:8px;">中文翻译</div>
+        <div class="instruction-text" style="border-left-color:#22c55e;">${escapeHtml(t.instruction_zh)}</div>
+      </div>`
+    : '';
+  const interactiveMeta = t.interactive ? `
+      <div style="margin-top:12px;padding:10px 12px;background:#fffbeb;border-radius:6px;border-left:3px solid #f59e0b;">
+        <div class="card-field"><span class="label">Type</span><span class="value">Interactive</span></div>
+        ${t.scenario_type ? `<div class="card-field"><span class="label">Scenario</span><span class="value">${escapeHtml(t.scenario_type)}</span></div>` : ''}
+        ${t.scenario_description ? `<div style="margin-top:8px;font-size:13px;line-height:1.5;">${escapeHtml(t.scenario_description)}</div>` : ''}
+        ${t.user_persona ? `<div class="card-field" style="margin-top:8px;"><span class="label">Persona</span><span class="value">${escapeHtml(JSON.stringify(t.user_persona))}</span></div>` : ''}
+      </div>` : '';
+  const phasesBlock = Array.isArray(t.phases) && t.phases.length > 0 ? `
+      <div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:600;color:#999;margin-bottom:8px;">Phases</div>
+        <ul class="traj-ai-list">
+          ${t.phases.map(p => `<li><strong>Phase ${p.phase_id || '?'}:</strong> ${escapeHtml(p.instruction || '')}</li>`).join('')}
+        </ul>
+      </div>` : '';
+  html += `
+    <div class="card">
+      <h3>Instruction</h3>
+      <div class="instruction-text">${escapeHtml(t.instruction || '')}</div>
+      ${instructionZhBlock}
+      ${interactiveMeta}
+      ${phasesBlock}
+      <div style="margin-top:12px;">
+        <div class="card-field"><span class="label">Task Key</span><span class="value">${escapeHtml(getTaskKey())}</span></div>
+        <div class="card-field"><span class="label">ID</span><span class="value">${t.id}</span></div>
+        ${t.difficulty ? `<div class="card-field"><span class="label">Difficulty</span><span class="value">${escapeHtml(t.difficulty)}</span></div>` : ''}
+        <div class="card-field"><span class="label">Snapshot</span><span class="value">${t.snapshot || '-'}</span></div>
+        <div class="card-field"><span class="label">Related Apps</span><span class="value">${(t.related_apps || []).join(', ') || '-'}</span></div>
+        <div class="card-field"><span class="label">Source</span><span class="value">${Array.isArray(t.source) ? t.source.map(s => `<a href="${escapeHtml(s)}" target="_blank" style="color:#667eea;">${escapeHtml(s)}</a>`).join('<br>') : (t.source ? `<a href="${escapeHtml(t.source)}" target="_blank" style="color:#667eea;">${escapeHtml(t.source)}</a>` : '-')}</span></div>
+        <div class="card-field"><span class="label">Proxy</span><span class="value">${t.proxy ?? '-'}</span></div>
+        <div class="card-field"><span class="label">Env Change</span><span class="value">${t.possibility_of_env_change || '-'}</span></div>
+      </div>
+    </div>`;
+
+  const showInteraction = t.interactive || (trajectoryData && trajectoryData.interaction_log);
+  if (showInteraction) {
+    html += renderCollapsibleSection('interaction', 'Interaction', '<div id="interactionContent" class="traj-empty">Loading interaction log...</div>');
+  }
+
+  // ── Traj (collapsible) ──
+  const trajPlaceholder = resultsDir
+    ? '<div id="trajContent" class="traj-empty">Loading trajectory...</div>'
+    : '<div id="trajContent" class="traj-empty">Set <strong>Results Directory</strong> in the left panel to view agent trajectory.</div>';
+  html += renderCollapsibleSection('trajectory', 'Traj', trajPlaceholder);
+
+  // ── Manual labeling ──
+  html += renderLabelCard();
+
+  // ── AI analysis (collapsible) ──
+  const aiPlaceholder = resultsDir
+    ? '<div id="trajAiContent" class="traj-empty">Loading AI analysis...</div>'
+    : '<div id="trajAiContent" class="traj-empty">Set <strong>Results Directory</strong> in the left panel to view AI analysis.</div>';
+  html += renderCollapsibleSection('ai-analysis', 'AI 分析', aiPlaceholder);
+
+  // ── Config & Evaluator (collapsible) ──
+  html += renderCollapsibleSection('config', 'Config', renderConfigContent());
+  html += renderCollapsibleSection('evaluator', 'Evaluator', renderEvaluatorContent());
+
+  content.innerHTML = html;
+  initLabelCard();
+  toggleSection('evaluator');
+  if (resultsDir) {
+    toggleSection('trajectory');
+    toggleSection('ai-analysis');
+    if (showInteraction) toggleSection('interaction');
+    if (trajectoryData) {
+      renderTrajectory();
+      renderInteractionContent();
+    }
+  }
+}
+
+function renderCollapsibleSection(id, title, innerHtml) {
+  return `
+    <div class="card collapsible-card">
+      <div class="collapsible-header" onclick="toggleSection('${id}')">
+        <span class="collapsible-arrow" id="arrow-${id}">▶</span>
+        <span class="collapsible-title">${title}</span>
+      </div>
+      <div class="collapsible-body" id="section-${id}" style="display:none;">
+        ${innerHtml}
+      </div>
+    </div>`;
+}
+
+function toggleSection(id) {
+  const body = document.getElementById(`section-${id}`);
+  const arrow = document.getElementById(`arrow-${id}`);
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    arrow.textContent = '▼';
+  } else {
+    body.style.display = 'none';
+    arrow.textContent = '▶';
+  }
+}
+
+function renderConfigContent() {
+  const configs = currentTask.config || [];
+  const postConfigs = currentTask.evaluator?.postconfig || [];
+  let html = '';
+
+  if (initialSetupPy) {
+    html += '<div class="eval-detail-block" style="margin-top:0;padding-top:0;border-top:none;">';
+    html += '<h4 style="color:#999;">initial_setup.py</h4>';
+    if (initialSetupPyPath) {
+      html += `<div class="card-field" style="margin-bottom:8px;"><span class="label">path</span><span class="value" style="font-family:Monaco,Menlo,monospace;font-size:11px;word-break:break-all;">${escapeHtml(initialSetupPyPath)}</span></div>`;
+    }
+    html += `<pre class="json-view" style="max-height:480px;overflow-y:auto;">${escapeHtml(initialSetupPy)}</pre>`;
+    html += '</div>';
+  } else {
+    html += '<p style="color:#999;font-size:12px;margin:0 0 12px;">initial_setup.py 未在 cache 目录中找到</p>';
+  }
+
+  if (configs.length === 0 && postConfigs.length === 0) {
+    html += '<p style="color:#999;font-size:13px;">No config steps</p>';
+  } else {
+    if (configs.length > 0) {
+      html += '<div class="eval-detail-block" style="margin-top:0;padding-top:0;border-top:none;"><h4 style="color:#999;">Setup Config</h4>';
+      configs.forEach((step, i) => {
+        html += `<div class="config-step">
+          <div class="step-type">Step ${i + 1}: ${step.type}</div>
+          <div class="step-params">${escapeHtml(JSON.stringify(step.parameters, null, 2))}</div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    if (postConfigs.length > 0) {
+      html += '<div class="eval-detail-block"><h4 style="color:#999;">Evaluator Post Config</h4>';
+      postConfigs.forEach((step, i) => {
+        html += `<div class="config-step">
+          <div class="step-type">Step ${i + 1}: ${step.type}</div>
+          <div class="step-params">${escapeHtml(JSON.stringify(step.parameters, null, 2))}</div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+  }
+  return html;
+}
+
+
+function matchRewardComponentScore(defComp, index, actualComponents) {
+  if (!Array.isArray(actualComponents) || actualComponents.length === 0) return null;
+  if (actualComponents[index]) return actualComponents[index];
+  if (defComp && defComp.weight != null) {
+    const byWeight = actualComponents.find(c => c.weight === defComp.weight);
+    if (byWeight) return byWeight;
+  }
+  return null;
+}
+
+function formatRewardScore(value) {
+  if (value == null || Number.isNaN(Number(value))) return '—';
+  return Number(value).toFixed(2);
+}
+
+function renderRewardScoreSummary() {
+  if (rewardComponents && Array.isArray(rewardComponents.components)) {
+    const components = rewardComponents.components;
+    const totalWeight = rewardComponents.total_weight != null
+      ? Number(rewardComponents.total_weight)
+      : components.reduce((sum, c) => sum + (Number(c.weight) || 0), 0);
+    const totalScore = components.reduce((sum, c) => sum + (Number(c.score) || 0), 0);
+    const passedCount = components.filter(c => c.passed === true).length;
+    const pct = totalWeight > 0 ? Math.min(100, (totalScore / totalWeight) * 100) : 0;
+    const resultTxt = trajectoryData && trajectoryData.result != null ? trajectoryData.result : null;
+    const scoreCls = totalScore >= totalWeight * 0.5 ? 'ok' : 'bad';
+
+    let html = `<div class="reward-score-summary has-score">
+      <div class="reward-score-summary-title">运行得分汇总</div>
+      <div class="reward-score-summary-grid">
+        <div class="reward-score-summary-item">
+          <span class="k">组件总分</span>
+          <span class="v ${scoreCls}">${formatRewardScore(totalScore)} / ${formatRewardScore(totalWeight)}</span>
+        </div>
+        <div class="reward-score-summary-item">
+          <span class="k">通过组件</span>
+          <span class="v">${passedCount} / ${components.length}</span>
+        </div>`;
+    if (resultTxt != null && resultTxt !== '') {
+      html += `<div class="reward-score-summary-item">
+          <span class="k">result.txt</span>
+          <span class="v ${scoreCls}">${escapeHtml(String(resultTxt))}</span>
+        </div>`;
+    }
+    html += `</div>
+      <div class="reward-score-progress" title="${formatRewardScore(totalScore)} / ${formatRewardScore(totalWeight)}">
+        <div class="reward-score-progress-bar" style="width:${pct.toFixed(1)}%"></div>
+      </div>
+    </div>`;
+    return html;
+  }
+
+  const resultTxt = trajectoryData && trajectoryData.result != null ? trajectoryData.result : null;
+  const manifestScore = (trajectoryData && trajectoryData.evaluator_manifest && trajectoryData.evaluator_manifest.score != null)
+    ? trajectoryData.evaluator_manifest.score
+    : (evaluatorManifest && evaluatorManifest.score != null ? evaluatorManifest.score : null);
+  if (resultTxt == null && manifestScore == null) {
+    if (resultsDir) {
+      return '<div class="reward-score-hint">加载轨迹后显示 result.txt / evaluator 得分</div>';
+    }
+    return '';
+  }
+  const scoreVal = resultTxt != null ? resultTxt : manifestScore;
+  const scoreCls = Number(scoreVal) >= 0.5 ? 'ok' : 'bad';
+  let html = `<div class="reward-score-summary has-score">
+    <div class="reward-score-summary-title">运行得分汇总</div>
+    <div class="reward-score-summary-grid">`;
+  if (resultTxt != null && resultTxt !== '') {
+    html += `<div class="reward-score-summary-item">
+        <span class="k">result.txt</span>
+        <span class="v ${scoreCls}">${escapeHtml(String(resultTxt))}</span>
+      </div>`;
+  }
+  if (manifestScore != null) {
+    html += `<div class="reward-score-summary-item">
+        <span class="k">evaluator manifest</span>
+        <span class="v ${scoreCls}">${escapeHtml(String(manifestScore))}</span>
+      </div>`;
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+function renderRewardLabelContent() {
+  const hasCuaLabel = !!rewardLabel;
+  const hasDeskCraftScore = (trajectoryData && trajectoryData.result != null)
+    || (trajectoryData && trajectoryData.evaluator_manifest)
+    || evaluatorManifest
+    || evaluatorDetail;
+
+  if (!hasCuaLabel && !hasDeskCraftScore) {
+    return '<p style="color:#999;font-size:12px;margin:12px 0;">暂无评分定义或运行得分（加载 Results Directory 后显示）</p>';
+  }
+
+  if (!hasCuaLabel) {
+    let html = '<div id="eval-reward-label-body" class="eval-detail-block" style="margin-top:0;padding-top:0;border-top:none;">';
+    html += '<h4 style="color:#667eea;">运行得分</h4>';
+    html += renderRewardScoreSummary();
+    html += '</div>';
+    return html;
+  }
+
+  const d = rewardLabel;
+  const actualComponents = rewardComponents && Array.isArray(rewardComponents.components)
+    ? rewardComponents.components
+    : null;
+
+  let html = '<div id="eval-reward-label-body" class="eval-detail-block" style="margin-top:0;padding-top:0;border-top:none;">';
+  html += '<h4 style="color:#667eea;">reward_label.json → label</h4>';
+
+  html += renderRewardScoreSummary();
+
+  if (d.summary) {
+    html += `<h4 style="margin-top:12px;">任务摘要</h4>
+      <div class="eval-overall-text">${escapeHtml(d.summary)}</div>`;
+  }
+
+  if (d.scoring_logic_explanation) {
+    html += `<h4 style="margin-top:16px;">评分逻辑说明</h4>
+      <div class="eval-overall-text">${escapeHtml(d.scoring_logic_explanation)}</div>`;
+  }
+
+  if (Array.isArray(d.scoring_components) && d.scoring_components.length > 0) {
+    html += '<h4 style="margin-top:16px;">评分组件</h4>';
+    d.scoring_components.forEach((comp, index) => {
+      const actual = matchRewardComponentScore(comp, index, actualComponents);
+      const weight = comp.weight != null ? comp.weight : (actual && actual.weight);
+      const weightTag = weight != null ? `<span class="eval-func-lineno">weight ${weight}</span>` : '';
+      const displayName = (actual && actual.name) ? actual.name : (comp.name || `component ${index + 1}`);
+
+      let scoreTags = '';
+      let cardCls = 'eval-func-card';
+      if (actual) {
+        const passed = actual.passed === true;
+        const score = actual.score != null ? actual.score : 0;
+        const maxScore = actual.weight != null ? actual.weight : weight;
+        cardCls += ` has-score ${passed ? 'pass' : 'fail'}`;
+        scoreTags = `<span class="eval-score-badge ${passed ? 'pass' : 'fail'}">${passed ? '✓ 通过' : '✗ 失败'}</span>
+          <span class="eval-score-value">${formatRewardScore(score)} / ${formatRewardScore(maxScore)}</span>`;
+      }
+
+      html += `<div class="${cardCls}">
+        <div class="eval-func-header">
+          <span class="eval-func-name">${escapeHtml(displayName)}</span>
+          ${weightTag}
+          ${scoreTags}
+        </div>
+        ${comp.description ? `<div class="eval-func-desc"><strong>描述：</strong>${escapeHtml(comp.description)}</div>` : ''}
+        ${comp.check_logic ? `<div class="eval-func-desc" style="margin-top:6px;"><strong>检查逻辑：</strong>${escapeHtml(comp.check_logic)}</div>` : ''}
+        ${comp.pass_condition ? `<div class="eval-func-desc" style="margin-top:6px;"><strong>通过条件：</strong>${escapeHtml(comp.pass_condition)}</div>` : ''}
+        ${actual && actual.detail ? `<div class="eval-score-detail"><strong>实际得分详情：</strong>${escapeHtml(actual.detail)}</div>` : ''}
+      </div>`;
+    });
+  } else if (actualComponents && actualComponents.length > 0) {
+    html += '<h4 style="margin-top:16px;">评分组件（仅运行得分）</h4>';
+    actualComponents.forEach((actual, index) => {
+      const passed = actual.passed === true;
+      const score = actual.score != null ? actual.score : 0;
+      const maxScore = actual.weight != null ? actual.weight : '—';
+      html += `<div class="eval-func-card has-score ${passed ? 'pass' : 'fail'}">
+        <div class="eval-func-header">
+          <span class="eval-func-name">${escapeHtml(actual.name || `component ${index + 1}`)}</span>
+          <span class="eval-score-badge ${passed ? 'pass' : 'fail'}">${passed ? '✓ 通过' : '✗ 失败'}</span>
+          <span class="eval-score-value">${formatRewardScore(score)} / ${formatRewardScore(maxScore)}</span>
+        </div>
+        ${actual.description ? `<div class="eval-func-desc"><strong>描述：</strong>${escapeHtml(actual.description)}</div>` : ''}
+        ${actual.detail ? `<div class="eval-score-detail"><strong>实际得分详情：</strong>${escapeHtml(actual.detail)}</div>` : ''}
+      </div>`;
+    });
+  }
+
+  if (Array.isArray(d.data_sources) && d.data_sources.length > 0) {
+    html += '<h4 style="margin-top:16px;">数据来源</h4><ul class="traj-ai-list">';
+    d.data_sources.forEach(src => { html += `<li>${escapeHtml(String(src))}</li>`; });
+    html += '</ul>';
+  }
+
+  if (Array.isArray(d.failure_modes) && d.failure_modes.length > 0) {
+    html += '<h4 style="margin-top:16px;">失败模式</h4><ul class="traj-ai-list">';
+    d.failure_modes.forEach(mode => { html += `<li>${escapeHtml(String(mode))}</li>`; });
+    html += '</ul>';
+  }
+
+  const meta = [];
+  if (d.total_max_score != null) meta.push(`total_max_score: ${d.total_max_score}`);
+  if (d.score_aggregation) meta.push(`score_aggregation: ${d.score_aggregation}`);
+  if (d.confidence != null) meta.push(`confidence: ${d.confidence}`);
+  if (d.is_placeholder != null) meta.push(`is_placeholder: ${d.is_placeholder}`);
+  if (meta.length > 0) {
+    html += `<div class="card-field" style="margin-top:16px;"><span class="label">meta</span><span class="value" style="font-size:12px;">${escapeHtml(meta.join(' | '))}</span></div>`;
+  }
+
+  if (rewardLabelPath) {
+    html += `<div class="eval-detail-source">source: ${escapeHtml(rewardLabelPath)}</div>`;
+  }
+  if (rewardComponentsPath) {
+    html += `<div class="eval-detail-source">reward_components: ${escapeHtml(rewardComponentsPath)}</div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function refreshEvaluatorRewardScores() {
+  const el = document.getElementById('eval-reward-label-body');
+  if (!el) return;
+  const parent = el.parentElement;
+  if (!parent) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = renderRewardLabelContent();
+  const fresh = tmp.firstElementChild;
+  if (fresh) parent.replaceChild(fresh, el);
+}
+
+function renderEvaluatorDetailContent() {
+  if (!evaluatorDetail) {
+    return '<p style="color:#999;font-size:12px;margin:12px 0;">evaluator_detail.json 未找到或无法解析</p>';
+  }
+
+  const d = evaluatorDetail;
+  let html = '<div class="eval-detail-block" style="margin-top:0;padding-top:0;border-top:none;">';
+
+  if (d.overall_validation) {
+    html += `<h4>整体验证逻辑</h4>
+      <div class="eval-overall-text">${escapeHtml(d.overall_validation)}</div>`;
+  }
+
+  if (Array.isArray(d.main_functions) && d.main_functions.length > 0) {
+    html += '<h4 style="margin-top:16px;">主函数</h4>';
+    d.main_functions.forEach(fn => {
+      const lineno = fn.lineno != null ? `<span class="eval-func-lineno">L${fn.lineno}</span>` : '';
+      html += `<div class="eval-func-card">
+        <div class="eval-func-header">
+          <span class="eval-func-name">${escapeHtml(fn.name || 'unknown')}</span>
+          ${lineno}
+        </div>
+        <div class="eval-func-desc">${escapeHtml(fn.description || '')}</div>
+      </div>`;
+    });
+  }
+
+  if (Array.isArray(d.helper_functions) && d.helper_functions.length > 0) {
+    html += `<h4 style="margin-top:16px;">辅助函数 <span style="font-weight:400;color:#aaa;">(${d.helper_functions.length})</span></h4>
+      <div class="eval-helper-grid">`;
+    d.helper_functions.forEach(fn => {
+      html += `<div class="eval-helper-item">
+        <div class="eval-helper-name">${escapeHtml(fn.name || 'unknown')}</div>
+        <div class="eval-helper-desc">${escapeHtml(fn.description || '')}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (evaluatorDetailPath) {
+    html += `<div class="eval-detail-source">source: ${escapeHtml(evaluatorDetailPath)}</div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderEvaluatorAuditContent() {
+  const audit = (trajectoryData && trajectoryData.evaluator_audit) || evaluatorAudit;
+  if (!audit) return '';
+
+  let html = '<div class="eval-detail-block">';
+  html += '<h4 style="color:#667eea;">evaluator_audit.json</h4>';
+  html += '<div class="eval-audit-summary">';
+  if (audit.evaluator_score != null) {
+    html += `<div class="item"><span class="k">evaluator_score</span><span class="v">${escapeHtml(String(audit.evaluator_score))}</span></div>`;
+  }
+  if (trajectoryData && trajectoryData.result != null) {
+    html += `<div class="item"><span class="k">result.txt</span><span class="v">${escapeHtml(String(trajectoryData.result))}</span></div>`;
+  }
+  if (audit.trajectory_claim) {
+    html += `<div class="item"><span class="k">trajectory_claim</span><span class="v">${escapeHtml(audit.trajectory_claim)}</span></div>`;
+  }
+  if (audit.verdict) {
+    html += `<div class="item"><span class="k">verdict</span><span class="v">${escapeHtml(audit.verdict)}</span></div>`;
+  }
+  if (audit.recommended_action) {
+    html += `<div class="item"><span class="k">recommended_action</span><span class="v">${escapeHtml(audit.recommended_action)}</span></div>`;
+  }
+  html += '</div>';
+
+  if (audit.execution_flow) {
+    html += `<h4 style="margin-top:12px;">Execution Flow</h4><div class="eval-overall-text">${escapeHtml(audit.execution_flow)}</div>`;
+  }
+  if (Array.isArray(audit.coverage_summary) && audit.coverage_summary.length > 0) {
+    html += '<h4 style="margin-top:12px;">Coverage Summary</h4>';
+    html += '<table class="eval-coverage-table"><thead><tr><th>Condition</th><th>Status</th><th>Evidence</th></tr></thead><tbody>';
+    audit.coverage_summary.forEach(row => {
+      const evidence = Array.isArray(row.evidence) ? row.evidence.join('; ') : (row.evidence || '');
+      html += `<tr><td>${escapeHtml(row.condition || '')}</td><td>${escapeHtml(row.status || '')}</td><td>${escapeHtml(evidence)}</td></tr>`;
+    });
+    html += '</tbody></table>';
+  }
+  if (audit.conflict_analysis && typeof audit.conflict_analysis === 'object') {
+    const ca = audit.conflict_analysis;
+    html += `<h4 style="margin-top:12px;">Conflict Analysis</h4>
+      <div class="eval-overall-text">${escapeHtml(ca.explanation || JSON.stringify(ca, null, 2))}</div>`;
+  }
+  const auditPath = (trajectoryData && trajectoryData.evaluator_audit_path) || evaluatorAuditPath;
+  if (auditPath) {
+    html += `<div class="eval-detail-source">source: ${escapeHtml(auditPath)}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderInteractionContent() {
+  const el = document.getElementById('interactionContent');
+  if (!el) return;
+  const log = trajectoryData && trajectoryData.interaction_log;
+  if (!log || !log.length) {
+    el.innerHTML = '<div class="traj-empty">No interaction log for this task.</div>';
+    return;
+  }
+  let html = '<ul class="interaction-log-list">';
+  log.forEach(entry => {
+    html += `<li class="interaction-log-item">
+      <div class="meta">Phase ${entry.phase || '?'} · ${escapeHtml(entry.type || '')} · step ${entry.step ?? '?'}${entry.timestamp ? ' · ' + escapeHtml(entry.timestamp) : ''}</div>
+      <div class="msg">${escapeHtml(entry.user_message || '')}</div>
+    </li>`;
+  });
+  html += '</ul>';
+  el.innerHTML = html;
+}
+
+function renderEvalJsonSubSection(id, title, data) {
+  const inner = `<pre class="json-view" style="max-height:240px;overflow-y:auto;">${syntaxHighlight(JSON.stringify(data, null, 2))}</pre>`;
+  return `
+    <div class="eval-sub-collapsible">
+      <div class="eval-sub-header" onclick="toggleSection('${id}')">
+        <span class="collapsible-arrow" id="arrow-${id}">▶</span>
+        <span>${title}</span>
+      </div>
+      <div class="eval-sub-body collapsible-body" id="section-${id}" style="display:none;">
+        ${inner}
+      </div>
+    </div>`;
+}
+
+function renderEvaluatorContent() {
+  const ev = currentTask.evaluator;
+  if (!ev) return '<p style="color:#999;font-size:13px;">No evaluator defined</p>';
+
+  const taskId = currentTask.id || 'task';
+  let html = '';
+
+  html += renderRewardLabelContent();
+
+  html += renderEvaluatorAuditContent();
+
+  if (evaluatorDetail) {
+    html += renderEvaluatorDetailContent();
+  }
+
+  html += `<div class="eval-detail-block">
+    <h4 style="color:#999;">Evaluation Function</h4>
+    <div class="card-field" style="margin-bottom:0;"><span class="label">func</span><span class="value" style="font-weight:600;color:#667eea;">${Array.isArray(ev.func) ? ev.func.join(', ') : ev.func}</span></div>
+  </div>`;
+
+  html += '<div class="eval-detail-block">';
+  if (evaluatorPy) {
+    const pyTitle = evaluatorPyPath && evaluatorPyPath.endsWith('reward.py') ? 'reward.py' : 'evaluator.py';
+    html += `<h4 style="color:#999;">${pyTitle}</h4>`;
+    if (evaluatorPyPath) {
+      html += `<div class="card-field" style="margin-bottom:8px;"><span class="label">path</span><span class="value" style="font-family:Monaco,Menlo,monospace;font-size:11px;word-break:break-all;">${escapeHtml(evaluatorPyPath)}</span></div>`;
+    }
+    html += `<pre class="json-view" style="max-height:480px;overflow-y:auto;">${escapeHtml(evaluatorPy)}</pre>`;
+  } else {
+    html += `<p style="color:#999;font-size:12px;">reward.py / evaluator.py not found</p>`;
+  }
+  html += '</div>';
+
+  // Result / Expected / Options after evaluator.py (collapsed by default)
+  const jsonSections = [];
+  if (ev.result) jsonSections.push({ id: `eval-result-${taskId}`, title: 'Result (Getter)', data: ev.result });
+  if (ev.expected) jsonSections.push({ id: `eval-expected-${taskId}`, title: 'Expected', data: ev.expected });
+  if (ev.options) jsonSections.push({ id: `eval-options-${taskId}`, title: 'Options', data: ev.options });
+  if (jsonSections.length > 0) {
+    html += '<div class="eval-detail-block">';
+    jsonSections.forEach(sec => {
+      html += renderEvalJsonSubSection(sec.id, sec.title, sec.data);
+    });
+    html += '</div>';
+  }
+
+  return html;
+}
+
+// ─── LLM Settings Panel ──────────────────────────────────────────────────
+const LLM_PRESETS = {
+  openai: { model: 'api_azure_openai_gpt-5.4-pro-2026-03-05', url: '' },
+  kimi: { model: 'kimi_k26', url: 'http://28.7.186.40:9090/v1' },
+  vllm: { model: '', url: 'http://127.0.0.1:8080/v1' },
+};
+
+function toggleLlmPanel() {
+  const panel = document.getElementById('llmPanel');
+  document.getElementById('helpPanel').style.display = 'none';
+  if (panel.style.display === 'none') {
+    panel.style.display = '';
+    loadLlmConfig();
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function toggleHelpPanel() {
+  const panel = document.getElementById('helpPanel');
+  document.getElementById('llmPanel').style.display = 'none';
+  panel.style.display = panel.style.display === 'none' ? '' : 'none';
+}
+
+async function loadLlmConfig() {
+  try {
+    const resp = await fetch('/api/llm/config');
+    const data = await resp.json();
+    // Set provider dropdown using the raw provider key
+    document.getElementById('llmProvider').value = data.provider || 'openai';
+    document.getElementById('llmModel').value = data.model || '';
+    document.getElementById('llmUrl').value = data.host || '';
+    document.getElementById('llmMaxTokens').value = data.max_tokens || 4096;
+    document.getElementById('llmTemperature').value = data.temperature ?? 0.3;
+    onProviderChange(false); // update visibility without overwriting values
+  } catch(e) {}
+}
+
+function onProviderChange(applyPreset = true) {
+  const provider = document.getElementById('llmProvider').value;
+  const urlField = document.getElementById('llmFieldUrl');
+  // Show URL field for kimi and vllm
+  if (provider === 'openai') {
+    urlField.style.display = 'none';
+  } else {
+    urlField.style.display = '';
+  }
+  // Pre-fill with preset values only when user manually switches provider
+  if (applyPreset) {
+    const preset = LLM_PRESETS[provider];
+    if (preset.model) document.getElementById('llmModel').value = preset.model;
+    if (preset.url) document.getElementById('llmUrl').value = preset.url;
+  }
+}
+
+async function applyLlmSettings() {
+  const provider = document.getElementById('llmProvider').value;
+  const model = document.getElementById('llmModel').value.trim();
+  const url = document.getElementById('llmUrl').value.trim();
+  const maxTokens = parseInt(document.getElementById('llmMaxTokens').value) || 4096;
+  const temperature = parseFloat(document.getElementById('llmTemperature').value) || 0.3;
+  const statusEl = document.getElementById('llmStatus');
+
+  const body = { provider: provider };
+  if (provider === 'openai') {
+    body.model_marker = model;
+  } else if (provider === 'kimi') {
+    body.kimi_model = model;
+    if (url) body.kimi_url = url;
+  } else {
+    body.vllm_model = model;
+    if (url) body.vllm_url = url;
+  }
+  body.max_tokens = maxTokens;
+  body.temperature = temperature;
+
+  statusEl.textContent = 'Applying...';
+  try {
+    const resp = await fetch('/api/llm/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (resp.ok) {
+      statusEl.textContent = '✅ Applied';
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    } else {
+      statusEl.textContent = '❌ Failed';
+    }
+  } catch(e) {
+    statusEl.textContent = '❌ ' + e.message;
+  }
+}
+
+// Wire up provider change event (user manually switches -> apply presets)
+document.getElementById('llmProvider').addEventListener('change', () => onProviderChange(true));
+
+// ─── Utilities ────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function syntaxHighlight(json) {
+  json = escapeHtml(json);
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    let cls = 'number';
+    if (/^"/.test(match)) {
+      if (/:$/.test(match)) { cls = 'key'; }
+      else { cls = 'string'; }
+    } else if (/true|false/.test(match)) { cls = 'boolean'; }
+    else if (/null/.test(match)) { cls = 'null'; }
+    return '<span class="' + cls + '">' + match + '</span>';
+  });
+}
+
+// ─── Trajectory Viewer ────────────────────────────────────────────────────
+function trajScreenshotUrl(taskId, filename) {
+  let url = `/api/trajectory/screenshot/${encodeURIComponent(taskId)}/${encodeURIComponent(filename)}?results_dir=${encodeURIComponent(resultsDir)}`;
+  if (currentDomain) url += `&domain=${encodeURIComponent(currentDomain)}`;
+  return url;
+}
+
+function trajAiBadgeClass(overallLabel) {
+  const t = String(overallLabel || '');
+  if (t.includes('成功')) return 'success';
+  if (t.includes('失败') || t.includes('不成功')) return 'failure';
+  return 'neutral';
+}
+
+function trajAiListHtml(items, ordered) {
+  if (!items || !items.length) return '<p style="color:#999;font-size:12px;margin:4px 0;">无</p>';
+  const cls = ordered ? 'traj-ai-list steps' : 'traj-ai-list';
+  return `<ul class="${cls}">${items.map(it => `<li>${escapeHtml(String(it))}</li>`).join('')}</ul>`;
+}
+
+function renderTrajectoryLabelHtml(label) {
+  if (!label) {
+    return '<div class="traj-ai-empty">暂无 AI 轨迹分析（未找到 trajectory_label.json 或 label 字段）</div>';
+  }
+
+  const exec = label.model_execution_analysis || {};
+  const task = label.task_issue_analysis || {};
+  const overall = label.overall_label || '';
+  const confidence = label.confidence != null
+    ? `${Math.round(Number(label.confidence) * 100)}%` : '';
+
+  let html = `<div class="traj-ai-panel">
+    <div class="traj-ai-header">
+      <h4>AI 轨迹分析 <span style="font-size:11px;font-weight:400;color:#999;">（仅供参考，AI 分析不一定完全正确）</span></h4>
+      ${overall ? `<span class="traj-ai-badge ${trajAiBadgeClass(overall)}">${escapeHtml(overall)}</span>` : ''}
+      ${confidence ? `<span class="traj-ai-confidence">置信度 ${confidence}</span>` : ''}
+    </div>
+    <div class="traj-ai-body">`;
+
+  html += `<div class="traj-ai-section">
+    <div class="traj-ai-section-title">模型执行分析</div>`;
+  if (exec.summary) {
+    html += `<div class="traj-ai-summary">${escapeHtml(exec.summary)}</div>`;
+  }
+  if (exec.success_judgement) {
+    const ok = exec.success_judgement === '成功';
+    html += `<div class="traj-ai-kv"><span class="k">执行判定</span><span class="v ${ok ? 'ok' : 'bad'}">${escapeHtml(exec.success_judgement)}</span></div>`;
+  }
+  if (exec.key_steps && exec.key_steps.length) {
+    html += `<div class="traj-ai-subtitle">关键步骤</div>${trajAiListHtml(exec.key_steps, true)}`;
+  }
+  if (exec.failure_or_risk_points && exec.failure_or_risk_points.length) {
+    html += `<div class="traj-ai-subtitle">失败 / 风险点</div>${trajAiListHtml(exec.failure_or_risk_points, false)}`;
+  }
+  if (exec.evidence && exec.evidence.length) {
+    html += `<div class="traj-ai-subtitle">依据</div>${trajAiListHtml(exec.evidence, false)}`;
+  }
+  html += `</div>`;
+
+  html += `<div class="traj-ai-section">
+    <div class="traj-ai-section-title">任务问题分析 <span style="font-size:11px;font-weight:400;color:#999;text-transform:none;letter-spacing:0;">（仅分析任务指令的可行性）</span></div>`;
+  if (task.has_task_issue != null) {
+    const hasIssue = task.has_task_issue === true || task.has_task_issue === 'true';
+    html += `<div class="traj-ai-kv"><span class="k">存在问题</span><span class="v ${hasIssue ? 'bad' : 'ok'}">${hasIssue ? '是' : '否'}</span></div>`;
+  }
+  if (task.issue_type) {
+    html += `<div class="traj-ai-kv"><span class="k">问题类型</span><span class="v">${escapeHtml(task.issue_type)}</span></div>`;
+  }
+  if (task.issue_description && task.issue_description !== '无') {
+    html += `<div class="traj-ai-kv"><span class="k">问题描述</span><span class="v">${escapeHtml(task.issue_description)}</span></div>`;
+  }
+  if (task.evidence && task.evidence.length) {
+    html += `<div class="traj-ai-subtitle">依据</div>${trajAiListHtml(task.evidence, false)}`;
+  }
+  html += `</div></div></div>`;
+
+  return html;
+}
+
+function parseTrajectoryScore(result) {
+  if (result == null || result === '' || String(result).includes('not completed')) return null;
+  const n = parseFloat(String(result).trim());
+  if (Number.isNaN(n)) return null;
+  return n >= 0.5;
+}
+
+function parseAiTrajectorySuccess(label) {
+  if (!label) return null;
+  const overall = String(label.overall_label || '');
+  const judgement = String((label.model_execution_analysis || {}).success_judgement || '');
+  const text = overall + judgement;
+  if (/失败|不成功/.test(text)) return false;
+  if (/成功/.test(text)) return true;
+  return null;
+}
+
+function scoreLabel(pass) {
+  return pass ? '1.0（正确）' : '0.0（错误）';
+}
+
+function aiLabel(pass, label) {
+  if (pass == null) return '—';
+  const overall = (label && label.overall_label) || (pass ? '成功' : '失败');
+  return escapeHtml(overall);
+}
+
+function renderScoreConsistencyHtml(scoreResult, trajectoryLabel) {
+  const scorePass = parseTrajectoryScore(scoreResult);
+  const aiPass = parseAiTrajectorySuccess(trajectoryLabel);
+
+  if (scorePass === null && aiPass === null) {
+    return `<div class="traj-consistency-panel neutral">
+      <div class="traj-consistency-title">AI 分析与 Score 一致性</div>
+      <div class="traj-consistency-verdict">缺少 Score 或 AI 分析数据，无法比对</div>
+    </div>`;
+  }
+
+  let panelCls = 'neutral';
+  let verdict = '';
+  let verdictDetail = '';
+
+  if (scorePass === null) {
+    verdict = '无法比对：缺少 Score';
+    verdictDetail = 'evaluator 未返回有效 score（result.txt）';
+  } else if (aiPass === null) {
+    verdict = '无法比对：缺少 AI 分析';
+    verdictDetail = '未找到 trajectory_label.json 中的判定结果';
+  } else if (scorePass === aiPass) {
+    panelCls = 'consistent';
+    verdict = '一致';
+    verdictDetail = 'AI 分析与 evaluator score 判定相同';
+  } else {
+    panelCls = 'inconsistent';
+    verdict = '不一致';
+    verdictDetail = 'AI 分析与 evaluator score 判定冲突';
+  }
+
+  const scoreDisplay = scorePass === null
+    ? escapeHtml(String(scoreResult ?? '—'))
+    : scoreLabel(scorePass);
+
+  return `<div class="traj-consistency-panel ${panelCls}">
+    <div class="traj-consistency-title">AI 分析与 Score 一致性</div>
+    <div class="traj-consistency-grid">
+      <div class="traj-consistency-item">
+        <span class="k">Evaluator Score</span>
+        <span class="v ${scorePass === null ? '' : (scorePass ? 'ok' : 'bad')}">${scoreDisplay}</span>
+      </div>
+      <div class="traj-consistency-item">
+        <span class="k">AI 判定</span>
+        <span class="v ${aiPass === null ? '' : (aiPass ? 'ok' : 'bad')}">${aiPass === null ? '—' : aiLabel(aiPass, trajectoryLabel)}</span>
+      </div>
+    </div>
+    <div class="traj-consistency-verdict">${escapeHtml(verdict)}：${escapeHtml(verdictDetail)}</div>
+  </div>`;
+}
+
+// ─── Task Labeling ────────────────────────────────────────────────────────
+async function loadAllLabels() {
+  if (!resultsDir) { taskLabels = {}; return; }
+  try {
+    const resp = await fetch(`/api/labels?results_dir=${encodeURIComponent(resultsDir)}`);
+    const data = await resp.json();
+    taskLabels = resp.ok ? (data.labels || {}) : {};
+  } catch (e) {
+    taskLabels = {};
+  }
+}
+
+function renderLabelCard() {
+  const noResultsHint = resultsDir
+    ? ''
+    : '<p style="color:#999;font-size:12px;margin:0 0 12px;">请先在左侧设置 <strong>Results Directory</strong>，标注将保存到对应轨迹任务目录下的 <code>easyvis_label.json</code>。</p>';
+  return `
+    <div class="card label-card">
+      <h3>人工标注</h3>
+      ${noResultsHint}
+      <div class="label-options">
+        <label class="label-option" id="label-opt-usable" onmousedown="labelOptionMouseDown(this)" onclick="handleLabelStatusLabelClick(this, event)">
+          <input type="radio" name="labelStatus" value="usable" tabindex="-1"> 可用
+        </label>
+        <label class="label-option" id="label-opt-unusable" onmousedown="labelOptionMouseDown(this)" onclick="handleLabelStatusLabelClick(this, event)">
+          <input type="radio" name="labelStatus" value="unusable" tabindex="-1"> 不可用
+        </label>
+      </div>
+      <div class="label-reason-wrap" id="labelReasonWrap">
+        <label>不可用类型</label>
+        <div class="label-reason-types">
+          <label class="label-reason-type" id="reason-type-instruction" onmousedown="labelOptionMouseDown(this)" onclick="handleLabelReasonCategoryLabelClick(this, event)">
+            <input type="radio" name="labelReasonCategory" value="instruction" tabindex="-1">
+            <span>Instruction 不合适（过于模糊 / 不可能完成 / 特别不符合应用场景）</span>
+          </label>
+          <label class="label-reason-type" id="reason-type-config" onmousedown="labelOptionMouseDown(this)" onclick="handleLabelReasonCategoryLabelClick(this, event)">
+            <input type="radio" name="labelReasonCategory" value="config" tabindex="-1">
+            <span>Config / setup 问题</span>
+          </label>
+          <label class="label-reason-type" id="reason-type-evaluator" onmousedown="labelOptionMouseDown(this)" onclick="handleLabelReasonCategoryLabelClick(this, event)">
+            <input type="radio" name="labelReasonCategory" value="evaluator" tabindex="-1">
+            <span>Evaluator 问题</span>
+          </label>
+          <label class="label-reason-type" id="reason-type-other" onmousedown="labelOptionMouseDown(this)" onclick="handleLabelReasonCategoryLabelClick(this, event)">
+            <input type="radio" name="labelReasonCategory" value="other" tabindex="-1">
+            <span>其他情况（请在详细说明里详细记录）</span>
+          </label>
+        </div>
+        <label for="labelReason">详细说明</label>
+        <textarea id="labelReason" placeholder="请填写详细说明" onblur="saveTaskLabel()"></textarea>
+      </div>
+      <div class="label-actions">
+        <span class="label-save-status" id="labelSaveStatus"></span>
+      </div>
+    </div>`;
+}
+
+function initLabelCard() {
+  if (!currentTask) return;
+  const lb = taskLabels[getTaskKey()];
+  const usableOpt = document.getElementById('label-opt-usable');
+  const unusableOpt = document.getElementById('label-opt-unusable');
+  const reasonEl = document.getElementById('labelReason');
+  document.querySelectorAll('input[name="labelStatus"]').forEach(r => { r.checked = false; });
+  document.querySelectorAll('input[name="labelReasonCategory"]').forEach(r => { r.checked = false; });
+  if (reasonEl) reasonEl.value = '';
+  if (lb) {
+    const radio = document.querySelector(`input[name="labelStatus"][value="${lb.status}"]`);
+    if (radio) radio.checked = true;
+    if (lb.reason_category) {
+      const reasonRadio = document.querySelector(`input[name="labelReasonCategory"][value="${lb.reason_category}"]`);
+      if (reasonRadio) reasonRadio.checked = true;
+    }
+    if (reasonEl) reasonEl.value = lb.reason || '';
+  }
+  onLabelStatusChange(false);
+  onLabelReasonCategoryChange(false);
+  const statusEl = document.getElementById('labelSaveStatus');
+  if (statusEl) statusEl.textContent = '';
+}
+
+function labelOptionMouseDown(labelEl) {
+  const input = labelEl.querySelector('input[type="radio"]');
+  if (input) input._wasChecked = input.checked;
+}
+
+function toggleLabelRadioInGroup(labelEl, groupName) {
+  const input = labelEl.querySelector('input[type="radio"]');
+  if (!input) return null;
+  if (input._wasChecked) {
+    input.checked = false;
+  } else {
+    document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => { r.checked = false; });
+    input.checked = true;
+  }
+  return input;
+}
+
+function handleLabelStatusLabelClick(labelEl, event) {
+  event.preventDefault();
+  toggleLabelRadioInGroup(labelEl, 'labelStatus');
+  onLabelStatusChange(true);
+}
+
+function handleLabelReasonCategoryLabelClick(labelEl, event) {
+  event.preventDefault();
+  toggleLabelRadioInGroup(labelEl, 'labelReasonCategory');
+  onLabelReasonCategoryChange(true);
+}
+
+function onLabelStatusChange(autoSave = false) {
+  const status = document.querySelector('input[name="labelStatus"]:checked')?.value;
+  const wrap = document.getElementById('labelReasonWrap');
+  const usableOpt = document.getElementById('label-opt-usable');
+  const unusableOpt = document.getElementById('label-opt-unusable');
+  const reasonEl = document.getElementById('labelReason');
+  const statusEl = document.getElementById('labelSaveStatus');
+  if (usableOpt) usableOpt.classList.toggle('selected-usable', status === 'usable');
+  if (unusableOpt) unusableOpt.classList.toggle('selected-unusable', status === 'unusable');
+  if (wrap) wrap.classList.toggle('show', status === 'unusable');
+  if (status === 'usable') {
+    if (reasonEl) reasonEl.value = '';
+    document.querySelectorAll('input[name="labelReasonCategory"]').forEach(r => { r.checked = false; });
+    onLabelReasonCategoryChange(false);
+  }
+  if (!status) {
+    if (reasonEl) reasonEl.value = '';
+    document.querySelectorAll('input[name="labelReasonCategory"]').forEach(r => { r.checked = false; });
+    onLabelReasonCategoryChange(false);
+    if (statusEl) statusEl.textContent = '';
+    if (autoSave) clearTaskLabel();
+    return;
+  }
+  if (autoSave) saveTaskLabel();
+}
+
+function onLabelReasonCategoryChange(autoSave = false) {
+  const selected = document.querySelector('input[name="labelReasonCategory"]:checked')?.value;
+  ['instruction', 'config', 'evaluator', 'other'].forEach(value => {
+    const opt = document.getElementById(`reason-type-${value}`);
+    if (opt) opt.classList.toggle('selected', selected === value);
+  });
+  if (autoSave) saveTaskLabel();
+}
+
+function updateLabelStatsBar() {
+  const totalTasks = Object.values(taskConfig).reduce((s, arr) => s + arr.length, 0);
+  const labeled = Object.keys(taskLabels).length;
+  const usable = Object.values(taskLabels).filter(l => l.status === 'usable').length;
+  const unusable = Object.values(taskLabels).filter(l => l.status === 'unusable').length;
+  const statsBar = document.getElementById('statsBar');
+  if (statsBar) {
+    statsBar.innerHTML =
+      `Domains: <span>${Object.keys(taskConfig).length}</span> | Tasks: <span>${totalTasks}</span> | 已标注: <span>${labeled}</span> (可用 <span>${usable}</span> / 不可用 <span>${unusable}</span>)`;
+  }
+}
+
+function labelResultsDirError(statusEl, message) {
+  if (statusEl) {
+    statusEl.className = 'label-save-status err';
+    statusEl.textContent = message || '请先在左侧设置 Results Directory';
+  }
+}
+
+async function clearTaskLabel() {
+  if (!currentTask) return;
+  const statusEl = document.getElementById('labelSaveStatus');
+  if (!resultsDir) {
+    labelResultsDirError(statusEl);
+    return;
+  }
+  const taskId = getTaskKey();
+  const saveSeq = ++labelSaveSeq;
+
+  if (statusEl) { statusEl.className = 'label-save-status'; statusEl.textContent = '清除中...'; }
+
+  try {
+    const resp = await fetch('/api/label', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        task_id: taskId,
+        results_dir: resultsDir,
+        domain: currentDomain || undefined,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      if (saveSeq !== labelSaveSeq || getTaskKey() !== taskId) return;
+      if (statusEl) { statusEl.className = 'label-save-status err'; statusEl.textContent = data.error || '清除失败'; }
+      return;
+    }
+    if (saveSeq !== labelSaveSeq || getTaskKey() !== taskId) return;
+    delete taskLabels[taskId];
+    if (statusEl) { statusEl.className = 'label-save-status ok'; statusEl.textContent = '已取消标注'; }
+    updateSidebarLabelDot(taskId);
+    updateLabelStatsBar();
+  } catch (e) {
+    if (saveSeq === labelSaveSeq && statusEl) {
+      statusEl.className = 'label-save-status err';
+      statusEl.textContent = e.message;
+    }
+  }
+}
+
+async function saveTaskLabel() {
+  if (!currentTask) return;
+  const status = document.querySelector('input[name="labelStatus"]:checked')?.value;
+  const reasonCategory = document.querySelector('input[name="labelReasonCategory"]:checked')?.value || '';
+  const reason = document.getElementById('labelReason')?.value?.trim() || '';
+  const statusEl = document.getElementById('labelSaveStatus');
+  const taskId = getTaskKey();
+  const saveSeq = ++labelSaveSeq;
+
+  if (!resultsDir) {
+    labelResultsDirError(statusEl);
+    return;
+  }
+  if (!status) return;
+  if (status === 'unusable' && reasonCategory === 'other' && !reason) {
+    if (statusEl) { statusEl.className = 'label-save-status err'; statusEl.textContent = '选择「其他情况」时请填写详细说明'; }
+    return;
+  }
+
+  if (statusEl) { statusEl.className = 'label-save-status'; statusEl.textContent = '保存中...'; }
+
+  try {
+    const resp = await fetch('/api/label', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        task_id: taskId,
+        results_dir: resultsDir,
+        domain: currentDomain || undefined,
+        status: status,
+        reason_category: status === 'unusable' ? reasonCategory : '',
+        reason: reason,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      if (saveSeq !== labelSaveSeq || getTaskKey() !== taskId) return;
+      if (statusEl) { statusEl.className = 'label-save-status err'; statusEl.textContent = data.error || '保存失败'; }
+      return;
+    }
+    if (saveSeq !== labelSaveSeq || getTaskKey() !== taskId) return;
+    taskLabels[taskId] = data.label;
+    if (statusEl) { statusEl.className = 'label-save-status ok'; statusEl.textContent = '已自动保存'; }
+    updateSidebarLabelDot(taskId);
+    updateLabelStatsBar();
+  } catch (e) {
+    if (saveSeq === labelSaveSeq && statusEl) {
+      statusEl.className = 'label-save-status err';
+      statusEl.textContent = e.message;
+    }
+  }
+}
+
+function updateSidebarLabelDot(taskId) {
+  const item = document.querySelector(`.task-item[data-id="${taskId}"]`);
+  if (!item) return;
+  const dot = item.querySelector('.label-dot');
+  if (!dot) return;
+  const lb = taskLabels[taskId];
+  dot.className = 'label-dot ' + (lb ? (lb.status === 'usable' ? 'usable' : 'unusable') : 'unlabeled');
+}
+
+async function loadTrajectory() {
+  if (!currentTask || !resultsDir) return;
+  const trajEl = document.getElementById('trajContent');
+  const aiEl = document.getElementById('trajAiContent');
+  if (!trajEl) return;
+  trajEl.innerHTML = '<div class="traj-empty">Loading trajectory...</div>';
+  if (aiEl) aiEl.innerHTML = '<div class="traj-empty">Loading AI analysis...</div>';
+  try {
+    const resp = await fetch('/api/trajectory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task_id: getTaskKey(), results_dir: resultsDir, domain: currentDomain || undefined })
+    });
+    trajectoryData = await resp.json();
+    rewardComponents = trajectoryData.reward_components || null;
+    rewardComponentsPath = trajectoryData.reward_components_path || null;
+    if (trajectoryData.evaluator_audit) {
+      evaluatorAudit = trajectoryData.evaluator_audit;
+      evaluatorAuditPath = trajectoryData.evaluator_audit_path || evaluatorAuditPath;
+    }
+    if (trajectoryData.evaluator_manifest) {
+      evaluatorManifest = trajectoryData.evaluator_manifest;
+      evaluatorManifestPath = trajectoryData.evaluator_manifest_path || evaluatorManifestPath;
+    }
+    renderTrajectory();
+    renderInteractionContent();
+    refreshEvaluatorRewardScores();
+  } catch (e) {
+    rewardComponents = null;
+    rewardComponentsPath = null;
+    const errHtml = `<div class="traj-empty">Failed to load trajectory: ${escapeHtml(e.message)}</div>`;
+    trajEl.innerHTML = errHtml;
+    if (aiEl) aiEl.innerHTML = errHtml;
+  }
+}
+
+function renderTrajectory() {
+  renderTrajectoryPlayer();
+  renderTrajectoryAiAnalysis();
+}
+
+function renderTrajectoryPlayer() {
+  const el = document.getElementById('trajContent');
+  if (!el || !trajectoryData) return;
+  const d = trajectoryData;
+
+  if (!d.found) {
+    el.innerHTML = '<div class="traj-empty">No trajectory found for this task in the results directory.</div>';
+    return;
+  }
+  if (!d.steps || d.steps.length === 0) {
+    el.innerHTML = `<div class="traj-empty">Trajectory folder exists but no steps yet (status: ${escapeHtml(d.status || 'unknown')}).</div>`;
+    return;
+  }
+
+  const statusCls = (d.status || '').startsWith('Done') ? 'traj-status-done'
+    : d.status === 'Error' ? 'traj-status-error' : 'traj-status-running';
+  const n = d.steps.length;
+
+  let html = `<div class="traj-summary">
+    <div><span>Status:</span> <strong class="${statusCls}">${escapeHtml(d.status)}</strong></div>
+    <div><span>Steps:</span> <strong>${d.progress} / ${d.total_steps}</strong></div>
+    ${d.result != null ? `<div><span>Score:</span> <strong>${escapeHtml(d.result)}</strong></div>` : ''}
+    ${d.last_update ? `<div><span>Last Update:</span> <strong>${escapeHtml(d.last_update)}</strong></div>` : ''}
+  </div>`;
+
+  html += `
+    <div class="traj-nav-bar">
+      <button type="button" class="traj-nav-btn" id="traj-prev-btn" onclick="trajChangeStep(-1)">← Previous</button>
+      <span class="traj-step-info" id="traj-step-info">Step 1/${n}</span>
+      <button type="button" class="traj-nav-btn" id="traj-next-btn" onclick="trajChangeStep(1)">Next →</button>
+      <label class="traj-action-toggle">
+        <input type="checkbox" id="traj-action-toggle" checked onchange="trajToggleAction(this.checked)"> Show Action
+      </label>
+    </div>
+    <div class="traj-slider-bar">
+      <span class="slider-label" id="traj-slider-label">1</span>
+      <input type="range" id="traj-slider" min="1" max="${n}" value="1" step="1" oninput="trajSliderChange(this.value)">
+      <span class="slider-label" id="traj-slider-total">/ ${n}</span>
+    </div>
+    <div class="traj-screenshot-area">
+      <div class="traj-screenshot-wrapper" id="traj-screenshot-wrapper">
+        <img id="traj-screenshot-img" src="" alt="Step screenshot" style="display:none;">
+        <svg id="traj-action-overlay" class="action-overlay-svg"></svg>
+        <div class="traj-no-image" id="traj-no-image"><span>📷</span><p>Select a step</p></div>
+      </div>
+      <div class="traj-action-panel">
+        <div class="traj-action-desc" id="traj-action-desc"></div>
+        <div id="traj-phase-marker"></div>
+        <pre class="traj-action-code" id="traj-action-code"></pre>
+        <div id="traj-response-panel"></div>
+      </div>
+    </div>`;
+
+  el.innerHTML = html;
+  trajCurrentStep = 0;
+  trajActionVizEnabled = true;
+  const overlay = document.getElementById('traj-action-overlay');
+  const img = document.getElementById('traj-screenshot-img');
+  const wrapper = document.getElementById('traj-screenshot-wrapper');
+  if (overlay && img && wrapper && typeof ActionVisualizer !== 'undefined') {
+    trajVisualizer = new ActionVisualizer(overlay, img, wrapper);
+  } else {
+    trajVisualizer = null;
+  }
+  trajLoadStep(0);
+}
+
+function renderTrajectoryAiAnalysis() {
+  const el = document.getElementById('trajAiContent');
+  if (!el || !trajectoryData) return;
+  const d = trajectoryData;
+  el.innerHTML = renderTrajectoryLabelHtml(d.trajectory_label)
+    + renderScoreConsistencyHtml(d.result, d.trajectory_label);
+}
+
+function trajSliderChange(val) {
+  const idx = parseInt(val, 10) - 1;
+  if (idx >= 0 && idx < (trajectoryData?.steps?.length || 0) && idx !== trajCurrentStep) {
+    trajLoadStep(idx);
+  }
+}
+
+function trajUpdateSlider() {
+  const n = trajectoryData?.steps?.length || 0;
+  const slider = document.getElementById('traj-slider');
+  const label = document.getElementById('traj-slider-label');
+  if (!slider || n === 0) return;
+  slider.value = trajCurrentStep + 1;
+  if (label) label.textContent = trajCurrentStep + 1;
+  const pct = n > 1 ? (trajCurrentStep / (n - 1)) * 100 : 0;
+  slider.style.background = `linear-gradient(to right, #667eea 0%, #764ba2 ${pct}%, #e0e4ee ${pct}%)`;
+}
+
+function trajChangeStep(delta) {
+  const n = trajectoryData?.steps?.length || 0;
+  const next = trajCurrentStep + delta;
+  if (next >= 0 && next < n) trajLoadStep(next);
+}
+
+function trajToggleAction(enabled) {
+  trajActionVizEnabled = enabled;
+  if (trajVisualizer && trajectoryData?.steps?.[trajCurrentStep]) {
+    if (enabled) trajVisualizer.visualize(trajectoryData.steps[trajCurrentStep].action);
+    else trajVisualizer.clear();
+  }
+}
+
+function trajPhaseMarkerHtml(stepIdx) {
+  const log = trajectoryData && trajectoryData.interaction_log;
+  if (!log || !log.length) return '';
+  const stepNum = trajectoryData.steps[stepIdx]?.step_num;
+  if (stepNum == null) return '';
+  const entry = log.find(e => e.step === stepNum);
+  if (!entry) return '';
+  return `<div class="traj-phase-marker">Phase ${entry.phase || '?'} · ${escapeHtml(entry.type || 'instruction')}</div>`;
+}
+
+function trajLoadStep(idx) {
+  const steps = trajectoryData?.steps;
+  if (!steps || idx < 0 || idx >= steps.length) return;
+  trajCurrentStep = idx;
+  const step = steps[idx];
+  const taskId = getTaskKey();
+  const n = steps.length;
+
+  const info = document.getElementById('traj-step-info');
+  const prevBtn = document.getElementById('traj-prev-btn');
+  const nextBtn = document.getElementById('traj-next-btn');
+  const phaseBadge = step.phase != null ? `<span class="traj-phase-badge">Phase ${step.phase}</span>` : '';
+  if (info) info.innerHTML = `Step ${idx + 1}/${n}${phaseBadge}`;
+  if (prevBtn) prevBtn.disabled = idx <= 0;
+  if (nextBtn) nextBtn.disabled = idx >= n - 1;
+  trajUpdateSlider();
+
+  const beforeFile = step.screenshot_before || '';
+  const imgEl = document.getElementById('traj-screenshot-img');
+  const noImg = document.getElementById('traj-no-image');
+  const descEl = document.getElementById('traj-action-desc');
+  const codeEl = document.getElementById('traj-action-code');
+  const phaseMarkerEl = document.getElementById('traj-phase-marker');
+  const responsePanel = document.getElementById('traj-response-panel');
+
+  if (descEl) descEl.textContent = step.action_description || '';
+  if (codeEl) codeEl.textContent = step.action || '';
+  if (phaseMarkerEl) phaseMarkerEl.innerHTML = trajPhaseMarkerHtml(idx);
+  if (responsePanel) {
+    if (step.response && String(step.response).trim()) {
+      responsePanel.innerHTML = `<details class="traj-response-wrap" open><summary>Model Response</summary><pre class="traj-response-pre">${escapeHtml(step.response)}</pre></details>`;
+    } else {
+      responsePanel.innerHTML = '';
+    }
+  }
+
+  if (beforeFile && imgEl && noImg) {
+    const src = trajScreenshotUrl(taskId, beforeFile);
+    imgEl.onload = function() {
+      imgEl.style.display = 'block';
+      noImg.style.display = 'none';
+      if (trajVisualizer) {
+        trajVisualizer.updateOverlayDimensions();
+        if (trajActionVizEnabled) trajVisualizer.visualize(step.action);
+        else trajVisualizer.clear();
+      }
+    };
+    imgEl.onerror = function() {
+      imgEl.style.display = 'none';
+      noImg.style.display = 'flex';
+      if (trajVisualizer) trajVisualizer.clear();
+    };
+    imgEl.src = src;
+  } else if (imgEl && noImg) {
+    imgEl.style.display = 'none';
+    noImg.style.display = 'flex';
+    if (trajVisualizer) trajVisualizer.clear();
+  }
+}
+
+function toggleSidebar() {
+  const shell = document.getElementById('sidebarShell');
+  const btn = document.getElementById('sidebarToggle');
+  if (!shell) return;
+  shell.classList.toggle('collapsed');
+  if (btn) btn.textContent = shell.classList.contains('collapsed') ? '›' : '‹';
+  if (trajVisualizer) setTimeout(() => trajVisualizer.updateOverlayDimensions(), 300);
+}
+
+// ─── Event Listeners ──────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll('.domain-group').forEach(group => {
+    const domain = group.dataset.domain.toLowerCase();
+    const items = group.querySelectorAll('.task-item');
+    let hasVisible = false;
+    items.forEach(item => {
+      const id = item.dataset.id.toLowerCase();
+      const show = id.includes(query) || domain.includes(query);
+      item.style.display = show ? '' : 'none';
+      if (show) hasVisible = true;
+    });
+    group.style.display = hasVisible ? '' : 'none';
+    if (hasVisible && query) {
+      group.querySelector('.domain-header').classList.add('expanded');
+      group.querySelector('.task-list').classList.add('show');
+    }
+  });
+});
+
+document.getElementById('configPathInput').addEventListener('keydown', e => { if (e.key === 'Enter') loadData(); });
+document.getElementById('examplesDirInput').addEventListener('keydown', e => { if (e.key === 'Enter') loadData(); });
+document.getElementById('resultsDirInput').addEventListener('keydown', e => { if (e.key === 'Enter') loadData(); });
+document.getElementById('cacheDirInput').addEventListener('keydown', e => { if (e.key === 'Enter') loadData(); });
+
+document.addEventListener('keydown', e => {
+  if (!trajectoryData?.steps?.length) return;
+  const trajOpen = document.getElementById('section-trajectory')?.style.display !== 'none';
+  if (!trajOpen) return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); trajChangeStep(-1); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); trajChangeStep(1); }
+});
+
+window.addEventListener('resize', () => {
+  if (trajVisualizer) trajVisualizer.updateOverlayDimensions();
+});
+
+// ─── URL State (shareable links) ──────────────────────────────────────────
+// URL format: #config=<path>&examples=<path>&results=<path>&task=<id>
+function updateUrlState() {
+  const configPath = document.getElementById('configPathInput').value.trim();
+  const exDir = document.getElementById('examplesDirInput').value.trim();
+  const resDir = document.getElementById('resultsDirInput').value.trim();
+  const cacheDirVal = document.getElementById('cacheDirInput').value.trim();
+  const taskId = currentTask ? getTaskKey() : '';
+  const params = new URLSearchParams();
+  if (configPath) params.set('config', configPath);
+  if (exDir) params.set('examples', exDir);
+  if (cacheDirVal) params.set('cache', cacheDirVal);
+  if (resDir) params.set('results', resDir);
+  if (taskId) params.set('task', taskId);
+  const hash = params.toString();
+  if (hash) {
+    history.replaceState(null, '', '#' + hash);
+  }
+}
+
+async function restoreFromUrl() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return;
+  const params = new URLSearchParams(hash);
+  const configPath = params.get('config') || '';
+  const exDir = params.get('examples') || '';
+  const resDir = params.get('results') || '';
+  const cacheDirParam = params.get('cache') || '';
+  const taskId = params.get('task') || '';
+
+  if (!configPath || !exDir) return;
+
+  document.getElementById('configPathInput').value = configPath;
+  document.getElementById('examplesDirInput').value = exDir;
+  if (cacheDirParam) document.getElementById('cacheDirInput').value = cacheDirParam;
+  if (resDir) document.getElementById('resultsDirInput').value = resDir;
+  await loadData();
+
+  // Select task if specified
+  if (taskId && examplesDir) {
+    // Find domain for this task
+    for (const [domain, tasks] of Object.entries(taskConfig)) {
+      if (tasks.includes(taskId)) {
+        await selectTask(taskId, domain);
+        break;
+      }
+    }
+  }
+}
+
+// Patch selectTask to update URL
+const _origSelectTask = selectTask;
+selectTask = async function(taskId, domain) {
+  await _origSelectTask(taskId, domain);
+  updateUrlState();
+};
+
+// Patch loadData to update URL
+const _origLoadData = loadData;
+loadData = async function() {
+  await _origLoadData();
+  updateUrlState();
+};
+
+// Restore state on page load (or auto-load defaults)
+(async function initPage() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) await applyServerDefaults();
+  if (hash) {
+    await restoreFromUrl();
+  } else {
+    await loadData();
+  }
+})();
+</script>
+</body>
+</html>
