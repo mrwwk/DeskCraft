@@ -1,0 +1,6 @@
+{
+  "title": "EasyVis DeskCraft - kimi_replay_full",
+  "config_path": "../../taiji_task/test_all_with_interactive.json",
+  "examples_dir": "../../evaluation_examples/examples_per_task",
+  "results_dir": "../../results/replay_full/kimi-replay-full/pyautogui/screenshot/Kimi-K2.6"
+}
