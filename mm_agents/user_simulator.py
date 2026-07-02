@@ -91,7 +91,7 @@ class UserSimulator:
         model: str,
         scenario_config: Dict[str, Any],
         temperature: float = 0.7,
-        max_tokens: int = 1024,
+        max_tokens: int = 10000,
     ):
         """
         Initialize UserSimulator.
@@ -289,6 +289,14 @@ class UserSimulator:
         except Exception as e:
             logger.error(f"[UserSim] Error generating response: {e}")
             # Fallback: keep the response shape simple and deterministic.
+            result = {
+                "action": "new_instruction",
+                "message": current_instruction,
+                "phase_complete": False,
+            }
+
+        if not isinstance(result, dict):
+            logger.warning("[UserSim] _parse_response returned non-dict; using fallback")
             result = {
                 "action": "new_instruction",
                 "message": current_instruction,
@@ -505,12 +513,12 @@ class UserSimulator:
             except json.JSONDecodeError:
                 continue
 
-            logger.warning(f"[UserSim] Failed to parse JSON, using raw text as message")
-            return {
-                "action": "new_instruction",
-                "message": text,
-                "phase_complete": False,
-            }
+        logger.warning(f"[UserSim] Failed to parse JSON, using raw text as message")
+        return {
+            "action": "new_instruction",
+            "message": text,
+            "phase_complete": False,
+        }
 
     def _normalize_user_action(
         self,

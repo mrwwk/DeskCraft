@@ -24,6 +24,7 @@ from multiprocessing import Manager, Process, current_process
 from typing import Dict, List
 
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 from mm_agents.qwen35vl_agent import Qwen35VLAgent
 from utils.taiji_proxy import initialize_taiji_proxy_pool
 
@@ -155,12 +156,7 @@ def distribute_tasks(test_all_meta: Dict[str, List[str]]) -> List[tuple]:
 
 
 def build_config_file_path(run_args: argparse.Namespace, domain: str, example_id: str) -> str:
-    return os.path.join(
-        run_args.test_config_base_dir,
-        run_args.examples_subdir,
-        domain,
-        f"{example_id}.json",
-    )
+    return resolve_task_config_path(run_args.test_config_base_dir, domain, example_id)
 
 
 def build_example_result_dir(run_args: argparse.Namespace, domain: str, example_id: str) -> str:
@@ -316,8 +312,7 @@ def run_env_tasks(task_queue, run_args: argparse.Namespace, shared_scores: list)
             domain, example_id = item
             config_file = build_config_file_path(run_args, domain, example_id)
 
-            with open(config_file, "r", encoding="utf-8") as file_obj:
-                example = json.load(file_obj)
+            example = load_task_config(config_file)
 
             logger.info("[%s][Domain]: %s", current_process().name, domain)
             logger.info("[%s][Example ID]: %s", current_process().name, example_id)

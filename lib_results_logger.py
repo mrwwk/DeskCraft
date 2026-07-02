@@ -95,6 +95,11 @@ def append_task_result(
                 f.write('\n')  # Add newline for readability
                 
             finally:
+                # Flush Python buffer + force kernel page cache to disk BEFORE releasing the lock.
+                # Without this, another process can acquire the lock, read stale (pre-write)
+                # content, and overwrite this write — losing records under concurrency.
+                f.flush()
+                os.fsync(f.fileno())
                 # Always unlock the file
                 fcntl.flock(f.fileno(), fcntl.LOCK_UN)
                 

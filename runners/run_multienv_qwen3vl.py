@@ -23,6 +23,7 @@ from multiprocessing import Process, Manager
 from multiprocessing import current_process
 import lib_run_single
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 from mm_agents.qwen3vl_agent import Qwen3VLAgent
 
 # Global variables for signal handling
@@ -222,11 +223,8 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list):
                 break
             domain, example_id = item
             try:
-                config_file = os.path.join(
-                    args.test_config_base_dir, f"examples/{domain}/{example_id}.json"
-                )
-                with open(config_file, "r", encoding="utf-8") as f:
-                    example = json.load(f)
+                config_file = resolve_task_config_path(args.test_config_base_dir, domain, example_id)
+                example = load_task_config(config_file)
                 
                 # 跳过需要外网代理的任务
                 # if example.get("proxy", False):

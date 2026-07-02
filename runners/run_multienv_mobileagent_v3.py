@@ -23,6 +23,7 @@ from tqdm import tqdm
 from multiprocessing import Process, Manager
 import lib_run_single_mobileagent_v3
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 from mm_agents.mobileagent_v3.mobile_agent import MobileAgentV3
 
 #  Logger Configs {{{ #
@@ -166,11 +167,8 @@ def run_env_tasks(env_idx: int, env: DesktopEnv, agent, env_tasks: dict, args: a
     
     for domain in tqdm(env_tasks, desc=f"Env{env_idx+1}-Domain"):
         for example_id in tqdm(env_tasks[domain], desc="Example", leave=False):
-            config_file = os.path.join(
-                args.test_config_base_dir, f"examples/{domain}/{example_id}.json"
-            )
-            with open(config_file, "r", encoding="utf-8") as f:
-                example = json.load(f)
+            config_file = resolve_task_config_path(args.test_config_base_dir, domain, example_id)
+            example = load_task_config(config_file)
 
             logger.info(f"[Env {env_idx+1}][Domain]: {domain}")
             logger.info(f"[Env {env_idx+1}][Example ID]: {example_id}")

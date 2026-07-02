@@ -9,7 +9,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/assets/blend/multiple_collections.blend",
+            "local_path": "assets/blend/multiple_collections.blend",
             "path": "/home/user/Documents/scene.blend"
           },
           {

@@ -1,4 +1,5 @@
 import os
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 import sys
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -164,7 +165,7 @@ def process_task(task_info,
     if not os.path.exists(history_save_dir):
         os.makedirs(history_save_dir)
     
-    task_config = json.load(open(cfg))
+    task_config = load_task_config(cfg)
     retry = 0
 
     while True:
@@ -283,7 +284,7 @@ if __name__ == "__main__":
                 result = open(os.path.join(args.result_dir, 'coact', f"{domain}/{ex_id}/result.txt"), "r").read()
                 print(f"Results already exist in {domain}/{ex_id}, result: {result}")
                 continue
-            cfg = os.path.join(args.test_config_base_dir, f"{domain}/{ex_id}.json")
+            cfg = resolve_task_config_path(args.test_config_base_dir, domain, ex_id)
             tasks.append((domain, ex_id, cfg))
     # Check if there are any tasks to process
     if not tasks:

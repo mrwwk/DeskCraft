@@ -1,0 +1,206 @@
+请修复这个 DeskCraft 任务的初始文件，消除"初始即满分"的答案泄漏。
+
+[任务目录]
+/apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496.
+
+[原始初始文件]
+- 路径（项目相对）: assets/pptx/libreoffice_impr_njc_59d057dc-fc2c-48b2-b7f2-b7c146be1496_Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx
+- 绝对路径: /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/assets/pptx/libreoffice_impr_njc_59d057dc-fc2c-48b2-b7f2-b7c146be1496_Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx
+
+[Gold / 参考文件]
+- 无 gold 文件（expected 为 null）。评测器只检查 result 文件的某些属性；把被检查属性改成明确不同但仍合理的默认值即可。
+
+[必须写入的修订文件]
+- 修订初始文件: /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496./revise_task/libreoffice_impr_njc_59d057dc-fc2c-48b2-b7f2-b7c146be1496_Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx
+- 修订 task.json: /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496./revise_task/task.json
+- 修复日志: /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496./revise_task/repair_log.md
+
+重要约束：
+- 不要覆盖或修改原始初始文件、gold 文件、原始 task.json、evaluator.py。
+- 把修订后的初始文件写入 /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496./revise_task/libreoffice_impr_njc_59d057dc-fc2c-48b2-b7f2-b7c146be1496_Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx（与原文件同名，放在 revise_task/ 下）。
+- 把完整 task.json 复制到 revise_task/task.json，仅将 config 中 upload_file 的 local_path 改为 "evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496./revise_task/libreoffice_impr_njc_59d057dc-fc2c-48b2-b7f2-b7c146be1496_Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx"（项目相对路径），其余字段（id、instruction、evaluator、trajectory、related_apps 等）原样保留；VM 内 path/dest 保持不变。
+- 写入 revise_task/repair_log.md（中文）。
+
+[DeskCraft 初始文件加载与评测逻辑]
+下面是 DeskCraft 中与"初始文件"相关的实际逻辑，修复时必须严格遵守。
+
+1. 任务 JSON 的 config 用于初始化 VM：
+   - 第一步通常是 {"type": "upload_file", "parameters": {"files": [{"local_path": "<相对 DeskCraft 项目根的路径>", "path": "<VM 内绝对路径>"}]}}，把本地初始文件上传到 VM。
+   - 紧接着 {"type": "open", ...} 在 LibreOffice 中打开该文件。
+   - local_path 是相对 DeskCraft 项目根目录的相对路径（例如 assets/xlsx/Foo.xlsx 或 cache/<id>/Foo.xlsx）。
+2. 评测流程：agent 操作后，evaluator.postconfig 会激活窗口并 Ctrl+S 保存；evaluator.result（type=vm_file）从 VM 拉回该文件，evaluator.expected（type=cache_file 或 null）提供 gold/参考，evaluator.func 用 per-task evaluator.py 中的函数打分。
+3. 因此"修订初始文件"只需要：生成一份新的本地初始文件，并把它放到一个新路径，再在 revise_task/task.json 的 config upload_file 中把 local_path 指向这个新路径；VM 内 path（dest）保持不变即可。
+4. 评测器函数签名与调用：metric(result_path, expected_path, **options) 或 metric(result_path, **options)。修订初始文件要让该调用对"修订初始文件 vs gold"返回严格小于 1.0 的分数。
+5. 多 metric 时 evaluator.conj（默认 "and"）合并：任一 metric 为 0 即总分 0，否则取平均；"or" 时任一为 1 即总分 1。要让总分严格低于 1.0，在 "and" 下至少破坏一个 metric，在 "or" 下破坏所有当前为 1.0 的 metric。
+
+
+[任务指令]
+Open "Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx". On slide 1, change the title font to "Georgia" and set the font size to 40pt.
+
+[初始文件当前评测结果（为何是答案泄漏）]
+初始文件总分: 1.0
+  - check_slide1_title_font: score=1.0 
+
+[评测器配置（task.json 的 evaluator 字段）]
+{
+  "postconfig": [
+    {
+      "type": "activate_window",
+      "parameters": {
+        "window_name": "Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx - LibreOffice Impress",
+        "strict": true
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 0.5
+      }
+    },
+    {
+      "type": "execute",
+      "parameters": {
+        "command": [
+          "python",
+          "-c",
+          "import pyautogui; import time; pyautogui.hotkey('ctrl', 's'); time.sleep(0.5);"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 0.5
+      }
+    }
+  ],
+  "func": "check_slide1_title_font",
+  "file": "evaluator.py",
+  "result": {
+    "type": "vm_file",
+    "path": "/home/user/Desktop/Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx",
+    "dest": "Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx"
+  },
+  "options": {
+    "font_name": "Georgia",
+    "font_size_pt": 40
+  }
+}
+
+[评测器源码 evaluator.py]
+"""
+Targeted evaluator for the task: On slide 1, change the title font to "Georgia" and set the font size to 40pt.
+
+This replaces the generic compare_pptx_files evaluator which had two issues:
+1. The expected file (Ecosystem_L1.pptx) had wrong title font (Sorts Mill Goudy, 54pt) instead of Georgia 40pt.
+2. With empty options, all default checks were enabled, causing failure on unrelated shape dimension differences.
+"""
+import logging
+
+from pptx import Presentation
+
+logger = logging.getLogger("desktopenv.metric.slides")
+
+
+def check_slide1_title_font(result_path, **options):
+    """
+    Check that the title shape on slide 1 has the expected font name and size.
+
+    Args:
+        result_path: Path to the PPTX file produced by the agent.
+        **options:
+            font_name: Expected font name (default: "Georgia").
+            font_size_pt: Expected font size in points (default: 40).
+
+    Returns:
+        1.0 if the title font matches expectations, 0.0 otherwise.
+    """
+    expected_font_name = options.get("font_name", "Georgia")
+    expected_font_size_pt = options.get("font_size_pt", 40)
+    # 1pt = 12700 EMU in python-pptx
+    expected_font_size_emu = expected_font_size_pt * 12700
+    # Allow 1pt tolerance for LibreOffice rounding
+    size_tolerance_emu = 12700
+
+    try:
+        prs = Presentation(result_path)
+    except Exception as e:
+        logger.error(f"Failed to open PPTX file: {e}")
+        return 0.0
+
+    if len(prs.slides) == 0:
+        logger.error("Presentation has no slides")
+        return 0.0
+
+    slide = prs.slides[0]
+
+    # Strategy 1: Try to find the title shape via placeholder type.
+    # TITLE (1) / CENTER_TITLE = 1, SUBTITLE = 3
+    title_shape = None
+    for shape in slide.shapes:
+        try:
+            if shape.is_placeholder:
+                ph_type = shape.placeholder_format.type
+                if ph_type in (1, 3):
+                    title_shape = shape
+                    break
+        except Exception:
+            pass
+
+    # Strategy 2: If placeholder-based detection failed, find the shape
+    # with the largest font size — typically the title.
+    if title_shape is None:
+        candidates = []
+        for shape in slide.shapes:
+            if not shape.has_text_frame:
+                continue
+            max_font_size = 0
+            for para in shape.text_frame.paragraphs:
+                for run in para.runs:
+                    if run.text.strip() and run.font.size and run.font.size > max_font_size:
+                        max_font_size = run.font.size
+            if max_font_size > 0:
+                candidates.append((max_font_size, shape))
+
+        if candidates:
+            candidates.sort(key=lambda x: x[0], reverse=True)
+            title_shape = candidates[0][1]
+
+    if title_shape is None:
+        logger.error("Could not identify title shape on slide 1")
+        return 0.0
+
+    # Verify font properties on all non-empty runs of the title shape
+    for para in title_shape.text_frame.paragraphs:
+        for run in para.runs:
+            if not run.text.strip():
+                continue
+
+            if run.font.name != expected_font_name:
+                logger.info(
+                    "Title font name mismatch: expected '%s', got '%s'",
+                    expected_font_name, run.font.name
+                )
+                return 0.0
+
+            if run.font.size is None or abs(run.font.size - expected_font_size_emu) > size_tolerance_emu:
+                actual_pt = run.font.size / 12700.0 if run.font.size else None
+                logger.info(
+                    "Title font size mismatch: expected %dpt (%d EMU), got %spt (%s EMU)",
+                    expected_font_size_pt, expected_font_size_emu,
+                    actual_pt, run.font.size
+                )
+                return 0.0
+
+    return 1.0
+
+
+[修复要求]
+1. 先阅读评测器源码和上面的 score_report，弄清楚初始文件当前已经满足、被评测器检查的属性是什么。
+2. 用 openpyxl / python-pptx / python-docx 读取原始初始文件，做最小修改翻转那些属性，使其不再满足目标值，另存为 /apdcephfs/hunyuanaidjpsh2/jp_sh2_cephfs/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496./revise_task/libreoffice_impr_njc_59d057dc-fc2c-48b2-b7f2-b7c146be1496_Ecosystem Mechanisms for Maintaining Biodiversity in Natural Forests.pptx。修改要合理：是"未完成"的起始状态，且能通过指令变换到 gold。
+3. 不要为了"看起来更难"而大改无关内容；不要删除整张表/整页/整段；保持文件可被对应库正常打开。
+4. 如果 expected 为 null，把被检查属性改成明确不同但仍合理的默认值。
+5. 更新 revise_task/task.json 的 config upload_file local_path 指向修订文件，其余保持原样。
+6. repair_log.md 用中文记录：原始初始文件为何即满分、改了哪些属性、新初始文件期望的评测分数（应 < 1.0）、仍有哪些风险、是否仍可由指令变换到 gold。
+
+完成后输出中文说明。

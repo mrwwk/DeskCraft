@@ -307,11 +307,16 @@ class SetupController:
             logger.warning("Command should be a list of strings. Now it is a string. Will split it by space.")
             command = command.split()
             
-        if command[0] == "google-chrome" and self.use_proxy:
+        chrome_binaries = ("google-chrome", "google-chrome-stable", "chromium-browser", "chromium")
+        if command[0] in chrome_binaries and self.use_proxy:
             if os.environ.get("USE_TINYPROXY_SERVER", "False") == "True":
                 command.append("--proxy-server=http://127.0.0.1:18888")  # Use the proxy server set up by _proxy_setup
             else:
                 command.append(f"--proxy-server={self.proxy_url}")
+        elif command[0] in chrome_binaries and os.environ.get("DESKCRAFT_VM_PROXY"):
+            # VM has no direct internet access; route Chrome through the corporate
+            # proxy configured via DESKCRAFT_VM_PROXY (gsettings also set in reset()).
+            command.append(f"--proxy-server={os.environ['DESKCRAFT_VM_PROXY']}")
 
         payload = json.dumps({"command": command, "shell": shell})
         headers = {"Content-Type": "application/json"}
@@ -606,6 +611,49 @@ class SetupController:
             logger.error(f"Failed to reload environment variables: {e}")
             proxy_pool.mark_proxy_failed(current_proxy)
             raise
+
+    def configure_vm_proxy(self, proxy_url: str) -> bool:
+        """Configure the VM's system-wide proxy from an explicit URL.
+
+        Used when the VM has no direct internet access and must route through a
+        corporate proxy (e.g. ``http://star-proxy.oa.com:3128``). Sets the GNOME
+        system proxy and shell env vars so Chrome and other apps use it.
+
+        Triggered by the ``DESKCRAFT_VM_PROXY`` env var in ``DesktopEnv.reset``;
+        independent of the dataimpulse proxy pool / ``enable_proxy`` flag.
+        """
+        from urllib.parse import urlparse
+        parsed = urlparse(proxy_url if "://" in proxy_url else f"http://{proxy_url}")
+        host = parsed.hostname
+        port = parsed.port or 3128
+        if not host:
+            logger.error(f"configure_vm_proxy: invalid proxy URL: {proxy_url}")
+            return False
+        logger.info(f"Configuring VM proxy (DESKCRAFT_VM_PROXY): {host}:{port}")
+        commands = [
+            "gsettings set org.gnome.system.proxy mode manual",
+            f"gsettings set org.gnome.system.proxy.http host {host}",
+            f"gsettings set org.gnome.system.proxy.http port {port}",
+            f"gsettings set org.gnome.system.proxy.https host {host}",
+            f"gsettings set org.gnome.system.proxy.https port {port}",
+            f"gsettings set org.gnome.system.proxy.socks host {host}",
+            f"gsettings set org.gnome.system.proxy.socks port {port}",
+            "gsettings set org.gnome.system.proxy ignore-hosts \"['localhost', '127.0.0.0/8', '28.33.*']\"",
+            f"echo 'export http_proxy={proxy_url}' >> ~/.bashrc",
+            f"echo 'export https_proxy={proxy_url}' >> ~/.bashrc",
+            f"echo 'export HTTP_PROXY={proxy_url}' >> ~/.bashrc",
+            f"echo 'export HTTPS_PROXY={proxy_url}' >> ~/.bashrc",
+            "echo 'export no_proxy=localhost,127.0.0.1,28.33.*' >> ~/.bashrc",
+            "echo 'export NO_PROXY=localhost,127.0.0.1,28.33.*' >> ~/.bashrc",
+        ]
+        for cmd in commands:
+            try:
+                self._execute_setup([cmd], shell=True)
+            except Exception as e:
+                logger.error(f"configure_vm_proxy: command failed '{cmd}': {e}")
+                return False
+        logger.info(f"VM proxy configured: {host}:{port}")
+        return True
 
     # Chrome setup
     def _chrome_open_tabs_setup(self, urls_to_open: List[str]):

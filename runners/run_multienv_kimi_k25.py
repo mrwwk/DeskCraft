@@ -53,6 +53,7 @@ from multiprocessing import current_process
 import lib_run_single
 import lib_run_interactive
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 from mm_agents.kimi import KimiAgent
 from mm_agents.user_simulator import UserSimulator
 # taiji_proxy 懒加载，仅 --taiji 模式下使用
@@ -217,17 +218,7 @@ def setup_logging(args):
 
 
 def resolve_config_file(test_config_base_dir: str, domain: str, example_id: str) -> str:
-    """Support both evaluation_examples/examples/<domain>/<id>.json and <base>/<domain>/<id>.json."""
-    if not os.path.isabs(test_config_base_dir):
-        test_config_base_dir = os.path.join(SCRIPT_DIR, test_config_base_dir)
-    candidate_paths = [
-        os.path.join(test_config_base_dir, "examples", domain, f"{example_id}.json"),
-        os.path.join(test_config_base_dir, domain, f"{example_id}.json"),
-    ]
-    for candidate_path in candidate_paths:
-        if os.path.exists(candidate_path):
-            return candidate_path
-    return candidate_paths[0]
+    return resolve_task_config_path(test_config_base_dir, domain, example_id)
 
 
 def distribute_tasks(test_all_meta: dict) -> List[tuple]:
@@ -295,8 +286,7 @@ def run_env_tasks(task_queue, args: argparse.Namespace, shared_scores: list):
                 config_file = resolve_config_file(
                     args.test_config_base_dir, domain, example_id
                 )
-                with open(config_file, "r", encoding="utf-8") as f:
-                    example = json.load(f)
+                example = load_task_config(config_file)
                 logger.info(f"[{current_process().name}][Domain]: {domain}")
                 logger.info(f"[{current_process().name}][Example ID]: {example_id}")
 

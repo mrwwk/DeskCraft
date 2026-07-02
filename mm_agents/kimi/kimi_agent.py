@@ -457,7 +457,7 @@ class KimiAgent:
 
                 history_content = STEP_TEMPLATE.format(step_num=i+1) + self.history_template.format(
                     thought=self.cots[i].get('thought'),
-                    action=self.cots[i]['action']
+                    action=self.cots[i].get('action')
                 )
 
                 messages.append({

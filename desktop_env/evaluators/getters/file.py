@@ -147,8 +147,23 @@ def get_cache_file(env, config: Dict[str, str]) -> str:
     """
     Config:
         path (str): relative path in cache dir
+
+    Looks up the expected file in ``env.cache_dir`` first; if it is not present,
+    falls back to the per-task config directory (the folder containing
+    ``task.json``, exposed as ``env._task_config_path``) so gold/expected files
+    shipped next to a task are loaded directly.
     """
 
     _path = os.path.join(env.cache_dir, config["path"])
-    assert os.path.exists(_path)
+    if os.path.exists(_path):
+        return _path
+
+    # Fallback: resolve from the task's per-task directory.
+    task_config_path = getattr(env, "_task_config_path", None)
+    if task_config_path:
+        fallback = os.path.join(os.path.dirname(task_config_path), config["path"])
+        if os.path.exists(fallback):
+            return fallback
+
+    assert os.path.exists(_path), f"Cache file not found: {_path}"
     return _path

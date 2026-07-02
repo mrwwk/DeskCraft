@@ -67,6 +67,7 @@ def run_single_example(agent, env, example, max_steps, instruction, args, exampl
                 break
         step_idx += 1
     time.sleep(20) # Wait for the environment to settle
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -104,6 +105,7 @@ def run_single_example_human(env, example, max_steps, instruction, args, example
         f.write("\n")
     
     # Evaluate the result
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -165,6 +167,7 @@ def run_single_example_agi(agent, env, example, max_steps, instruction, args, ex
                 logger.info("The episode is done.")
                 break
         step_idx += 1
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -226,6 +229,7 @@ def run_single_example_openaicua(agent, env, example, max_steps, instruction, ar
                 logger.info("The episode is done.")
                 break
         step_idx += 1
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -302,6 +306,7 @@ def run_single_example_gpt54(agent, env, example, max_steps, instruction, args, 
                 break
         step_idx += 1
     time.sleep(20) # Wait for the environment to settle
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -358,6 +363,7 @@ def run_single_example_opencua(agent, env, example, max_steps, instruction, args
         step_idx += 1
 
     time.sleep(20) # Wait for the environment to settle
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -441,6 +447,7 @@ def run_single_example_kimi(agent, env, example, max_steps, instruction, args, e
                 break
         step_idx += 1
     time.sleep(20)  # Wait for the environment to settle
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -507,6 +514,7 @@ def run_single_example_autoglm(agent, env, example, max_steps, instruction, args
     if not done: # not completed the task yet
         env.action_history.append('FAIL')
     
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -567,6 +575,7 @@ def run_single_example_mano(agent, env, example, max_steps, instruction, args, e
                 logger.info("The episode is done.")
                 break
         step_idx += 1
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -623,6 +632,7 @@ def run_single_example_uipath(agent, env, example, max_steps, instruction, args,
                 logger.info("The episode is done.")
                 break
         step_idx += 1
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)
@@ -714,6 +724,7 @@ def run_single_example_evocua(agent, env, example, max_steps, instruction, args,
         step_idx += 1
         
     time.sleep(20) # Wait for environment to settle
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)

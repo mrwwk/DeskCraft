@@ -1,4 +1,5 @@
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 import argparse
 import logging
 import os
@@ -7,8 +8,7 @@ import datetime
 import json
 
 
-with open("evaluation_examples/examples/vs_code/4e60007a-f5be-4bfc-9723-c39affa0a6d3.json", "r") as f:
-    example = json.load(f)
+example = load_task_config(resolve_task_config_path("evaluation_examples", "vscode", "4e60007a-f5be-4bfc-9723-c39affa0a6d3"))
 # Parse arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--provider_name", type=str, default="docker")
