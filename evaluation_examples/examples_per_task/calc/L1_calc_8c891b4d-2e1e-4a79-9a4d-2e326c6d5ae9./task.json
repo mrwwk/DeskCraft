@@ -11,7 +11,7 @@
       "parameters": {
         "files": [
           {
-            "local_path": "cache/8c891b4d-2e1e-4a79-9a4d-2e326c6d5ae9/Product_Gross_Margin.xlsx",
+            "local_path": "assets/xlsx/Product_Gross_Margin.xlsx",
             "path": "/home/user/Product_Gross_Margin.xlsx"
           }
         ]
