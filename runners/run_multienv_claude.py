@@ -24,6 +24,7 @@ from multiprocessing import Process, Manager, current_process
 import lib_run_single
 from lib_results_logger import log_task_error
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 from mm_agents.anthropic import AnthropicAgent
 
 # Global variables for signal handling
@@ -259,11 +260,8 @@ def run_env_tasks(task_queue, args, shared_scores):
                 break
             domain, example_id = item
             try:
-                config_file = os.path.join(
-                    args.test_config_base_dir, f"examples/{domain}/{example_id}.json"
-                )
-                with open(config_file, "r", encoding="utf-8") as f:
-                    example = json.load(f)
+                config_file = resolve_task_config_path(args.test_config_base_dir, domain, example_id)
+                example = load_task_config(config_file)
                 logger.info(f"[{current_process().name}][Domain]: {domain}")
                 logger.info(f"[{current_process().name}][Example ID]: {example_id}")
                 logger.info(f"[{current_process().name}][Instruction]: {example['instruction']}")

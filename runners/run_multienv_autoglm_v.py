@@ -32,6 +32,7 @@ from types import SimpleNamespace
 import lib_run_single
 from run_autoglm_v import DesktopEnv, get_unfinished, get_result
 from desktop_env.desktop_env import MAX_RETRIES, DesktopEnv as DesktopEnvBase
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 from mm_agents.autoglm_v import AutoGLMAgent
 from openai import OpenAI
 
@@ -97,9 +98,8 @@ def _worker_run(task):
     domain, example_id, args = task  # args 为 argparse.Namespace
     logger = logging.getLogger("desktopenv.experiment")
     try:
-        config_file = os.path.join(args.test_config_base_dir, f"{domain}/{example_id}.json")
-        with open(config_file, "r", encoding="utf-8") as f:
-            example = json.load(f)
+        config_file = resolve_task_config_path(args.test_config_base_dir, domain, example_id)
+        example = load_task_config(config_file)
         instruction = example["instruction"]
 
         @backoff.on_exception(backoff.constant, (RateLimitError, APIConnectionError), interval=0.1)

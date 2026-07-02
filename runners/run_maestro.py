@@ -21,6 +21,7 @@ from dotenv import load_dotenv
 from multiprocessing import Pool, cpu_count
 from functools import partial
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 
 # Import from local mm_agents/maestro
 try:
@@ -185,8 +186,7 @@ def process_single_task(task_info, args, vm_log_dir, base_timestamp=None, task_i
     domain, example_id, config_file = task_info
     
     try:
-        with open(config_file, "r", encoding="utf-8") as f:
-            example = json.load(f)
+        example = load_task_config(config_file)
 
         user_query = example["instruction"]
         
@@ -255,11 +255,7 @@ def test(args: argparse.Namespace, test_all_meta: dict) -> None:
         domain_sanitized = str(domain).strip()
         for example_id in test_all_meta[domain]:
             example_id_sanitized = str(example_id).strip()
-            config_file = os.path.join(
-                args.test_config_base_dir,
-                domain_sanitized,
-                f"{example_id_sanitized}.json"
-            )
+            config_file = resolve_task_config_path(args.test_config_base_dir, domain_sanitized, example_id_sanitized)
 
             if not os.path.exists(config_file):
                 try:
@@ -303,8 +299,7 @@ def test(args: argparse.Namespace, test_all_meta: dict) -> None:
             logger.info(f"[Domain]: {domain}")
             logger.info(f"[Example ID]: {example_id}")
 
-            with open(config_file, "r", encoding="utf-8") as f:
-                example = json.load(f)
+            example = load_task_config(config_file)
 
             user_query = example["instruction"]
             logger.info(f"[User Query]: {user_query}")

@@ -522,6 +522,7 @@ def _extract_call_user_question(response_text):
 
 def _finalize_interactive_run(env, example, args, example_result_dir, scores, runtime_logger, interaction_log):
     time.sleep(20)
+    env.eval_result_dir = example_result_dir
     result = env.evaluate()
     logger.info("Result: %.2f", result)
     scores.append(result)

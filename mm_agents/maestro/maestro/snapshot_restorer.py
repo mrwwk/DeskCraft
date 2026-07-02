@@ -18,6 +18,7 @@ from .simple_snapshot import SimpleSnapshot
 from .new_global_state import NewGlobalState
 from .controller.main_controller import MainController
 from desktop_env.desktop_env import DesktopEnv
+from desktop_env.evaluators.task_loader import resolve_task_config_path, load_task_config
 
 
 def _load_task_config_by_id(os_word_task_id: str, os_type_value: Optional[str] = None, test_config_base_dir: Optional[str] = None) -> Optional[Dict[str, Any]]:
