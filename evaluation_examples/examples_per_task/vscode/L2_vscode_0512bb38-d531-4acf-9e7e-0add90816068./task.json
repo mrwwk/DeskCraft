@@ -11,7 +11,7 @@
   ],
   "config": [
     {
-      "type": "download",
+      "type": "upload_file",
       "parameters": {
         "files": [
           {

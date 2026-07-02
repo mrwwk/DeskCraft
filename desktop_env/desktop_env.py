@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import logging
 import os
 import time
@@ -12,6 +13,8 @@ import gymnasium as gym
 from desktop_env.controllers.python import PythonController
 from desktop_env.controllers.setup import SetupController
 from desktop_env.evaluators import metrics, getters
+from desktop_env.evaluators.artifacts import save_evaluator_artifacts
+from desktop_env.evaluators.loader import resolve_metric
 from desktop_env.providers import create_vm_manager_and_provider
 
 logger = logging.getLogger("desktopenv.env")
@@ -194,6 +197,11 @@ class DesktopEnv(gym.Env):
         self._step_no: int = 0
         self.action_history: List[Dict[str, any]] = []
 
+        # Directory where evaluator replay artifacts are written (set by the
+        # runner before env.evaluate()). Saving is gated by the
+        # DESKCRAFT_SAVE_EVALUATOR_ARTIFACTS env var (off by default).
+        self.eval_result_dir: Optional[str] = None
+
 
     def _start_emulator(self):
         try:
@@ -280,6 +288,10 @@ class DesktopEnv(gym.Env):
                     # If proxy is enabled at system level, always set up the proxy configuration
                     # This ensures VM can access network regardless of task's proxy setting
                     self.setup_controller._proxy_setup(self.client_password)
+                vm_proxy = os.environ.get("DESKCRAFT_VM_PROXY")
+                if vm_proxy:
+                    # VM has no direct internet access; route through a corporate proxy.
+                    self.setup_controller.configure_vm_proxy(vm_proxy)
                 self._set_task_info(task_config)
                 self.setup_controller.reset_cache_dir(self.cache_dir)
                 logger.info("Setting up environment...")
@@ -325,6 +337,7 @@ class DesktopEnv(gym.Env):
     def _set_task_info(self, task_config: Dict[str, Any]):
         """Set task info (proxy logic is handled in reset method)"""
         self.task_id: str = task_config["id"]
+        self._task_config_path: Optional[str] = task_config.get("_task_config_path")
         self.cache_dir: str = os.path.join(self.cache_dir_base, self.task_id)
         os.makedirs(self.cache_dir, exist_ok=True)
         self.instruction = task_config.get("instruction", task_config.get("phases", [{}])[0].get("instruction", ""))
@@ -343,11 +356,11 @@ class DesktopEnv(gym.Env):
         # if func is a str list, then result, expected (if exists), options (if exists) should also be lists of the same length
         # even if one of the metrics does not need expected or options field, it should be included in the list with None
         self.evaluator = task_config["evaluator"]
-        self.metric: Metric = [getattr(metrics, func) for func in self.evaluator["func"]] \
+        self.metric: Metric = [resolve_metric(func, self.evaluator, task_config) for func in self.evaluator["func"]] \
             if isinstance(self.evaluator["func"], list) \
-            else getattr(metrics, self.evaluator["func"])
+            else resolve_metric(self.evaluator["func"], self.evaluator, task_config)
         self.metric_conj: str = self.evaluator.get("conj", "and")  # take conjunction of multiple metrics
-        if "result" in self.evaluator and len(self.evaluator["result"]) > 0:
+        if self.evaluator.get("result"):
             self.result_getter: Getter = [getattr(getters, "get_{:}".format(res["type"])) for res in
                                           self.evaluator["result"]] \
                 if isinstance(self.evaluator["result"], list) \
@@ -357,7 +370,7 @@ class DesktopEnv(gym.Env):
                 if isinstance(self.metric, list) \
                 else None
 
-        if "expected" in self.evaluator and len(self.evaluator["expected"]) > 0:
+        if self.evaluator.get("expected"):
             self.expected_getter: Getter = [getattr(getters, "get_{:}".format(exp["type"])) if exp else None for exp in
                                             self.evaluator["expected"]] \
                 if isinstance(self.evaluator["expected"], list) \
@@ -374,6 +387,24 @@ class DesktopEnv(gym.Env):
             else [{}] * len(self.metric) \
             if isinstance(self.metric, list) \
             else {}
+
+        # When func is a list but a sibling field (result/expected/options) was
+        # provided as a single scalar config, broadcast it to one entry per
+        # metric so every metric shares the same getter/config. This tolerates
+        # revised task configs where, e.g., several metrics read the same file
+        # but only one ``result`` entry was written.
+        if isinstance(self.metric, list):
+            n = len(self.metric)
+            if not isinstance(self.result_getter, list):
+                self.result_getter = [self.result_getter] * n
+                if "result" in self.evaluator and not isinstance(self.evaluator["result"], list):
+                    self.evaluator["result"] = [self.evaluator["result"]] * n
+            if not isinstance(self.expected_getter, list):
+                self.expected_getter = [self.expected_getter] * n
+                if self.evaluator.get("expected") is not None and not isinstance(self.evaluator["expected"], list):
+                    self.evaluator["expected"] = [self.evaluator["expected"]] * n
+            if not isinstance(self.metric_options, list):
+                self.metric_options = [self.metric_options] * n
 
         assert (not isinstance(self.evaluator["func"], list)
                 or (len(self.metric) == len(self.result_getter) == len(self.expected_getter) == len(
@@ -436,10 +467,133 @@ class DesktopEnv(gym.Env):
 
         return observation, reward, done, info
 
+    @staticmethod
+    def _metric_expects_expected_arg(metric_fn: Metric) -> bool:
+        """Return True if metric_fn takes >=2 positional args (result, expected)."""
+        try:
+            parameters = inspect.signature(metric_fn).parameters.values()
+        except (TypeError, ValueError):
+            return False
+        positional = [
+            param
+            for param in parameters
+            if param.kind in (
+                inspect.Parameter.POSITIONAL_ONLY,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            )
+        ]
+        return len(positional) >= 2
+
+    def _evaluator_func_names(self) -> List[str]:
+        funcs = self.evaluator.get("func")
+        if isinstance(funcs, str):
+            return [funcs]
+        if isinstance(funcs, list):
+            return [str(name) for name in funcs]
+        return []
+
+    def _evaluate_metrics(self) -> Tuple[float, List[Dict[str, Any]]]:
+        """Run configured metrics and collect artifact records.
+
+        Normalizes metric/getter/options to lists, runs each metric, collects a
+        record dict per metric (for offline replay), and applies the and/or
+        short-circuit. Returns (score, records).
+        """
+        metrics_list = self.metric if isinstance(self.metric, list) else [self.metric]
+        result_getters = (
+            self.result_getter if isinstance(self.result_getter, list) else [self.result_getter]
+        )
+        expected_getters = (
+            self.expected_getter if isinstance(self.expected_getter, list) else [self.expected_getter]
+        )
+        options_list = (
+            self.metric_options if isinstance(self.metric_options, list) else [self.metric_options]
+        )
+        result_configs = (
+            self.evaluator["result"]
+            if isinstance(self.evaluator.get("result"), list)
+            else [self.evaluator.get("result")]
+        )
+        expected_configs = self.evaluator.get("expected")
+        if expected_configs is None:
+            expected_configs = [None] * len(metrics_list)
+        elif not isinstance(expected_configs, list):
+            expected_configs = [expected_configs]
+
+        func_names = self._evaluator_func_names()
+        metric_records: List[Dict[str, Any]] = []
+        results: List[float] = []
+
+        for idx, metric_fn in enumerate(metrics_list):
+            func_name = func_names[idx] if idx < len(func_names) else f"metric_{idx}"
+            result_getter_config = result_configs[idx] if idx < len(result_configs) else None
+            expected_getter_config = expected_configs[idx] if idx < len(expected_configs) else None
+            options = options_list[idx] if idx < len(options_list) else {}
+
+            try:
+                result_state = result_getters[idx](self, result_getter_config)
+            except FileNotFoundError:
+                logger.error("File not found!")
+                result_state = None
+
+            record: Dict[str, Any] = {
+                "func_name": func_name,
+                "result_getter_config": result_getter_config,
+                "expected_getter_config": expected_getter_config,
+                "options": options,
+                "result_state": result_state,
+                "expected_state": None,
+                "metric_score": None,
+            }
+            metric_records.append(record)
+
+            if result_state is None:
+                logger.warning("Result state is None for metric %d, treating as failure", idx)
+                if self.metric_conj == "and":
+                    return 0.0, metric_records
+                results.append(0.0)
+                record["metric_score"] = 0.0
+                continue
+
+            expected_state = None
+            if (
+                expected_getters[idx] is not None
+                and expected_getter_config is not None
+            ):
+                expected_state = expected_getters[idx](self, expected_getter_config)
+            record["expected_state"] = expected_state
+
+            if self._metric_expects_expected_arg(metric_fn) and expected_getter_config is not None:
+                metric_score = float(metric_fn(result_state, expected_state, **options))
+            else:
+                metric_score = float(metric_fn(result_state, **options))
+
+            record["metric_score"] = metric_score
+
+            if self.metric_conj == "and" and metric_score == 0.0:
+                return 0.0, metric_records
+            if self.metric_conj == "or" and metric_score == 1.0:
+                return 1.0, metric_records
+            results.append(metric_score)
+
+        if not results:
+            return 0.0, metric_records
+        if self.metric_conj == "and":
+            return sum(results) / len(results), metric_records
+        return max(results), metric_records
+
     def evaluate(self):
         """
         Evaluate whether the task is successfully completed.
         """
+        metric_records: List[Dict[str, Any]] = []
+
+        def _finish(final_score: float, error: Optional[str] = None) -> float:
+            try:
+                save_evaluator_artifacts(self, metric_records, final_score, error=error)
+            except Exception as exc:
+                logger.warning("Failed to save evaluator artifacts: %s", exc)
+            return final_score
 
         postconfig = self.evaluator.get("postconfig", [])
         self.setup_controller.setup(postconfig, self.enable_proxy)
@@ -451,58 +605,16 @@ class DesktopEnv(gym.Env):
             if len(self.action_history) > 0:
                 last_action = self.action_history[-1]
                 if last_action == "FAIL" or (type(last_action) == dict and last_action.get('action_type') == 'FAIL'):
-                    return 1
-            return 0
+                    return _finish(1.0)
+            return _finish(0.0)
         else:
             if len(self.action_history) > 0:
                 last_action = self.action_history[-1]
                 if last_action == "FAIL" or (type(last_action) == dict and last_action.get('action_type') == 'FAIL'):
-                    return 0
+                    return _finish(0.0)
 
-        if type(self.metric) == list:
-            # Multiple metrics to evaluate whether the task is successfully completed
-            results = []
-            assert len(self.metric) == len(self.result_getter), "The number of metrics and result getters must be the same"
-            if "expected" in self.evaluator:
-                assert len(self.metric) == len(self.expected_getter), "The number of metrics and expected getters must be the same"
-            for idx, metric in enumerate(self.metric):
-                try:
-                    config = self.evaluator["result"][idx]
-                    result_state = self.result_getter[idx](self, config)
-                except FileNotFoundError:
-                    logger.error("File not found!")
-                    if self.metric_conj == 'and':
-                        return 0
-
-                if "expected" in self.evaluator and self.expected_getter and self.evaluator["expected"]:
-                    expected_state = self.expected_getter[idx](self, self.evaluator["expected"][idx])
-                    metric: int = metric(result_state, expected_state, **self.metric_options[idx])
-                else:
-                    metric: int = metric(result_state, **self.metric_options[idx])
-
-                if self.metric_conj == 'and' and float(metric) == 0.0:
-                    return 0
-                elif self.metric_conj == 'or' and float(metric) == 1.0:
-                    return 1
-                else:
-                    results.append(metric)
-
-            return sum(results) / len(results) if self.metric_conj == 'and' else max(results)
-        else:
-            # Single metric to evaluate whether the task is successfully completed
-            try:
-                result_state = self.result_getter(self, self.evaluator["result"])
-            except FileNotFoundError:
-                logger.error("File not found!")
-                return 0
-
-            if "expected" in self.evaluator and self.expected_getter and self.evaluator["expected"]:
-                expected_state = self.expected_getter(self, self.evaluator["expected"])
-                metric: float = self.metric(result_state, expected_state, **self.metric_options)
-            else:
-                metric: float = self.metric(result_state, **self.metric_options)
-
-        return metric
+        score, metric_records = self._evaluate_metrics()
+        return _finish(score)
 
     def render(self, mode='rgb_array'):
         if mode == 'rgb_array':
