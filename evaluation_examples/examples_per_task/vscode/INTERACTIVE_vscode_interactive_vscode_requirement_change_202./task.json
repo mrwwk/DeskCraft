@@ -102,7 +102,8 @@
     "func": [
       "check_ui_bundle_required_files",
       "check_ui_bundle_required_keywords",
-      "check_ui_bundle_html_checks"
+      "check_ui_bundle_html_checks",
+      "check_ui_bundle_manifest_subset"
     ],
     "conj": "and",
     "expected": [
@@ -126,7 +127,9 @@
               "pricing-card",
               "Starter",
               "Growth",
-              "Scale"
+              "Enterprise",
+              "Popular",
+              "Talk to Sales"
             ],
             "styles.css": [
               "pricing-grid",
@@ -148,8 +151,37 @@
                 "type": "selector_count",
                 "selector": ".pricing-card",
                 "count": 3
+              },
+              {
+                "type": "selector_exists",
+                "selector": ".pricing-card.popular"
+              },
+              {
+                "type": "selector_text_contains",
+                "selector": ".pricing-card.popular",
+                "text": "Popular"
+              },
+              {
+                "type": "selector_text_contains",
+                "selector": "#pricing-grid .pricing-card:nth-of-type(3)",
+                "text": "Enterprise"
+              },
+              {
+                "type": "selector_text_contains",
+                "selector": "#pricing-grid .pricing-card:nth-of-type(3) button",
+                "text": "Talk to Sales"
               }
             ]
+          }
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_manifest": {
+            "project": "pricing-studio",
+            "theme": "violet",
+            "version": "2.0"
           }
         }
       }

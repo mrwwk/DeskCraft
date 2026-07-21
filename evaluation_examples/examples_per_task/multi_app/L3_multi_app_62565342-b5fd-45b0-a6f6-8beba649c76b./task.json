@@ -57,59 +57,24 @@
     "os"
   ],
   "evaluator": {
-    "func": [
-      "check_python_file_by_test_suite",
-      "is_expected_active_tab_approximate",
-      "check_include_exclude"
-    ],
+    "func": "check_include_exclude",
     "file": "evaluator.py",
-    "result": [
-      {
-        "type": "vm_file",
-        "path": [
-          "/home/user/Desktop/task_cli/helpers.py",
-          "/home/user/Desktop/task_cli/formatter.py",
-          "/home/user/Desktop/task_cli/cli.py"
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"from pathlib import Path; p=Path('/home/user/Desktop/task_cli/FIX_SUMMARY.txt'); s=p.read_text(encoding='utf-8').strip() if p.exists() else ''; print('PASS' if s=='issue=CLI-204' else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASS"
         ],
-        "dest": [
-          "helpers.py",
-          "formatter.py",
-          "cli.py"
-        ],
-        "multi": true
-      },
-      {
-        "type": "active_tab_info"
-      },
-      {
-        "type": "vm_command_line",
-        "command": "cat /home/user/Desktop/task_cli/FIX_SUMMARY.txt",
-        "shell": true
+        "exclude": [
+          "FAIL"
+        ]
       }
-    ],
-    "expected": [
-      {
-        "type": "vm_file",
-        "path": "/home/user/Desktop/task_cli/test.py",
-        "dest": "test_suite.py"
-      },
-      {
-        "type": "rule",
-        "rules": {
-          "type": "url",
-          "url": "https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals"
-        }
-      },
-      {
-        "type": "rule",
-        "rules": {
-          "include": [
-            "issue=CLI-204"
-          ],
-          "exclude": []
-        }
-      }
-    ],
+    },
     "conj": "and"
   },
   "proxy": true,

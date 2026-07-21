@@ -62,16 +62,17 @@
     "func": "check_include_exclude",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/bug_tracker.xlsx'); s = df.to_string(); print('PASSED' if 'BUG-2025-0312' in s else 'FAILED')\""
+      "command": "python3 -c \"import pandas as pd; df=pd.read_excel('/home/user/Desktop/bug_tracker.xlsx'); s=df.to_string(); print('PASS' if all(v in s for v in ['BUG-2025-0312', 'User Center - Login', 'High', 'P1', 'Xu Hao', 'Cui Ming', '2025-03-12']) else 'FAIL')\"",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
         "include": [
-          "PASSED"
+          "PASS"
         ],
         "exclude": [
-          "FAILED"
+          "FAIL"
         ]
       }
     },

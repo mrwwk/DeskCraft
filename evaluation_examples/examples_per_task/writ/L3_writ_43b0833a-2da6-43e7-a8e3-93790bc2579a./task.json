@@ -60,11 +60,8 @@
         }
       }
     ],
-    "func": "compare_docx_files",
-    "expected": {
-      "type": "cache_file",
-      "path": "Proposal_L3_07_gold.docx"
-    },
+    "func": "evaluate_proposal_docx",
+    "expected": null,
     "result": {
       "type": "vm_file",
       "path": "/home/user/Desktop/Proposal_L3_07.docx",

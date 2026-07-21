@@ -3,7 +3,7 @@
   "task_slug": "deploy_config_full_pipeline_os_vscode_chrome",
   "difficulty": "L3",
   "snapshot": "os",
-  "instruction": "You are bootstrapping a new micro-service using the central deployment configuration at ~/Desktop/deploy_config.json. Every action you take must be driven by values from that file — do not use any hard-coded values that differ from what is in the config. Complete all four steps: (1) OS — create the log directory specified in the config's 'logDir' field (/tmp/fastapi_logs/), then write ~/Desktop/env_summary.txt with exactly these two lines taken from the config: 'project=FastAPI Service' and 'author=dev_team'. (2) VS Code — apply the settings from the config to VS Code User Settings: set editor.tabSize to the 'tabSize' field (2), set editor.rulers to a single-element array with the 'maxLineLength' value (88), and add each directory in the 'excludeDirs' list (__pycache__, .env, venv) to files.exclude mapped to true. (3) Chrome — open the URL stored in the config's 'docsUrl' field (https://fastapi.tiangolo.com/) in a new Chrome tab.",
+  "instruction": "You are bootstrapping a new micro-service using the central deployment configuration at ~/Desktop/deploy_config.json. Every action you take must be driven by values from that file — do not use any hard-coded values that differ from what is in the config. Complete all three steps: (1) OS — create the log directory specified in the config's 'logDir' field (/tmp/fastapi_logs/), then write ~/Desktop/env_summary.txt with exactly these two lines taken from the config: 'project=FastAPI Service' and 'author=dev_team'. (2) VS Code — apply the settings from the config to VS Code User Settings: set editor.tabSize to the 'tabSize' field (2), set editor.rulers to a single-element array with the 'maxLineLength' value (88), and add each directory in the 'excludeDirs' list (__pycache__, .env, venv) to files.exclude mapped to true. (3) Chrome — open the URL stored in the config's 'docsUrl' field (https://fastapi.tiangolo.com/) in a new Chrome tab.",
   "source": "authors",
   "config": [
     {
@@ -16,19 +16,28 @@
     {
       "type": "launch",
       "parameters": {
-        "command": ["google-chrome", "--remote-debugging-port=1337"]
+        "command": [
+          "google-chrome",
+          "--remote-debugging-port=1337"
+        ]
       }
     },
     {
       "type": "launch",
       "parameters": {
-        "command": ["socat", "tcp-listen:9222,fork", "tcp:localhost:1337"]
+        "command": [
+          "socat",
+          "tcp-listen:9222,fork",
+          "tcp:localhost:1337"
+        ]
       }
     },
     {
       "type": "launch",
       "parameters": {
-        "command": ["code"]
+        "command": [
+          "code"
+        ]
       }
     },
     {
@@ -39,7 +48,11 @@
     }
   ],
   "trajectory": "trajectories/",
-  "related_apps": ["os", "vscode", "chrome"],
+  "related_apps": [
+    "os",
+    "vscode",
+    "chrome"
+  ],
   "evaluator": {
     "func": [
       "check_include_exclude",
@@ -56,7 +69,7 @@
       },
       {
         "type": "vm_command_line",
-        "command": "cat /home/user/Desktop/env_summary.txt",
+        "command": "python3 -c \"from pathlib import Path; p=Path('/home/user/Desktop/env_summary.txt'); lines=p.read_text(encoding='utf-8').splitlines() if p.exists() else []; print('PASS' if lines==['project=FastAPI Service','author=dev_team'] else 'FAIL')\"",
         "shell": true
       },
       {
@@ -72,15 +85,21 @@
       {
         "type": "rule",
         "rules": {
-          "include": ["DIREXISTS"],
+          "include": [
+            "DIREXISTS"
+          ],
           "exclude": []
         }
       },
       {
         "type": "rule",
         "rules": {
-          "include": ["project=FastAPI Service", "author=dev_team"],
-          "exclude": []
+          "include": [
+            "PASS"
+          ],
+          "exclude": [
+            "FAIL"
+          ]
         }
       },
       {
@@ -88,7 +107,9 @@
         "rules": {
           "expected": {
             "editor.tabSize": 2,
-            "editor.rulers": [88],
+            "editor.rulers": [
+              88
+            ],
             "files.exclude": {
               "**/__pycache__": true,
               "**/.env": true,
