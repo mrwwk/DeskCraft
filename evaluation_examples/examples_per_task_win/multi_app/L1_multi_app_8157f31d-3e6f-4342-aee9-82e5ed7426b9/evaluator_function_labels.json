@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_8157f31d-3e6f-4342-aee9-82e5ed7426b9/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_csv_summary_fix",
+      "lineno": 1
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_csv_summary_fix",
+      "lineno": 1
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证CSV汇总器bug修复任务是否完整完成。它要求从VM环境中拉取两个特定文件：summarize.py和SUMMARY_FIXED.txt。核心检查对象是两份文件的内容正确性：一是代码文件summarize.py必须包含'next(reader)'以跳过CSV表头；二是标记文件SUMMARY_FIXED.txt的内容在去除首尾空白后必须恰好等于'csv summary fixed'。比较方式为直接字符串包含判断和完全相等判断，无近似匹配、无阈值容错。成功判定采用\"全部满足\"逻辑，仅当两项检查同时通过时返回1.0，任一检查失败即在对应分支返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_csv_summary_fix",
+        "lineno": 1,
+        "description": "该函数接收actual_files（从VM通过vm_file multi=true拉取的文件路径列表）和**options。它期望actual_files按顺序包含两个元素：索引0为summarize.py路径，索引1为SUMMARY_FIXED.txt路径。测试逻辑分为两步严格检查：第一步，读取summarize.py的完整文本内容，检查其中是否包含字符串'next(reader)'，若文件缺失、不可读或不包含该字符串，则立即返回0.0；第二步，读取SUMMARY_FIXED.txt的完整文本内容并执行strip()去除首尾空白，检查结果是否恰好等于'csv summary fixed'，若文件缺失、不可读或内容不完全一致，则立即返回0.0。两步全部通过时返回1.0。该函数未调用任何辅助函数，所有文件读取与比较均在函数内部直接完成。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:17:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_8157f31d-3e6f-4342-aee9-82e5ed7426b9/evaluator_function_labels.json"
+}

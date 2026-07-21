@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b070486d-e161-459b-aa2b-ef442d973b92/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_tamiflu_side_effects",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_tamiflu_side_effects",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于判定一个复合浏览器任务的完成状态，任务包含两个子要求：(a)在浏览器中打开Drugs.com关于Tamiflu副作用的文章页面；(b)在Chrome中启用Enhanced Safe Browsing保护。由于评测端只能通过accessTree获取当前活动标签页的URL，因此evaluator将两种终端状态均视为任务完成：状态一是活动标签页为Drugs.com的Tamiflu副作用页面（需同时满足包含drugs.com、tamiflu、side-effects或sfx三项特征）；状态二是活动标签页停留在chrome://settings/security（表明两个子任务均已执行完毕，Drugs.com页面此时位于后台标签页）。核心检查对象是当前活动URL字符串，通过与expected中配置的多组正则模式进行匹配来判定：同一组内的多个模式必须全部命中（逻辑与），不同组之间只要有一组命中即可（逻辑或），最终输出离散分数1.0（成功）或0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "check_tamiflu_side_effects",
+        "lineno": 7,
+        "description": "该函数作为唯一主评测入口，接收result（当前活动页信息）与expected（期望正则模式配置）两个核心参数，按以下步骤执行检查：第一步，进行前置合法性校验——若result为空、既不是字符串也不是包含'url'键的字典、或expected为None，则立即返回0.0；第二步，从result中提取目标URL（字符串直接取用，字典则取'url'字段）；第三步，从expected字典的\"expected\"键中获取模式组列表pattern_groups，若为空列表则返回0.0；第四步，遍历pattern_groups中的每一组模式，若该组为列表类型，则对其中每一个正则表达式使用re.search在URL中搜索，记录该组内各模式是否命中，仅当组内所有模式均命中（AND逻辑）时才返回1.0；若该组为单个字符串模式，则直接使用re.search搜索，一旦命中（OR逻辑中的单组满足）即返回1.0；第五步，若所有模式组均未命中，最终返回0.0。该函数通过\"组内全匹配、组间任一匹配\"的多层正则策略，兼容两种合法终端URL的判定需求。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:09:11",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b070486d-e161-459b-aa2b-ef442d973b92/evaluator_function_labels.json"
+}

@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_42a9a163-a7b0-4bf0-9b9b-6057dc90fcc2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 6
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 19
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 49
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 6
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 19
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 49
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是一个多维度、离散打分的任务完成度判定器，针对三类不同场景分别给出 0.0 或 1.0 的硬判定：1）验证程序输出或文本字符串中是否同时包含所有指定子串（include），且不含任何禁用子串（exclude）；2）验证 VS Code 的 settings.json 配置文件中是否完整存在预期的键值对；3）验证 Chrome 浏览器当前活动标签页的 URL 是否与预期 URL 一致（忽略查询参数）。每个主函数独立执行、互不依赖，只有各自检查链上的全部细分条件完全通过时才返回 1.0，任一条件失败或发生异常即返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 6,
+        "description": "检查对象为 result 字符串。步骤如下：首先判断 result 是否为 None，若为 None 直接返回 0；然后从 rules 字典中分别取出键为 'include' 和 'exclude' 的列表；接着检查 result 是否包含 include 列表中的每一个子串，同时不包含 exclude 列表中的任何一个子串。判定依据为“全部包含且全部排除”同时成立时返回 1.0，否则返回 0。该函数用于对文本输出或页面源码进行白名单/黑名单子串匹配。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 19,
+        "description": "检查对象为 actual 参数指向的 settings.json 文件。步骤如下：首先判断 actual 路径是否为空，为空则返回 0；随后尝试打开该文件并调用 json.load 解析为 Python 字典，若文件读取或 JSON 解析过程中发生任何异常也返回 0；接着从 expected 字典中取出键为 'expected' 的子字典，遍历其中所有 key-value 对，逐一检查该 key 是否存在于实际解析出的 JSON 对象中，且对应的 value 是否与预期值完全相等（使用 == 比较）。判定依据为所有键值对全部匹配时返回 1.0，只要有一对不匹配或过程异常即返回 0.0。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 49,
+        "description": "检查对象为 Chrome 活动标签页的 URL。步骤如下：首先判断 active_tab_info 是否为空，为空则返回 0；然后读取 rule['type']，仅当其值为字符串 'url' 时才继续，否则返回 0；从 rule 中取出 expected_url，从 active_tab_info（若为字典则取 'url' 键，否则直接视为 URL 字符串）中取出 actual_url，若 actual_url 为空也返回 0；在比较阶段，函数内部使用 urlparse 与 urlunparse 将两个 URL 的 query 查询参数部分去除，再对处理后的 URL 进行完全相等比较。判定依据为去参后的 URL 相等返回 1.0，不相等返回 0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:21:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_42a9a163-a7b0-4bf0-9b9b-6057dc90fcc2/evaluator_function_labels.json"
+}

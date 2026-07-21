@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_012/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator的核心目的是验证某个文本结果（如程序输出、页面文本、日志内容等）是否严格符合预设的包含与排除规则。它接收一个待检字符串result和一个规则字典rules，其中rules通过键\"include\"指定必须全部出现在result中的子串列表，通过键\"exclude\"指定必须全部不出现在result中的子串列表。评测逻辑采用硬判定方式：只有当所有include子串均被包含且所有exclude子串均未被包含时，才判定成功并返回1.0；若result为None、任一include缺失、或任一exclude出现，则返回0.0。这是一种基于精确子串匹配的布尔式打分，不涉及近似匹配、正则匹配、文件读取或加权累计。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数是唯一的评测入口，接收result（待检查的字符串，可能为None）和rules（字典，可包含键\"include\"和\"exclude\"，对应值为字符串列表）。检查步骤如下：1）若result为None，直接返回0.0；2）从rules中取出include列表（默认空）和exclude列表（默认空）；3）使用子串包含判断，检查result是否同时满足：包含include中每一个字符串，且不包含exclude中任何一个字符串；4）若两个条件同时满足则返回1.0，否则返回0.0。该函数不调用任何辅助函数，也不进行文件读取、正则匹配或近似匹配，仅通过简单的字符串存在性检查完成布尔式打分。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:13:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_012/evaluator_function_labels.json"
+}

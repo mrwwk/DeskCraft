@@ -1,0 +1,78 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib07_bottle_multidelivery_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 114
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 158
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 37
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 114
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 158
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender交互式渲染任务的多项产出与状态。核心检查对象包括：1) Blender场景渲染参数（引擎、分辨率X、分辨率Y、帧率、采样数、图像格式、活动相机）；2) 世界环境光照的HDRI文件配置；3) 最终渲染输出图像文件的物理存在性、尺寸精度与格式合规性；4) 通用文本输出的包含与排除规则。评测逻辑采用逐项严格匹配（完全相等或子串包含），各检查维度分别由独立主函数承担，每个主函数内部采用“全部满足即得1.0，任一不满足即得0.0”的硬阈值判定，不存在加权累计。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 50,
+        "description": "接收Blender检查脚本输出的JSON字符串command_output，以及一个规则字典rule。首先调用辅助函数_parse_blender_output将JSON字符串解析为Python字典。随后针对rule中实际存在的键，依次检查以下字段是否与解析结果严格相等（==）：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。只有当rule中指定的所有键都完全匹配时，才返回1.0；若解析失败、结果为空，或任一指定字段不匹配，立即返回0.0并记录警告日志。"
+      },
+      {
+        "name": "check_blender_world_hdri",
+        "lineno": 85,
+        "description": "接收Blender检查脚本输出的JSON字符串command_output，以及包含期望hdri_filename的rule字典。首先调用_parse_blender_output解析JSON。然后分两步判定：第一步确认解析结果中的has_hdri为真，若否则直接返回0.0；第二步比较实际HDRI文件名与期望值，采用“期望值被包含于实际文件名”或“完全相等”的宽松匹配策略。两步均通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 114,
+        "description": "接收渲染产物文件路径file_path和规则字典rule。首先验证文件是否真实存在。若存在，尝试使用PIL.Image打开图像文件并读取实际宽高。若rule指定了width或height，要求与实际尺寸严格相等；若rule指定了format，要求图像格式（img.format）与期望值统一转换为大写后一致，并兼容JPG到JPEG的别名映射。若PIL未安装，则退化为仅检查文件存在性（存在返回1.0，否则0.0）。任一硬性条件不满足即返回0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 158,
+        "description": "接收一个待检查的字符串result和规则字典rules。从rules中提取include列表与exclude列表。判定条件为：result必须同时包含include中所有字符串，且必须不包含exclude中任何字符串。两个条件同时满足返回1.0，否则返回0.0。该函数为通用文本检查器，不局限于Blender场景。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 24,
+        "description": "接收Blender相关检查脚本输出的原始字符串command_output，负责将其解析为Python字典。先检查输入是否为空或仅含空白，若是则返回None；否则尝试使用json.loads解析。若解析失败（如JSONDecodeError），记录错误并返回None。该函数为check_blender_render_settings和check_blender_world_hdri提供统一的前置解析服务，解析失败会导致调用方直接判0.0。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:31:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib07_bottle_multidelivery_001/evaluator_function_labels.json"
+}

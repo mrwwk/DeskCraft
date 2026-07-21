@@ -1,0 +1,78 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib11_corset_lookdev_clarify_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 114
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 158
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 37
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 85
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 114
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 158
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender交互式渲染任务在多个维度上的配置正确性与最终产出质量。核心验证对象包括：1）渲染管线参数，即通过Blender检查脚本（如check_render.py）输出的JSON验证渲染引擎、分辨率、帧率、采样数、图像格式及活动相机是否严格符合规则；2）世界环境光照，即通过check_world.py输出的JSON验证是否启用了HDRI环境贴图且文件名匹配；3）最终渲染图像文件，通过PIL读取验证图像尺寸、格式及文件存在性，若PIL不可用则退化为仅检查文件是否存在；4）通用文本内容，通过包含与排除列表验证字符串内容。所有检查项均采用二元打分机制（1.0表示该维度全部条件满足，0.0表示任一条件失败或输入数据异常），要求各自维度内的所有指定规则必须同时满足，不存在加权或部分得分逻辑。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 50,
+        "description": "接收Blender检查脚本输出的JSON字符串command_output，以及包含期望渲染参数的字典rule。首先调用辅助函数_parse_blender_output将原始命令输出解析为Python字典；若解析失败或输出为空/空白，则直接返回0.0。随后针对rule中可能出现的键（engine、resolution_x、resolution_y、fps、samples、image_format、active_camera）逐一检查：若某键存在于rule中，则要求解析结果result中的对应字段值与rule中的期望值进行严格相等（==）比较。所有存在的检查项必须全部通过，若任一项不匹配则记录警告日志并立即返回0.0；仅当所有项均匹配时才返回1.0。"
+      },
+      {
+        "name": "check_blender_world_hdri",
+        "lineno": 85,
+        "description": "接收Blender检查脚本（check_world.py）输出的JSON字符串command_output，以及包含期望HDRI文件名的rule字典（键为hdri_filename）。首先调用_parse_blender_output解析JSON，解析失败返回0.0。接着检查解析结果中的has_hdri布尔字段，若未启用HDRI则记录警告并返回0.0。然后比对实际文件名（result中的hdri_filename）与期望值：支持两种匹配模式——期望文件名完全等于实际文件名，或期望文件名被包含在实际文件名路径中（in 操作）。满足任一条件返回1.0；否则记录不匹配警告并返回0.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 114,
+        "description": "接收最终渲染输出文件的本地路径file_path，以及包含期望宽度、高度和图像格式的rule字典。首先验证file_path是否非空且文件真实存在，不存在则返回0.0。若PIL可用，使用Image.open打开图像并获取实际宽度、高度及格式。依次执行以下严格比对：若rule指定width/height，要求与实际图像尺寸完全相等；若rule指定format，先将期望格式与实际格式均转为大写，再进行等值比较，并额外支持JPG到JPEG的别名映射（fmt_map）。任一维度不匹配则记录警告并返回0.0，全部匹配返回1.0。若系统未安装PIL（触发ImportError），则退化为仅检查file_path是否存在，存在返回1.0，否则0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 158,
+        "description": "接收待检查的字符串result，以及包含include列表与exclude列表的rules字典。判定逻辑为组合条件：result必须同时包含include列表中的每一个字符串（all(r in result for r in include)），并且必须同时不包含exclude列表中的每一个字符串（all(r not in result for r in exclude)）。两个条件同时满足返回1.0，任一不满足返回0.0。若输入result为None，直接返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 30,
+        "description": "辅助解析函数，接收Blender检查脚本返回的原始命令输出字符串command_output。首先判断输出是否为空或仅包含空白字符，若是则记录错误日志并返回None；否则尝试使用json.loads将字符串解析为Python对象（通常为字典）。若解析过程中抛出json.JSONDecodeError或ValueError，则记录错误日志并附带原始输出内容（用于调试），然后返回None。该函数为check_blender_render_settings和check_blender_world_hdri提供统一的JSON解析入口与异常兜底，一旦返回None，调用主函数将直接判定该检查项为0.0分。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:33:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib11_corset_lookdev_clarify_001/evaluator_function_labels.json"
+}

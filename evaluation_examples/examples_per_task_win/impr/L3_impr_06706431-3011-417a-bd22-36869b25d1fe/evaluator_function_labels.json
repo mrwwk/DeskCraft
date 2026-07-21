@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_06706431-3011-417a-bd22-36869b25d1fe/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对两份PPTX演示文稿进行逐页、逐形状、逐段落、逐文本运行（run）的精细化比对，以判定任务产出是否符合预期。它通过python-pptx库加载参考文件与候选文件，默认对幻灯片数量、形状位置与尺寸（容差0.5%）、文本内容、字体名称/大小/粗体/斜体/下划线/删除线/颜色、段落对齐方式（None视为LEFT）、缩进级别、表格行列结构与单元格格式、幻灯片背景色、备注文本、项目符号等属性进行全面检查。比较采用“一票否决”机制：任一检查项不匹配即返回0，全部通过则返回1。支持通过options字典灵活开关各项检查，并针对标题位置、表格位置、图片尺寸、高度修改等场景提供特殊判定分支。",
+    "main_functions": [
+      {
+        "name": "enable_debug_logging",
+        "lineno": 26,
+        "description": "配置并启用名为desktopenv.metric.slides.debug的调试日志记录器。它将日志级别设为DEBUG，并添加一个带标准格式化的StreamHandler。该函数本身不执行比较逻辑，仅在compare_pptx_files的enable_debug选项为True时被调用，用于输出比对过程中的详细差异信息（如幻灯片数量、形状维度、字体属性等），帮助定位不匹配项。"
+      },
+      {
+        "name": "get_all_text_shapes",
+        "lineno": 36,
+        "description": "递归遍历单张幻灯片中的所有形状（包括GROUP分组内部的嵌套形状），收集并返回所有同时具备text和text_frame属性的文本形状对象列表。它通过内部递归函数extract_text_shapes实现深度遍历：若当前形状包含文本则加入结果；若当前形状为组合形状（存在shapes属性），则对其内部子形状递归调用。该函数服务于compare_pptx_files末尾的额外对齐检查环节，确保即使文本框被嵌套在组合对象中，其段落对齐方式也能被正确比对。"
+      },
+      {
+        "name": "compare_pptx_files",
+        "lineno": 60,
+        "description": "核心比对函数，接收两个PPTX文件路径及options关键字参数。首先使用Presentation加载两份文件，提取近似容差（默认0.005）及各项检查开关。比对流程如下：(1)幻灯片数量检查：若examine_number_of_slides为True且数量不一致，返回0；(2)逐页迭代比对：背景色（调用内部函数get_slide_background_color比较RGB值）、备注文本（调用内部函数get_slide_notes并去除首尾空白后比较）、获取全部文本形状（含GROUP内，调用get_all_text_shapes）、形状总数比对；(3)逐形状迭代比对：先执行特殊位置/尺寸规则——examine_title_bottom_position对文本为Product Comparison的形状检查top条件；examine_table_bottom_position对第3页表格检查top；examine_right_position对第2页非文本形状检查left；examine_top_position对第2页图片检查top；examine_shape_for_shift_size对特定文本跳过尺寸差异；examine_image_size仅比对图片宽高；examine_modify_height在非文本或FREEFORM（type 5）形状上仅比对高度（注意：必须关闭examine_shape才能生效）；再执行常规形状检查（examine_shape），使用内部函数is_approximately_equal对left/top/width/height进行0.5%容差比对，任一维度不匹配即返回0；(4)表格类型（MSO_SHAPE_TYPE.TABLE）特殊处理：比较行列数，再逐单元格比较段落数、runs数（空段落通过内部函数nonempty_runs过滤无文本run）、字体颜色/粗体/斜体/下划线；(5)文本与段落比对：比较shape文本（strip后）、段落数量；逐段落比较对齐（内部将None转为PP_ALIGN.LEFT）、文本内容、缩进级别（level）；比较runs数量（空段落再次使用nonempty_runs归一化）；逐run比较字体名称、大小、粗体（None与False等价）、斜体（None与False等价）、颜色RGB、下划线（None与True差异需匹配）、删除线（strike属性）；(6)项目符号：通过内部函数_extract_bullets解析XML提取(lvl, char, text, color)，再由内部函数_compare_bullets_with_tolerance比对，其中lvl的None与'0'视为等价，颜色不纳入比对；(7)额外文本形状对齐检查：若examine_alignment为True且两组文本形状数量一致，逐形状比较文本内容与各段落对齐方式；(8)全部通过返回1，任一失败返回0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:27:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_06706431-3011-417a-bd22-36869b25d1fe/evaluator_function_labels.json"
+}

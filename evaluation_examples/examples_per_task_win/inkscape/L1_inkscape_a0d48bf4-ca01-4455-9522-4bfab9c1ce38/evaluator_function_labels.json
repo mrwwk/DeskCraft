@@ -1,0 +1,66 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_a0d48bf4-ca01-4455-9522-4bfab9c1ce38/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_rule",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 31
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 39
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 47
+    },
+    {
+      "name": "check_inkscape_fill_rule",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Inkscape 任务最终生成的 SVG 文件中，指定 ID 的图形元素是否具备预期的 fill-rule（填充规则）属性。它直接解析 SVG 源码的 XML 结构，定位目标元素后，读取其 fill-rule 的实际值（兼容内联 style 属性写法与元素的直接 XML 属性写法），并与预期值进行不区分大小写的精确字符串比对。判定采用二值打分制：若 SVG 文件解析失败、目标元素不存在、或 fill-rule 实际值与预期值不一致，均返回 0.0；仅当两者完全匹配时返回 1.0。整个检查链路不依赖视觉渲染，而是基于文档对象模型的语义化属性校验。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_rule",
+        "lineno": 54,
+        "description": "该函数接收 svg_file_path（待测 SVG 文件路径）和 rule 字典（必须包含 element_id 与 expected_fill_rule 两个键）作为输入。执行步骤如下：1）调用 _parse_svg 解析 SVG 文件，若解析失败（返回 None）则直接返回 0.0；2）从 rule 中提取 element_id 与 expected_fill_rule，并将预期值统一转为小写；3）调用 _find_element_by_id 在 SVG 根节点下递归查找 id 匹配的元素，若未找到则返回 0.0；4）调用 _get_style_prop 获取该元素 fill-rule 属性的实际值，并转为小写；5）进行精确字符串比较：实际值与预期值相等则返回 1.0，否则返回 0.0。该逻辑为严格的单条件二值判定，不存在近似匹配、容差阈值或多指标组合打分。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 16,
+        "description": "将 CSS 风格的样式字符串（例如 'fill:#ff0000;stroke:#000'）按分号分割，进一步按冒号拆分为键值对，返回字典。用于处理 SVG 元素内联 style 属性的文本解析，通常被 _get_style_prop 调用以提取具体样式值。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 29,
+        "description": "接收 SVG 根节点 root 与目标 element_id，通过 root.iter() 递归遍历所有后代元素，逐一比对 elem.get('id') 是否与给定 id 相等。返回匹配到的元素对象，若遍历结束未找到则返回 None。是主函数在 SVG DOM 中定位目标图形元素的核心查找器。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 37,
+        "description": "接收一个 XML 元素 elem 与属性名 prop，优先读取该元素 style 属性字符串并通过 _parse_style 解析，若其中存在对应键则返回其值；若 style 中不存在，则回退到读取元素的直接 XML 属性（即 elem.get(prop)）。用于统一提取 SVG 元素的样式属性，兼容内联 CSS 写法与直接 XML 属性两种定义方式。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 45,
+        "description": "接收 SVG 文件路径，使用 xml.etree.ElementTree.parse 解析文件并返回 (tree, root) 元组；若解析过程中发生任何异常，则捕获后返回 (None, None)。是 evaluator 读取并初始化 SVG 文档结构的入口，主函数依赖它获取待检查的 DOM 根节点。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:40:39",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_a0d48bf4-ca01-4455-9522-4bfab9c1ce38/evaluator_function_labels.json"
+}

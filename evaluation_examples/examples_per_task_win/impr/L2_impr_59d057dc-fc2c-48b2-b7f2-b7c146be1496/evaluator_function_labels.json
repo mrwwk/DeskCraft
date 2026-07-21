@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_slide1_title_font",
+      "lineno": 15
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_slide1_title_font",
+      "lineno": 15
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证智能体是否成功将演示文稿第一张幻灯片的标题字体设置为\"Georgia\"且字号为40pt。它直接解析智能体产出的PPTX文件，核心检查对象是第一张幻灯片中被识别为\"标题\"的形状内的所有非空文本run。主要比较方式是将每个非空run的字体名称与预期值（默认\"Georgia\"）进行严格相等比较，并将字号从pt转换为EMU（1pt=12700 EMU）后与预期值（默认40pt对应508000 EMU）进行容差比较，允许±1pt（12700 EMU）的偏差以兼容LibreOffice的舍入行为。标题定位采用 fallback 双策略：优先通过占位符类型（1或3）识别，若失败则通过比较各形状的最大字体大小取最大者推断。成功判定的总体思路是：必须所有非空文本run同时满足字体名称完全匹配且字号在容差范围内，才返回1.0；文件无法打开、无幻灯片、找不到标题形状、或任一非空run不满足条件，均立即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_slide1_title_font",
+        "lineno": 15,
+        "description": "该函数接收result_path（智能体生成的PPTX文件路径）和**options（可选配置，其中font_name默认为\"Georgia\"，font_size_pt默认为40）。首先将预期字号从pt转换为EMU单位（乘数12700），并设定±1pt的容差阈值（12700 EMU）。随后尝试以Presentation打开目标PPTX，若抛出异常或文件不含任何幻灯片，则直接返回0.0。接着获取第一张幻灯片（prs.slides[0]），通过两种策略定位标题形状：策略1遍历幻灯片内所有shape，若shape.is_placeholder为真且其placeholder_format.type属于(1, 3)，则将其视为标题；若策略1未命中，策略2在所有具备text_frame的形状中，逐一遍历paragraph与run，筛选出text非空且存在font.size的run，取该shape下最大字号作为候选依据，将所有候选按字号降序排列后取首位作为标题形状。若两种策略均无法确定标题，返回0.0。确定标题后，遍历其text_frame的全部paragraph与run，跳过text为空的run，对每一个非空run执行两项严格检查：其一，run.font.name必须严格等于预期字体名；其二，run.font.size不得为None，且其值与预期EMU值的绝对差不得超过12700。只要任一非空run不满足上述任一条件，函数立即记录日志并返回0.0。仅当所有非空run全部通过两项检查时，才返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:25:32",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_59d057dc-fc2c-48b2-b7f2-b7c146be1496/evaluator_function_labels.json"
+}

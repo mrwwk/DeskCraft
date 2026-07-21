@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_204/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 88
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    },
+    {
+      "name": "is_in_list",
+      "lineno": 88
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测Chrome交互类任务（INTERACTIVE_chrome_interactive_chrome_correction_204）的完成状态，采用独立的0/1二元打分机制。其核心验证对象分为三类：一是Chrome浏览器当前活动标签页的URL（通过去除查询参数后进行规范化比对，确认是否打开到预期页面）；二是程序或环境返回的单一结果值（通过严格相等判断验证正确性）；三是程序返回的列表或集合型结果（通过成员关系检查验证目标值是否被包含）。三个主函数各自作为独立的评判接口，分别返回1.0表示满足条件、0.0表示不满足。代码中未明确体现多个指标之间的联合判定逻辑（如全部满足、任一满足或加权累计），各函数独立工作。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 50,
+        "description": "检查Chrome当前活动标签页是否与预期匹配。输入参数包括active_tab_info（当前标签页信息，类型可为字典或字符串）和rule（匹配规则字典）。执行步骤如下：首先进行判空处理，若active_tab_info为空则直接返回0.0；然后读取rule['type']字段，当类型为'url'时，从rule中提取expected_url，从active_tab_info中获取actual_url（若active_tab_info为字典则取'url'键值，否则直接将其视为URL字符串）；接着通过urllib.parse中的urlparse与urlunparse解析两个URL，并利用局部逻辑去除查询参数（query）后重新组装为规范化URL；最后比较两个规范化URL，若完全一致则返回1.0，否则返回0.0。若rule['type']不是'url'，则记录错误日志并返回0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 78,
+        "description": "对程序输出或状态值进行精确相等判定。输入参数为result（实际结果）和rules（规则字典）。执行步骤：从rules字典中提取键'expected'对应的值作为期望值，通过print语句输出result与expect供调试，随后使用Python的'=='运算符比较result与expect。判定依据为：若两者完全相等则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "is_in_list",
+        "lineno": 88,
+        "description": "对列表或集合型结果进行成员关系检查。输入参数为result（结果列表、集合或其他可迭代对象）和rules（规则字典）。执行步骤：从rules中提取'expected'作为目标值，使用'in'操作符判断该目标值是否存在于result中。判定依据为：若存在则返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:00:16",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_204/evaluator_function_labels.json"
+}

@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_2888b4e6-5b47-4b57-8bf5-c73827890774/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是针对 Chrome 浏览器任务（L2_chrome_2888b4e6-5b47-4b57-8bf5-c73827890774）的逐任务评分器，核心目标是判定浏览器当前状态或任务产出是否达到预期。它通过两个独立的主函数进行二元打分（返回 0.0 或 1.0）：其一，is_expected_url_pattern_match 负责检查浏览器当前激活标签页的 URL 是否同时满足一组预期正则表达式模式，用于验证页面跳转、地址栏状态或特定网址规则；其二，exact_match 对任务返回的任意结果与预期值进行严格相等比对。两个函数均采用“一票否决”式的硬匹配逻辑，不存在加权累计、部分得分或容差阈值，任一检查项失败即返回 0.0，全部命中才返回 1.0。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "该函数负责检查浏览器当前 URL 是否符合预期正则模式。输入参数 result 为 activate_tab_info 或 get_active_url_from_accessTree 的返回值，支持两种格式：字符串 URL 或包含 'url' 键的字典；rules 为包含 'expected' 键的字典，其值为正则表达式字符串列表。检查步骤如下：首先判空，若 result 为空直接返回 0.0；接着提取 result_url，若格式非法（既非字符串也非含 'url' 的字典）则返回 0.0；然后遍历 rules['expected'] 中的每一个正则 pattern，使用 re.search 在 result_url 中依次搜索。判定依据为“全部满足”：只要有一个 pattern 未匹配成功，立即返回 0.0；只有当所有 pattern 均匹配成功时，才返回 1.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 82,
+        "description": "该函数负责对任务结果进行精确相等性判定。输入参数 result 为待检查的实际结果，rules 为包含 'expected' 键的字典。检查步骤极为直接：从 rules 中取出 expect 值，使用 Python 的 == 运算符比较 result 与 expect。判定依据为：若两者完全相等则返回 1.0，否则返回 0.0。函数会先打印 result 与 expect 的值以便调试，不做任何类型转换、近似匹配、正则匹配或容差处理。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:07:39",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_2888b4e6-5b47-4b57-8bf5-c73827890774/evaluator_function_labels.json"
+}

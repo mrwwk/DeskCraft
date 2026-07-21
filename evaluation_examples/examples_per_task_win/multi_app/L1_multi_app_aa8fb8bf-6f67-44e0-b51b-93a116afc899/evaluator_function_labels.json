@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_aa8fb8bf-6f67-44e0-b51b-93a116afc899/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 13
+    },
+    {
+      "name": "check_json",
+      "lineno": 41
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 133
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 13
+    },
+    {
+      "name": "check_json",
+      "lineno": 41
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 133
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 总体验证三类任务结果或状态：1）Chrome 浏览器当前活动标签页是否为指定页面，核心是比较 URL 并在比较前统一去除查询参数；2）JSON 或 YAML 文件的内容结构是否符合预期规则，包括验证指定嵌套键路径的值是否满足期望规则，同时确保指定键路径的值不满足非期望规则；3）任意文本字符串是否同时包含所有必须出现的关键词，且完全不包含任何禁止出现的关键词。核心检查对象分别为浏览器标签信息（字典或字符串）、结构化数据文件（JSON/YAML）的嵌套字段、以及纯文本内容。比较方式涵盖 URL 规范化后完全匹配、嵌套字典逐级键值规则匹配（依赖外部 _match_value_to_rule）、以及字符串子串包含性检查。成功判定采用严格的二元逻辑：URL 去查询参数后必须完全相等；JSON/YAML 要求所有 expect 规则全部满足且所有 unexpect 规则全部不满足（逻辑与）；字符串检查要求 include 列表全部命中且 exclude 列表全部未命中。任一检查失败即返回 0.0，全部通过返回 1.0。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 13,
+        "description": "接收 active_tab_info（字典或字符串）和 rule 字典。首先判空：若 active_tab_info 为空则直接返回 0。当 rule['type'] 为 'url' 时，从 rule 中提取 expected_url，从 active_tab_info 中提取 actual_url（若 active_tab_info 为字典则取 'url' 键，否则直接视为 URL 字符串）。随后使用 urllib.parse 中的 urlparse 与 urlunparse 对两个 URL 进行解析，并通过内部嵌套函数 strip_query 去除 query 查询参数后重组为无参 URL。最终比较处理后的 expected_url 与 actual_url：完全一致返回 1，否则返回 0。若 rule['type'] 不是 'url'，则记录错误日志并返回 0。"
+      },
+      {
+        "name": "check_json",
+        "lineno": 41,
+        "description": "接收 result（JSON/YAML 文件路径字符串）、rules（包含 'expect' 与 'unexpect' 规则列表的字典）以及 is_yaml 标志。首先检查 result 是否为 None 或对应文件不存在，任一情况直接返回 0。随后按 is_yaml 标志使用 yaml.safe_load 或 json.load 读取并解析文件，期间捕获 YAML/JSON 解析错误、IO 错误及其他通用异常，出错均返回 0；若 YAML 文件解析结果为 None 同样返回 0。解析成功后提取 expect_rules 与 unexpect_rules。对 expect_rules 中的每条规则，按 r['key'] 列表逐级深入 result_data 字典取值，若遇 KeyError 或 TypeError 则直接返回 0，否则调用 _match_value_to_rule(value, r) 进行值匹配，并将返回结果与 metric 做逻辑与（AND）。对 unexpect_rules 中的每条规则，同样逐级取值，若键不存在或类型错误则将 value 置为 None 并中断该规则的键遍历，然后调用 _match_value_to_rule(value, r)，要求其结果为假（即 not），再与 metric 做逻辑与。整个处理过程中任一异常均导致返回 0。最终返回 float(metric)，即仅当全部期望规则满足且全部非期望规则不满足时返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 133,
+        "description": "接收 result（待检查的字符串）和 rules 字典。若 result 为 None 则直接返回 0。从 rules 中提取 include 列表（默认空列表）与 exclude 列表（默认空列表）。检查逻辑要求 result 必须包含 include 列表中的每一个字符串，并且必须不包含 exclude 列表中的任何一个字符串。两个条件同时满足返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:17:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_aa8fb8bf-6f67-44e0-b51b-93a116afc899/evaluator_function_labels.json"
+}

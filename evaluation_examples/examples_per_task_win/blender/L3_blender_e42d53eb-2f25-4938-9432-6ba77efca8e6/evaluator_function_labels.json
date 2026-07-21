@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_e42d53eb-2f25-4938-9432-6ba77efca8e6/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_light_energy",
+      "lineno": 58
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 89
+    },
+    {
+      "name": "check_blender_multi_material_scene",
+      "lineno": 133
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 41
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 48
+    },
+    {
+      "name": "check_blender_light_energy",
+      "lineno": 58
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 89
+    },
+    {
+      "name": "check_blender_multi_material_scene",
+      "lineno": 133
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 任务的三类核心产出与状态：一是场景中指定灯光的能量（energy）数值是否在容差范围内，通过解析 check_object.py 输出的 JSON 并匹配对象名称与类型后做数值比较；二是渲染输出图像文件是否真实存在，且其宽度、高度、图像格式（支持 JPG/JPEG 别名映射）是否符合预期，依赖 PIL 读取图像元数据，若 PIL 不可用则降级为仅检查文件存在性；三是场景中多个物体的材质属性是否满足要求，通过解析 check_material.py 输出的 JSON，对每个指定物体逐一检查其材质列表中是否至少有一个材质在纹理文件名、基础颜色（base_color，向量分量级容差）、粗糙度（roughness）、金属度（metallic）等方面全部达标。三个主评测维度相互独立，各自内部均采用“全部条件满足则返回 1.0，任一关键条件失败即返回 0.0”的严格通过/失败打分逻辑。",
+    "main_functions": [
+      {
+        "name": "check_blender_light_energy",
+        "lineno": 58,
+        "description": "接收来自 check_object.py 的命令行输出字符串 command_output 以及规则字典 rule。首先调用 _parse_blender_output 将输出解析为 JSON；然后从 rule 中提取 light_name（对象名称）、expected_energy（预期能量，兼容 energy 键名）、tolerance（容差，默认 10）。接着调用 _find_object 在 JSON 的 objects 数组中按精确名称查找目标对象，并校验其 type 字段必须为 LIGHT。最后读取该对象的 energy 字段，使用 _check_tolerance 判断实际值与预期值的绝对差是否在容差内。若解析失败、对象不存在、类型不符或能量超差，均返回 0.0；全部通过则返回 1.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 89,
+        "description": "接收渲染输出文件的本地路径 file_path 以及规则字典 rule。首先检查 file_path 是否非空且文件真实存在。随后尝试使用 PIL.Image.open 打开图像并获取尺寸与格式。若 rule 中包含 width 或 height，则要求实际图像尺寸与预期精确相等；若 rule 中包含 format，则将预期格式与实际图像的 format 字段转为大写后比较，并通过 fmt_map 处理 JPG 与 JPEG 的别名映射。所有指定条件必须同时满足，任一不匹配即返回 0.0。若 PIL 未安装，则降级为仅做文件存在性检查，存在返回 1.0，否则返回 0.0。无异常且全部通过时返回 1.0。"
+      },
+      {
+        "name": "check_blender_multi_material_scene",
+        "lineno": 133,
+        "description": "接收来自 check_material.py 的命令行输出字符串 command_output 以及规则字典 rule。首先调用 _parse_blender_output 解析 JSON。从 rule 中读取 tolerance（默认 0.05）与 materials 列表，然后对每个材质规范 mat_spec 依次执行检查：以 object_name 为键从 JSON 结果中取出对应材质数据（若非列表则包装为列表），遍历该对象的所有材质条目，寻找是否至少有一个材质能同时满足 mat_spec 中声明的全部条件——若指定 has_texture，则检查 texture_filename 或 image_textures 数组中任一 filename 是否精确匹配；若指定 expected_color，则通过 _check_vector_tolerance 比对 base_color 的每个分量；若指定 roughness 或 metallic，则通过 _check_tolerance 比对对应字段。单个对象的多材质之间是“任一满足”逻辑，但 rule 中所有对象必须全部通过，若任一对象无材质或无材质能满足其全部要求，则立即返回 0.0；全部对象检查通过返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 17,
+        "description": "接收 Blender 检查脚本（如 check_object.py 或 check_material.py）的命令行输出字符串。先判断输出是否为空或仅含空白，若是则记录错误并返回 None；否则尝试使用 json.loads 解析为 Python 对象并返回。解析失败时记录错误与原始输出内容，返回 None。该函数是主函数处理 Blender JSON 输出的统一入口，负责将原始字符串转换为可供后续查找与比对的结构化数据。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 28,
+        "description": "接收已解析的 JSON 字典 result 与目标对象名称 name。在 result['objects'] 列表中遍历每个对象，通过精确字符串匹配比对 obj['name'] 与传入的 name。若找到则返回该对象字典，否则返回 None。该函数服务于需要按名称定位场景中特定物体（如灯光）的检查逻辑。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 35,
+        "description": "接收实际值 actual、预期值 expected 与容差 tol。若 actual 或 expected 为 None 则直接返回 False；否则将两者转为浮点数后计算绝对差，判断是否小于等于 tol。返回布尔值。该函数被灯光能量、材质粗糙度、材质金属度等标量属性的容差比较所复用。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 41,
+        "description": "接收实际向量 actual、预期向量 expected 与容差 tol。先检查两者是否非空且长度一致，若否返回 False；随后逐分量计算绝对差，使用 all 判断每一对分量是否均在容差范围内。返回布尔值。该函数专门用于材质基础颜色（base_color）等向量型属性的分量级容差比较。"
+      }
+    ]
+  },
+  "created_at": "2026-06-30 21:18:27",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_e42d53eb-2f25-4938-9432-6ba77efca8e6/evaluator_function_labels.json"
+}

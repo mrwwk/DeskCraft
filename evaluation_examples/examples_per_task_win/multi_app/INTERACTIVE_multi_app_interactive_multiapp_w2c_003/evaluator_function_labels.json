@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_003/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 服务于 INTERACTIVE_multi_app_interactive_multiapp_w2c_003 任务，采用二元评分机制对任务产出的文本结果进行合规性判定。核心检查对象是一个字符串形式的结果（result），配合外部传入的规则字典（rules）进行内容校验。规则分为两类：include 列表要求结果必须包含的指定字符串，exclude 列表要求结果不得包含的指定字符串。evaluator 不读取文件、不解析图像、不访问页面 DOM，仅对传入的 result 做纯字符串包含检查。成功判定的总体思路是“全包含且全不包含”的逻辑与（AND）关系：result 必须同时包含所有 include 中的字符串，且同时不包含任何 exclude 中的字符串，满足则得 1.0（完全成功），否则得 0.0（失败）；若 result 本身为 None，则直接判 0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数是唯一的评测入口，接收 result（待检查的字符串结果）和 rules（字典，预期包含 include 与 exclude 两个键，对应值为字符串列表）。检查步骤如下：1）若 result 为 None，直接返回 0.0，表示无有效结果可判；2）通过 print 打印 result 与 rules（用于调试或日志记录）；3）从 rules 中取出 include 列表（默认空列表）和 exclude 列表（默认空列表）；4）使用 all(r in result for r in include) 判定 result 是否包含所有必须字符串；5）使用 all(r not in result for r in exclude) 判定 result 是否不包含任何禁止字符串；6）仅当第 4 步和第 5 步同时成立时返回 1.0，否则返回 0.0。判定依据是严格的逻辑与组合，属于非 0 即 1 的二元打分，不存在部分匹配得分、近似匹配或阈值容忍。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_003/evaluator_function_labels.json"
+}

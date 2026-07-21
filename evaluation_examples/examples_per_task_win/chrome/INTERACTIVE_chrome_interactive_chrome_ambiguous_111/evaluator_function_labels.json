@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_111/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_chrome_debug_ready",
+      "lineno": 6
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_chrome_debug_ready",
+      "lineno": 6
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器是否已成功导航至扩展管理页面并就绪，以便进行本地扩展的调试、加载未打包扩展或启用Developer mode。其核心检查对象是当前活跃标签页的URL，具体通过比对getter返回的实际URL与rules中配置的期望URL（通常为chrome://extensions）来完成判定。比对时采用两种策略：先对双方去除末尾斜杠进行标准化，随后检查是否精确相等，或实际URL是否以“期望URL + '/'”为前缀（例如chrome://extensions/?id=xxx可匹配chrome://extensions）。只要满足任一匹配条件即返回1.0表示任务完成；若result为None、提取不到有效URL、期望URL未配置，或两种匹配均失败，则返回0.0表示未就绪。整个判定逻辑为二元打分制，不存在加权、累计或多指标联合判定。",
+    "main_functions": [
+      {
+        "name": "check_chrome_debug_ready",
+        "lineno": 6,
+        "description": "该函数接收result（来自active_url_from_accessTree getter的返回值，类型可为字符串、含url或name键的字典，或其他类型）和rules（含url键的字典，或可直接转为字符串的期望URL配置）作为输入。第一步检查result是否为None，为None则记录日志并直接返回0.0。第二步从result中提取实际URL：若result为字符串则直接strip；若为字典则依次尝试取url键或name键的值并转为字符串后strip；其他类型则直接转为字符串strip；若提取结果为空字符串则记录日志并返回0.0。第三步从rules中提取期望URL：若rules为字典则依次尝试取url键或expected键的值；否则转为字符串；若结果为空则记录日志并返回0.0。第四步对实际URL和期望URL进行标准化，去除末尾斜杠。第五步执行两种匹配判断：1）精确匹配，即url_norm == expected_norm；2）前缀匹配，即url_norm.startswith(expected_norm + '/)。任一匹配成功则记录日志并返回1.0；若均不匹配则记录日志并返回0.0。该函数未调用任何其他自定义辅助函数，所有逻辑均在函数内部顺序完成。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 14:58:14",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_111/evaluator_function_labels.json"
+}

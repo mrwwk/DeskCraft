@@ -1,0 +1,157 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00001-0001-4000-8000-000000000001-L2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_file_exists",
+      "lineno": 76
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 85
+    },
+    {
+      "name": "check_transparency_exists",
+      "lineno": 100
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 135
+    },
+    {
+      "name": "check_subject_scale_and_center",
+      "lineno": 174
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 238
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 305
+    },
+    {
+      "name": "check_l2_perfume_listing_complete",
+      "lineno": 402
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_has_transparency",
+      "lineno": 27
+    },
+    {
+      "name": "_get_transparency_ratio",
+      "lineno": 38
+    },
+    {
+      "name": "_build_foreground_mask",
+      "lineno": 49
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 76
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 85
+    },
+    {
+      "name": "check_transparency_exists",
+      "lineno": 100
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 135
+    },
+    {
+      "name": "check_subject_scale_and_center",
+      "lineno": 174
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 238
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 305
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 390
+    },
+    {
+      "name": "check_l2_perfume_listing_complete",
+      "lineno": 402
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测GIMP L2任务——制作一张香水产品的透明电商主图。它要求最终产出同时满足以下全部条件：存在一个有效的PNG文件；该PNG为1200×1200像素；背景已被移除且透明像素占比不低于5%；产品主体占据画布高度的68%–84%且基本居中；产品下方存在柔和阴影；对应的XCF源文件包含名为Product、Shadow、Guide_BG的图层。评测逻辑为严格的“全或无”二进制聚合：共7项子检查，必须全部通过才得1.0分，任何一项失败即得0分。",
+    "main_functions": [
+      {
+        "name": "check_file_exists",
+        "lineno": 76,
+        "description": "接收file_path字符串作为输入，使用os.path.isfile判断该路径是否存在且为普通文件。若路径为None或文件不存在，返回0；存在则返回1。该检查不打开文件内容，仅做存在性判定。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 85,
+        "description": "接收image_path字符串，使用PIL.Image.open尝试打开文件，读取图像对象的format属性。仅当format严格等于'PNG'时返回1；若文件不存在、打开失败或格式不是PNG，均返回0。"
+      },
+      {
+        "name": "check_transparency_exists",
+        "lineno": 100,
+        "description": "接收image_path和min_transparency_ratio参数（默认0.05）。先用_has_transparency判断图像是否存在任何透明像素；若存在，再调用_get_transparency_ratio计算alpha值小于128的像素占总像素的比例。仅当该比例大于等于min_transparency_ratio时才返回1，否则返回0。此检查用于确认背景被真正移除，而非仅有边缘抗锯齿产生的少量透明像素。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 135,
+        "description": "接收image_path、expected_width、expected_height（可选，默认为None）和tolerance（默认5）。使用PIL打开图像获取实际宽高，检查宽度与expected_width的绝对差是否不超过tolerance；若指定了expected_height，则高度与expected_height的绝对差也需不超过tolerance。宽度和高度（如指定）同时满足时返回1，否则返回0。"
+      },
+      {
+        "name": "check_subject_scale_and_center",
+        "lineno": 174,
+        "description": "接收image_path和rule字典。调用_build_foreground_mask生成前景掩码，提取前景像素的包围盒。依次检查三项：1）包围盒高度占画布高度的比例是否在min_height_ratio与max_height_ratio之间（默认值分别为0.65和0.85）；2）水平中心偏移比例是否不超过center_tolerance_ratio（默认0.12）；3）垂直中心偏移比例是否不超过center_tolerance_ratio的1.8倍（垂直更宽松）。三项全部满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_soft_shadow_presence",
+        "lineno": 238,
+        "description": "接收image_path和rule字典。先将图像转为RGBA数组，通过alpha>180定位前景主体，获取其底部位置和水平范围。在主体正下方定义一个搜索带（高度约为画布高度的1/5，水平向两侧扩展）。检查该带内alpha值介于alpha_low与alpha_high之间的半透明像素占比是否达到min_shadow_ratio（默认0.01）。若未达到，则fallback到RGB灰度阴影检测：排除纯白像素，检查是否存在偏暗且低饱和度的区域。任一条件满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 305,
+        "description": "接收xcf_path和rule字典。优先尝试导入gimpformats库解析XCF文件，提取所有图层名称；若解析失败则fallback到二进制内容字符串搜索。检查是否包含rule中layers指定的全部图层名；若ordered为True，还需确认这些图层名在文件中的出现顺序与预期顺序一致。全部满足返回1，任一图层缺失或顺序错误返回0。"
+      },
+      {
+        "name": "check_l2_perfume_listing_complete",
+        "lineno": 402,
+        "description": "该evaluator的唯一入口函数，接收result_paths列表（要求至少包含3个元素）。将result_paths[0]作为PNG路径、result_paths[1]作为XCF路径、result_paths[2]作为源图路径（代码中未实际使用）。依次执行7项二进制检查：1）PNG文件存在；2）PNG格式有效；3）透明像素占比≥0.05；4）图像尺寸为1200×1200（容差5像素）；5）主体高度占比68%–84%且居中（水平容差14%，垂直容差25.2%）；6）底部柔和阴影占比≥0.008；7）XCF包含Product、Shadow、Guide_BG图层且不要求顺序。最后调用_all_binary_checks_pass聚合结果，仅当7项全部返回1时输出1.0，否则输出0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_has_transparency",
+        "lineno": 37,
+        "description": "接收PIL.Image对象，判断其是否包含透明像素。若模式为RGBA，检查alpha通道是否存在小于255的值；若模式为P，检查image.info中是否包含transparency键。返回布尔值。服务于check_transparency_exists等透明度相关检查。"
+      },
+      {
+        "name": "_get_transparency_ratio",
+        "lineno": 47,
+        "description": "接收PIL.Image对象，将其转为RGBA模式后提取alpha通道，统计alpha值小于128的像素数量，除以总像素数得到透明像素比例，返回0.0到1.0之间的浮点数。用于量化背景移除程度，被check_transparency_exists调用。"
+      },
+      {
+        "name": "_build_foreground_mask",
+        "lineno": 57,
+        "description": "接收PIL.Image对象及white_threshold、alpha_threshold参数。将图像转为RGBA数组后，优先依据alpha通道判断：若存在alpha小于250的像素，则mask为alpha大于alpha_threshold的区域；否则回退到RGB非白判断（任一通道小于white_threshold）。返回二维布尔numpy数组。用于定位产品主体区域，被check_subject_scale_and_center和check_soft_shadow_presence复用。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 388,
+        "description": "接收scores列表，过滤掉None值后，检查所有有效分数是否都大于等于1.0。若全部满足则返回1.0，否则返回0.0。该函数是最终评分聚合器，实现“全或无”判定逻辑，被check_l2_perfume_listing_complete调用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:14:16",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L2_gimp_a2b00001-0001-4000-8000-000000000001-L2/evaluator_function_labels.json"
+}

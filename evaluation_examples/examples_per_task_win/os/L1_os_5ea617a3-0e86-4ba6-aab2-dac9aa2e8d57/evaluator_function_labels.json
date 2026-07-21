@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_trash_recovery",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_trash_recovery",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证“从操作系统回收站恢复文件”的任务结果。它通过读取 shell 收集器输出的 key=value 格式文本，将其解析为字典后，与评测规则中预定义的 checks 键值对进行严格相等比对。核心检查对象是回收站恢复后相关文件或目录的状态（如存在性、路径、数量等，由具体 key 定义）；比较方式为逐键精确匹配；只有当 rules[\"checks\"] 中所有期望键值对都在实际输出中找到且完全相等时，才判定任务成功并返回 1.0，否则返回 0.0。异常容错方面，任何解析或比对过程中的错误都会直接判为失败。",
+    "main_functions": [
+      {
+        "name": "check_os_trash_recovery",
+        "lineno": 31,
+        "description": "该函数接收 result（字符串类型，通常为 shell 收集器返回的原始输出）和 rules（字典类型，内含评测期望）。执行步骤如下：首先调用辅助函数 _parse_kv 将 result 按行解析为键值对字典；接着从 rules 中提取 \"checks\" 子字典作为期望检查项；然后遍历 checks 中的每一个 key，使用 kv.get(key) 获取实际值，并与 expected_val 进行严格相等（==）比较。判定依据为“全部满足”：若所有键值对均匹配成功，则返回 1.0；若在遍历过程中发现任一 key 缺失或值不相等，立即返回 0.0。此外，整个逻辑被 try-except 包裹，若解析或比对过程中抛出任何异常，函数捕获后记录错误日志并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该函数是一个专用解析器，接收 shell 输出字符串，将其转换为字典以服务于主评测逻辑。具体行为：若输入为空或 None，直接返回空字典；否则按换行符分割为行，对每行去除首尾空白后，检查是否包含 \"=\"；若包含，则以第一个 \"=\" 为界分割为键和值，并分别去除首尾空白，存入结果字典。该函数仅做格式解析，不做任何业务语义判断，通常被 check_os_trash_recovery 用于将原始 shell 输出标准化为可比较的字典结构。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:09",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57/evaluator_function_labels.json"
+}

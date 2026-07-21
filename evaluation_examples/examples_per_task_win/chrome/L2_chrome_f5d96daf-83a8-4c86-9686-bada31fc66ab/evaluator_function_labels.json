@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_f5d96daf-83a8-4c86-9686-bada31fc66ab/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是针对 Chrome 浏览器任务的自动化评分器，核心验证两类任务结果：第一，检查浏览器当前激活标签页的 URL 是否完全匹配一组预期正则表达式模式；第二，检查从页面或接口获取到的 JSON 数据对象是否在结构和内容上与预期一致。评测采用二元打分机制（返回 0.0 或 1.0），任一检查项失败即判定为 0 分，全部通过才得 1 分。对于 URL 检查，支持多个正则模式联合验证，要求所有模式均需在 URL 中命中；对于 JSON 检查，支持严格相等（逐 key 精确比对，可选忽略列表顺序）和包含模式（预期列表或字符串需被实际结果包含）两种逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "该函数接收 result（当前激活标签页的信息，可以是纯 URL 字符串，也可以是包含 'url' 键的字典，通常来自 activte_tab_info 或 get_active_url_from_accessTree 的返回值）以及 rules（包含 'expected' 键，其值为正则表达式模式列表）。执行步骤如下：首先判断 result 是否为空，若为空直接返回 0.0；接着从 result 中提取 URL 字符串，若格式非法（既非字符串也非含 'url' 的字典）也返回 0.0；然后遍历 rules['expected'] 中的每一个 pattern，使用 re.search 在提取出的 URL 中搜索。若任一 pattern 未匹配成功，立即返回 0.0；仅当所有 pattern 均匹配命中时，才返回 1.0。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 82,
+        "description": "该函数用于直接比对 JSON 对象。接收 result（待验证的 JSON 对象或其字符串形式）和 rules（包含 'expected' 预期结构及若干控制标志）。执行流程如下：若 result 为字符串，先执行 strip 去除首尾空白，再将所有单引号替换为双引号，使用 json.loads 解析为对象；若 result 为 None，直接返回 0.0。随后检查 rules['expected'] 中是否存在值为 '__EVALUATION_FAILED__' 的键，若存在则返回 0.0。接着依据 rules 中的 'expect_in_result' 标志分两种模式处理：若该标志为 False（默认），则对 expected 与 result 逐 key 进行严格相等比较，若配置项 'ignore_list_order' 为 True，则先将对应列表排序再比较，任一 key 值不符即返回 0.0；若 'expect_in_result' 为 True，则逐 key 检查包含关系——当预期值为列表时，要求 result 对应字段（列表或字符串）至少包含其中一个预期元素，当预期值为字符串时，要求 result 对应字段包含该子串，任一 key 不满足即返回 0.0。所有 key 检查均通过则返回 1.0，整个过程中任何异常也捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:10:02",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_f5d96daf-83a8-4c86-9686-bada31fc66ab/evaluator_function_labels.json"
+}

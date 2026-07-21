@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_7048a664-27f5-4626-8670-40999f2118e8/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_track_mute",
+      "lineno": 38
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_property_value",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_track_mute",
+      "lineno": 38
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Kdenlive 视频编辑项目中指定轨道是否已被静音。它读取 .kdenlive 项目文件（MLT XML 格式），解析其中的 playlist、tractor 和 track 元素，建立 playlist ID 与轨道名称（kdenlive:track_name）之间的映射关系，然后在主 tractor 中定位目标轨道，并检查该轨道元素的 hide 属性值。如果 hide 属性为 \"1\"、\"video\"、\"audio\" 或 \"both\"，则判定该轨道处于静音/隐藏状态，任务完成，返回 1.0；若属性值不符、找不到目标轨道、解析失败或文件缺失，则返回 0.0。整个判定是单一条件满足即得满分的通过制逻辑。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_track_mute",
+        "lineno": 38,
+        "description": "接收 project_file_path（Kdenlive 项目文件路径）和 rule（字典，必须包含键 \"muted_track\"，如 {\"muted_track\": \"V1\"}）。执行步骤如下：1) 检查文件路径是否存在且有效，检查 rule 中是否指定了 muted_track；2) 使用 ET.parse 解析 MLT XML；3) 遍历所有 playlist 元素，调用 _get_property_value 提取 \"kdenlive:track_name\" 属性值，建立 playlist id → track name 的映射表；4) 查找主 tractor：优先寻找 id 包含 \"main\" 或等于 \"tractor0\" 的 tractor，若未找到则取文档中最后一个 tractor；5) 在主 tractor 下的所有 track 元素中，读取 producer 属性作为 playlist 引用，通过映射表得到轨道名称，与 muted_track 进行精确字符串匹配；6) 若找到目标轨道，读取其 hide 属性值，若该值属于 (\"1\", \"video\", \"audio\", \"both\") 中的任意一个，则判定轨道已静音，返回 1.0；若 hide 属性值不在上述集合中，返回 0.0；若遍历结束仍未找到对应轨道，返回 0.0。过程中若出现 XML 解析异常或其他异常，也返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_property_value",
+        "lineno": 20,
+        "description": "接收一个 xml.etree.ElementTree.Element 元素和 property_name 字符串。遍历该元素的所有 \"property\" 子元素，查找其中 name 属性与传入 property_name 完全匹配（区分大小写）的项。若找到，返回该 property 元素的 text 内容；若未找到，返回 None。该函数被 check_kdenlive_track_mute 调用，用于从 playlist 元素中解析 \"kdenlive:track_name\" 属性，以建立 playlist ID 与轨道显示名称之间的映射关系，是轨道定位的关键数据提取器。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:58:05",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_7048a664-27f5-4626-8670-40999f2118e8/evaluator_function_labels.json"
+}

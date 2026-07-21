@@ -1,0 +1,66 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_87e0281b-2063-4767-bf00-fb053014f47e/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_bin_color_clip_duration",
+      "lineno": 97
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 20
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 37
+    },
+    {
+      "name": "_get_project_fps",
+      "lineno": 47
+    },
+    {
+      "name": "_duration_str_to_seconds",
+      "lineno": 64
+    },
+    {
+      "name": "check_kdenlive_bin_color_clip_duration",
+      "lineno": 97
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Kdenlive 项目文件中是否在项目箱（project bin）内创建了颜色片段（color clip）。它通过解析 `.kdenlive` 项目文件（MLT XML 格式），查找所有 `mlt_service=\"color\"` 的 `<producer>` 元素，读取其 `kdenlive:duration` 属性（若缺失则回退到 `length` 属性），并结合项目帧率将时长字符串转换为秒数。最终采用“任一满足”策略：只要找到任意一个颜色片段的时长落在 `expected` 指定的 `[min_duration_seconds, max_duration_seconds]` 闭区间内，即判定任务成功并返回 1.0；若文件不存在、解析失败、未找到颜色片段或所有颜色片段时长均不在范围内，则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_bin_color_clip_duration",
+        "lineno": 97,
+        "description": "该函数接收 `project_file_path`（从 VM 获取的 `.kdenlive` 文件路径）和 `expected` 字典（可包含 `min_duration_seconds` 与 `max_duration_seconds`）作为输入。首先检查文件是否存在，不存在则直接返回 0.0。随后使用 `ET.parse` 解析项目 XML，调用 `_get_project_fps` 获取帧率（默认 25.0）。接着遍历 XML 中所有 `<producer>` 元素，通过 `_get_mlt_service` 提取 `mlt_service` 值，并筛选出值为 `\"color\"`（不区分大小写）的 producer。对每个颜色 producer，调用 `_get_property_value` 读取 `kdenlive:duration` 属性文本；若该属性缺失，则回退读取 `length` 属性。随后调用 `_duration_str_to_seconds` 将时长字符串按项目帧率转换为秒数。最后进行范围判定：若 `min_duration_seconds` 已设置且实际时长小于该值，或 `max_duration_seconds` 已设置且实际时长大于该值，则视为不匹配；只要有一个颜色片段的时长同时满足上下限约束（或仅存在单边约束时满足该边），函数立即返回 1.0。若遍历完所有颜色片段均无匹配，或项目中不存在颜色片段，或发生 XML 解析异常，则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 20,
+        "description": "从 MLT XML 元素中提取 `mlt_service` 的值。它优先读取元素自身的 `mlt_service` XML 属性；若不存在，则遍历该元素下的所有 `<property>` 子节点，查找 `name=\"mlt_service\"` 的 property 并返回其文本内容。该函数服务于主逻辑中识别哪些 `<producer>` 是颜色片段（`mlt_service=\"color\"`）。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 37,
+        "description": "从 MLT XML 元素的子 `<property>` 节点中，按 `name` 属性名匹配，提取指定属性的文本值。主逻辑通过它读取 producer 的 `kdenlive:duration` 属性，并在该属性缺失时回退读取 `length` 属性。"
+      },
+      {
+        "name": "_get_project_fps",
+        "lineno": 47,
+        "description": "从 MLT 项目 XML 的 `<profile>` 元素中读取 `frame_rate_num`（分子）和 `frame_rate_den`（分母），计算并返回帧率（浮点数）。若 profile 缺失、属性值非法或发生除零错误，则返回默认值 25.0。该帧率被 `_duration_str_to_seconds` 用于将帧数转换为秒数，是时长精确比较的关键参数。"
+      },
+      {
+        "name": "_duration_str_to_seconds",
+        "lineno": 64,
+        "description": "将 Kdenlive 的时长字符串转换为秒数。支持三种格式：`HH:MM:SS:FF`（时:分:秒:帧，其中帧部分按给定 fps 折算为秒）、`HH:MM:SS.fff` 或 `HH:MM:SS,fff`（含毫秒/小数秒的三段式）、以及纯数字字符串（视为帧数，除以 fps 得到秒数）。若输入为 None 或格式无法解析，返回 0.0。该转换结果是主函数进行时长范围比较的基础数据。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:58:33",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_87e0281b-2063-4767-bf00-fb053014f47e/evaluator_function_labels.json"
+}

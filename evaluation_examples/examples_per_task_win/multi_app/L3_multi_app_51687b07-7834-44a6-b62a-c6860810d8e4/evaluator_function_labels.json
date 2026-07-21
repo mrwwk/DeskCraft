@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_51687b07-7834-44a6-b62a-c6860810d8e4/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于多应用任务（L3_multi_app）的结果验证，核心检查对象涵盖Chrome浏览器标签页状态、文本输出内容以及JSON配置文件内容。它通过三种相互独立的检查指标分别判定任务结果：第一，验证Chrome当前活跃标签页的URL是否与期望URL一致，比较时会忽略查询参数，仅对协议、域名和路径进行精确匹配；第二，验证文本结果是否同时满足\"必须包含所有指定字符串\"与\"必须排除所有指定字符串\"的组合规则；第三，验证指定JSON文件是否完整包含期望的所有键值对且值完全相等。每个主函数均采用\"全有或全无\"的打分方式，独立返回0.0（失败）或1.0（成功），任一条件不满足即返回0分，全部匹配才返回1分。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 57,
+        "description": "接收当前Chrome活跃标签页信息active_tab_info（字典或字符串类型）和匹配规则rule。首先判断active_tab_info是否为空，若为空则直接返回0分。当rule['type']为\"url\"时，从rule中提取期望URL（expected_url），从active_tab_info中提取实际URL（actual_url）；随后调用urllib.parse对两个URL去除查询参数（query），仅保留协议、域名和路径部分进行精确字符串比较；若去除参数后完全一致则返回1分，否则返回0分。若rule['type']为其他未知类型，则记录错误日志并返回0分。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 85,
+        "description": "接收待检查的文本result和规则字典rules。若result为None，直接返回0分。从rules中获取\"include\"列表（默认空列表）和\"exclude\"列表（默认空列表），检查result是否同时满足两个条件：一是包含include列表中的每一个字符串，二是不包含exclude列表中的任何一个字符串。两个条件同时满足返回1.0分，否则返回0分。代码中还会将result和rules打印输出，用于调试。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 98,
+        "description": "接收实际文件路径actual（字符串）和期望配置expected（字典）。若actual为空字符串，直接返回0分。尝试打开actual指向的文本文件并使用json.load解析为Python字典，若文件读取或JSON解析失败则返回0分。接着从expected字典中提取键为\"expected\"的子字典，遍历该子字典中的每一对键值，检查解析后的实际JSON数据中是否存在对应键且值完全相等（使用==比较）。所有键值对均匹配返回1.0分，只要任一键缺失或对应值不匹配即返回0分。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:25:41",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_51687b07-7834-44a6-b62a-c6860810d8e4/evaluator_function_labels.json"
+}

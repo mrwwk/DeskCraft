@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务是否正确地生成了符合预期的JSON格式配置文件（如VS Code的settings.json或类似配置）。核心检查对象是实际输出的JSON文件内容，采用“全有或全无”的二元评分机制：读取实际JSON文件后，将其与嵌套在expected参数中的预期配置字典进行逐键精确比对。要求实际JSON必须在顶层完整包含所有预期的键值对，且每个值必须与预期严格相等。任何键缺失、值不匹配、文件路径为空或文件读取/JSON解析失败都将直接判0分；仅当全部键值对完全一致时才返回1分。",
+    "main_functions": [
+      {
+        "name": "check_json_settings",
+        "lineno": 25,
+        "description": "该主函数接收actual（实际结果文件的路径字符串）和expected（包含嵌套键\"expected\"的字典，其中\"expected\"对应的值为待比对的预期配置字典）。执行步骤如下：1）若actual为空字符串，直接返回0.0；2）尝试打开actual指向的文件并以JSON格式解析，若文件不存在、读取失败或JSON解析异常，返回0.0；3）从expected参数中提取expect = expected['expected']；4）遍历expect中的每一个key和value，检查该key是否存在于实际JSON对象data中，且data[key]与value严格相等（使用!=判断）；5）若任一键不存在或值不相等，立即返回0.0；6）若全部键值对检查通过，最终返回1.0。该函数为严格的精确匹配评分器，不支持近似匹配、容错阈值或部分得分。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:46:01",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6/evaluator_function_labels.json"
+}

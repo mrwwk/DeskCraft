@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_workflow_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对任务输出的文本结果进行基于规则的精确子串匹配验证。其核心检查对象是程序返回或生成的字符串result，通过一组包含规则（include）和排除规则（exclude）来判定任务完成质量。具体而言，evaluator要求result必须同时满足：包含所有include列表中指定的子串，且不包含任何exclude列表中指定的子串。若result为None，直接判定为失败（0.0分）；只有当上述两个条件全部满足时，才返回1.0表示成功，否则返回0.0。这是一种非此即彼的硬阈值判定逻辑，不涉及近似匹配或加权打分。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收字符串result和规则字典rules作为输入，执行包含-排除双重检查。首先，若result为None，直接返回0.0。随后从rules中提取include（必须包含的字符串列表，默认为空）和exclude（必须排除的字符串列表，默认为空）。接着进行两步验证：第一步使用all()检查result是否包含include中每一个字符串；第二步使用all()检查result是否不包含exclude中任何一个字符串。函数还会将result和rules打印到标准输出用于调试。只有当“全部包含”与“全部不排除”同时成立时，才返回1.0；任一条件不满足即返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:22:39",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_workflow_001/evaluator_function_labels.json"
+}

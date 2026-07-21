@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_d5bc8185-21b3-4c7a-ad02-9e564549e1a6/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator为多应用任务（任务ID：L1_multi_app_d5bc8185-21b3-4c7a-ad02-9e564549e1a6）提供多个独立的评估维度，分别验证浏览器状态、文本输出合规性与配置文件正确性。核心检查对象包括：Chrome当前活动标签页的URL（去除查询参数后进行规范化精确匹配）、输出字符串是否同时满足包含指定内容与排除指定内容的双重要求、以及JSON设置文件是否精确包含所有预期的键值对。每个评估函数均采用独立的二值打分机制，成功返回1.0，失败返回0.0。代码中未明确体现多个评估函数之间的联合调用、加权累计或组合判定逻辑，各函数可作为独立的指标被外部评测框架调用。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 57,
+        "description": "检查Chrome浏览器活动标签页是否与预期规则匹配。接收active_tab_info（字典或字符串，包含实际URL信息）和rule（字典，包含匹配类型与预期值）。首先判空：若active_tab_info为空则返回0.0。随后读取rule['type']，当前仅支持\"url\"类型。对于URL匹配，从rule中提取expected_url，从active_tab_info中提取actual_url（若active_tab_info为字典则取'url'键，否则直接使用该值）。通过urllib.parse.urlparse与urlunparse去除两个URL的query查询参数后进行规范化比较；若完全一致返回1.0，否则返回0.0。若rule['type']为未知类型，记录错误日志并返回0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 85,
+        "description": "检查字符串结果是否同时满足包含与排除规则。接收result（待检查的字符串）和rules（字典，包含可选键\"include\"与\"exclude\"，对应值为字符串列表）。若result为None直接返回0.0。检查逻辑为：result必须包含所有include列表中的子串，且必须不包含任何exclude列表中的子串。两个条件同时满足返回1.0，任一不满足返回0.0。执行时会将result与rules打印至标准输出。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 98,
+        "description": "检查JSON配置文件是否完全包含预期的键值对设置。接收actual（字符串，表示实际结果JSON文件的路径）、expected（字典，内含键\"expected\"对应的预期配置字典）及可选参数**options。若actual为空字符串直接返回0.0。尝试打开actual路径文件并用json.load解析；若文件读取或解析失败返回0.0。提取expected['expected']作为期望字典，遍历其中每一对key-value，检查实际JSON数据中是否存在该键且值通过==精确匹配。所有键值对均匹配返回1.0，只要有一个键缺失或值不符立即返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:18:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_d5bc8185-21b3-4c7a-ad02-9e564549e1a6/evaluator_function_labels.json"
+}

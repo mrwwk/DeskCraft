@@ -1,0 +1,79 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00011-0011-4000-8000-000000000011/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 99
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 120
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 99
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 120
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 音频编辑任务最终导出的 WAV 格式音频文件是否满足特定编辑要求。核心检查对象是任务完成后保存或导出的 WAV 文件本体，evaluator 直接读取该文件的元数据与原始采样数据进行判定，不依赖外部页面状态或数据库。主要比较方式分为两类：一是时长精确度检查，将文件实际时长与 rule 中指定的 expected_duration 进行数值比较，允许在 tolerance（默认 0.5 秒）阈值范围内存在偏差；二是音频末尾淡出效果检查，将末尾 fade_duration 时长的音频划分为 num_windows（默认 5）个窗口，计算每个窗口的 RMS dB，通过判断相邻窗口能量是否总体递减（允许最多 2 组不递减）来识别 fade-out 趋势。两个主函数各自独立返回 0.0（不满足）或 1.0（满足）的离散分数，属于对单一指标的独立判定，上层调用方可根据需要分别或组合使用这些分数来评估任务完成度。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 99,
+        "description": "该函数接收 file_path 与 rule 字典作为输入。首先检查文件是否存在，若不存在则记录错误并返回 0.0。随后调用 _read_wav_info 读取 WAV 文件元数据，提取实际时长 actual（即 info[\"duration\"]）。从 rule 中读取 expected_duration 作为期望时长，并读取 tolerance（若 rule 中未提供则默认取 0.5）作为允许误差阈值。计算 actual 与 expected 的绝对差值，若差值小于等于 tolerance，则判定音频时长符合要求，返回 1.0；否则返回 0.0。函数内部通过 try/except 捕获所有异常，异常时同样返回 0.0。"
+      },
+      {
+        "name": "check_audio_fade_out",
+        "lineno": 120,
+        "description": "该函数接收 file_path 与 rule 字典作为输入。首先检查文件是否存在，不存在直接返回 0.0。接着调用 _get_mono_samples 获取单声道样本序列 samples 与采样率 sr。从 rule 中读取 fade_duration（淡出时长，单位秒）与 num_windows（若未提供则默认取 5）。计算淡出段样本数 fade_samples = fade_duration * sr，若超过音频总长度则记录错误并返回 0.0。将淡出段均分为 num_windows 个窗口，计算每个窗口内样本的 RMS dB 值（调用 _rms_db）。随后遍历相邻窗口的 RMS 值，统计严格递减（后一个 < 前一个）的次数 decreases。若 decreases >= num_windows - 2，即允许最多两组相邻窗口不呈递减，则判定音频末尾存在总体 fade-out 趋势，返回 1.0；否则返回 0.0。所有异常均被捕获并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 23,
+        "description": "使用 Python 标准库 wave 模块以只读二进制模式打开 file_path 指定的 WAV 文件，提取通道数 channels、采样率 sample_rate、总帧数 n_frames、采样宽度 sampwidth，并计算时长 duration = n_frames/ sample_rate。返回包含上述字段的字典。该函数作为音频元数据的基础读取器，被 check_audio_duration 直接调用以获取时长，也被 _get_mono_samples 调用以获取通道数与采样率。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 40,
+        "description": "使用 wave 模块读取 WAV 文件的全部原始帧数据，根据采样宽度 sampwidth 将字节流解析为归一化到 [-1.0, 1.0] 的浮点样本列表。具体解析规则：8 位无符号（先减 128 再除以 128）、16 位有符号小端序（除以 32768）、24 位有符号小端序（除以 8388608）、32 位有符号小端序（除以 2147483648）。若音频为多通道，返回的样本按通道交错排列。该函数为 _get_mono_samples 提供原始采样数据。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 73,
+        "description": "对输入的浮点样本列表计算均方根（RMS）并转换为分贝值。先计算样本平方的均值，再开方得到 RMS；若样本为空或 RMS 小于 1e-10，返回 -100.0；否则返回 20.0 * math.log10(rms)。该函数为 check_audio_fade_out 提供各窗口的能量指标，用于判断音频能量变化趋势。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 84,
+        "description": "先后调用 _read_wav_info 与 _read_wav_samples 读取指定 WAV 文件。若通道数 channels 大于 1，则将交错的多样本按帧取平均值，转换为单声道样本序列；若为单声道则直接返回原始样本。最终返回单声道样本列表与采样率 sample_rate。该函数被 check_audio_fade_out 调用，确保淡出分析基于单声道数据进行，避免多通道相位差异干扰能量趋势判断。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:22:08",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00011-0011-4000-8000-000000000011/evaluator_function_labels.json"
+}

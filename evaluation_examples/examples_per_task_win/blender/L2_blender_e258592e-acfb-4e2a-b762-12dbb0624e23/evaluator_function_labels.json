@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_e258592e-acfb-4e2a-b762-12dbb0624e23/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_object_visibility",
+      "lineno": 41
+    },
+    {
+      "name": "check_blender_modifier_boolean",
+      "lineno": 76
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_object_visibility",
+      "lineno": 41
+    },
+    {
+      "name": "check_blender_modifier_boolean",
+      "lineno": 76
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender 3D场景编辑任务中的对象状态与修改器配置。它通过读取并解析外部Blender检查脚本（如check_object.py、check_modifier.py）输出的JSON数据，对场景中的指定对象进行二元评分（成功1.0，失败0.0）。核心验证目标包括两类：一是对象在视口中的可见性状态（hide_viewport属性）是否与规则一致；二是指定对象上是否挂载了符合特定参数（类型、操作方式、目标对象）的Boolean修改器。每个主函数独立执行检查，不存在加权累计，只要各自检查项完全匹配即视为该维度通过。",
+    "main_functions": [
+      {
+        "name": "check_blender_object_visibility",
+        "lineno": 41,
+        "description": "该函数验证指定Blender对象在视口中的可见性状态。输入command_output为check_object.py脚本输出的JSON字符串，rule为包含object_name及hide_viewport或expected_visible字段的字典。执行步骤为：首先调用_parse_blender_output将JSON字符串解析为Python对象；若解析失败或结果为空则直接返回0.0。接着调用_find_object在解析结果的objects列表中按object_name精确匹配目标对象；若对象不存在则返回0.0。随后进入分支判断：若rule中包含hide_viewport键，则将其值与对象属性hide_viewport直接比较，相等则返回1.0；若rule中包含expected_visible键，则将其值与对象实际的hide_viewport状态取反比较（即expected_visible为true时要求hide_viewport为false），符合则返回1.0。其余情况均视为不匹配，返回0.0。"
+      },
+      {
+        "name": "check_blender_modifier_boolean",
+        "lineno": 76,
+        "description": "该函数验证指定Blender对象上是否存在符合规则的Boolean修改器。输入command_output为check_modifier.py脚本输出的JSON字符串，rule为包含object_name、modifier_type（默认为BOOLEAN）、operation、target_object等字段的字典。执行步骤为：首先调用_parse_blender_output解析JSON；若失败返回0.0。然后从解析结果中以object_name为键取出该对象的修改器列表mods。遍历列表中的每个修改器，依次进行三项条件筛选：1) 修改器的type字段必须等于rule中的modifier_type（默认BOOLEAN）；2) 若rule包含operation键，则修改器的operation字段必须与之严格相等；3) 若rule包含target_object键，则修改器的object字段必须与之严格相等。只要遍历中找到第一个同时满足所有存在条件的修改器，立即返回1.0；若遍历结束仍未找到，则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 14,
+        "description": "该函数负责将Blender检查脚本输出的原始字符串解析为Python对象。它首先检查command_output是否为空或仅包含空白字符，若是则记录错误并返回None；随后尝试调用json.loads进行解析。若遭遇JSONDecodeError或ValueError，则记录错误及原始输出内容，并返回None。该函数是command_output的统一入口预处理器，被check_blender_object_visibility和check_blender_modifier_boolean两个主函数复用，其返回值直接决定后续检查是否继续执行。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 25,
+        "description": "该函数在check_object.py输出的解析结果中按精确名称查找对象。它接收result字典和name字符串，遍历result中objects键对应的列表，逐个比对obj['name']是否与传入的name完全相等（区分大小写，精确匹配）。若找到则返回该对象字典，否则返回None。该函数仅被check_blender_object_visibility调用，用于定位待检查可见性的目标对象。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:39:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_e258592e-acfb-4e2a-b762-12dbb0624e23/evaluator_function_labels.json"
+}

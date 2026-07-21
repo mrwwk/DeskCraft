@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_interruption_002/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于通过虚拟机命令行输出（vm_command_line结果获取器）来判定任务最终是否完成。核心思路是：VM命令会在所有业务条件达成（如备份存在、Profit列出现、Sales按降序排列等）时输出类似'PASSED'的成功标识，否则输出'FAILED'。evaluator并不直接检查文件或数据库，而是检查VM命令返回的文本字符串，通过子串包含与排除规则进行二元判定：输出中必须同时包含所有指定的'include'模式，且必须不包含任何'exclude'模式；若命令无输出（None）也直接判失败。只有全部包含条件与全部排除条件同时满足时，才视为成功。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 7,
+        "description": "该函数接收一个字符串result（通常为VM命令行输出）和一个规则字典rules。首先检查result是否为None，若为None则直接返回0.0表示失败。随后从rules中提取键名为'include'和'exclude'的字符串列表，对result执行双重遍历检查：第一，确认result中包含所有'include'列表里的每一个字符串模式（要求全部满足）；第二，确认result中不包含任何'exlude'列表里的字符串模式（要求全部排除）。如果上述两类条件同时成立，返回1.0表示通过；若任一include未出现、任一exclude出现，或result为None，则返回0.0表示失败。函数执行过程中会打印result与rules内容。该逻辑是一个基于子串匹配的严格二元打分器，常用于匹配命令行输出中的'PASSED'等成功标识。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 14:45:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_interruption_002/evaluator_function_labels.json"
+}

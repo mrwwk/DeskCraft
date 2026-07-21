@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L2_kdenlive_8b5c202b-81ac-46b0-9f11-1af977f9656f/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_clip_split",
+      "lineno": 38
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_property_value",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_clip_split",
+      "lineno": 38
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务中，指定的源文件是否已在时间线上被分割为多个片段。它读取.kdenlive项目文件（MLT XML格式），核心检查对象是时间线playlist（排除素材箱bin）中引用同一producer的entry元素数量。通过匹配rule中指定的source_file与XML内producer/chain元素的resource属性，建立目标producer ID集合，再统计时间线中指向这些ID的entry条目数。若统计数量大于等于rule设定的min_segments阈值（默认2），则判定分割成功并返回1.0，否则返回0.0。任何文件缺失、XML解析错误或异常均导致直接失败。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_clip_split",
+        "lineno": 38,
+        "description": "接收project_file_path（Kdenlive项目文件路径）和rule字典（必须包含source_file键，可选min_segments键，默认值为2）。执行步骤如下：1）检查project_file_path是否存在，不存在则返回0.0；2）使用ET.parse解析MLT XML，遍历根节点下所有producer和chain元素，调用_get_property_value提取各元素的resource属性值，将包含source_file的元素的id加入matching_producer_ids集合；3）若集合为空，说明未找到对应素材，返回0.0；4）再次遍历所有playlist元素，跳过id中包含\"bin\"的素材箱，对其下每个entry元素检查producer属性是否在matching_producer_ids中，累加计数到total_entries；5）比较total_entries与min_segments，若大于等于阈值返回1.0，否则返回0.0。过程中若触发ET.ParseError或其他Exception，同样返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_property_value",
+        "lineno": 19,
+        "description": "接收一个xml.etree.ElementTree.Element对象和property_name字符串。在该元素的所有子property元素中查找name属性等于property_name的节点，返回其text文本值；若未找到则返回None。该函数专门用于从MLT XML结构中提取指定名称的属性值（例如从producer或chain元素中提取resource），为主函数建立源文件与producer ID的映射关系提供数据解析支持。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:06:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L2_kdenlive_8b5c202b-81ac-46b0-9f11-1af977f9656f/evaluator_function_labels.json"
+}

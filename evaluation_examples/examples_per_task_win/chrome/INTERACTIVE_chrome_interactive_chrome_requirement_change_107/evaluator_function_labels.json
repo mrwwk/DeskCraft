@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_requirement_change_107/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 39
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 75
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_url",
+      "lineno": 20
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 39
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 75
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器在任务执行后的最终状态是否符合预期，核心检查两个维度：一是当前活动标签页的URL是否指向特定的Security FAQ页面；二是书签栏的书签结构是否被正确修改（例如仅保留Security FAQ，且Pricing Overview书签已被移除）。评测器通过读取Chrome的accessTree（获取活动标签URL）和bookmarks（获取书签栏数据）作为输入，利用URL标准化函数处理Chrome协议前缀异常后，采用严格的字符串相等或集合相等比较进行判定。两个检查项各自独立返回0.0或1.0的分数，任一检查失败即对应维度不得分，整体任务完成度取决于这两个维度是否同时满足预期状态。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 39,
+        "description": "接收来自active_url_from_accessTree获取器的active_tab_info（可能为包含url键的字典或纯URL字符串）以及包含type和url的rule字典。首先判空，若输入为空直接返回0.0；随后校验rule['type']必须为\"url\"，否则记录错误并返回0.0；接着使用_normalize_url对预期URL和实际URL进行标准化（处理https?:///本地路径到file://的转换）；最后通过严格字符串相等比较判定：若标准化后的实际URL与预期URL完全一致则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 75,
+        "description": "接收来自bookmarks获取器的bookmarks字典（预期包含bookmark_bar及其children列表）以及包含type的rule字典。根据rule['type']分三支处理：1) bookmark_bar_folders_names：提取bookmark_bar下所有type为folder的书签名称组成列表，转换为集合后与rule['names']集合进行相等比较，完全一致返回1.0，否则0.0。2) bookmark_bar_websites_urls：提取bookmark_bar下所有type为url的书签URL，经_normalize_url标准化后组成列表，与经同样标准化的rule['urls']进行集合相等比较，完全一致返回1.0，否则0.0。3) liked_authors_websites_urls：在bookmark_bar的children中查找名为\"Liked Authors\"且type为folder的文件夹，若不存在直接返回0.0；若存在则提取其内部所有type为url的子项URL并标准化。将rule['urls']中的每个字符串元素转换为单元素列表并进行标准化后，使用itertools.product生成所有可能的URL组合，逐一检查是否有任一组合的标准化URL集合与Liked Authors文件夹内的URL集合完全相等，若找到匹配则返回1.0，遍历完所有组合无匹配则返回0.0。若rule['type']为以上三种之外的值，抛出TypeError。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_url",
+        "lineno": 18,
+        "description": "对Chrome accessTree报告URL时产生的协议前缀异常进行修正。输入为字符串url，若为空则直接返回；使用正则表达式^https?://(/[^/].*)$匹配以http://或https://开头后接绝对本地路径（如https:///home/user/...）的情况，若匹配则将协议部分替换为file://，保留后续路径；若不匹配则原样返回。该函数被is_expected_active_tab和is_expected_bookmarks调用，用于消除Chrome本地文件URL协议前缀不一致对严格相等比较造成的干扰。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:03:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_requirement_change_107/evaluator_function_labels.json"
+}

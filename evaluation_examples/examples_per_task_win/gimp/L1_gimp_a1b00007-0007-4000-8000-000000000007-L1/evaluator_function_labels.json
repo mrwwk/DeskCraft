@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00007-0007-4000-8000-000000000007-L1/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_554785e9_saturation_increase_40",
+      "lineno": 23
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_554785e9_saturation_increase_40",
+      "lineno": 23
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该评测器用于验证GIMP图像编辑任务是否成功将图像饱和度提升40%。它通过对比云端原始图像（src_path）与虚拟机中保存的结果图像（tgt_path）在HSV色彩空间下的S（饱和度）通道差异来进行判定。核心检查包括两项必须同时满足的联合指标：一是结果图像的平均饱和度相对于原图的比例必须落在1.4±0.15的区间内（即约提升40%，对应有效范围为[1.25, 1.55]）；二是结果图像中高饱和度像素（S>0.6）的占比必须严格高于原图。此外，评测器还会前置检查文件是否存在、图像是否成功打开、是否被强制转换为RGB模式、图像尺寸是否保持一致，并在任何异常情况下返回失败。",
+    "main_functions": [
+      {
+        "name": "check_554785e9_saturation_increase_40",
+        "lineno": 23,
+        "description": "该函数接收原始图像路径src_path（来自云端）和结果图像路径tgt_path（来自虚拟机），依次执行以下检查：1) 路径非空与文件存在性校验，任一缺失则返回0.0；2) 使用PIL.Image.open打开两张图像并强制转换为RGB模式；3) 尺寸一致性检查，若结果图像尺寸与原图不同则返回0.0；4) 调用内部辅助逻辑get_s_channel分别提取两张图像HSV空间的S通道并归一化到[0,1]；5) 计算两张图像S通道的均值，得到饱和度比例saturation_ratio = result_mean/ source_mean，并判定其是否处于[1.25, 1.55]区间（期望1.4，容差0.15），若不在区间内则直接返回0.0；6) 计算两张图像中S值大于0.6的像素占比（high_sat_ratio），并检查结果图像的该占比是否严格大于原图；7) 最终仅当饱和度比例正确且高饱和度像素占比增加同时成立时返回1.0，否则返回0.0。整个过程被异常捕获机制包裹，任何异常均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:13:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00007-0007-4000-8000-000000000007-L1/evaluator_function_labels.json"
+}

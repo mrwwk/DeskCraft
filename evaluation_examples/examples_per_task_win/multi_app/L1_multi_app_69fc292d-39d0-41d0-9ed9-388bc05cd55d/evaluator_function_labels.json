@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_69fc292d-39d0-41d0-9ed9-388bc05cd55d/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 37
+    },
+    {
+      "name": "check_bookmark_contains_url",
+      "lineno": 50
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 37
+    },
+    {
+      "name": "check_bookmark_contains_url",
+      "lineno": 50
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于多应用任务（L1_multi_app_69fc292d-39d0-41d0-9ed9-388bc05cd55d）的结果判定，核心目标是验证两类独立条件是否满足：第一，检查任务产生的文本输出（result）是否精确包含所有要求的关键词子串（include规则），同时必须不包含任何禁用子串（exclude规则），采用严格的精确子串匹配（in操作符），无近似容错；第二，检查Chrome浏览器书签JSON数据（roots层级）的完整树形结构中，是否存在任意一个收藏夹URL包含指定的模式子串（url_pattern）。两个检查项各自独立执行，均返回1.0表示通过、0.0表示不通过，整体评测逻辑为基于精确包含/排除的分项判定，无加权累计或阈值容忍机制。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 37,
+        "description": "接收任务文本结果result（str类型）和规则字典rules（Dict[str, List[str]]）。第一步检查result是否为None，若为None直接返回0.0；第二步通过print将result和rules输出到控制台；第三步从rules中提取include列表（默认空列表）和exclude列表（默认空列表）。判定逻辑为：仅当include中所有字符串都作为子串存在于result中，且exclude中所有字符串都不存在于result中时，返回1.0；任一include未命中或任一exclude命中，则返回0.0。匹配方式为Python原生的精确子串包含判断（in操作符），不支持正则或模糊匹配。"
+      },
+      {
+        "name": "check_bookmark_contains_url",
+        "lineno": 50,
+        "description": "接收Chrome书签数据bookmarks_roots（即Bookmarks JSON的roots字典，包含bookmark_bar、other等分区）和规则字典rule（要求含url_pattern键）。首先进行前置校验：若bookmarks_roots为空或rule中url_pattern为空字符串，则直接返回0.0。核心检查依赖内部嵌套的递归函数_search：该函数对传入节点判断是否为字典，若节点type字段等于'url'，则检查其url字段值是否包含url_pattern子串；若节点存在children列表，则对列表中每个子节点递归调用_search。主函数遍历bookmarks_roots.values()中的每个顶级分区，依次调用_search。只要在任意深度找到一个匹配的URL节点，立即返回1.0；若整棵树遍历完毕无匹配，返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:16:54",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_69fc292d-39d0-41d0-9ed9-388bc05cd55d/evaluator_function_labels.json"
+}

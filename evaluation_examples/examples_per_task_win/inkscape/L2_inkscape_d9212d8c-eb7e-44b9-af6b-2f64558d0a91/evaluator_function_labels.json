@@ -1,0 +1,123 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_d9212d8c-eb7e-44b9-af6b-2f64558d0a91/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_transform",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_group_children",
+      "lineno": 143
+    },
+    {
+      "name": "check_inkscape_l2_group_transform",
+      "lineno": 190
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 66
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 75
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_transform",
+      "lineno": 116
+    },
+    {
+      "name": "check_inkscape_group_children",
+      "lineno": 143
+    },
+    {
+      "name": "check_inkscape_l2_group_transform",
+      "lineno": 190
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape任务产出的SVG文件是否满足指定的视觉与结构要求。它通过解析SVG的XML树，对指定元素的填充颜色（fill）、变换属性（transform）以及元素分组关系进行精确检查。核心检查对象包括：单个SVG元素的样式属性、多个元素是否被共同包裹在同一个<g>分组内、以及分组后父级<g>节点是否带有预期的变换属性。比较方式以精确匹配为主：颜色值经规范化（3位十六进制扩展为6位、大写转小写、8位#rrggbbaa截取前6位、保留none）后进行完全相等比对；变换属性采用字符串包含检查（transform属性或style中的transform是否包含指定子串）；分组检查则通过构建父子映射表，验证所有指定元素是否共享同一个父节点且该父节点标签为<g>。对于组合型任务（如L2级别任务），采用“全部满足”的串联逻辑：分组检查、父级<g>的transform检查、以及填充颜色检查必须全部通过，任一失败即整体判为0分。所有主函数均返回1.0表示成功，0.0表示失败，属于二元打分机制。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 83,
+        "description": "接收svg_file_path和rule字典（需包含\"element_id\"和\"expected_fill\"）。首先调用_parse_svg解析SVG文件，若解析失败返回0.0。通过_find_element_by_id按id定位目标元素，若元素不存在返回0.0。使用_get_style_prop读取该元素的fill属性；若目标元素标签为\"text\"且自身无fill，则遍历其直接子节点，对标签为\"tspan\"的子节点继续查找fill，直到找到为止。将实际颜色与预期颜色均经_normalize_color规范化后比对：若预期为\"none\"，则要求实际也必须为\"none\"；其他情况要求完全相等。匹配成功返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_transform",
+        "lineno": 116,
+        "description": "接收svg_file_path和rule字典（需包含\"element_id\"和\"expected_transform_contains\"）。调用_parse_svg解析SVG，若失败返回0.0。通过_find_element_by_id定位元素，若不存在返回0.0。先读取元素的transform属性，检查其中是否包含预期子串；若未命中，再通过_get_style_prop读取style属性中的transform值进行同样检查。任一命中返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_group_children",
+        "lineno": 143,
+        "description": "接收svg_file_path和rule字典（需包含\"element_ids\"列表，可选\"group_id\"）。调用_parse_svg解析SVG，若失败返回0.0。构建parent_map（子元素到父元素的映射）。遍历element_ids：若任一元素不存在或无父元素，立即返回0.0；收集所有父元素的id(parent)到集合中。要求所有元素共享唯一父节点（集合长度必须为1）。若rule中指定了group_id，要求该父元素的id属性与之完全相等。最后要求父节点的本地标签名必须为\"g\"。全部满足返回1.0，任一不满足返回0.0。"
+      },
+      {
+        "name": "check_inkscape_l2_group_transform",
+        "lineno": 190,
+        "description": "接收svg_file_path和rule字典（需包含\"group_check\"、\"transform_check\"、\"fill_check\"三个子规则）。采用串联逻辑，必须全部通过才返回1.0，任一失败立即返回0.0。步骤如下：1）先调用check_inkscape_group_children验证分组；2）针对分组后的父级<g>节点检查transform：重新解析SVG并构建parent_map，找到第一个分组元素的父节点，确认其标签为\"g\"后，读取其transform属性，检查是否包含transform_rule中的\"expected_transform_contains\"子串；若group_elem_ids为空或expected_contains为空，则退化为调用check_inkscape_transform；3）最后调用check_inkscape_fill_color验证填充颜色。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 17,
+        "description": "解析CSS样式字符串（如\"fill:#ff0000;stroke:#000\"），按分号分割为多个部分，再按冒号分割为键值对，去除空白后返回字典。服务于_get_style_prop，用于提取内联style属性中的具体样式值。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 30,
+        "description": "规范化颜色值：去除空白并转小写；\"none\"保持原样；3位十六进制（如#f00）扩展为6位（#ff0000）；8位十六进制（#rrggbbaa）截取前6位；其余情况原样返回小写字符串。被check_inkscape_fill_color用于统一预期颜色和实际颜色后再做精确比较。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 49,
+        "description": "遍历SVG根节点下的所有元素，匹配元素的id属性等于传入element_id时返回该元素；找不到返回None。是各主函数定位目标元素的基础查找器。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 57,
+        "description": "先从元素的style字符串（通过_parse_style解析）中查找指定属性，若不存在则回退到读取该属性的直接XML属性值。被check_inkscape_fill_color和check_inkscape_transform用于统一读取内联样式和直接属性。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 65,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，返回(tree, root)；任何异常返回(None, None)。是所有主函数的入口级文件读取器。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 74,
+        "description": "去除XML标签中的命名空间前缀（如\"{namespace}tag\"转为\"tag\"），返回本地标签名。用于check_inkscape_group_children判断父节点是否为\"g\"，以及check_inkscape_fill_color判断元素是否为\"text\"。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:43:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_d9212d8c-eb7e-44b9-af6b-2f64558d0a91/evaluator_function_labels.json"
+}

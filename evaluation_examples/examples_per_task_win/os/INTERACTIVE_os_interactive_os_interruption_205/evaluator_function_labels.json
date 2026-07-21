@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_interruption_205/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于任务INTERACTIVE_os_interactive_os_interruption_205的结果判定，核心验证逻辑为精确匹配。它通过exact_match函数将任务实际输出（result）与规则配置中的预期值（rules[\"expected\"]）进行严格相等比较。若两者完全一致则返回1.0（成功），否则返回0.0（失败）。代码中未明确体现该任务具体的最终产物类型、状态要求或检查对象（如文件、页面、文档等），但判定方式属于严格的精确匹配打分逻辑，无近似容错、无阈值缓冲、无多指标联合判定，要求结果在值和类型上与预期值完全吻合。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数是评测的核心入口，接收result（任务实际返回结果）和rules（评测规则字典）作为输入。其执行步骤为：1）从rules字典中读取键名为\"expected\"的预期值；2）通过print语句输出result与expect的内容；3）使用==运算符对result和expect进行严格相等比较。判定依据为：若result与expect完全相等，则返回浮点数1.0；若不相等，则返回0.0。该函数不涉及文件读取、图像解析、正则匹配、模糊匹配、顺序检查或字段提取等操作，仅执行简单的严格相等判断。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:32:11",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_interruption_205/evaluator_function_labels.json"
+}

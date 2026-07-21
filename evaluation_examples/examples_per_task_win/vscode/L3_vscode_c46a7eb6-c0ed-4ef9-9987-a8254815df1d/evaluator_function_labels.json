@@ -1,0 +1,61 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_c46a7eb6-c0ed-4ef9-9987-a8254815df1d/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_config",
+      "lineno": 58
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 115
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_task_commands",
+      "lineno": 5
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 34
+    },
+    {
+      "name": "compare_config",
+      "lineno": 58
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 115
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证代理生成的VS Code配置文件（如tasks.json、extensions.json、settings.json）的内容是否符合预期。核心检查对象包括：任务配置文件中的命令与参数结构、扩展清单文件中的JSON结构，以及用户设置文件中的键值对。评测逻辑分为两条主线：对于tasks.json和extensions.json，采用“结构化子集比较”策略——默认允许实际文件包含比预期更多的内容，只要预期出现的字段和值都在实际文件中存在且一致即可，同时内部会对VS Code两种等价的任务命令写法（command字符串 vs command+args拆分）进行归一化，以避免格式差异导致误判；对于settings.json，则采用“精确键值对存在性检查”，要求预期中的每一个设置项都必须在实际文件中存在且值完全相等。成功判定的总体思路是：读取代理产出的目标文件，按文件类型选择对应的比较策略，若通过全部检查则返回1.0表示任务成功，任一环节不满足则返回0.0表示失败。",
+    "main_functions": [
+      {
+        "name": "compare_config",
+        "lineno": 58,
+        "description": "该函数负责比较VS Code配置文件（如tasks.json、extensions.json）的实际内容与预期内容。输入包括：actual（代理生成的JSON文件路径）、rules（字典，内含键'expected'，其值为预期JSON文本字符串或字典）、options（可选标志，如containment_ok）。检查步骤如下：首先验证actual路径和rules['expected']是否存在，若任一缺失直接返回0.0；接着读取actual文件的完整文本。若options中的containment_ok为True（默认值），则先将双方文本解析为JSON对象，并调用_normalize_task_commands对expected_json和actual_json进行递归归一化（将'command'+'args'合并为单一command字符串）；随后调用_is_subset判断expected_json是否是actual_json的结构子集。若JSON解析或比较过程中发生异常，则回退到纯字符串子串检查：判断expected_text.strip()是否包含在actual_text中。若containment_ok为False，则进入严格模式：先比较原始文本是否完全相等，再比较JSON解析后是否完全相等。满足对应条件时返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 115,
+        "description": "该函数负责检查settings.json中是否包含所有预期的键值对。输入包括：actual（代理生成的settings.json文件路径）、expected（在实际调用中应为一个字典，内含键'expected'，其值为嵌套字典，表示预期的设置项）。检查步骤如下：首先验证actual路径是否存在，若不存在返回0.0；然后读取并解析actual文件的JSON内容。接着遍历expected['expected']中的每一对key与value，逐一检查该key是否存在于实际解析出的data字典中，且对应的value是否与预期值精确相等（使用==判断）。所有键值对都必须同时满足存在性和值相等性；若出现任一key缺失或value不匹配，立即返回0.0。全部通过则返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_task_commands",
+        "lineno": 6,
+        "description": "该辅助函数递归归一化VS Code tasks.json中的任务命令格式。当遍历到某个字典且该字典同时包含'command'键、'args'键，并且'args'为非空列表时，会将args中的元素以空格拼接后追加到'command'值末尾，随后删除'args'键，从而将'command': 'npm', 'args': ['run', 'build']转换为'command': 'npm run build'。该函数通过递归方式处理嵌套字典和列表中的所有值。它被compare_config在主比较流程前调用，用于消除语义等价但写法不同的任务配置差异，确保后续子集比较不会因格式差异而误判。"
+      },
+      {
+        "name": "_is_subset",
+        "lineno": 28,
+        "description": "该辅助函数执行结构化的子集判定，用于检查expected是否是actual的子结构。具体规则为：若expected为字典，则要求actual也必须为字典，且expected中的每一个键都必须存在于actual中，其对应值递归调用_is_subset进行子集判定；若expected为列表，则要求expected与actual在顺序和内容上严格相等（使用==）；若为标量（字符串、数字等），则要求精确相等（使用==）。该函数被compare_config调用，是核心的配置包含性判断器。对于字典类型，它允许actual包含expected未声明的额外键，体现“最小预期满足”策略；但对于列表和标量，则要求严格匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:53:09",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_c46a7eb6-c0ed-4ef9-9987-a8254815df1d/evaluator_function_labels.json"
+}
