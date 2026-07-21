@@ -1,0 +1,131 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_152ebab3-5dca-4706-b4c7-e59909c6af9a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 65
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 98
+    },
+    {
+      "name": "check_inkscape_add_layer",
+      "lineno": 119
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 139
+    },
+    {
+      "name": "check_inkscape_layer_lock",
+      "lineno": 170
+    },
+    {
+      "name": "check_inkscape_layer_workflow",
+      "lineno": 194
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 40
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 48
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 57
+    },
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 65
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 98
+    },
+    {
+      "name": "check_inkscape_add_layer",
+      "lineno": 119
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 139
+    },
+    {
+      "name": "check_inkscape_layer_lock",
+      "lineno": 170
+    },
+    {
+      "name": "check_inkscape_layer_workflow",
+      "lineno": 194
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对 Inkscape 编辑后的 SVG 文件进行图层（layer）管理操作的正确性验证。最终产物必须是一个可被解析的 SVG 文件，其中图层以 `<g>` 元素表示，且需带有 `inkscape:groupmode=\"layer\"` 属性。核心检查对象包括：图层的 `inkscape:label`（名称）、`style` 中的 `display`（可见性）、`sodipodi:insensitive`（锁定状态），以及图层在文档中的堆叠顺序。主要比较方式为：使用 xml.etree.ElementTree 解析 SVG XML 树，遍历或定位目标 `<g>` 元素后，直接比对属性值或列表顺序。所有单项检查均采用二元打分（1.0 表示完全匹配，0.0 表示不匹配或找不到），而 `check_inkscape_layer_workflow` 作为组合检查，要求 rule 中指定的所有子检查全部返回 1.0，整体才算成功。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_layer_visibility",
+        "lineno": 65,
+        "description": "验证指定标签的图层可见性。接收 svg_file_path 和 rule（含 \"layer_label\" 与 \"expected_visible\"）。首先调用 _parse_svg 解析 SVG 并获取 root；然后分两轮遍历：第一轮使用带 SVG 命名空间的 `{{{NS[\"svg\"]}}}g` 迭代，第二轮退化为无命名空间前缀的 `g` 迭代（兼容部分 SVG）。在每一轮中，寻找 `inkscape:groupmode=\"layer\"` 且 `inkscape:label` 等于 layer_label 的 `<g>` 元素。找到后，用 _parse_style 解析该元素的 style 属性，提取 display 值，默认视为 inline；若 display 为 none 则判定为不可见。最后将实际可见性与 expected_visible 做布尔比较，一致返回 1.0，否则返回 0.0；全程未找到目标图层也返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_name",
+        "lineno": 98,
+        "description": "验证图层是否被正确重命名。接收 svg_file_path 和 rule（含 \"layer_id\" 与 \"expected_label\"）。调用 _parse_svg 获取 root 后，使用 _find_element_by_id 在整个 XML 树中查找 id 属性等于 layer_id 的元素。若找不到返回 0.0。找到后，读取该元素的 `inkscape:label` 属性值（带命名空间），与 expected_label 进行字符串完全比对，相同返回 1.0，不同返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_add_layer",
+        "lineno": 119,
+        "description": "验证是否存在指定标签的新图层。接收 svg_file_path 和 rule（含 \"expected_layer_label\"）。调用 _parse_svg 获取 root 后，遍历所有元素，使用 _tag_local 判断标签本地名是否为 g，并检查其 `inkscape:groupmode=\"layer\"` 与 `inkscape:label` 是否等于 expected_layer_label。只要命中一个即返回 1.0，遍历结束未命中返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_order",
+        "lineno": 139,
+        "description": "验证图层的堆叠顺序（从下到上）。接收 svg_file_path 和 rule（含 \"expected_order\" 列表）。调用 _parse_svg 获取 root 后，仅遍历 root 的直接子元素（而非整个树），筛选出标签本地名为 g 且 `inkscape:groupmode=\"layer\"` 的元素，按文档顺序收集它们的 `inkscape:label`。若收集到的图层数量少于 expected_order 长度，直接返回 0.0。否则，从收集到的全部图层标签中过滤出仅存在于 expected_order 中的项（保持原有文档顺序），将过滤后的列表与 expected_order 做完全顺序比对，完全一致返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_lock",
+        "lineno": 170,
+        "description": "验证图层的锁定状态。接收 svg_file_path 和 rule（含 \"layer_label\" 与 \"expected_locked\"，默认 True）。调用 _parse_svg 获取 root 后，遍历所有元素，使用 _tag_local 判断标签本地名为 g，并匹配 `inkscape:groupmode=\"layer\"` 与 `inkscape:label` 等于 layer_label 的图层。读取其 `sodipodi:insensitive` 属性值，若等于字符串 \"true\" 则视为已锁定（is_locked=True）。将 is_locked 与 expected_locked 做布尔比较，一致返回 1.0，否则返回 0.0；未找到目标图层返回 0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_workflow",
+        "lineno": 194,
+        "description": "L3 任务 3-4 的组合工作流检查，要求图层重排、重命名、锁定、可见性以及新增图层全部满足。接收 svg_file_path 和 rule，rule 中可包含五个子项：\"layer_order_check\"、\"layer_name_check\"、\"lock_check\"、\"visibility_check\"、\"add_layer_check\"。函数按固定顺序依次检查：若 rule 中存在某子项，则调用对应的主函数（check_inkscape_layer_order、check_inkscape_layer_name、check_inkscape_layer_lock、check_inkscape_layer_visibility、check_inkscape_add_layer）进行验证；只要任一子检查返回值小于 1.0，立即返回 0.0。只有当所有存在的子检查全部返回 1.0 时，最终才返回 1.0。属于\"全部满足\"的严格与逻辑。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 24,
+        "description": "解析类 CSS 的样式字符串（如 `\"fill:#ff0000;stroke:#000\"`），按分号分割为多个声明，再按冒号分割为键值对，去除首尾空格后组成字典返回。若输入为空或 None，返回空字典。该函数主要用于提取 `<g>` 元素 style 属性中的 display 值，以支撑图层可见性判定。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 35,
+        "description": "在整个已解析的 XML 树中递归遍历所有元素（root.iter()），查找并返回第一个 `id` 属性值等于传入 element_id 的元素。若遍历结束未找到，返回 None。该函数为 check_inkscape_layer_name 提供按 id 精准定位元素的能力。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 42,
+        "description": "使用 xml.etree.ElementTree.parse 读取并解析指定路径的 SVG 文件，返回 (tree, root) 元组，其中 root 为 xml 树的根元素。若解析过程中发生任何异常，返回 (None, None)。该函数是所有主函数的统一入口，负责文件读取与 XML 解析。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 51,
+        "description": "提取 XML 元素的本地标签名。若元素标签中包含命名空间前缀（以 `}` 分隔），则返回 `}` 之后的部分；否则直接返回原标签字符串。该函数用于在遍历 SVG 元素时，屏蔽命名空间差异，准确判断元素是否为 `<g>` 标签，被 add_layer、layer_order、layer_lock 等检查复用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:45:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_152ebab3-5dca-4706-b4c7-e59909c6af9a/evaluator_function_labels.json"
+}

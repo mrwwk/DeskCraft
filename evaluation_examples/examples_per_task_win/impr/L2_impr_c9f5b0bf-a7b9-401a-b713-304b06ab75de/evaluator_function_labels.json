@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_c9f5b0bf-a7b9-401a-b713-304b06ab75de/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_pptx_files",
+      "lineno": 13
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_pptx_files",
+      "lineno": 13
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 对 PPTX 演示文稿执行二值判定（通过返回 1.0，失败返回 0.0）。它要求结果文件满足两项独立且必须同时成立的条件：第一，所有幻灯片的背景必须是纯色填充（solid fill），且 RGB 十六进制字符串等于 expected_background_color（默认 \"003366\"）；如果某张幻灯片的背景类型为继承 slide master（type==5），则必须进一步追溯到 master 的背景，且 master 也必须是纯色填充并同样匹配该颜色值。第二，在 target_slide_idx 指定的幻灯片（默认第 2 页，1-based）上，结果文件必须与预期 gold 文件的对应幻灯片在文本段落对齐方式（paragraph alignment）以及非空文本 run 的斜体（italic）属性上完全一致。文本比较时，仅考虑包含文本框的形状（has_text_frame），跳过双方均为空或仅含空白字符的段落，并将 None 值的对齐方式视为 PP_ALIGN.LEFT、None 值的斜体视为 False。任一条件不满足即立即返回 0.0，全部满足才返回 1.0。",
+    "main_functions": [
+      {
+        "name": "compare_pptx_files",
+        "lineno": 13,
+        "description": "接收 result_path（结果 PPTX 文件路径）、expected_path（标准答案 PPTX 文件路径）以及 options 字典。options 支持 target_slide_idx（默认 2，1-based）和 expected_background_color（默认 \"003366\"，不带 # 的 hex RGB 字符串）。函数内部依次执行以下检查：1）全局背景色检查：遍历 prs_result 的每一张幻灯片，读取 slide.background.fill；若 fill.type 为 1（solid fill），直接取 str(fill.fore_color.rgb)；若 fill.type 为 5（继承自 slide master），则进一步读取 slide.slide_layout.slide_master.background.fill，仅当其 type 也为 1 时才取色。只要任一幻灯片的颜色不等于 expected_background_color，立即返回 0.0。2）目标幻灯片文本格式对齐检查：先判断 target_slide_idx 是否超出 result 或 expected 的幻灯片总数，超出则返回 0.0。然后分别取出两张 PPTX 中对应索引（target_slide_idx-1）的幻灯片，筛选出 has_text_frame 为 True 的形状；若两侧形状数量不一致，返回 0.0。对每一对形状，比较其 text_frame.paragraphs 的数量，不一致则返回 0.0。遍历段落对时，若双方段落的 text 均为空或仅含空白字符，则跳过。对于非空段落，比较 alignment：将 None 视为 PP_ALIGN.LEFT，若不一致返回 0.0。接着在该段落内筛选出 text.strip() 非空的 run，若 run 数量不一致返回 0.0；再逐对比较 run.font.italic，将 None 视为 False，若不一致返回 0.0。若所有检查均通过，最终返回 1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:26:30",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L2_impr_c9f5b0bf-a7b9-401a-b713-304b06ab75de/evaluator_function_labels.json"
+}

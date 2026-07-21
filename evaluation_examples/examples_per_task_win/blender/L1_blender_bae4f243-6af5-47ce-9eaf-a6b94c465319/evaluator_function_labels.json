@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_bae4f243-6af5-47ce-9eaf-a6b94c465319/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender渲染任务中各项渲染设置是否被正确配置。它不直接读取磁盘文件，而是通过参数接收Blender检查脚本（如check_render.py）执行后输出的JSON文本作为核心输入。评测逻辑提取JSON中的渲染引擎（engine）、分辨率X/Y（resolution_x/resolution_y）、帧率（fps）、采样数（samples）、图像格式（image_format）及活动相机（active_camera）等字段，并与评测规则（rule）中指定的期望值进行精确相等比对。采用“全部满足”的严格与逻辑（AND）：只有当rule中列出的所有参数都在JSON输出中存在且完全匹配时，才返回1.0表示任务成功；若JSON解析失败、输出为空，或任一指定参数不匹配，则立即返回0.0表示失败。判定结果为二元分数，不存在部分得分或近似匹配。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "该函数接收两个参数：command_output（来自Blender检查脚本的原始JSON字符串输出）和rule（字典，包含期望的渲染设置键值对）。首先调用辅助函数_parse_blender_output将原始输出解析为Python字典；若解析失败或输出为空，直接返回0.0。随后，函数内置一个checks映射，涵盖engine、resolution_x、resolution_y、fps、samples、image_format、active_camera共7个检查项，每个项对应一个精确相等比较函数。函数遍历rule中实际出现的所有键，依次调用对应的检查函数比对实际值与期望值。若发现任何一项不匹配，立即记录warning日志并返回0.0；若rule中所有键均通过精确匹配，则返回1.0。整个过程中若抛出异常，也会被捕获并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 21,
+        "description": "该辅助函数负责将Blender检查脚本打印的原始命令行输出解析为结构化数据。它接收command_output字符串，先判断是否为空或仅含空白字符，若是则记录error并返回None；否则尝试调用json.loads进行解析。若遭遇JSONDecodeError或ValueError，则记录error及原始输出调试信息，并返回None。成功时返回解析后的Python对象（通常为字典）。该函数是check_blender_render_settings的前置步骤，为其提供结构化数据，解析失败会直接导致主函数判定为0.0。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:35:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_bae4f243-6af5-47ce-9eaf-a6b94c465319/evaluator_function_labels.json"
+}

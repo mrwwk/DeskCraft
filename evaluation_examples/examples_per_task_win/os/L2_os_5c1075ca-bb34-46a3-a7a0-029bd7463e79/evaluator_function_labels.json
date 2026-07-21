@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_5c1075ca-bb34-46a3-a7a0-029bd7463e79/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_file_operations",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_file_operations",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证操作系统层面的文件操作任务是否按预期完成。它通过读取 Shell 收集器输出的 key=value 格式文本，将其解析为键值对，并与预设规则中定义的多个检查项进行精确字符串匹配。核心检查对象包括文件的存在性、缺失性或内容状态等（由外部 Shell 命令生成对应的 key 和 value）。判定逻辑为“全部满足”：只有当 rules 中声明的所有检查项的键值都与实际输出完全一致时，任务才得满分（1.0）；任何一项不匹配或解析过程发生异常，均直接判定为失败（0.0）。",
+    "main_functions": [
+      {
+        "name": "check_os_file_operations",
+        "lineno": 31,
+        "description": "该函数接收 Shell 收集器返回的原始字符串 result 和评测规则 rules。首先调用辅助函数 _parse_kv 将 result 按行解析为字典，其中每行需包含“key=value”格式，以第一个等号分割键值并去除首尾空白。随后从 rules 中提取 checks 字段（预期为一个字典），遍历其中每一个 key 和 expected_val，使用 kv.get(key) 与实际解析值进行精确相等比较。若所有检查项的值都与预期完全一致，则返回 1.0；若在遍历过程中发现任一检查项不匹配，立即返回 0.0。此外，整个流程被 try-except 包裹，若解析或比较过程中抛出任何异常，函数将记录错误日志并返回 0.0。该逻辑属于严格的“全部通过”式判定，无近似匹配、无阈值容忍、无加权计分。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 16,
+        "description": "该辅助函数负责将 Shell 命令输出的多行文本转换为 Python 字典。它接收字符串 output，先判断是否为空，若为空则返回空字典。随后按换行符分割文本，对每一行去除首尾空白后，检查是否包含等号“=”。对于包含等号的行，使用 split(\"=\", 1) 以第一个等号为界将行分割为键和值，并对键和值分别执行 strip() 去除空白，最终存入字典。该函数通常用于预处理外部 Shell 收集器的输出，为 check_os_file_operations 提供结构化的键值对数据，以便进行后续的预期值比对。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:34:17",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_5c1075ca-bb34-46a3-a7a0-029bd7463e79/evaluator_function_labels.json"
+}

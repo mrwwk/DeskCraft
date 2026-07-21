@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_109/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_tabs",
+      "lineno": 14
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 37
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_tabs",
+      "lineno": 14
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 37
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器在任务执行后的标签页状态是否满足预期。它从桌面环境获取两类核心信息：一是当前已打开的全部标签页列表（每个标签页对象包含 url 字段），二是当前处于焦点状态的活动标签页信息（字典形式或字符串形式）。评测逻辑分为两个独立维度：首先通过 is_expected_tabs 检查所有打开标签页的 URL 列表（包括顺序）是否与规则中给定的预期 URL 列表完全一致；其次通过 is_expected_active_tab 检查当前活动标签页的单个 URL 是否与规则中指定的预期 URL 匹配。针对活动标签页检测，还包含对底层 getter（active_url_from_accessTree）的容错修复：当实际 URL 被错误地以 https:/// 协议前缀返回本地文件路径时，会将其强制规范为 file:/// 后再进行比较。两个主函数均调用外部工具函数 compare_urls 执行 URL 等价性判定，并采用硬二分制返回 1（满足条件）或 0（不满足条件），不存在加权或累计打分逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_tabs",
+        "lineno": 14,
+        "description": "该函数接收当前 Chrome 已打开的标签页列表 open_tabs（列表元素为包含 url 键的字典）以及匹配规则 rule。第一步判空：若 open_tabs 为空列表，直接返回 0。第二步读取 rule['type']，当前仅支持 'url' 类型；若为其他类型则记录 error 日志并返回 0。在 'url' 分支中，先从 rule['urls'] 提取预期 URL 列表 expected_urls，再遍历 open_tabs 提取每个标签页的 tab['url'] 组成实际 URL 列表 actual_urls。随后调用辅助函数 are_lists_equal，并将 compare_urls 作为元素级比较器传入，对 expected_urls 与 actual_urls 按列表顺序进行逐一比较。若首次比较发现不匹配，则记录 error 日志并立即返回 0；若通过前置检查，则在最后的 return 语句中再次通过 compare_urls 确认后返回 1，否则返回 0。"
+      },
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 37,
+        "description": "该函数接收当前 Chrome 活动标签页信息 active_tab_info（可以是字典或字符串）以及匹配规则 rule。第一步判空：若 active_tab_info 为空，直接返回 0。第二步读取 rule['type']，当前仅支持 'url' 类型；若为其他类型则记录 error 日志并返回 0。在 'url' 分支中，从 rule['url'] 获取预期 URL expected_url；若 active_tab_info 为字典，则取 active_tab_info.get('url', None) 作为实际 URL actual_url，否则将 active_tab_info 本身视为实际 URL。接着执行关键预处理：若 actual_url 非空且以 'https:///' 开头（针对 active_url_from_accessTree getter 将本地文件路径误报为 https:/// 的已知缺陷），则将其替换为 'file:///' 前缀。最后调用 compare_urls(expected_url, actual_url) 进行等价比较，若返回 True 则返回 1，否则返回 0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:00:32",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_109/evaluator_function_labels.json"
+}

@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_d0c6f54f-7489-454f-a7ff-bc97460cd3e7/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_render_video",
+      "lineno": 68
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_render_video",
+      "lineno": 68
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender渲染任务是否按预期完成，核心检查分为两部分：一是渲染设置（Render Settings）的正确性，二是最终输出视频文件的合规性。对于渲染设置，evaluator读取Blender检查脚本（check_render.py）返回的JSON数据，对引擎、分辨率、帧率、采样数、图像格式、活动相机等字段进行逐项精确匹配，采用\"全部满足\"的严格逻辑，任一字段不匹配即判定失败（0分）。对于视频产物，evaluator直接检查本地MP4文件的存在性，并通过ffprobe提取视频时长与编码信息，验证其是否满足最小时长要求以及编码是否为指定类型（如h264），同样采用\"全部满足\"逻辑。两部分检查相互独立，分别由不同主函数执行，各自返回1.0（通过）或0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "接收command_output（来自Blender检查脚本check_render.py的JSON字符串）和rule字典。首先调用_parse_blender_output将输出解析为Python字典。然后依次检查rule中指定的渲染参数：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。对每个字段采用精确相等比较（==），只要rule中声明了该字段且实际值与期望值不符，立即记录警告并返回0.0。所有字段全部匹配则返回1.0。若JSON解析失败或发生异常，也返回0.0。"
+      },
+      {
+        "name": "check_blender_render_video",
+        "lineno": 68,
+        "description": "接收file_path（本地MP4视频文件路径）和rule字典（可包含min_duration和codec）。首先检查文件是否存在，不存在则返回0.0。接着调用ffprobe命令提取视频流与容器格式的时长（duration）和编码名称（codec_name），超时时间为30秒。时长优先从format.duration读取，其次遍历streams中的duration字段。若rule包含min_duration，则要求实际时长大于等于该阈值，否则返回0.0。若rule包含codec，则将视频首条视频流的codec_name与期望值进行不区分大小写的字符串比较，不匹配则返回0.0。全部通过返回1.0。特殊容错：若系统中未安装ffprobe（抛出FileNotFoundError），则降级为仅检查文件是否存在，存在返回1.0，否则返回0.0。其他异常返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 21,
+        "description": "接收Blender检查脚本的原始字符串输出，去除首尾空白后尝试用json.loads解析为Python对象。若输入为空或仅含空白，或JSON解析失败，则记录错误并返回None，供主函数识别为\"无法获取有效数据\"。解析成功则返回对应的字典。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:42:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_d0c6f54f-7489-454f-a7ff-bc97460cd3e7/evaluator_function_labels.json"
+}

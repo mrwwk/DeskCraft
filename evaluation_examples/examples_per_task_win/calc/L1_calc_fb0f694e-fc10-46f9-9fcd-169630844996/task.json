@@ -1,0 +1,134 @@
+{
+  "id": "fb0f694e-fc10-46f9-9fcd-169630844996",
+  "task_slug": "calc_reorder_the_columns_to_be_finish_the_wor",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Reorder the columns to be \"ID\", \"Name\", \"Department\", \"Join Date\", \"Salary\". Finish the work and don't touch irrelevant regions, even if they are blank.",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "cache/fb0f694e-fc10-46f9-9fcd-169630844996/Staff_Records_Reorder.xlsx",
+            "path": "/home/user/Staff_Records_Reorder.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Staff_Records_Reorder.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/fb0f694e-fc10-46f9-9fcd-169630844996",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Staff_Records_Reorder.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": "compare_table",
+    "expected": null,
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Staff_Records_Reorder.xlsx",
+      "dest": "Staff_Records_Reorder.xlsx"
+    },
+    "options": {
+      "rules": [
+        {
+          "type": "check_cell",
+          "sheet_idx": 0,
+          "coordinate": "A1",
+          "props": {
+            "value": {
+              "method": "eq",
+              "ref": "ID"
+            }
+          }
+        },
+        {
+          "type": "check_cell",
+          "sheet_idx": 0,
+          "coordinate": "B1",
+          "props": {
+            "value": {
+              "method": "eq",
+              "ref": "Name"
+            }
+          }
+        },
+        {
+          "type": "check_cell",
+          "sheet_idx": 0,
+          "coordinate": "C1",
+          "props": {
+            "value": {
+              "method": "eq",
+              "ref": "Department"
+            }
+          }
+        },
+        {
+          "type": "check_cell",
+          "sheet_idx": 0,
+          "coordinate": "D1",
+          "props": {
+            "value": {
+              "method": "eq",
+              "ref": "Join Date"
+            }
+          }
+        },
+        {
+          "type": "check_cell",
+          "sheet_idx": 0,
+          "coordinate": "E1",
+          "props": {
+            "value": {
+              "method": "eq",
+              "ref": "Salary"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

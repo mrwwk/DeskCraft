@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00003-0003-4000-8000-000000000003-L1/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_8ea73f6f_resize_1920x1080",
+      "lineno": 18
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_8ea73f6f_resize_1920x1080",
+      "lineno": 18
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证\"在GIMP中将图像resize到1920x1080像素\"这一任务。它要求最终产物必须是一张尺寸严格等于1920x1080像素的图像，并且在提供原始源图像的前提下，输出图像的内容结构必须相对于源图像得到保留。核心检查对象包括两部分：一是输出图像的物理宽高尺寸，二是输出图像与源图像经相同目标尺寸缩放后的结构相似度（SSIM）。主要比较方式为：将结果图像与源图像均统一转换为RGB模式，把源图像使用BICUBIC插值缩放到1920x1080后，与结果图像一同转为numpy数组，再计算SSIM。成功判定采用\"全部满足\"的串联逻辑：尺寸必须完全正确，且（在提供源图时）SSIM必须达到或超过设定阈值（默认0.85），两者同时满足才返回1.0；任一检查失败、文件缺失或发生异常，均返回0.0。若未提供源图，则仅通过尺寸检查即可判定成功。",
+    "main_functions": [
+      {
+        "name": "check_8ea73f6f_resize_1920x1080",
+        "lineno": 18,
+        "description": "该函数接收result_path（智能体输出的图像路径）、expected_path（原始源图像路径）和options（可选参数字典）作为输入，按顺序执行以下检查与判定：\n\n1. 前置校验：若result_path为None，或对应文件不存在，直接返回0.0。\n2. 尺寸严格检查：使用PIL.Image打开结果图像，读取其实际宽高。要求宽度必须严格等于1920且高度必须严格等于1080。若尺寸不符，记录日志并立即返回0.0。\n3. 内容结构保留检查（条件执行）：仅在expected_path不为None且对应文件存在时执行。打开源图像后，将结果图像与源图像均转换为RGB模式；使用Image.Resampling.BICUBIC将源图像缩放至1920x1080作为对比基准；将两图分别转为numpy数组；根据数组最小空间维度确定SSIM窗口大小win_size（若最小维度小于7，则取不大于该维度的最大奇数，若该值小于1则判定失败返回0.0；否则固定为7）；调用skimage.metrics.structural_similarity计算SSIM，先尝试channel_axis=2参数，若触发TypeError则回退到multichannel=True；从options字典中读取ssim_threshold（默认值为0.85），若计算出的SSIM值小于该阈值，则判定内容结构未保留，返回0.0。\n4. 若expected_path不存在或为None，则跳过内容检查，仅尺寸检查通过即可进入成功分支。\n5. 当尺寸检查通过且（内容检查通过或被跳过）时，函数返回1.0。整个执行流程由try-except包裹，任何未捕获异常均会导致返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:12:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00003-0003-4000-8000-000000000003-L1/evaluator_function_labels.json"
+}

@@ -1,0 +1,507 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_3b6edea0-506d-413f-a7d9-c02391728a53/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 110
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 143
+    },
+    {
+      "name": "check_inkscape_element_geometry",
+      "lineno": 177
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 263
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 286
+    },
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 351
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 384
+    },
+    {
+      "name": "check_inkscape_element_deleted",
+      "lineno": 405
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 418
+    },
+    {
+      "name": "check_inkscape_opacity",
+      "lineno": 456
+    },
+    {
+      "name": "check_inkscape_element_count",
+      "lineno": 482
+    },
+    {
+      "name": "check_inkscape_text_align",
+      "lineno": 510
+    },
+    {
+      "name": "check_inkscape_add_layer",
+      "lineno": 539
+    },
+    {
+      "name": "check_inkscape_ungroup",
+      "lineno": 559
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 589
+    },
+    {
+      "name": "check_inkscape_stroke_dasharray",
+      "lineno": 626
+    },
+    {
+      "name": "check_inkscape_stroke_linecap",
+      "lineno": 647
+    },
+    {
+      "name": "check_inkscape_radial_gradient",
+      "lineno": 666
+    },
+    {
+      "name": "check_inkscape_transform",
+      "lineno": 711
+    },
+    {
+      "name": "check_inkscape_align",
+      "lineno": 738
+    },
+    {
+      "name": "check_inkscape_object_to_path",
+      "lineno": 796
+    },
+    {
+      "name": "check_inkscape_fill_rule",
+      "lineno": 815
+    },
+    {
+      "name": "check_inkscape_snap_to_grid",
+      "lineno": 834
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 920
+    },
+    {
+      "name": "check_inkscape_boolean_operation",
+      "lineno": 967
+    },
+    {
+      "name": "check_inkscape_gradient",
+      "lineno": 996
+    },
+    {
+      "name": "check_inkscape_clone_exists",
+      "lineno": 1059
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 1102
+    },
+    {
+      "name": "check_inkscape_group_children",
+      "lineno": 1133
+    },
+    {
+      "name": "check_inkscape_layer_lock",
+      "lineno": 1180
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 1204
+    },
+    {
+      "name": "check_inkscape_l2_boolean_restyle",
+      "lineno": 1219
+    },
+    {
+      "name": "check_inkscape_l2_boolean_move",
+      "lineno": 1235
+    },
+    {
+      "name": "check_inkscape_l2_blur_opacity",
+      "lineno": 1246
+    },
+    {
+      "name": "check_inkscape_l2_clone_restyle",
+      "lineno": 1259
+    },
+    {
+      "name": "check_inkscape_l2_gradient_shadow",
+      "lineno": 1272
+    },
+    {
+      "name": "check_inkscape_l2_multi_transform",
+      "lineno": 1285
+    },
+    {
+      "name": "check_inkscape_l2_layer_ops",
+      "lineno": 1298
+    },
+    {
+      "name": "check_inkscape_l2_group_transform",
+      "lineno": 1311
+    },
+    {
+      "name": "check_inkscape_l2_path_stroke",
+      "lineno": 1350
+    },
+    {
+      "name": "check_inkscape_l2_scale_guide",
+      "lineno": 1363
+    },
+    {
+      "name": "check_inkscape_l2_shadow_zorder",
+      "lineno": 1374
+    },
+    {
+      "name": "check_inkscape_infographic_rebrand",
+      "lineno": 1391
+    },
+    {
+      "name": "check_inkscape_icon_composition",
+      "lineno": 1415
+    },
+    {
+      "name": "check_inkscape_boolean_pipeline",
+      "lineno": 1435
+    },
+    {
+      "name": "check_inkscape_layer_workflow",
+      "lineno": 1455
+    },
+    {
+      "name": "check_inkscape_complex_path_workflow",
+      "lineno": 1478
+    },
+    {
+      "name": "check_inkscape_full_poster_workflow",
+      "lineno": 1501
+    },
+    {
+      "name": "check_inkscape_shape_composition_workflow",
+      "lineno": 1524
+    },
+    {
+      "name": "check_inkscape_dashboard_surgery",
+      "lineno": 1547
+    },
+    {
+      "name": "check_inkscape_tiled_pattern_workflow",
+      "lineno": 1570
+    },
+    {
+      "name": "check_inkscape_dual_export_poster",
+      "lineno": 1593
+    },
+    {
+      "name": "check_interactive_inkscape_ii01",
+      "lineno": 1621
+    },
+    {
+      "name": "check_interactive_inkscape_ii02",
+      "lineno": 1634
+    },
+    {
+      "name": "check_interactive_inkscape_ii03",
+      "lineno": 1650
+    },
+    {
+      "name": "check_interactive_inkscape_ii04",
+      "lineno": 1663
+    },
+    {
+      "name": "check_interactive_inkscape_ii05",
+      "lineno": 1679
+    },
+    {
+      "name": "check_interactive_inkscape_ii06",
+      "lineno": 1692
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 30
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 43
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 62
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 70
+    },
+    {
+      "name": "_get_float",
+      "lineno": 78
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 89
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 98
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 110
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 143
+    },
+    {
+      "name": "check_inkscape_element_geometry",
+      "lineno": 177
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 263
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 286
+    },
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 351
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 384
+    },
+    {
+      "name": "check_inkscape_element_deleted",
+      "lineno": 405
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 418
+    },
+    {
+      "name": "check_inkscape_opacity",
+      "lineno": 456
+    },
+    {
+      "name": "check_inkscape_element_count",
+      "lineno": 482
+    },
+    {
+      "name": "check_inkscape_text_align",
+      "lineno": 510
+    },
+    {
+      "name": "check_inkscape_add_layer",
+      "lineno": 539
+    },
+    {
+      "name": "check_inkscape_ungroup",
+      "lineno": 559
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 589
+    },
+    {
+      "name": "check_inkscape_stroke_dasharray",
+      "lineno": 626
+    },
+    {
+      "name": "check_inkscape_stroke_linecap",
+      "lineno": 647
+    },
+    {
+      "name": "check_inkscape_radial_gradient",
+      "lineno": 666
+    },
+    {
+      "name": "check_inkscape_transform",
+      "lineno": 711
+    },
+    {
+      "name": "check_inkscape_align",
+      "lineno": 738
+    },
+    {
+      "name": "check_inkscape_object_to_path",
+      "lineno": 796
+    },
+    {
+      "name": "check_inkscape_fill_rule",
+      "lineno": 815
+    },
+    {
+      "name": "check_inkscape_snap_to_grid",
+      "lineno": 834
+    },
+    {
+      "name": "_check_guide",
+      "lineno": 878
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 920
+    },
+    {
+      "name": "check_inkscape_boolean_operation",
+      "lineno": 967
+    },
+    {
+      "name": "check_inkscape_gradient",
+      "lineno": 996
+    },
+    {
+      "name": "check_inkscape_clone_exists",
+      "lineno": 1059
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 1102
+    },
+    {
+      "name": "check_inkscape_group_children",
+      "lineno": 1133
+    },
+    {
+      "name": "check_inkscape_layer_lock",
+      "lineno": 1180
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 1204
+    },
+    {
+      "name": "check_inkscape_l2_boolean_restyle",
+      "lineno": 1219
+    },
+    {
+      "name": "check_inkscape_l2_boolean_move",
+      "lineno": 1235
+    },
+    {
+      "name": "check_inkscape_l2_blur_opacity",
+      "lineno": 1246
+    },
+    {
+      "name": "check_inkscape_l2_clone_restyle",
+      "lineno": 1259
+    },
+    {
+      "name": "check_inkscape_l2_gradient_shadow",
+      "lineno": 1272
+    },
+    {
+      "name": "check_inkscape_l2_multi_transform",
+      "lineno": 1285
+    },
+    {
+      "name": "check_inkscape_l2_layer_ops",
+      "lineno": 1298
+    },
+    {
+      "name": "check_inkscape_l2_group_transform",
+      "lineno": 1311
+    },
+    {
+      "name": "check_inkscape_l2_path_stroke",
+      "lineno": 1350
+    },
+    {
+      "name": "check_inkscape_l2_scale_guide",
+      "lineno": 1363
+    },
+    {
+      "name": "check_inkscape_l2_shadow_zorder",
+      "lineno": 1374
+    },
+    {
+      "name": "check_inkscape_infographic_rebrand",
+      "lineno": 1391
+    },
+    {
+      "name": "check_inkscape_icon_composition",
+      "lineno": 1415
+    },
+    {
+      "name": "check_inkscape_boolean_pipeline",
+      "lineno": 1435
+    },
+    {
+      "name": "check_inkscape_layer_workflow",
+      "lineno": 1455
+    },
+    {
+      "name": "check_inkscape_complex_path_workflow",
+      "lineno": 1478
+    },
+    {
+      "name": "check_inkscape_full_poster_workflow",
+      "lineno": 1501
+    },
+    {
+      "name": "check_inkscape_shape_composition_workflow",
+      "lineno": 1524
+    },
+    {
+      "name": "check_inkscape_dashboard_surgery",
+      "lineno": 1547
+    },
+    {
+      "name": "check_inkscape_tiled_pattern_workflow",
+      "lineno": 1570
+    },
+    {
+      "name": "check_inkscape_dual_export_poster",
+      "lineno": 1593
+    },
+    {
+      "name": "check_interactive_inkscape_ii01",
+      "lineno": 1621
+    },
+    {
+      "name": "check_interactive_inkscape_ii02",
+      "lineno": 1634
+    },
+    {
+      "name": "check_interactive_inkscape_ii03",
+      "lineno": 1650
+    },
+    {
+      "name": "check_interactive_inkscape_ii04",
+      "lineno": 1663
+    },
+    {
+      "name": "check_interactive_inkscape_ii05",
+      "lineno": 1679
+    },
+    {
+      "name": "check_interactive_inkscape_ii06",
+      "lineno": 1692
+    }
+  ],
+  "source_was_condensed": false,
+  "label": "{\"overall_validation\":\"该evaluator用于DeskCraft长程任务中Inkscape SVG编辑结果的自动化判定。它通过xml.etree.ElementTree解析任务最终保存的SVG文件，针对L1原子操作、L2复合操作、L3复杂工作流及交互式任务，检查图形元素的属性、几何状态、层级关系、文档属性和资源引用。所有检查函数统一返回1.0（通过）或0.0（失败）。核心比较方式包括：颜色规范化后精确匹配（将hex统一为6位小写，处理#rrggbbaa截断和'none'）；数值容差比较（几何尺寸、位置、透明度、描边宽度等，默认容差5或0.5，部分可通过rule.tolerance覆盖）；存在性检查（元素/图层/渐变/滤镜/克隆是否存在）；层级与顺序检查（z-order、图层堆叠顺序、编组关系）；引用链解析（渐变、滤镜、克隆通过url(#id)追踪，支持xlink:href链）。L2/L3及交互式复合检查采用严格的串联逻辑：所有子检查必须全部返回1.0，整体才返回1.0；任一子检查失败，立即返回0.0。对于文本内容，采用itertext()递归收集tspan等子节点文本后做精确字符串比较。对于图层，通过inkscape:groupmode='layer'和inkscape:label识别。对于辅助线，通过sodipodi:guide或inkscape:namedview中的guide元素解析orientation和position。\",\"main_functions\":[{\"name\":\"check_inkscape_fill_color\",\"lineno\":110,\"description\":\"验证指定元素的填充颜色。调用_parse_svg解析SVG，通过_find_element_by_id定位rule.element_id元素。使用_get_style_prop读取fill属性；若元素标签为text且自身无fill，则递归检查其tspan子元素的fill。利用_normalize_color将期望颜色和实际颜色统一为6位小写hex（处理#f00扩展、大写转小写、#rrggbbaa截断为#rrggbb，none保持none）。若期望为'none'，则实际必须为'none'；否则两者必须完全相等。满足返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_stroke\",\"lineno\":143,\"description\":\"验证指定元素的描边颜色与/或描边宽度。调用_parse_svg解析SVG并定位元素。若rule含expected_stroke，使用_normalize_color比较stroke颜色；期望为'none'时，实际必须为'none'或None。若rule含expected_stroke_width，使用_get_float去除单位后比较数值，容差默认0.5（可通过rule.tolerance覆盖）。任一条件不满足即返回0.0，全部满足返回1.0。\"},{\"name\":\"check_inkscape_element_geometry\",\"lineno\":177,\"description\":\"验证指定元素的尺寸和/或位置。调用_parse_svg解析SVG并定位元素，默认容差为5（rule.tolerance可覆盖）。若rule含expected_scale_factor：对circle检查r属性及transform属性是否包含'scale'或'matrix'子串；对其他元素检查transform是否存在或width/height属性是否存在，满足存在性即返回1.0（代码中未对具体缩放比例做数值验证）。否则分别检查expected_x（取x或cx属性）、expected_y（取y或cy）、expected_width（取width）、expected_height（取height），与期望值做绝对差值比较，任一超容差则返回0.0。\"},{\"name\":\"check_inkscape_text_content\",\"lineno\":263,\"description\":\"验证text元素的文本内容。调用_parse_svg解析SVG，通过_find_element_by_id定位rule.element_id元素。使用elem.itertext()收集该元素及其所有子元素（如tspan）的全部文本内容，strip去除首尾空白后拼接为实际文本。将实际文本与rule.expected_text做精确字符串比较，相等返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_text_style\",\"lineno\":286,\"description\":\"验证text元素的字体样式属性（大小、粗细、样式、家族、填充）。调用_parse_svg解析SVG并定位元素。内部定义_get_text_style：优先从元素自身通过_get_style_prop获取指定样式属性，若未找到则遍历其tspan子元素获取。依次检查：expected_font_size（数值差容差2）、expected_font_weight（bold匹配bold/700；normal匹配normal/400/空/None）、expected_font_style（精确匹配）、expected_font_family（去除引号后小写，做子串包含判断expected in actual）、expected_fill（颜色规范化后精确匹配）。任一不满足即返回0.0。\"},{\"name\":\"check_inkscape_layer_visibility\",\"lineno\":351,\"description\":\"验证指定图层的可见性。调用_parse_svg解析SVG，遍历所有svg:g元素，查找inkscape:groupmode='layer'且inkscape:label等于rule.layer_label的图层。解析该图层的style属性中display值，默认inline；display为none表示隐藏。将实际可见性与rule.expected_visible（默认True）比较，一致返回1.0。若带命名空间查找失败，还会回退到无前缀的g标签进行兼容查找。未找到图层返回0.0。\"},{\"name\":\"check_inkscape_layer_name\",\"lineno\":384,\"description\":\"验证图层是否已被重命名。调用_parse_svg解析SVG，通过_find_element_by_id查找rule.layer_id指定的图层元素。读取其inkscape:label属性，与rule.expected_label做精确字符串比较，相等返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_element_deleted\",\"lineno\":405,\"description\":\"验证指定元素是否已被删除。调用_parse_svg解析SVG，通过_find_element_by_id在整棵树中查找rule.deleted_element_id指定的元素。若找不到返回1.0（确认已删除），若仍存在返回0.0。\"},{\"name\":\"check_inkscape_document_properties\",\"lineno\":418,\"description\":\"验证文档尺寸（宽高）。调用_parse_svg解析SVG获取根元素。检查width/height时，优先读取根元素的width/height属性；若缺失，则解析viewBox属性（格式为'min-x min-y width height'，取第3、4个数值分别作为宽和高）。使用_get_float去除单位后，与rule.expected_width/expected_height比较，容差为5，任一超差返回0.0，否则返回1.0。\"},{\"name\":\"check_inkscape_opacity\",\"lineno\":456,\"description\":\"验证元素的主透明度。调用_parse_svg解析SVG，通过_find_element_by_id定位rule.element_id元素。使用_get_style_prop读取opacity，若缺失则默认值为1.0。将实际值与rule.expected_opacity做数值比较，容差默认0.05（rule.tolerance可覆盖），在容差内返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_element_count\",\"lineno\":482,\"description\":\"统计特定标签类型元素的数量。调用_parse_svg解析SVG，分别统计带svg命名空间和纯本地标签名等于rule.element_tag的元素总数（两者相加）。若rule含also_tag，则将两类标签数量之和与rule.combined_min比较；否则与rule.min_count（默认1）比较。满足数量要求返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_text_align\",\"lineno\":510,\"description\":\"验证文本对齐属性text-anchor。调用_parse_svg解析SVG，定位rule.element_id的text元素。使用_get_style_prop读取text-anchor，若元素自身无该属性，则检查其tspan子元素。将实际值转小写后与rule.expected_text_anchor精确比较，相等返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_add_layer\",\"lineno\":539,\"description\":\"验证是否存在指定名称的新图层。调用_parse_svg解析SVG，遍历所有元素，筛选本地标签为g且inkscape:groupmode='layer'的元素，检查其inkscape:label是否等于rule.expected_layer_label。找到匹配图层返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_ungroup\",\"lineno\":559,\"description\":\"验证编组是否已解散。调用_parse_svg解析SVG，分两种情况：若rule.ungrouped_id指定的组元素仍存在，则遍历rule.expected_free_ids，使用_find_element_by_id在该组内部查找每个子元素，若任一子元素仍在组内则返回0.0，全部不在组内则返回1.0；若该组已不存在，则在全树中查找expected_free_ids，若全部独立存在返回1.0，任一缺失返回0.0。\"},{\"name\":\"check_inkscape_zorder\",\"lineno\":589,\"description\":\"验证元素在同级视觉元素中的z-order位置。调用_parse_svg解析SVG，定位rule.element_id元素，通过parent_map找到其父元素。过滤父元素的子节点，排除defs、metadata、namedview、title、desc等非视觉元素。若rule.expected_position为'top'，检查该元素是否为过滤后子列表的最后一个；若为'bottom'，检查是否为第一个。满足返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_stroke_dasharray\",\"lineno\":626,\"description\":\"验证描边是否具有虚线模式。调用_parse_svg解析SVG，定位元素，使用_get_style_prop读取stroke-dasharray。若值存在且不为'none'、''、'0'，则认为有虚线。将实际有无虚线与rule.expect_dash（默认True）比较，一致返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_stroke_linecap\",\"lineno\":647,\"description\":\"验证stroke-linecap属性。调用_parse_svg解析SVG，定位元素，使用_get_style_prop读取stroke-linecap，转小写后与rule.expected_linecap精确比较，相等返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_radial_gradient\",\"lineno\":666,\"description\":\"验证元素是否应用了指定类型的渐变。调用_parse_svg解析SVG，定位元素，从fill属性中使用正则r'url//(#([^)]+)//)'提取渐变ID。在defs或全树中查找该ID对应的渐变定义，检查其本地标签名是否等于rule.gradient_type（默认radialGradient）。也支持xlink:href链的间接引用检查。找到匹配返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_transform\",\"lineno\":711,\"description\":\"验证元素transform属性是否包含预期内容。调用_parse_svg解析SVG，定位元素，检查其transform属性或style中的transform是否包含rule.expected_transform_contains子串。包含返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_align\",\"lineno\":738,\"description\":\"验证多个元素是否沿指定轴对齐。调用_parse_svg解析SVG，对rule.element_ids中的每个元素计算中心点：rect取x+width/2、y+height/2；circle/ellipse取cx、cy；其他取x、y。若rule.align_axis为horizontal_center，计算所有cx的平均值，各cx与平均值差值必须在rule.tolerance（默认10）内；若为vertical_center，同理比较cy值。全部满足返回1.0，任一超差返回0.0。\"},{\"name\":\"check_inkscape_object_to_path\",\"lineno\":796,\"description\":\"验证形状是否已转换为path。调用_parse_svg解析SVG，定位rule.original_id元素，检查其本地标签名是否等于rule.expected_tag（默认path）。相等返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_fill_rule\",\"lineno\":815,\"description\":\"验证fill-rule属性。调用_parse_svg解析SVG，定位元素，使用_get_style_prop读取fill-rule，转小写后与rule.expected_fill_rule精确比较，相等返回1.0，否则0.0。\"},{\"name\":\"check_inkscape_snap_to_grid\",\"lineno\":834,\"description\":\"验证辅助线（guide）是否存在且位置和方向正确。调用_parse_svg解析SVG，在sodipodi:namedview、inkscape:namedview或全树中查找guide元素。",
+  "created_at": "2026-07-01 15:43:09",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_3b6edea0-506d-413f-a7d9-c02391728a53/evaluator_function_labels.json"
+}

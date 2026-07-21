@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_7f52cab9-535c-4835-ac8c-391ee64dc930/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 65
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 65
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测Chrome浏览器相关任务的完成状态，核心围绕两大对象展开验证：一是当前浏览器激活标签页的URL文本，二是Chrome书签栏的层级结构与内容。对于URL验证，函数从result中提取当前页面URL（支持字符串或含'url'键的字典），并逐一用rules['expected']中的正则表达式进行搜索匹配，要求所有pattern全部命中才视为通过。对于书签验证，依据rule['type']分为三类检查：书签栏文件夹名称的精确集合匹配、书签栏网站URL的精确集合匹配、以及特定'Liked Authors'文件夹内URL的精确集合匹配（其中预期URL支持多值组合，通过itertools.product生成笛卡尔积遍历所有可能组合与实际URL集合比对）。两个主函数均采用二元评分机制，完全满足条件返回1.0，任一条件不满足或输入异常即返回0.0，不存在部分得分或加权累计。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 33,
+        "description": "该函数负责验证当前浏览器标签页的URL是否符合预期正则模式。接收参数result（字符串URL或包含'url'键的字典）与rules（包含'expected'键的字典）。检查步骤为：首先判断result非空，若为空返回0.0；接着解析出URL字符串，若格式非法也返回0.0；然后从rules['expected']获取正则表达式列表，遍历每个pattern并使用re.search在URL中搜索。判定依据为：所有正则pattern必须全部匹配成功才返回1.0，只要有任一pattern未匹配或输入异常，立即返回0.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 65,
+        "description": "该函数负责验证Chrome书签栏的结构与内容是否符合预期规则。接收参数bookmarks（书签结构字典）与rule（包含'type'键的规则字典）。检查步骤为：首先判断bookmarks非空，否则返回0.0；随后根据rule['type']分三支处理：若type为'bookmark_bar_folders_names'，提取bookmark_bar下所有type为'folder'的书签的'name'字段组成列表，与rule['names']做集合比对；若type为'bookmark_bar_websites_urls'，提取bookmark_bar下所有type为'url'的书签的'url'字段组成列表，与rule['urls']做集合比对；若type为'liked_authors_websites_urls'，先在bookmark_bar的children中查找name为'Liked Authors'且type为'folder'的文件夹，若不存在返回0.0，若存在则提取其children中所有type为'url'的'url'字段，并将rule['urls']中的字符串元素转为单元素列表，通过itertools.product生成所有组合，逐一检查是否有组合的集合与实际URL集合相等。判定依据为：前两种类型要求实际集合与预期集合完全相等（set equality）；第三种类型要求实际URL集合与笛卡尔积中某一组合完全相等。完全匹配返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:08:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_7f52cab9-535c-4835-ac8c-391ee64dc930/evaluator_function_labels.json"
+}

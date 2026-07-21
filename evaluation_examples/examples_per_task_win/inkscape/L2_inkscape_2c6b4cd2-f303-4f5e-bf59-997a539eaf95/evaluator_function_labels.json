@@ -1,0 +1,114 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_2c6b4cd2-f303-4f5e-bf59-997a539eaf95/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_element_count",
+      "lineno": 73
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 101
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 138
+    },
+    {
+      "name": "check_inkscape_l2_shadow_zorder",
+      "lineno": 185
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 40
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 48
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 56
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 65
+    },
+    {
+      "name": "check_inkscape_element_count",
+      "lineno": 73
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 101
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 138
+    },
+    {
+      "name": "check_inkscape_l2_shadow_zorder",
+      "lineno": 185
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator针对一个Inkscape SVG编辑任务（任务ID：L2_inkscape_2c6b4cd2-f303-4f5e-bf59-997a539eaf95），最终产物是一个SVG文件。核心检查对象包括三类：1）特定图形元素（如rect、circle、ellipse等）的数量是否达到最低要求；2）指定id的元素在视觉层级（z-order）中是否处于最上层（top）或最下层（bottom）；3）指定id的元素是否应用了特定类型的滤镜（如feGaussianBlur、feDropShadow）。主要比较方式是通过xml.etree.ElementTree解析SVG的XML结构，遍历元素节点、解析style属性、匹配命名空间标签，并进行精确计数、位置索引和滤镜定义链式查找。成功判定总体思路：对于L2组合任务（check_inkscape_l2_shadow_zorder），采用严格的“全部满足”逻辑——滤镜检查、z-order检查、元素数量检查三个子项必须同时返回1.0，最终才判定为成功（1.0），任一子项失败即整体失败（0.0）。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_element_count",
+        "lineno": 73,
+        "description": "接收svg_file_path和rule字典。首先调用_parse_svg解析SVG文件获取根元素。根据rule中的element_tag，使用SVG命名空间路径查找（//{http://www.w3.org/2000/svg}tag）和无命名空间遍历（_tag_local匹配）两种方式统计目标标签的元素数量。如果rule中包含also_tag和combined_min，则将主标签与also_tag的计数相加，判断总和是否大于等于combined_min；否则判断主标签计数是否大于等于min_count。达到阈值返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_zorder",
+        "lineno": 101,
+        "description": "接收svg_file_path和rule字典。解析SVG后，通过_find_element_by_id定位rule中element_id指定的目标元素。构建父元素映射表（parent_map）找到该元素的父节点，然后过滤父节点的子元素，仅保留视觉子元素（排除defs、metadata、namedview、title、desc等非视觉标签）。根据rule中的expected_position判断：若为'top'，要求目标元素是视觉子元素列表的最后一个；若为'bottom'，要求目标元素是第一个。满足条件返回1.0，否则返回0.0。若找不到元素或父元素，也返回0.0。"
+      },
+      {
+        "name": "check_inkscape_filter",
+        "lineno": 138,
+        "description": "接收svg_file_path和rule字典。解析SVG后，通过_find_element_by_id找到目标元素，使用_get_style_prop读取其filter属性值（支持内联style或独立属性）。使用正则表达式r'url/(#([^)]+)/)'提取引用的滤镜ID。遍历SVG中所有filter标签，匹配id等于提取到的滤镜ID的filter定义，检查其直接子元素的本地标签名（通过_tag_local）是否包含expected_filter_type（不区分大小写）。若当前filter通过xlink:href或href属性引用了另一个filter，还会进一步查找被引用的filter并检查其子元素。找到匹配的滤镜类型返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_l2_shadow_zorder",
+        "lineno": 185,
+        "description": "这是L2任务的主评测入口。接收svg_file_path和rule字典，rule中需包含三个子规则：filter_check、zorder_check、count_check。依次调用check_inkscape_filter、check_inkscape_zorder、check_inkscape_element_count，并严格判断每个函数的返回值是否都等于1.0。三个检查必须全部通过（逻辑与），函数才返回1.0；只要任意一个检查未通过，立即返回0.0。该函数本身不直接解析SVG，而是依赖上述三个子函数完成具体检查。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 24,
+        "description": "解析CSS样式字符串（例如'fill:#ff0000;stroke:#000'）。按分号分割为多个声明，再按冒号分割为键值对，去除空白后返回字典。该函数用于将SVG元素的内联style属性转换为可查询的字典结构，服务于_get_style_prop以及滤镜、颜色等属性的提取。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 35,
+        "description": "遍历SVG根元素下的所有后代元素（root.iter()），检查每个元素的id属性是否等于传入的element_id。找到则返回该元素，否则返回None。该函数是z-order检查和滤镜检查定位目标元素的基础。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 43,
+        "description": "先从元素的style属性字符串中解析CSS字典（调用_parse_style），查找指定prop（如filter）；若style字典中不存在，则回退到直接获取元素的同名属性（elem.get(prop)）。用于统一处理既可能写在内联style里、也可能作为独立XML属性存在的值，例如filter。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 50,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，返回(tree, tree.getroot())元组。如果解析过程中发生任何异常，返回(None, None)。所有主函数都通过该函数读取和初始化SVG文档对象。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 59,
+        "description": "处理带XML命名空间的标签名（例如'{http://www.w3.org/2000/svg}rect'），提取并返回本地标签名（'rect'）。用于兼容带命名空间和不带命名空间的SVG文件，确保元素计数和滤镜查找能正确匹配标签类型。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:43:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_2c6b4cd2-f303-4f5e-bf59-997a539eaf95/evaluator_function_labels.json"
+}

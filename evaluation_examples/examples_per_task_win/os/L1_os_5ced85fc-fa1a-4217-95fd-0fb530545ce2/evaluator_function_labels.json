@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_5ced85fc-fa1a-4217-95fd-0fb530545ce2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_text_transform",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_text_transform",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统层面的文本转换任务（如HTML列表生成）是否成功完成。它通过读取shell收集器返回的键值对文本，检查其中output_ok与summary_ok两个状态字段是否同时等于\"true\"。核心检查对象是shell端已完成内容比对后上报的布尔标识，采用严格的\"全部满足\"式判定：只有两个字段均严格为\"true\"时才得1.0分；任一字段不符或解析异常即得0.0分。rules参数在代码中未被直接使用，实际内容比对由shell端前置完成，evaluator仅做最终状态校验。",
+    "main_functions": [
+      {
+        "name": "check_os_text_transform",
+        "lineno": 31,
+        "description": "该主函数接收shell收集器输出的字符串result和规则字典rules（代码中未直接使用rules，内容比较由shell前置完成）。它首先调用_parse_kv将result字符串解析为字典，然后依次执行两项严格检查：1) 检查解析后的字典中output_ok字段是否严格等于字符串\"true\"；2) 检查summary_ok字段是否严格等于字符串\"true\"。只有当这两个条件同时满足时，才返回1.0表示任务成功；若任一字段不为\"true\"，或在解析与比较过程中捕获到任何异常，均返回0.0表示失败。这是一种无阈值、无近似匹配的联合判定逻辑，要求两个状态标识必须完全正确。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该辅助函数接收一段shell输出字符串，将其按换行符分割后逐行处理：去除每行首尾空白，以第一个\"=\"为界将行拆分为键和值，再分别去除首尾空白后存入字典并返回。它专门用于解析key=value格式的shell输出，为check_os_text_transform提供结构化数据。若输入为空或None，则返回空字典；不含等号的行会被跳过。该函数不做类型转换、不做值内容校验，仅做字符串分割与空白清洗。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_5ced85fc-fa1a-4217-95fd-0fb530545ce2/evaluator_function_labels.json"
+}

@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L2_writ_1cd80191-f69d-4d57-9197-e10d0c8fbbce/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_docx_formatting",
+      "lineno": 18
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_docx_formatting",
+      "lineno": 18
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 agent 修改后的 Policy_L2_04.docx 文档是否满足三项 Word 排版要求。它通过 python-docx 库解析文档，区分正文段落与结构性标题段落，重点检查：1）所有正文文本 run 的字体大小是否等于指定 pt 值（默认 12pt，允许 0.01pt 的浮点误差）；2）“5. Communication Standards” 章节范围内的正文是否全部应用斜体（每个 run 的 italic 属性必须为 True）；3）其他章节的正文是否未应用斜体（italic 为 None 或 False）。评测采用累计打分制：三项子检查独立进行，全部通过得 1.0，通过两项得约 0.67，以此类推；若文档无法打开或经筛选后没有正文段落可检查，则直接返回 0.0。此外，evaluator 支持通过 expected_path 读取标准文档来辅助识别可能被 agent 破坏的标题结构，确保章节边界判断的鲁棒性。",
+    "main_functions": [
+      {
+        "name": "check_docx_formatting",
+        "lineno": 18,
+        "description": "该函数接收 result_path（待评测的 docx 文件路径）、expected_path（可选的标准答案 docx 路径，用于辅助识别标题结构）和 options（支持通过 font_size_pt 传入字体大小，默认 12）。评测逻辑分为四步：第一步，使用 python-docx 打开 result_path 文档，若失败则返回 0.0。第二步，识别结构性（非正文）段落：通过正则 ^/d+//s+ 匹配所有编号标题段落并记录索引；将第一个编号标题之前的所有非空段落也标记为结构性段落；若提供了 expected_path，还会读取标准文档中的标题，并在结果文档中通过文本前 20 个字符前缀匹配来补充标题索引（防止 agent 修改导致标题格式变化而漏识别）。第三步，定位第 5 章节边界：遍历段落找到以 \"5.\" 或 \"5 \" 开头的标题作为 section_5_start_idx，找到其后的下一个编号标题作为 section_6_start_idx。第四步，格式检查：遍历所有段落，跳过空段落和已识别的标题段落，对每个正文段落的每个非空 run 执行三项检查——（1）字体大小：run.font.size 不能为 None，且其 pt 值与目标值的绝对差不能超过 0.01；（2）若段落位于第 5 章节范围内，要求 run.font.italic 必须为 True；（3）若段落不在第 5 章节范围内，要求 run.font.italic 必须为 False 或 None。若不存在任何正文段落则返回 0.0。最终，三项检查分别产生布尔结果 font_size_ok、section_5_italic_ok、non_section_5_italic_ok，将三者求和除以 3.0 得到 [0.0, 1.0] 区间的比例分数返回。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:56:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/L2_writ_1cd80191-f69d-4d57-9197-e10d0c8fbbce/evaluator_function_labels.json"
+}

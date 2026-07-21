@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证VSCode任务产生的JSON配置文件（如settings.json）是否严格符合预期状态。核心检查对象是实际生成的JSON文件内容，主要比较方式为逐键精确匹配。验证逻辑要求实际JSON中必须包含所有预期的配置项（键），且每个键对应的值必须与预期完全一致。这是一种二元判定机制：只要存在一个预期键缺失、或任意键的值不匹配，即判定为失败（返回0分）；仅当所有预期键值对全部精确匹配时，才判定为成功（返回1分）。",
+    "main_functions": [
+      {
+        "name": "check_json_settings",
+        "lineno": 25,
+        "description": "该函数接收实际文件路径字符串actual和包含预期配置的字典expected作为输入。执行步骤如下：1）若actual为空字符串，直接返回0.0；2）尝试打开actual指向的文本文件并使用json.load解析为JSON对象，若文件读取失败或JSON解析异常，返回0.0；3）从expected字典中提取键名为'expected'的子字典作为基准配置；4）遍历该基准字典中的每一对键值，检查实际JSON对象data中是否存在该键且值完全相等（使用Python的!=判断）；5）若发现任一预期键不存在于实际数据中，或存在但值不匹配，立即返回0.0；6）若所有键值对均通过检查，最终返回1.0。该函数不进行近似匹配、不忽略类型差异、也不支持嵌套结构的模糊比较，属于严格的精确匹配判定器。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:46:29",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2/evaluator_function_labels.json"
+}

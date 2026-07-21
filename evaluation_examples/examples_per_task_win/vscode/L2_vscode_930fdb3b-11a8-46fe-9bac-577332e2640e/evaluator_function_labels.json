@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_930fdb3b-11a8-46fe-9bac-577332e2640e/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 78
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 VS Code 快捷键配置文件（通常为 keybindings.json）的内容是否符合任务预期。它读取实际生成的结果文件，通过两种解析策略（直接 JSON 加载或跳过首行后加载）将其转换为快捷键绑定列表。核心检查方式是将期望的键绑定对象视为“子集模板”，与实际列表中的每一个字典项进行子集匹配：只有当实际项包含期望对象中的所有键值对时，才视为匹配成功。评测逻辑分为三种模式：验证单个指定绑定是否存在、验证 all_of 列表中的多个绑定是否全部存在、或验证 none_of 列表中的多个绑定是否全部不存在。最终采用二元打分制，所有条件均满足时返回 1.0，任一条件失败则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_json_keybindings",
+        "lineno": 25,
+        "description": "该函数接收 actual（实际结果文件路径字符串）和 expected（期望规则字典）作为输入。首先依次尝试两种文件读取策略：direct_load_json 直接打开文件解析 JSON；skip_first_line_load_json 先读取并丢弃第一行，再解析剩余内容为 JSON。若任一方式成功得到 list 类型的数据，则进入后续检查；否则返回 0.0。接着定义 contains_binding 逻辑，利用 _is_subset 遍历 data 列表中的每个字典项，判断期望的 binding 是否为其中某一项的子集。随后进入分支判定：若 expected 包含 all_of 键，则要求该列表内每一个 binding 都必须被找到，任一缺失即返回 0.0；若包含 none_of 键，则要求该列表内每一个 binding 都不得被找到，任一存在即返回 0.0；若以上两种键均不存在，则取 expected['expected'] 作为单一 binding 进行存在性检查，找到返回 1.0，未找到返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 76,
+        "description": "这是一个递归子集比较器，用于判定 expected 对象是否为 actual 对象的子集。当 expected 为 dict 时，要求 actual 也为 dict，并递归检查 expected 中的每一个键是否都存在于 actual 中且对应值满足子集关系；当 expected 为 list 时，要求与 actual 完全相等；对于其他基本类型，要求两者完全相等。该函数被 check_json_keybindings 中的 contains_binding 逻辑调用，用于判定一个实际的快捷键绑定条目是否包含了期望绑定所要求的所有字段和值。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:50:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_930fdb3b-11a8-46fe-9bac-577332e2640e/evaluator_function_labels.json"
+}

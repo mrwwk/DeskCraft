@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_28cc3b7e-b194-4bc9-8353-d04c0f4d56d2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_audio_config",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_audio_config",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统音频配置任务是否按预期完成。它通过读取shell采集器输出的键值对文本，对三项核心状态进行严格检查：音频音量（volume）必须等于规则指定的数值（默认期望\"100\"）、静音开关（mute）必须等于规则指定的状态（默认期望\"no\"）、以及音频sink配置文件必须已被正确保存（sink_file_ok必须等于\"true\"）。判定逻辑为\"全部满足\"式硬阈值打分：三项检查必须同时通过，任务才得1.0分；任一项不匹配或解析过程发生异常，均直接得0.0分。",
+    "main_functions": [
+      {
+        "name": "check_os_audio_config",
+        "lineno": 31,
+        "description": "该函数接收两个参数：result为shell采集器输出的原始字符串，rules为包含期望规则的字典。它首先调用辅助函数_parse_kv将result按行解析为键值对字典。随后依次执行三项严格相等检查：第一，比对字典中的\"volume\"值与rules.get(\"volume\", \"100\")，若不一致立即返回0.0；第二，比对字典中的\"mute\"值与rules.get(\"mute\", \"no\")，若不一致立即返回0.0；第三，比对字典中的\"sink_file_ok\"值与字符串\"true\"，若不一致立即返回0.0。只有当三项检查全部通过时，才返回1.0。如果在解析或比较过程中触发任何异常，函数捕获异常后记录错误日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 16,
+        "description": "该函数接收一个字符串output（通常为shell命令的标准输出），按换行符分割后逐行处理。对每一行去除首尾空白，若包含\"=\"号，则以第一个\"=\"为界将左侧作为键、右侧作为值（均去除首尾空白），存入字典并返回。空输入或仅含空白的输入会返回空字典。该函数被check_os_audio_config调用，负责将形如\"volume=100\"、\"mute=no\"、\"sink_file_ok=true\"的原始shell输出转换为结构化字典，以便主函数对特定字段进行严格的相等性判定。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_28cc3b7e-b194-4bc9-8353-d04c0f4d56d2/evaluator_function_labels.json"
+}

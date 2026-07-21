@@ -1,0 +1,66 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00005-0005-4000-8000-000000000005/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_fade_in",
+      "lineno": 99
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "check_audio_fade_in",
+      "lineno": 99
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务生成的音频文件是否包含符合要求的淡入（fade-in）效果。它直接读取指定的WAV音频文件，关注音频起始阶段（时长由rule中的fade_duration指定）的响度变化趋势。核心思路是将淡入时段划分为多个等长窗口，计算每个窗口的RMS（均方根）分贝值，然后检查这些窗口的能量是否总体呈递增趋势。如果各窗口RMS值在整体上单调上升（允许最多出现一次非递增的容错），则判定淡入效果合格，返回1.0；否则返回0.0。任何文件缺失、时长不足或读取异常均直接判为失败（返回0.0）。",
+    "main_functions": [
+      {
+        "name": "check_audio_fade_in",
+        "lineno": 99,
+        "description": "该函数接收file_path（待测WAV文件路径）和rule（字典，必须包含fade_duration表示淡入秒数，可选num_windows表示窗口数量，默认5）。检查流程如下：1）判断文件是否存在，不存在则返回0.0；2）调用_get_mono_samples读取音频并混音为单声道，同时获取采样率；3）根据fade_duration与采样率计算淡入所需样本数，若超过音频总长度则报错并返回0.0；4）将淡入样本数划分为num_windows个等长窗口（window_size = fade_samples// num_windows），若窗口小于1则返回0.0；5）对每个窗口提取样本并调用_rms_db计算该窗口的RMS分贝值，得到rms_values列表；6）统计相邻窗口间RMS递增的次数（后一个大于前一个）。判定依据为：若递增次数大于等于num_windows - 2（即允许最多1次非递增或持平），则返回1.0表示淡入合格；否则返回0.0。整个流程被try-except包裹，任何异常均返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 16,
+        "description": "使用Python标准库wave模块打开指定WAV文件，读取并返回基础元信息字典，包含channels（声道数）、sample_rate（采样率）、n_frames（总帧数）、sampwidth（采样位宽，字节数）和duration（时长，秒）。为主函数及_get_mono_samples提供音频基本参数。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 30,
+        "description": "读取WAV文件的全部原始样本，并按采样位宽转换为[-1.0, 1.0]范围内的浮点数列表。支持8位无符号（归一化方式：(s-128)/128）、16位有符号（/32768）、24位有符号（/8388608）和32位有符号（/2147483648）。对于多声道音频，返回的列表是交织（interleaved）样本。该函数是后续能量分析和混音的数据来源。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 60,
+        "description": "接收一个浮点样本列表，计算其RMS（均方根）并转换为分贝值返回。计算公式为20*log10(sqrt(mean(s^2)))。若样本为空或RMS小于1e-10，则返回-100.0。该函数被主函数用于量化每个窗口的响度水平。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 70,
+        "description": "整合读取与混音流程：先调用_read_wav_info获取文件信息，再调用_read_wav_samples获取交织样本。若声道数大于1，则对每帧的各声道样本取平均值，生成单声道样本列表；若为单声道则直接返回。最终返回(mono_samples, sample_rate)元组。主函数通过它获得统一用于淡入分析的单声道数据。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:19:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00005-0005-4000-8000-000000000005/evaluator_function_labels.json"
+}

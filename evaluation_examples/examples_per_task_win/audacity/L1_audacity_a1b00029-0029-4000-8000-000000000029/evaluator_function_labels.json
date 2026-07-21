@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00029-0029-4000-8000-000000000029/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_properties",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "check_audio_properties",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务最终生成的WAV音频文件是否满足一组预设的音频属性规则。核心检查对象是磁盘上的WAV文件，通过Python标准库wave解析其元数据，并与rule中给定的期望值进行比对。检查采用“全部满足”的联合判定逻辑：必须同时满足时长要求（在指定容差范围内，默认±0.5秒）、采样率要求（若rule中指定了expected_sr则必须精确匹配）、声道数要求（若rule中指定了expected_channels则必须精确匹配）。所有已启用的检查项全部通过时返回1.0表示成功；任一项不匹配、文件不存在或读取异常时均返回0.0表示失败。",
+    "main_functions": [
+      {
+        "name": "check_audio_properties",
+        "lineno": 41,
+        "description": "接收file_path（待检测的WAV文件路径）和rule（规则字典）作为输入。首先使用os.path.isfile检查文件是否存在，若不存在则直接返回0.0。接着调用_read_wav_info(file_path)读取WAV文件的通道数、采样率、总帧数、时长等元数据。然后依次执行以下检查：1）时长检查，从rule中取expected_duration作为期望值，取rule.get(\"tolerance\", 0.5)作为容差阈值（默认0.5秒），若实际时长与期望时长的绝对差值超过该容差，则记录日志并返回0.0；2）采样率检查（可选），仅当rule中包含expected_sr键时启用，要求实际采样率info[\"sample_rate\"]与期望值精确相等，否则返回0.0；3）声道数检查（可选），仅当rule中包含expected_channels键时启用，要求实际声道数info[\"channels\"]与期望值精确相等，否则返回0.0。若上述所有已启用的检查项全部通过，则返回1.0；若过程中捕获任何异常，也返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 23,
+        "description": "接收file_path参数，使用Python标准库wave以\"rb\"模式打开WAV文件，提取其通道数（channels）、采样率（sample_rate）、总帧数（n_frames）、采样宽度（sampwidth），并通过n_frames/ sample_rate计算音频时长（duration）。将这些字段打包为字典返回。该函数是纯粹的WAV元数据读取器，不执行任何判断或评分逻辑，主要为check_audio_properties提供待检测的原始音频属性数据。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:21:23",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00029-0029-4000-8000-000000000029/evaluator_function_labels.json"
+}

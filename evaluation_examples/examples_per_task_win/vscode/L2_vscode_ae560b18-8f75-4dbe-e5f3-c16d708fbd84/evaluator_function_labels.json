@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_ae560b18-8f75-4dbe-e5f3-c16d708fbd84/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 66
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 85
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 107
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 20
+    },
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 37
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 41
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 56
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 66
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 85
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 107
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个VS Code任务最终生成的UI bundle（ZIP压缩包）是否符合预期规范。核心检查对象是任务产出的ZIP文件路径（actual参数），通过rules字典传入各类预期规则。evaluator采用\"全部满足则得1.0，任一失败即得0.0\"的二元打分策略，从三个维度进行严格检查：1）ZIP内必须包含指定的必需文件；2）manifest.json的内容必须包含预期的键值子集（递归子集匹配）；3）HTML文件必须通过CSS选择器相关的结构、数量、文本、属性等细粒度检查。所有主函数共享同一套ZIP读取与路径规范化逻辑，任一环节抛出异常或检查不通过均直接判定为0分。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 66,
+        "description": "该函数检查ZIP包内是否完整包含rules['required_files']列出的所有必需文件。首先判断actual路径是否为空；随后调用_load_ui_bundle_entries读取ZIP内的全部条目，并利用_normalize_ui_bundle_path将规则中的文件路径与ZIP内的路径统一格式（去除开头'/'、反斜杠转正斜杠）后进行比对。若列表中任一文件在ZIP中找不到，立即返回0.0；全部存在则返回1.0。若读取ZIP过程中发生任何异常，也返回0.0。"
+      },
+      {
+        "name": "check_ui_bundle_manifest_subset",
+        "lineno": 85,
+        "description": "该函数验证ZIP包中的manifest.json是否包含预期的内容子集。先判断actual是否为空；然后调用_load_ui_bundle_entries加载ZIP内容，定位并读取manifest.json的文本；接着使用json.loads将其解析为字典；最后调用_is_subset判断rules['expected_manifest']是否为实际manifest字典的递归子集（即实际manifest必须包含所有预期键，且对应值满足子集关系）。若manifest.json不存在、解析失败或子集检查不通过，均返回0.0；通过则返回1.0。异常同样返回0.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 107,
+        "description": "该函数对ZIP包内的HTML文件执行一系列基于CSS选择器的细粒度检查。先判断actual是否为空；再调用_load_ui_bundle_entries读取ZIP；对每个rules['html_checks']中指定的文件，先用_normalize_ui_bundle_path规范化路径确认文件存在，再调用_get_ui_bundle_html_soup解析为BeautifulSoup对象。随后依次执行checks列表中的单项检查，支持以下类型：'selector_exists'（选择器必须匹配到至少一个元素）、'selector_count'（选择器匹配元素数量必须严格等于预期值）、'selector_text_contains'（选中元素的文本内容必须包含预期文本，不区分大小写）、'selector_attribute_equals'（选中元素的指定属性必须精确等于预期值）、'text_present'（整个HTML文档文本必须包含预期文本，不区分大小写）。若遇到未知check_type或任一检查失败，立即返回0.0；全部通过返回1.0。过程中任何异常均导致0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 17,
+        "description": "递归判断expected是否为actual的子集。若expected为字典，则要求actual也为字典，并递归检查expected中的每个键值对是否都存在于actual中；若expected为列表，则要求与actual完全相等；其他基础类型也要求完全相等。该函数被check_ui_bundle_manifest_subset用于判定manifest.json的内容子集关系。"
+      },
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 30,
+        "description": "对ZIP内的文件路径进行规范化处理：去除开头的'/'，并将所有反斜杠'//'替换为正斜杠'/'。该函数被_load_ui_bundle_entries、check_ui_bundle_required_files、check_ui_bundle_manifest_subset、check_ui_bundle_html_checks以及_get_ui_bundle_html_soup调用，用于统一路径格式以进行跨平台比对。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 34,
+        "description": "打开指定路径的ZIP文件，读取并返回三个核心数据结构：1）normalized_to_raw，即规范化路径到原始路径的映射；2）file_sizes，即各规范化路径对应的文件大小；3）text_contents，即对后缀为.html、.css、.js、.json、.md、.txt、.svg的文件读取的UTF-8文本内容（解码错误时忽略）。该函数是三个主函数读取任务产物的统一入口，所有ZIP内容检查都依赖其返回结果。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 50,
+        "description": "从_load_ui_bundle_entries返回的text_contents字典中，根据规范化后的文件名获取HTML文本，并使用BeautifulSoup解析为DOM对象（html.parser）返回。若对应文件不存在或不是HTML文本，返回None。该函数专为check_ui_bundle_html_checks提供HTML解析能力，支撑后续的CSS选择器查询。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:50:21",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_ae560b18-8f75-4dbe-e5f3-c16d708fbd84/evaluator_function_labels.json"
+}

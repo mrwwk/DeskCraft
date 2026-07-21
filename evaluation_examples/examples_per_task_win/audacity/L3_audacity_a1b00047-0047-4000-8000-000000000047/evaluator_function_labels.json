@@ -1,0 +1,145 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00047-0047-4000-8000-000000000047/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 171
+    },
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 192
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 209
+    },
+    {
+      "name": "check_audio_peak_amplitude",
+      "lineno": 248
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 271
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 24
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 70
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 81
+    },
+    {
+      "name": "_open_aup3",
+      "lineno": 98
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 103
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 122
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 171
+    },
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 192
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 209
+    },
+    {
+      "name": "check_audio_peak_amplitude",
+      "lineno": 248
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 271
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 OSWorld 任务 a1b00047 中 Audacity 音频编辑的产出质量，从两个独立维度进行检查：一是导出的 WAV 音频文件，二是 .aup3 项目文件。对于 WAV，evaluator 会验证音频时长是否在允许误差范围内、采样率是否精确匹配预期值、音频末尾是否存在淡出效果（通过末尾分段 RMS 能量递减判断）、以及峰值振幅是否落在指定的 dB 区间内。对于 .aup3 项目，evaluator 将其作为 SQLite 数据库打开，提取内部项目 XML 并解析轨道结构，验证项目是否可读、总轨道数是否达标，以及波形轨道（wave）和标签轨道（label）的数量是否分别满足要求。每个指标函数独立执行，采用布尔式打分，成功返回 1.0，失败返回 0.0；每个指标内部必须全部满足其 rule 中的阈值、范围或数量条件，才能获得满分。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 171,
+        "description": "接收 file_path 和 rule 字典（必须包含 expected_duration，可选 tolerance，默认 0.5 秒）。首先检查文件是否存在，若不存在直接返回 0.0；随后调用 _read_wav_info 读取 WAV 头信息，获取实际时长 actual。判定依据：计算 |actual - expected_duration|，若结果小于等于 tolerance 则返回 1.0，否则返回 0.0。任何异常也返回 0.0。"
+      },
+      {
+        "name": "check_audio_sample_rate",
+        "lineno": 192,
+        "description": "接收 file_path 和 rule 字典（必须包含 expected_sr）。先检查文件是否存在，不存在则返回 0.0；再调用 _read_wav_info 获取 WAV 的实际采样率 actual。判定依据：actual 必须精确等于 expected_sr（整数严格相等），满足返回 1.0，否则返回 0.0。异常时返回 0.0。"
+      },
+      {
+        "name": "check_audio_fade_out",
+        "lineno": 209,
+        "description": "接收 file_path 和 rule 字典（必须包含 fade_duration，可选 num_windows，默认 5）。先检查文件是否存在；随后调用 _get_mono_samples 获取单声道样本列表及采样率 sr。计算 fade_samples = int(fade_duration * sr)，若该值超过音频总长度则直接返回 0.0。将音频末尾 fade_samples 长度的区间均分为 num_windows 个窗口（window_size = fade_samples// num_windows，若小于 1 也返回 0.0），对每个窗口内的样本调用 _rms_db 计算 RMS 分贝值，得到 rms_values 列表。判定依据：统计相邻窗口间 RMS 值严格递减的次数 decreases，若 decreases >= num_windows - 2（即允许最多 1~2 个相邻窗口不满足递减）则返回 1.0，否则返回 0.0。异常时返回 0.0。"
+      },
+      {
+        "name": "check_audio_peak_amplitude",
+        "lineno": 248,
+        "description": "接收 file_path 和 rule 字典（必须包含 min_peak_db 和 max_peak_db）。先检查文件是否存在；调用 _get_mono_samples 获取单声道样本。计算所有样本绝对值的最大值 peak，若 peak < 1e-10 则将峰值设为 -100.0 dB，否则按 20.0 * math.log10(peak) 转换为 dB。判定依据：peak_db 必须落在 [min_peak_db, max_peak_db] 闭区间内，满足返回 1.0，否则返回 0.0。异常时返回 0.0。"
+      },
+      {
+        "name": "check_aup3_project_valid",
+        "lineno": 271,
+        "description": "接收 file_path 和 rule 字典（可选 min_track_count 默认 1、min_wave_tracks 默认 0、min_label_tracks 默认 0）。先检查文件是否存在；随后调用 _parse_aup3_tracks 解析 .aup3 项目 XML，得到轨道列表。若解析结果为空列表则返回 0.0。统计总轨道数 total、type 为 wave 的轨道数 wave_count、type 为 label 的轨道数 label_count。判定依据：三个条件必须同时满足——total >= min_track_count 且 wave_count >= min_wave_tracks 且 label_count >= min_label_tracks。全部满足返回 1.0，任一不满足返回 0.0。异常时返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 24,
+        "description": "使用 Python 标准库 wave 打开指定 WAV 文件，读取通道数（channels）、采样率（sample_rate）、总帧数（n_frames）、采样宽度（sampwidth），并计算 duration = n_frames/ sample_rate。返回包含这些字段的字典。该函数为所有需要 WAV 头信息的检查提供基础数据。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 41,
+        "description": "使用 wave 模块读取 WAV 文件的全部原始帧数据，根据采样宽度 sampwidth（支持 1/2/3/4 字节）分别通过 struct.unpack 或 int.from_bytes 将原始字节解码为归一化到 [-1.0, 1.0] 范围的浮点样本列表。多声道数据按交织格式返回。该函数为 _get_mono_samples 提供原始样本数据。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 70,
+        "description": "对输入的浮点样本列表计算均方根（RMS）能量，并转换为分贝值：20 * log10(sqrt(mean_sq))。若样本为空或 RMS 小于 1e-10，则返回 -100.0 dB。该函数被 check_audio_fade_out 调用，用于衡量各时间窗口内的能量水平变化。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 81,
+        "description": "整合 _read_wav_info 和 _read_wav_samples，先读取 WAV 头信息和全部样本；若通道数大于 1，则将交织的多声道样本按帧取算术平均，转换为单声道样本列表。最终返回 (mono_samples, sample_rate)。该函数被 check_audio_fade_out 和 check_audio_peak_amplitude 调用，确保后续分析统一基于单声道数据。"
+      },
+      {
+        "name": "_open_aup3",
+        "lineno": 98,
+        "description": "将 .aup3 文件路径直接传给 sqlite3.connect 并返回数据库连接对象。该函数是访问 Audacity 项目文件的底层包装器，仅被 _get_aup3_project_xml 调用。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 103,
+        "description": "调用 _open_aup3 建立 SQLite 连接，依次尝试从 project 表和 autosave 表中 SELECT doc LIMIT 1 读取项目 XML。若获取到的数据为 bytes 类型则解码为 utf-8 字符串返回；若两张表均无记录则返回 None。该函数被 _parse_aup3_tracks 调用，是提取项目元数据的关键步骤。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 122,
+        "description": "调用 _get_aup3_project_xml 获取 XML 字符串，使用 xml.etree.ElementTree 进行解析。自动处理 XML 命名空间，遍历根元素下的子节点，识别标签名为 wavetrack/WaveTrack 或 labeltrack/LabelTrack 的轨道。对 wave 轨道提取 name、gain、mute、solo、pan 等属性；对 label 轨道提取 name 及其下属 label 节点的时间（优先取 t，其次 t0/t1）和文本（优先取 title，其次 text）。返回轨道信息字典列表，供 check_aup3_project_valid 进行数量统计与判定。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:30:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L3_audacity_a1b00047-0047-4000-8000-000000000047/evaluator_function_labels.json"
+}

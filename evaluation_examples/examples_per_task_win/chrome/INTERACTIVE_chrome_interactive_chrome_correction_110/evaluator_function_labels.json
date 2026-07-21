@@ -1,0 +1,269 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_110/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 56
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 79
+    },
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 108
+    },
+    {
+      "name": "is_expected_installed_extensions",
+      "lineno": 140
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 158
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 181
+    },
+    {
+      "name": "is_expected_search_query",
+      "lineno": 225
+    },
+    {
+      "name": "compare_pdfs",
+      "lineno": 237
+    },
+    {
+      "name": "compare_pdf_images",
+      "lineno": 274
+    },
+    {
+      "name": "compare_archive",
+      "lineno": 344
+    },
+    {
+      "name": "compare_htmls",
+      "lineno": 410
+    },
+    {
+      "name": "is_cookie_deleted",
+      "lineno": 449
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 465
+    },
+    {
+      "name": "check_history_deleted",
+      "lineno": 556
+    },
+    {
+      "name": "check_history_keywords_absent_and_present",
+      "lineno": 572
+    },
+    {
+      "name": "check_enabled_experiments",
+      "lineno": 598
+    },
+    {
+      "name": "check_font_size",
+      "lineno": 610
+    },
+    {
+      "name": "is_added_to_steam_cart",
+      "lineno": 624
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_url_path",
+      "lineno": 21
+    },
+    {
+      "name": "_urls_match",
+      "lineno": 40
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 56
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 79
+    },
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 108
+    },
+    {
+      "name": "is_expected_installed_extensions",
+      "lineno": 140
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 158
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 181
+    },
+    {
+      "name": "is_expected_search_query",
+      "lineno": 225
+    },
+    {
+      "name": "compare_pdfs",
+      "lineno": 237
+    },
+    {
+      "name": "compare_pdf_images",
+      "lineno": 274
+    },
+    {
+      "name": "compare_archive",
+      "lineno": 344
+    },
+    {
+      "name": "compare_htmls",
+      "lineno": 410
+    },
+    {
+      "name": "is_cookie_deleted",
+      "lineno": 449
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 465
+    },
+    {
+      "name": "check_history_deleted",
+      "lineno": 556
+    },
+    {
+      "name": "check_history_keywords_absent_and_present",
+      "lineno": 572
+    },
+    {
+      "name": "check_enabled_experiments",
+      "lineno": 598
+    },
+    {
+      "name": "check_font_size",
+      "lineno": 610
+    },
+    {
+      "name": "is_added_to_steam_cart",
+      "lineno": 624
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器任务执行后的各类状态与产物是否符合预期。核心检查对象涵盖四大类：一是浏览器实时状态，包括当前活动标签页URL（精确匹配或忽略查询参数）、同时打开的标签页集合、已安装扩展程序、书签栏结构（文件夹名称、网址集合、特定文件夹\"Liked Authors\"的子链接）、搜索查询参数、Cookie残留、历史记录关键词（需同时满足某些关键词消失且某些存在）、浏览器实验功能（chrome flags）及默认字体大小；二是桌面快捷方式（按Name或Exec字段匹配）；三是Steam购物车内容是否包含指定商品；四是文件级比较，包括PDF文本相似度（rapidfuzz模糊匹配）、PDF内嵌图像感知哈希比对（phash差异阈值5）、压缩包逐文件对标（根据file_type自动选择文本/PDF/Word/PPT/图像/CSV/表格/音频/视频等专用比较器，要求文件列表一致后取平均分）、以及HTML文档的DOM树递归比对（元素标签名、文本内容、属性对等，可忽略sdnum属性）。判定逻辑以二元制（1.0为通过，0.0为失败）为主，文件比较类采用累计打分取平均，多条件检查需全部满足方可通过。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 56,
+        "description": "检查Chrome当前活动标签页是否为预期页面。接收active_tab_info（字典或字符串）与rule（含type和url字段）。若active_tab_info为空直接返回0。当match_type为\"url\"时，从active_tab_info中提取实际URL（字典则取'url'键，否则直接使用）；调用辅助函数_urls_match将expected_url与actual_url进行比对：先执行标准URL比较，若失败则忽略scheme仅比较规范化后的路径。若匹配成功返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 79,
+        "description": "检查Chrome当前活动标签页URL是否与预期一致，但忽略查询参数。接收active_tab_info与rule。若输入为空返回0。当type为\"url\"时，提取实际URL；通过urlparse解析预期与实际URL，将query字段置空后重新拼接为无查询参数的URL；若两者相等返回1，否则返回0。"
+      },
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 108,
+        "description": "使用正则表达式检查给定结果中的URL是否匹配所有预期模式。接收result（可为字符串URL或含'url'键的字典）与rules（其中\"expected\"为正则模式列表）。先从result中提取result_url；然后遍历patterns列表，对每个pattern使用re.search在result_url中搜索。所有pattern必须全部匹配成功才返回1.0，任一pattern未匹配则立即返回0。"
+      },
+      {
+        "name": "is_expected_installed_extensions",
+        "lineno": 140,
+        "description": "检查Chrome中是否已安装所有预期扩展。接收installed_extensions（已安装扩展列表）与expected（含\"expected\"预期列表）。将两个列表转为集合后，判断预期集合是否为已安装集合的子集。若是则返回1.0，否则返回0。"
+      },
+      {
+        "name": "is_expected_tabs",
+        "lineno": 158,
+        "description": "检查Chrome中打开的标签页集合是否与预期完全一致。接收open_tabs（标签页字典列表）与rule（含type和urls）。若open_tabs为空返回0。当type为\"url\"时，提取所有标签页的url组成actual_urls列表；调用are_lists_equal工具函数，以compare_urls作为元素比对函数，比较expected_urls与actual_urls两个列表。仅当列表完全相等时返回1，否则返回0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 181,
+        "description": "检查Chrome书签是否符合预期，支持三种比对类型。接收bookmarks（书签数据结构）与rule（含type字段）：当type为\"bookmark_bar_folders_names\"时，提取书签栏（bookmark_bar）下所有类型为folder的名称组成集合，与rule['names']集合进行相等比较；当type为\"bookmark_bar_websites_urls\"时，提取书签栏下类型为url的链接，经_normalize_url_path规范化路径后组成集合，与rule['urls']规范化后的集合比较；当type为\"liked_authors_websites_urls\"时，在书签栏下查找名为\"Liked Authors\"且类型为folder的文件夹，提取其下所有url链接；rule['urls']中每个元素可为字符串或列表（若为字符串则转为单元素列表），通过itertools.product生成所有可能的URL组合，检查是否存在某一组合与实际链接集合完全相等。匹配成功返回1.0，否则返回0；不支持的type抛出TypeError。"
+      },
+      {
+        "name": "is_expected_search_query",
+        "lineno": 225,
+        "description": "检查当前活动标签页的URL中是否包含预期的搜索查询模式。接收active_tab_info（字典，需包含'url'键）与rules（含expect.pattern正则字符串）。若active_tab_info为空返回0。使用re.search将pattern作用于active_tab_info['url']，若匹配成功返回1.0，否则返回0。"
+      },
+      {
+        "name": "compare_pdfs",
+        "lineno": 237,
+        "description": "比较两个PDF文件的文本内容相似度。接收pdf1_path与pdf2_path（均可为字符串路径或路径列表）。若输入非列表则转为单元素列表。内部使用fitz逐页提取文本并拼接，对每一对文件使用rapidfuzz.fuzz.ratio计算文本相似度（归一化为0-1），最终返回所有文件对的平均分数。若处理过程中发生异常则记录错误并跳过该对。"
+      },
+      {
+        "name": "compare_pdf_images",
+        "lineno": 274,
+        "description": "比较两个PDF文件中所包含图像的感知相似度。接收pdf1_path与pdf2_path。先检查文件是否存在；创建临时目录复制PDF后，使用fitz提取每页所有内嵌图像并转为PIL Image对象；若两PDF图像数量不同返回0；若均无图像返回1.0。对每一对对应图像计算imagehash.phash感知哈希值，当哈希差异hash_diff <= 5时认为该图像匹配。最终返回匹配图像数占总图像数的比例。"
+      },
+      {
+        "name": "compare_archive",
+        "lineno": 344,
+        "description": "比较两个压缩包（archive）内部文件的一致性。接收pred_path（预测压缩包）、gold_path（标准答案压缩包）及kwargs（可包含file_path指定包内子目录、file_type指定文件类型等）。分别解压到_pred和_gold临时目录；比较指定子路径下的文件名列表（已排序）是否完全一致，不一致直接返回0。根据file_type动态选择比较函数：text调用compare_text_file、pdf调用compare_pdfs、docx调用compare_docx_files、ppt调用compare_pptx_files、image调用compare_images、csv调用compare_csv、table调用compare_table、audio调用compare_audios、video调用compare_videos。对每一对同名文件调用选定的比较函数并累加分数，最终返回平均分。"
+      },
+      {
+        "name": "compare_htmls",
+        "lineno": 410,
+        "description": "比较两个HTML文件的DOM结构是否一致。接收html_path1、html_path2及options（如ignore_sdnum）。使用BeautifulSoup以lxml解析两个HTML文件；通过recursiveChildGenerator递归遍历所有子元素，逐对比较：元素类型（Tag与非Tag直接比较值）、标签名称（name）、文本内容（strip后）、属性字典（attrs），若options中ignore_sdnum为真则忽略sdnum属性差异。若任一元素不匹配则记录日志并返回0.0；全部匹配则返回1.0。"
+      },
+      {
+        "name": "is_cookie_deleted",
+        "lineno": 449,
+        "description": "检查指定域名的Cookie是否已被删除。接收cookie_data（Cookie数据列表）与rule（含type和domains）。当type为\"domains\"时，提取所有cookie的domain字段（取每个cookie的第2个元素）；遍历rule['domains']中的每个预期域名，使用compare_urls与实际cookie domain进行比对。若任一预期域名仍存在于cookie中则返回0.0；全部不存在则返回1.0。"
+      },
+      {
+        "name": "is_shortcut_on_desktop",
+        "lineno": 465,
+        "description": "检查桌面快捷方式是否满足预期规则。接收shortcuts（字典，键为快捷方式路径，值为文件内容字符串）与rule（含type字段）：当type为\"name\"时，在快捷方式内容中查找\"Name=\"行。先尝试精确匹配（\"Name=\" + expected_name + \"/n\"）；否则逐行提取Name值，支持精确相等、expected_name被包含于actual_name（不区分大小写）、actual_name被包含于expected_name（不区分大小写）三种通过条件；当type为\"exec\"时，类似地查找\"Exec=\"行，支持精确相等、expected_exec被包含于actual_exec、actual_exec被包含于expected_exec三种通过条件（区分大小写）。找到满足条件的快捷方式即返回1.0，遍历结束未找到返回0.0；其他type抛出TypeError。"
+      },
+      {
+        "name": "check_history_deleted",
+        "lineno": 556,
+        "description": "检查浏览器历史记录中是否已删除包含指定关键词的记录。接收history_data（历史数据列表）与rule（含type和keywords）。当type为\"keywords\"时，提取所有历史记录的domain（取每个history的第1个元素）；遍历rule['keywords']，若任一关键词仍存在于任一domain中则返回0.0；全部不存在则返回1.0。"
+      },
+      {
+        "name": "check_history_keywords_absent_and_present",
+        "lineno": 572,
+        "description": "同时检查浏览器历史记录中某些关键词必须不存在而另一些必须存在。接收history_data与rule（type须为\"keywords_absent_present\"，含absent_keywords和present_keywords）。提取所有历史记录URL并转为小写。absent_keywords中每个词都不得出现在任何URL中；present_keywords中每个词都至少必须出现在一个URL中。两类条件同时满足返回1.0，任一不满足返回0。"
+      },
+      {
+        "name": "check_enabled_experiments",
+        "lineno": 598,
+        "description": "检查Chrome已启用的实验功能（experiments）是否与预期一致。接收enabled_experiments（实验标识符列表）与rule（含type和names）。当type为\"names\"时，提取每个experiment字符串中\"@\"符号前的名称部分，组成列表后与rule['names']进行精确比较。完全相等返回1.0，否则返回0。"
+      },
+      {
+        "name": "check_font_size",
+        "lineno": 610,
+        "description": "检查Chrome默认字体大小是否符合预期。接收font_size（字典，含default_font_size）与rule（含type字段）。当type为\"value\"时，要求default_font_size精确等于rule['value']；当type为\"range\"时，要求default_font_size严格大于rule['min']且严格小于rule['max']（开区间）。满足条件返回1.0，否则返回0；不支持的type抛出TypeError。"
+      },
+      {
+        "name": "is_added_to_steam_cart",
+        "lineno": 624,
+        "description": "检查Steam购物车页面内容中是否已包含所有预期商品。接收active_tab_info（字典，需包含'content'键，通常为页面文本内容）与rule（含items列表）。遍历rule['items']，检查每个item是否都存在于active_tab_info['content']中。全部存在返回1.0，任一缺失返回0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_url_path",
+        "lineno": 24,
+        "description": "对URL进行路径规范化，用于解决Chrome accessTree将本地file:///URL报告为https:///等scheme不匹配问题。移除URL的scheme前缀（包括http://、https://、file://等，兼容双斜杠和三斜杠情况），去除尾部斜杠，并转为小写。若处理后路径为空则返回空字符串。该函数为_urls_match及书签URL比对提供统一的路径提取与格式化能力。"
+      },
+      {
+        "name": "_urls_match",
+        "lineno": 42,
+        "description": "比较两个URL是否等价，作为标准URL比较的容错回退层。首先调用compare_urls进行常规URL比对；若失败，则分别对两个URL调用_normalize_url_path提取规范化路径，仅当两条路径均非空且相等时返回True。该函数主要用于is_expected_active_tab及is_expected_bookmarks中，以兼容Chrome内部API返回的异常scheme格式。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:59:13",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_correction_110/evaluator_function_labels.json"
+}

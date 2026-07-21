@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_3b531757-692d-4de3-9f49-5d8c3a1558a3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_clip_position",
+      "lineno": 57
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_property_value",
+      "lineno": 21
+    },
+    {
+      "name": "_get_project_fps",
+      "lineno": 38
+    },
+    {
+      "name": "check_kdenlive_clip_position",
+      "lineno": 57
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 Kdenlive 视频编辑任务中，指定素材片段是否被正确放置在时间轴的特定起始位置。它通过读取 .kdenlive 项目文件（MLT XML 格式），解析其中的时间线结构（playlist 中的 blank 和 entry 序列），计算目标素材片段在时间轴上的实际开始时间（秒），并与规则中给定的期望开始时间 start_time 进行比较。若两者差值在容差范围 tolerance（默认 0.5 秒）内，则判定任务成功（返回 1.0），否则判定失败（返回 0.0）。核心检查对象包括项目帧率、素材资源映射、播放列表中的空白间隔与片段时长累加计算。该 evaluator 采用单一指标判定逻辑，仅验证素材位置这一个条件。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_clip_position",
+        "lineno": 56,
+        "description": "该函数接收 project_file_path（Kdenlive 项目文件路径）和 rule（验证规则字典）作为输入。首先检查项目文件是否存在，并从 rule 中提取 source_file（目标素材文件名）、start_time（期望起始时间，单位秒）和 tolerance（容差，默认 0.5 秒），若缺失必要字段则直接返回 0.0。随后使用 xml.etree.ElementTree 解析 .kdenlive 项目文件（MLT XML 格式），调用 _get_project_fps 获取项目帧率。接着遍历 XML 中所有 producer 与 chain 元素，利用 _get_property_value 提取 name 为 resource 的 property 子元素文本内容，构建素材 ID 到资源路径的映射表 producer_resources。之后遍历所有 playlist 元素（跳过 ID 中包含 bin 的素材箱播放列表），通过累加 blank 元素的 length 属性值，以及已处理过的 entry 元素的时长（out - in + 1），来维护当前时间轴位置 current_pos_frames（单位帧）。当遇到 entry 元素时，先检查其 producer 属性对应的资源路径是否包含目标 source_file：若匹配，则将 current_pos_frames 除以 FPS 转换为实际开始时间 start_sec（单位秒），并比较其与 expected_start 的绝对差值，若小于等于 tolerance 则返回 1.0；若不匹配，则将该 entry 的时长累加到 current_pos_frames 后继续搜索。若遍历完所有 playlist 仍未找到匹配的素材或位置超出容差，则返回 0.0。过程中若发生 XML 解析错误或其他异常，也返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_property_value",
+        "lineno": 20,
+        "description": "该辅助函数接收一个 XML 元素（xml.etree.ElementTree.Element）和一个 property_name 字符串，遍历该元素下所有 tag 为 property 的子元素，匹配其 name 属性与传入的 property_name，返回首个匹配项的 text 内容；若未找到则返回 None。在主评测逻辑中，该函数被用于从 MLT XML 的 producer 或 chain 元素中提取 name 为 resource 的 property 子元素文本值，以建立素材 ID 到文件路径的映射关系，供后续在时间轴中定位素材时查询。"
+      },
+      {
+        "name": "_get_project_fps",
+        "lineno": 37,
+        "description": "该辅助函数接收 MLT XML 的根元素 root，通过 XPath//profile 查找项目配置节点，读取其 frame_rate_num（帧率分子，默认 25）和 frame_rate_den（帧率分母，默认 1）属性，计算并返回项目的实际帧率（浮点数）。若 profile 节点不存在、属性缺失或发生数值转换错误、除零错误，则返回默认值 25.0。该函数服务于主评测逻辑，用于将时间轴上的帧位置转换为秒，从而与规则中的期望时间进行容差比较。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:55:14",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_3b531757-692d-4de3-9f49-5d8c3a1558a3/evaluator_function_labels.json"
+}

@@ -1,0 +1,725 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_3bca71b4-a61c-4f1b-859f-64659b240cbe/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_object_deleted",
+      "lineno": 76
+    },
+    {
+      "name": "check_blender_object_exists",
+      "lineno": 102
+    },
+    {
+      "name": "check_blender_object_count",
+      "lineno": 132
+    },
+    {
+      "name": "check_blender_object_location",
+      "lineno": 163
+    },
+    {
+      "name": "check_blender_object_scale",
+      "lineno": 195
+    },
+    {
+      "name": "check_blender_object_rotation",
+      "lineno": 225
+    },
+    {
+      "name": "check_blender_object_renamed",
+      "lineno": 255
+    },
+    {
+      "name": "check_blender_object_visibility",
+      "lineno": 281
+    },
+    {
+      "name": "check_blender_light_type",
+      "lineno": 316
+    },
+    {
+      "name": "check_blender_light_energy",
+      "lineno": 346
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 377
+    },
+    {
+      "name": "check_blender_animation_range",
+      "lineno": 412
+    },
+    {
+      "name": "check_blender_collection_exists",
+      "lineno": 439
+    },
+    {
+      "name": "check_blender_object_in_collection",
+      "lineno": 462
+    },
+    {
+      "name": "check_blender_text_content",
+      "lineno": 488
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 525
+    },
+    {
+      "name": "check_blender_modifier_boolean",
+      "lineno": 596
+    },
+    {
+      "name": "check_blender_texture_assigned",
+      "lineno": 630
+    },
+    {
+      "name": "check_blender_modifier_stack",
+      "lineno": 680
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 725
+    },
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 754
+    },
+    {
+      "name": "check_blender_parent_child",
+      "lineno": 791
+    },
+    {
+      "name": "check_blender_collection_members",
+      "lineno": 847
+    },
+    {
+      "name": "check_blender_constraints_multi",
+      "lineno": 881
+    },
+    {
+      "name": "check_blender_applied_modifier",
+      "lineno": 920
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 958
+    },
+    {
+      "name": "check_blender_particle_params",
+      "lineno": 996
+    },
+    {
+      "name": "check_blender_selective_smooth",
+      "lineno": 1033
+    },
+    {
+      "name": "check_blender_animation_extended",
+      "lineno": 1063
+    },
+    {
+      "name": "check_blender_collection_organization",
+      "lineno": 1096
+    },
+    {
+      "name": "check_blender_hierarchy",
+      "lineno": 1153
+    },
+    {
+      "name": "check_blender_multi_light_config",
+      "lineno": 1164
+    },
+    {
+      "name": "check_blender_text_styling",
+      "lineno": 1219
+    },
+    {
+      "name": "check_blender_material_textures",
+      "lineno": 1265
+    },
+    {
+      "name": "check_blender_follow_path",
+      "lineno": 1336
+    },
+    {
+      "name": "check_blender_modifier_order",
+      "lineno": 1374
+    },
+    {
+      "name": "check_blender_transform_applied",
+      "lineno": 1426
+    },
+    {
+      "name": "check_blender_mesh_bounds",
+      "lineno": 1459
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 1493
+    },
+    {
+      "name": "check_blender_render_video",
+      "lineno": 1535
+    },
+    {
+      "name": "check_blender_multi_material_scene",
+      "lineno": 1587
+    },
+    {
+      "name": "check_blender_scene_objects",
+      "lineno": 1651
+    },
+    {
+      "name": "check_blender_material_color",
+      "lineno": 1700
+    },
+    {
+      "name": "check_blender_camera_config",
+      "lineno": 1712
+    },
+    {
+      "name": "check_blender_modifier_subsurf",
+      "lineno": 1778
+    },
+    {
+      "name": "check_blender_render_engine",
+      "lineno": 1819
+    },
+    {
+      "name": "check_blender_frame_range",
+      "lineno": 1829
+    },
+    {
+      "name": "check_blender_fps",
+      "lineno": 1839
+    },
+    {
+      "name": "check_blender_mesh_modified",
+      "lineno": 1849
+    },
+    {
+      "name": "check_blender_modifier_bevel",
+      "lineno": 1859
+    },
+    {
+      "name": "check_blender_pbr_setup",
+      "lineno": 1895
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 26
+    },
+    {
+      "name": "_find_object",
+      "lineno": 39
+    },
+    {
+      "name": "_find_object_by_name_contains",
+      "lineno": 47
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 55
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 62
+    },
+    {
+      "name": "check_blender_object_deleted",
+      "lineno": 76
+    },
+    {
+      "name": "check_blender_object_exists",
+      "lineno": 102
+    },
+    {
+      "name": "check_blender_object_count",
+      "lineno": 132
+    },
+    {
+      "name": "check_blender_object_location",
+      "lineno": 163
+    },
+    {
+      "name": "check_blender_object_scale",
+      "lineno": 195
+    },
+    {
+      "name": "check_blender_object_rotation",
+      "lineno": 225
+    },
+    {
+      "name": "check_blender_object_renamed",
+      "lineno": 255
+    },
+    {
+      "name": "check_blender_object_visibility",
+      "lineno": 281
+    },
+    {
+      "name": "check_blender_light_type",
+      "lineno": 316
+    },
+    {
+      "name": "check_blender_light_energy",
+      "lineno": 346
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 377
+    },
+    {
+      "name": "check_blender_animation_range",
+      "lineno": 412
+    },
+    {
+      "name": "check_blender_collection_exists",
+      "lineno": 439
+    },
+    {
+      "name": "check_blender_object_in_collection",
+      "lineno": 462
+    },
+    {
+      "name": "check_blender_text_content",
+      "lineno": 488
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 525
+    },
+    {
+      "name": "check_blender_modifier_boolean",
+      "lineno": 596
+    },
+    {
+      "name": "check_blender_texture_assigned",
+      "lineno": 630
+    },
+    {
+      "name": "check_blender_modifier_stack",
+      "lineno": 680
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 725
+    },
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 754
+    },
+    {
+      "name": "check_blender_parent_child",
+      "lineno": 791
+    },
+    {
+      "name": "check_blender_collection_members",
+      "lineno": 847
+    },
+    {
+      "name": "check_blender_constraints_multi",
+      "lineno": 881
+    },
+    {
+      "name": "check_blender_applied_modifier",
+      "lineno": 920
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 958
+    },
+    {
+      "name": "check_blender_particle_params",
+      "lineno": 996
+    },
+    {
+      "name": "check_blender_selective_smooth",
+      "lineno": 1033
+    },
+    {
+      "name": "check_blender_animation_extended",
+      "lineno": 1063
+    },
+    {
+      "name": "check_blender_collection_organization",
+      "lineno": 1096
+    },
+    {
+      "name": "check_blender_hierarchy",
+      "lineno": 1153
+    },
+    {
+      "name": "check_blender_multi_light_config",
+      "lineno": 1164
+    },
+    {
+      "name": "check_blender_text_styling",
+      "lineno": 1219
+    },
+    {
+      "name": "check_blender_material_textures",
+      "lineno": 1265
+    },
+    {
+      "name": "check_blender_follow_path",
+      "lineno": 1336
+    },
+    {
+      "name": "check_blender_modifier_order",
+      "lineno": 1374
+    },
+    {
+      "name": "check_blender_transform_applied",
+      "lineno": 1426
+    },
+    {
+      "name": "check_blender_mesh_bounds",
+      "lineno": 1459
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 1493
+    },
+    {
+      "name": "check_blender_render_video",
+      "lineno": 1535
+    },
+    {
+      "name": "check_blender_multi_material_scene",
+      "lineno": 1587
+    },
+    {
+      "name": "check_blender_scene_objects",
+      "lineno": 1651
+    },
+    {
+      "name": "check_blender_material_color",
+      "lineno": 1700
+    },
+    {
+      "name": "check_blender_camera_config",
+      "lineno": 1712
+    },
+    {
+      "name": "check_blender_modifier_subsurf",
+      "lineno": 1778
+    },
+    {
+      "name": "check_blender_render_engine",
+      "lineno": 1819
+    },
+    {
+      "name": "check_blender_frame_range",
+      "lineno": 1829
+    },
+    {
+      "name": "check_blender_fps",
+      "lineno": 1839
+    },
+    {
+      "name": "check_blender_mesh_modified",
+      "lineno": 1849
+    },
+    {
+      "name": "check_blender_modifier_bevel",
+      "lineno": 1859
+    },
+    {
+      "name": "check_blender_pbr_setup",
+      "lineno": 1895
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 3D 任务的完成状态。验证路径分为两类：一是通过解析 Blender 后台检查脚本（check_object.py、check_render.py、check_material.py 等）输出的 JSON 数据（格式为 RESULT:{json}）来断言场景内部状态；二是直接检查最终渲染产物（PNG/EXR 图像或 MP4 视频）的物理文件属性。核心检查对象涵盖场景对象的存在性、变换（位置/缩放/旋转）、层级与父子关系、可见性、灯光参数、相机参数、材质与 PBR 属性（基础颜色、金属度、粗糙度、纹理连接）、修改器类型/参数/顺序/应用状态、粒子系统、文本内容与样式、集合组织与可见性、动画关键帧与帧范围、世界 HDRI 环境、渲染设置（引擎、分辨率、采样、帧率）以及输出文件的尺寸/格式/时长/编码。比较方式以容差匹配（标量与向量）和精确匹配（字符串、枚举、布尔）为主，辅以子集/包含检查与外部工具（PIL、ffprobe）读取。判定逻辑为硬阈值式：绝大多数函数要求所有指定条件全部满足才返回 1.0，任一条件失败即返回 0.0；部分支持多候选对象（如 name_contains）的函数采用“任一候选满足即通过”策略。",
+    "main_functions": [
+      {
+        "name": "check_blender_object_deleted",
+        "lineno": 76,
+        "description": "接收 command_output（check_object.py 的 JSON 输出）与 rule。调用 _parse_blender_output 解析 JSON，读取 rule['deleted_object'] 作为待验证已删除的对象名，并读取 result['object_names'] 列表。若该对象名不在列表中，说明删除成功，返回 1.0；若仍存在，返回 0.0。"
+      },
+      {
+        "name": "check_blender_object_exists",
+        "lineno": 102,
+        "description": "接收 command_output 与 rule。解析 JSON 后遍历 result['objects']。rule 中 object_type 或 expected_type 指定对象类型（如 MESH），name_contains 指定名称子串。对每个对象，若类型匹配（未指定则跳过）且名称包含子串（未指定则跳过），即返回 1.0。遍历结束无匹配返回 0.0。"
+      },
+      {
+        "name": "check_blender_object_count",
+        "lineno": 132,
+        "description": "接收 command_output 与 rule。解析 JSON，读取 min_count（默认 1）。若 rule 指定 object_type，则读取 result['type_counts'] 中该类型的数量；否则读取 result['object_count']。若数量大于等于 min_count 返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_blender_object_location",
+        "lineno": 163,
+        "description": "接收 command_output 与 rule。解析 JSON，调用 _find_object 按 rule['object_name'] 精确查找对象。读取 expected_location（默认 [0,0,0]）与 tolerance（默认 0.1），调用 _check_vector_tolerance 比较 obj['location'] 与 expected_location。在容差内返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_object_scale",
+        "lineno": 195,
+        "description": "接收 command_output 与 rule。解析 JSON，调用 _find_object 查找对象。读取 expected_scale（默认 [1,1,1]）与 tolerance（默认 0.1），调用 _check_vector_tolerance 比较 obj['scale']。在容差内返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_object_rotation",
+        "lineno": 225,
+        "description": "接收 command_output 与 rule。解析 JSON，调用 _find_object 查找对象。读取 expected_rotation_deg（默认 [0,0,0]）与 tolerance（默认 2），调用 _check_vector_tolerance 比较 obj['rotation_euler_deg']。在容差内返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_object_renamed",
+        "lineno": 255,
+        "description": "接收 command_output 与 rule。解析 JSON，读取 result['object_names'] 列表。检查 expected_name 是否存在于列表中，且 old_name 是否不在列表中（若 old_name 非空）。两者同时满足返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_object_visibility",
+        "lineno": 281,
+        "description": "接收 command_output 与 rule。解析 JSON，调用 _find_object 按 object_name 查找对象。若 rule 含 'hide_viewport'，比较 obj['hide_viewport'] 是否等于预期布尔值；若含 'expected_visible'，则预期可见性与实际 hide_viewport 相反。匹配返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_light_type",
+        "lineno": 316,
+        "description": "接收 command_output 与 rule。解析 JSON，遍历 result['objects']，筛选 type 为 'LIGHT' 的对象。若 rule 指定 light_name，则对象名必须精确匹配；再检查 obj['light_type'] 是否等于 rule['light_type']。满足返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_light_energy",
+        "lineno": 346,
+        "description": "接收 command_output 与 rule。解析 JSON，调用 _find_object 按 light_name 查找对象，并确认 type 为 'LIGHT'。读取 expected_energy（或 energy）与 tolerance（默认 10），调用 _check_tolerance 比较 obj['energy']。在容差内返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 377,
+        "description": "接收 command_output（check_render.py 输出）与 rule。解析 JSON 后，对 rule 中存在的 engine、resolution_x、resolution_y、fps、samples、image_format、active_camera 分别与 result 中同名字段进行精确相等检查。任一不匹配立即记录警告并返回 0.0；全部通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_animation_range",
+        "lineno": 412,
+        "description": "接收 command_output（check_render.py 输出）与 rule。解析 JSON。若 rule 含 frame_start，比较 result['frame_start'] 精确相等；若含 frame_end，比较 result['frame_end'] 精确相等。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_collection_exists",
+        "lineno": 439,
+        "description": "接收 command_output（check_collection.py 输出）与 rule。解析 JSON，检查 rule['collection_name'] 是否存在于 result['user_collections'] 列表中。存在返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_object_in_collection",
+        "lineno": 462,
+        "description": "接收 command_output（check_collection.py 输出）与 rule。解析 JSON，读取 result['object_collections'][obj_name] 列表，检查是否包含 collection_name。包含返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_text_content",
+        "lineno": 488,
+        "description": "接收 command_output（check_text.py 输出）与 rule。解析 JSON。优先从 result[obj_name] 取 text_data；若不存在，则回退到遍历 result['objects'] 按精确名称匹配并读取 text_body。比较 body/text_body 是否等于 expected_text。相等返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_material_pbr",
+        "lineno": 525,
+        "description": "接收 command_output（check_material.py 输出）与 rule。解析 JSON 后按三种方式定位对象：精确 object_name、name_contains 子串、或不指定则遍历所有非下划线前缀的键。对每个候选对象的材质列表，若 rule 指定 material_name 则名称必须精确匹配。随后按需检查 expected_color（比较 mat['base_color']，向量容差）、metallic（标量容差）、roughness（标量容差）。任一材质满足所有指定条件即返回 1.0；全部不满足返回 0.0。"
+      },
+      {
+        "name": "check_blender_modifier_boolean",
+        "lineno": 596,
+        "description": "接收 command_output（check_modifier.py 输出）与 rule。解析 JSON，读取 result[obj_name] 修改器列表。遍历查找 type 为 'BOOLEAN'（或 rule 指定）的修改器。若 rule 指定 operation 或 target_object，则对应字段必须匹配。找到满足条件的返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_texture_assigned",
+        "lineno": 630,
+        "description": "接收 command_output（check_material.py 输出）与 rule。解析 JSON，读取 obj_name 的材质列表。对每个材质，若 expected_input 为 None 或 'Base Color' 且 mat['texture_filename'] 匹配 expected_filename，则直接通过。否则遍历 mat['image_textures']，检查 filename 匹配，且若指定 expected_input，该纹理的 connected_to 列表（或字符串）必须包含该输入名。满足返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_modifier_stack",
+        "lineno": 680,
+        "description": "接收 command_output（check_modifier.py 输出）与 rule。解析 JSON，读取 obj_name 的修改器列表。rule['modifiers'] 为字典，键为修改器类型，值为参数字典。对每个预期修改器类型，必须在实际列表中找到；然后对其每个参数，若为数值则调用 _check_tolerance 比较，否则精确匹配。任一修改器缺失或参数不匹配返回 0.0。全部通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_world_hdri",
+        "lineno": 725,
+        "description": "接收 command_output（check_world.py 输出）与 rule。解析 JSON，先检查 result['has_hdri'] 为真。再比较 result['hdri_filename'] 是否等于或包含 expected_filename。满足返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_animation_keyframes",
+        "lineno": 754,
+        "description": "接收 command_output（check_animation.py 输出）与 rule。解析 JSON，读取 obj_name 的动画数据 obj_anim。若指定 min_keyframe_count，检查 obj_anim['keyframe_count'] >= 该值。若 rule['has_location_keys'] 为真，检查 keyframes 中是否存在包含 'location' 的键。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_parent_child",
+        "lineno": 791,
+        "description": "接收 command_output（check_object.py 输出）与 rule。解析 JSON，支持多分支联合检查：1) parent + expected_children：调用 _find_object 找到父对象，检查其 children 列表包含所有 expected_children（子集检查）。2) parent_map：检查每个子对象的 parent 字段等于预期父对象。3) not_parent：检查子对象不应拥有错误父对象。4) parent_has_children：遍历所有对象，检查是否存在对象拥有 >= min_children_count 个子对象。任一指定规则失败返回 0.0；无失败返回 1.0。"
+      },
+      {
+        "name": "check_blender_collection_members",
+        "lineno": 847,
+        "description": "接收 command_output（check_collection.py 输出）与 rule。解析 JSON，优先遍历 result['collections'] 找名称匹配的集合，检查其 objects 列表包含所有 expected_members（子集检查）。若 collections 结构不存在，则回退检查每个 expected_member 的 object_collections 是否包含该集合名。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_constraints_multi",
+        "lineno": 881,
+        "description": "接收 command_output（check_constraints.py 输出）与 rule。解析 JSON，遍历 rule['constraints'] 中的每个预期约束。对每个约束，在 result[obj_name] 中查找 type 匹配，且 target、track_axis、up_axis 若指定则必须匹配的约束。任一预期约束未找到返回 0.0，全部找到返回 1.0。"
+      },
+      {
+        "name": "check_blender_applied_modifier",
+        "lineno": 920,
+        "description": "接收 command_output（check_mesh.py 输出）与 rule。解析 JSON，读取 obj_name 的 mesh_info。若指定 min_vertices，检查 vertex_count >= 该值。若指定 no_modifier_type，检查 mesh_info['modifier_types'] 中不再包含该类型（表示已应用）。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_smooth_shading",
+        "lineno": 958,
+        "description": "接收 command_output（check_mesh.py 输出）与 rule。解析 JSON。若指定 object_name，直接检查该对象 mesh_info['has_smooth'] 是否等于 expected_smooth（默认 True）。若指定 object_name_contains，遍历 result 中键名包含该子串且值为字典的项，检查 has_smooth。匹配返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_particle_params",
+        "lineno": 996,
+        "description": "接收 command_output（check_particles.py 输出）与 rule。解析 JSON，读取 obj_name 的粒子系统列表并取第一个。对 rule 中存在的 count、lifetime、frame_start、frame_end、normal_factor，调用 _check_tolerance 与 ps 对应字段比较。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_selective_smooth",
+        "lineno": 1033,
+        "description": "接收 command_output（check_mesh.py 输出）与 rule。解析 JSON。对 smooth_objects 列表中的每个对象，检查 has_smooth 为真；对 flat_objects 列表中的每个对象，检查 has_smooth 为假或不存在。任一违反返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_animation_extended",
+        "lineno": 1063,
+        "description": "接收 command_output（check_animation.py 输出）与 rule。解析 JSON，读取 obj_name 的动画数据。若指定 min_keyframe_count，检查 keyframe_count >= 该值。若指定 max_frame，检查 frame_range[1] >= max_frame。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_collection_organization",
+        "lineno": 1096,
+        "description": "接收 command_output（check_collection.py 输出）与 rule。解析 JSON，分三部分检查：1) new_collection 必须在 user_collections 中存在。2) member_in_collection 中每个对象名必须在对应集合中。3) hidden_collections 中每个集合必须在 collections 列表中找到，且其 viewlayer_hide_viewport（若不存在则回退 hide_viewport）必须为真。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_hierarchy",
+        "lineno": 1153,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_parent_child 的直接包装器，调用并返回其结果，用于验证父子层级关系。"
+      },
+      {
+        "name": "check_blender_multi_light_config",
+        "lineno": 1164,
+        "description": "接收 command_output（扩展了灯光数据的 check_object.py 输出）与 rule。解析 JSON，遍历 rule['lights'] 中的每盏灯规范。调用 _find_object 查找对象并确认 type 为 'LIGHT'。按需检查：energy（标量容差，默认容差 50）、color（向量容差，默认 0.05）、spot_size_deg（仅 SPOT 类型，容差默认 5.0）、shape（仅 AREA 类型，精确匹配 area_shape）、area_size（容差默认 0.1）。任一失败返回 0.0，全部通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_text_styling",
+        "lineno": 1219,
+        "description": "接收 command_output（check_text.py 输出）与 rule。解析 JSON，读取 obj_name 的 text_data。body 字段精确匹配；size、extrude、bevel_depth 调用 _check_tolerance（容差默认 0.05）；align_x 精确匹配。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_material_textures",
+        "lineno": 1265,
+        "description": "接收 command_output（check_material.py 输出）与 rule。解析 JSON，读取 obj_name 的材质列表。对 rule['textures'] 中的每个纹理规范，在材质的 image_textures 中查找 filename 匹配；若指定 connected_to，则该纹理的 connected_to 必须包含它。也支持 texture_filename 快捷匹配。纹理检查通过后，若 rule 指定 metallic 或 roughness，还需任一材质的这些参数在容差内匹配。全部满足返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_follow_path",
+        "lineno": 1336,
+        "description": "接收 command_output（check_constraints.py 输出）与 rule。解析 JSON，在 obj_name 的约束列表中查找 type 为 'FOLLOW_PATH'（或 rule 指定）的约束。检查 target、use_curve_follow、forward_axis、up_axis 若存在则匹配。找到满足条件的返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_modifier_order",
+        "lineno": 1374,
+        "description": "接收 command_output（check_modifier.py 输出）与 rule。解析 JSON，读取 obj_name 的修改器列表，提取实际 type 顺序。对 rule['modifier_order'] 中的每个类型，按顺序查找其在实际列表中的索引，要求索引严格递增（顺序一致）。然后检查 params 中各修改器参数，数值用 _check_tolerance，其他精确匹配。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_transform_applied",
+        "lineno": 1426,
+        "description": "接收 command_output（check_object.py 输出）与 rule。解析 JSON，调用 _find_object 查找对象。若指定 expected_location，调用 _check_vector_tolerance 比较 location，容差为 location_tolerance（或 tolerance，默认 0.1）。若指定 expected_scale，同样比较 scale。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_mesh_bounds",
+        "lineno": 1459,
+        "description": "接收 command_output（check_mesh.py 输出）与 rule。解析 JSON，读取 obj_name 的 mesh_info。若指定 min_dimension，检查 dimensions 列表的最大值 >= min_dimension。失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 1493,
+        "description": "接收 file_path（渲染图像文件路径）与 rule。先检查文件存在性。若存在，使用 PIL.Image.open 打开图像。比较 width、height 精确匹配；比较 format（不区分大小写，支持 JPG 与 JPEG 映射）。若 PIL 未安装，退化为仅检查文件存在性（存在返回 1.0，否则 0.0）。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_render_video",
+        "lineno": 1535,
+        "description": "接收 file_path（渲染视频文件路径）与 rule。检查文件存在性后，调用 ffprobe 获取 JSON 元数据，提取 duration（优先 format.duration，其次 streams 中的 duration）与 codec_name。若指定 min_duration，检查 duration >= 该值；若指定 codec，精确匹配（不区分大小写）。ffprobe 不可用时退化为仅检查文件存在。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_multi_material_scene",
+        "lineno": 1587,
+        "description": "接收 command_output（check_material.py 输出）与 rule。解析 JSON，遍历 rule['materials'] 中每个材质规范。对 obj_name 读取其材质列表，检查 has_texture（在 texture_filename 或 image_textures 中查找）、expected_color（向量容差）、roughness、metallic（标量容差）。要求每个对象至少有一个材质满足其规范。任一对象失败返回 0.0，全部通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_scene_objects",
+        "lineno": 1651,
+        "description": "接收 command_output（check_object.py 输出）与 rule。解析 JSON，检查 has_objects 中每个名称是否存在于 object_names 中；has_light_type 是否存在对应灯光类型；has_plane 是否存在 MESH 类型对象；min_mesh_count 是否满足；has_cylinder 是否存在名称包含 Cylinder/cylinder 的 MESH 对象。任一失败返回 0.0，否则 1.0。"
+      },
+      {
+        "name": "check_blender_material_color",
+        "lineno": 1700,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_material_pbr 的直接包装器，调用并返回其结果，用于验证对象材质的基础颜色及 PBR 参数。"
+      },
+      {
+        "name": "check_blender_camera_config",
+        "lineno": 1712,
+        "description": "接收 command_output（含相机数据的 check_object.py 输出）与 rule。解析 JSON，调用 _find_object 查找 camera_name（默认 'Camera'），确认 type 为 'CAMERA'。按需检查 focal_length、 dof_enabled、fstop、focus_distance。focal_length、fstop、focus_distance 调用 _check_tolerance（容差默认 0.5），dof_enabled 精确匹配。若字段在输出中缺失则返回 0.0。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_modifier_subsurf",
+        "lineno": 1778,
+        "description": "接收 command_output（check_modifier.py 输出）与 rule。解析 JSON，按 obj_name 精确匹配或 object_name_contains 子串匹配定位修改器列表。遍历查找 type 为 'SUBSURF'（或 rule 指定）的修改器。若 rule 指定 levels，检查 mod['levels'] 精确匹配；未指定则存在即通过。失败返回 0.0，通过返回 1.0。"
+      },
+      {
+        "name": "check_blender_render_engine",
+        "lineno": 1819,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_render_settings 的薄封装，直接调用并返回其结果，仅用于验证渲染引擎设置。"
+      },
+      {
+        "name": "check_blender_frame_range",
+        "lineno": 1829,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_animation_range 的薄封装，直接调用并返回其结果，仅用于验证动画帧范围。"
+      },
+      {
+        "name": "check_blender_fps",
+        "lineno": 1839,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_render_settings 的薄封装，直接调用并返回其结果，仅用于验证 FPS 设置。"
+      },
+      {
+        "name": "check_blender_mesh_modified",
+        "lineno": 1849,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_applied_modifier 的薄封装，直接调用并返回其结果，用于验证网格是否已被修改（修改器已应用）。"
+      },
+      {
+        "name": "check_blender_modifier_bevel",
+        "lineno": 1859,
+        "description": "接收 command_output（check_modifier.py 输出）与 rule。解析 JSON，读取 obj_name 的修改器列表，查找 type 为 'BEVEL'（或 rule 指定）的修改器。检查 width（容差 tolerance，默认 0.01）和 segments（精确匹配）。满足返回 1.0，否则 0.0。"
+      },
+      {
+        "name": "check_blender_pbr_setup",
+        "lineno": 1895,
+        "description": "接收 command_output 与 rule。该函数是 check_blender_material_textures 的薄封装，直接调用并返回其结果，用于验证 PBR 材质与纹理连接设置。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 44,
+        "description": "解析 Blender 检查脚本输出的 JSON 字符串。去除首尾空白后使用 json.loads 加载为 Python 字典。如果输出为空或解析失败，则记录错误并返回 None。该函数被所有依赖 JSON 输入的主函数首先调用，是数据入口。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 55,
+        "description": "在 result['objects'] 列表中按精确名称查找对象字典。遍历每个对象，比较 obj['name'] 与传入的 name，返回第一个匹配的对象字典；未找到返回 None。用于需要定位特定对象的位置、缩放、旋转、可见性、灯光、相机等检查。"
+      },
+      {
+        "name": "_find_object_by_name_contains",
+        "lineno": 63,
+        "description": "在 result['objects'] 中按名称子串查找对象。遍历每个对象，检查 substring 是否包含在 obj['name'] 中，返回第一个匹配的对象字典；未找到返回 None。用于对象名称不完全确定、仅需部分匹配的模糊定位场景。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 71,
+        "description": "对两个标量值进行容差比较。如果 actual 或 expected 为 None 则返回 False；否则计算绝对差值 abs(float(actual) - float(expected))，判断是否小于等于 float(tol)。被广泛用于能量、金属度、粗糙度、粒子参数、修改器数值参数等浮点比较。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 78,
+        "description": "对两个向量（列表/元组）进行逐分量容差比较。首先检查两者均非空且长度相等；然后对每个分量调用 abs(float(a) - float(e)) <= float(tol)。全部通过返回 True，否则 False。被用于位置、缩放、旋转、颜色、灯光颜色等向量型属性的比较。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:36:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_3bca71b4-a61c-4f1b-859f-64659b240cbe/evaluator_function_labels.json"
+}

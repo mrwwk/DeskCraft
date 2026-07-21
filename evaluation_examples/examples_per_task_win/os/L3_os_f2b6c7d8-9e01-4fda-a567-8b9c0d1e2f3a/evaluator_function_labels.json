@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_f2b6c7d8-9e01-4fda-a567-8b9c0d1e2f3a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_quota_dirs",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_quota_dirs",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证多用户目录配额与权限配置任务是否完成。它接收shell收集器输出的原始文本作为待测系统状态，核心检查对象是各用户目录的配额或权限字段值；其主要比较方式是将原始文本解析为键值对字典后，与评测规则中预设的期望值进行精确字符串比对（==）。成功判定采用“全部满足”的二元打分逻辑：只有当rules.checks中定义的所有键值对都完全匹配时，才返回1.0表示任务成功；若任意一项不匹配，或解析/比对过程中发生异常，则返回0.0表示失败。",
+    "main_functions": [
+      {
+        "name": "check_os_quota_dirs",
+        "lineno": 31,
+        "description": "该函数是评测主入口，接收shell收集器输出的原始字符串result和包含期望规则的rules字典。其检查步骤如下：首先调用辅助函数_parse_kv将result文本按行解析为键值对字典kv；然后从rules中提取checks子字典，遍历其中每一项key与expected值；对每一项检查，使用kv.get(key)获取实际值，并与expected进行精确字符串相等比较（!=）；若发现任何一项不匹配，立即返回0.0；若循环结束所有检查项均通过，则返回1.0。整个逻辑采用严格的“全部满足”策略，且函数外层由try-except包裹，任何异常都会记录错误日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该函数负责将shell命令输出的原始文本转换为Python字典，是连接原始shell输出与评测逻辑的关键预处理步骤。它逐行处理输入字符串，跳过空输出，对包含“=”符号的行按第一个等号分割为键和值，并对键和值分别去除首尾空白字符后存入字典。返回的字典供check_os_quota_dirs使用，用于后续的精确键值比对。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:37:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_f2b6c7d8-9e01-4fda-a567-8b9c0d1e2f3a/evaluator_function_labels.json"
+}

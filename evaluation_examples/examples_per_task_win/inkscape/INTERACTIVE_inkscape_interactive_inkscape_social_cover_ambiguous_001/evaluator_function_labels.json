@@ -1,0 +1,111 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_social_cover_ambiguous_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 100
+    },
+    {
+      "name": "check_inkscape_text_element",
+      "lineno": 111
+    },
+    {
+      "name": "check_png_dimensions",
+      "lineno": 137
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_svg",
+      "lineno": 8
+    },
+    {
+      "name": "_get_float",
+      "lineno": 16
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 25
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 32
+    },
+    {
+      "name": "_document_size",
+      "lineno": 38
+    },
+    {
+      "name": "_text_elements",
+      "lineno": 51
+    },
+    {
+      "name": "_element_text",
+      "lineno": 55
+    },
+    {
+      "name": "_position",
+      "lineno": 59
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 83
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 100
+    },
+    {
+      "name": "check_inkscape_text_element",
+      "lineno": 111
+    },
+    {
+      "name": "check_png_dimensions",
+      "lineno": 137
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "The evaluator validates the final social-cover SVG and PNG. It checks the SVG canvas dimensions, the exact scene_title text, required added copy as real SVG text elements, top-right placement for the badge copy, and the exported PNG dimensions.",
+    "main_functions": [
+      {
+        "name": "check_inkscape_document_properties",
+        "lineno": 83,
+        "description": "Checks the SVG document width and height against the expected values, using width/height or viewBox with a small tolerance."
+      },
+      {
+        "name": "check_inkscape_text_content",
+        "lineno": 100,
+        "description": "Checks that a specific element id contains exactly the expected text."
+      },
+      {
+        "name": "check_inkscape_text_element",
+        "lineno": 111,
+        "description": "Checks that required copy exists as a standalone SVG text element and optionally falls within a requested page region."
+      },
+      {
+        "name": "check_png_dimensions",
+        "lineno": 137,
+        "description": "Opens the exported PNG with PIL and verifies its exact width and height."
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_svg",
+        "lineno": 8,
+        "description": "Parses the SVG XML and returns the tree and root node, or None values on failure."
+      },
+      {
+        "name": "_position",
+        "lineno": 59,
+        "description": "Extracts a text element position from x/y attributes, child x/y attributes, and simple translate transforms."
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:38:14",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_social_cover_ambiguous_001/evaluator_function_labels.json"
+}

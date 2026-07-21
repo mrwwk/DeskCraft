@@ -1,0 +1,75 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_bb095bd9-5919-4a02-86da-2a9bb6380ff1/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_render_multi_clip_transition",
+      "lineno": 165
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 24
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 41
+    },
+    {
+      "name": "_load_project_xml",
+      "lineno": 51
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 67
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 86
+    },
+    {
+      "name": "check_kdenlive_render_multi_clip_transition",
+      "lineno": 165
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务是否完整执行：用户需将多个视频片段导入项目，按顺序连续放置于主时间线，在相邻片段之间添加指定类型的转场（如Dissolve/Luma），保存项目文件并渲染输出为MP4。评测采用严格的“全或无”串联逻辑（全部通过得1.0，任一失败即返回0.0），核心检查四个维度：1）渲染输出文件的存在性、非空性、视频编码（默认要求包含h264）及最小时长（通过ffprobe探测）；2）项目XML中所有预期片段是否作为producer或chain资源被导入（resource路径子串匹配）；3）预期片段是否按指定顺序连续出现在主时间线（通过解析主tractor关联的playlist entry顺序验证）；4）项目中transition与link元素包含的指定类型转场数量是否达到预期值（片段数量减一）。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_render_multi_clip_transition",
+        "lineno": 165,
+        "description": "该函数是复合评测入口，接收result_paths（因multi:true配置，预期为包含[渲染MP4路径, 项目.kdenlive路径]的列表）和rule字典。执行流程如下：首先调用_extract_result_paths拆分出渲染路径与项目路径；随后调用_verify_render_output对MP4进行ffprobe探测，验证文件存在、非空、包含视频流、编码名称包含expected_codec（默认h264，子串匹配且不区分大小写）、时长不低于min_duration（默认1.0秒，rule中常配5.0），任一失败直接返回0.0；接着调用_load_project_xml解析.kdenlive项目XML。解析成功后分三步检查项目结构：第一步，遍历所有producer与chain元素，通过_get_property_value读取resource属性，确认rule[\"expected_files\"]中每个文件名至少出现在某一资源路径中（子串匹配），否则返回0.0；第二步，建立producer/chain的id到resource映射，定位主tractor（优先id含\"main\"或等于\"tractor0\"，否则取最后一个tractor），收集其track引用的非black playlist id，再遍历这些playlist的entry元素，按出现顺序提取属于expected_files的引用，验证这些文件名是否在时间线上按expected_files列表顺序连续排列（即提取后的序列中必须存在一段与expected_files完全一致的连续子序列），失败返回0.0；第三步，遍历所有transition与link元素，通过_get_mlt_service读取服务类型，统计与rule[\"transition_type\"]（默认\"luma\"）匹配的数量，要求不少于max(0, len(expected_files)-1)，不足则返回0.0。全部检查通过返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 24,
+        "description": "从MLT XML元素（如transition、link或filter）中提取mlt_service值。优先读取元素的直接属性mlt_service；若不存在，则遍历其子property元素，查找name=\"mlt_service\"的property并返回其文本内容；未找到返回None。该函数被主函数用于判断转场元素的服务类型是否与预期transition_type匹配。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 38,
+        "description": "从MLT XML元素的子property元素中，查找name等于指定property_name的property节点，返回其文本内容；未找到返回None。被主函数用于读取producer和chain元素的resource属性，以验证素材是否被导入及建立id到资源路径的映射。"
+      },
+      {
+        "name": "_load_project_xml",
+        "lineno": 47,
+        "description": "接收项目文件路径，检查文件存在性后使用xml.etree.ElementTree.parse解析.kdenlive项目XML，返回(root元素, 空字符串)；若文件不存在或解析失败，返回(None, 错误信息字符串)。为主函数提供项目XML根节点供后续结构检查使用。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 61,
+        "description": "处理result_paths输入格式适配：若输入为列表（对应multi:true结果配置），取索引0为render_path、索引1为project_path；若输入为字符串，则视为render_path且project_path为None。返回(render_path, project_path)元组。用于在主函数起始阶段拆分评测所需的两个文件路径。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 79,
+        "description": "对渲染结果文件进行物理与内容验证。先检查文件存在且大小非零；然后调用ffprobe以JSON格式提取流与格式信息，解析后查找第一个codec_type为video的流，验证codec_name包含expected_codec（默认h264，子串匹配，不区分大小写）；再按优先级计算时长：优先取video_stream.duration，其次format.duration，最后使用nb_frames除以r_frame_rate估算，要求时长不小于min_duration（默认1.0秒）。任一失败返回(False, 错误信息)，成功返回(True, 空字符串)。该函数被主函数用于第一步渲染质量检查。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:11:17",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_bb095bd9-5919-4a02-86da-2a9bb6380ff1/evaluator_function_labels.json"
+}

@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_fc6d8143-9452-4171-9459-7f515143419a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 46
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 46
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对任务执行结果进行二元打分（成功为1.0，失败为0.0），核心判定逻辑分为两层：一是针对简单标量值的精确相等比较（exact_match），二是针对JSON结构化对象的深度字段比对（check_direct_json_object）。对于JSON对象比对，支持两种模式：严格精确匹配（要求结果对象与预期对象的所有字段及对应值完全一致，且可通过ignore_list_order规则选择是否忽略列表内元素顺序）和包含匹配（expect_in_result为True时，要求结果对象的对应字段包含预期值，而非完全相等）。检查过程中若遇到结果为空、预期值包含失败标记__EVALUATION_FAILED__、任一字段不匹配或解析异常，均直接判定为0分；仅当所有检查项全部通过时，才返回1.0。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "检查对象为result实际结果值与rules['expected']预期值。检查步骤为：直接从rules字典中提取expected字段，将其与result进行相等性（==）比较。判定依据为：若两者完全相等则返回1.0，否则返回0.0。该函数无任何容错、近似匹配或类型转换，要求绝对精确一致。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 46,
+        "description": "检查对象为JSON格式的实际结果对象与rules['expected']中的预期JSON对象。检查步骤如下：1）输入预处理：若result为字符串，先strip去除首尾空白，将所有单引号替换为双引号，再用json.loads解析为Python对象；若result为None则直接返回0.0。2）失败标记检查：遍历rules['expected']中的键值对，若存在值为'__EVALUATION_FAILED__'的字段，立即返回0.0。3）分支匹配：依据rules['expect_in_result']选择模式。若expect_in_result为False（默认精确匹配模式），遍历expected的所有key，取expected_value与result中的actual_value比对；若rules中存在ignore_list_order且为True，则对列表型值先排序再比较，否则直接比较相等性，任一key不匹配即返回0.0。若expect_in_result为True（包含匹配模式），遍历expected的所有key：当预期值为列表时，检查result对应key的值（支持列表或字符串类型）是否包含该列表中的任意一项；当预期值为字符串时，检查result对应key的字符串值是否包含该预期子串；任一key不满足包含关系即返回0.0。4）异常处理：任何解析或比较过程中的异常均捕获并返回0.0。判定依据为：所有key在选定模式下全部通过则返回1.0，任一失败、异常或存在失败标记则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:10:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_fc6d8143-9452-4171-9459-7f515143419a/evaluator_function_labels.json"
+}

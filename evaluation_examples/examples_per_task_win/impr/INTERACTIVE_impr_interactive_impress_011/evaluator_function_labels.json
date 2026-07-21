@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_011/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 服务于 INTERACTIVE_impr_interactive_impress_011 任务，其核心目标是验证某个文本结果（result）是否同时满足预设的内容包含规则与排除规则。代码中未明确体现 result 的具体来源（可能是程序输出、页面文本、文件内容或命令回显）。评测方式采用严格的子串匹配：首先判断 result 是否为 None，若为 None 则直接判定失败并返回 0.0；随后从 rules 字典中读取 include 列表（要求所有字符串必须全部出现在 result 中）和 exclude 列表（要求所有字符串必须全部不出现在 result 中）。只有当“所有包含项都命中”且“所有排除项都未命中”这两个条件同时成立时，才返回 1.0 表示任务成功，否则返回 0.0。这是一种“全部满足”式的硬判定逻辑，不存在近似匹配、相似度阈值或加权打分机制。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数是唯一的评测入口，接收 result（待检查的字符串，可能为 None）和 rules（字典，包含可选键 include 与 exclude，对应值为字符串列表）。检查步骤如下：1）若 result 为 None，直接返回 0.0；2）通过 rules.get 提取 include 规则（默认为空列表），使用 all(r in result for r in include) 检查是否所有指定字符串都作为子串存在于 result 中；3）通过 rules.get 提取 exclude 规则（默认为空列表），使用 all(r not in result for r in exclude) 检查是否所有指定字符串都作为子串不存在于 result 中；4）仅当 include 全部命中且 exclude 全部未命中时返回 1.0，任一条件不满足即返回 0.0。判定依据为严格的子串包含与不包含组合条件，无顺序要求、无正则匹配、无容错阈值。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:22:14",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_011/evaluator_function_labels.json"
+}

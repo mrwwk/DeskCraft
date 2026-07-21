@@ -1,0 +1,78 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib14_lantern_day_night_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 36
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 77
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 112
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 166
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 19
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 36
+    },
+    {
+      "name": "check_blender_world_hdri",
+      "lineno": 77
+    },
+    {
+      "name": "check_blender_render_output",
+      "lineno": 112
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 166
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender交互式任务（lantern_day_night）的完成质量，核心检查四类对象：渲染设置、世界环境HDRI、渲染输出图像文件、以及命令输出的文本包含关系。它通过读取Blender检查脚本输出的JSON数据、本地图像文件和shell命令输出字符串，与预设规则进行严格比对。每个指标采用独立的二元打分机制：所有检查项必须全部满足才返回1.0（成功），任一关键项不匹配即返回0.0（失败）。其中渲染设置和HDRI检查依赖_parse_blender_output解析JSON；图像检查依赖PIL库读取实际宽高与格式（支持JPG/JPEG别名容错）；文本检查则基于子串包含与排除的布尔逻辑。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 36,
+        "description": "接收来自check_render.py的命令输出字符串command_output（格式为RESULT:{json}）和规则字典rule。首先调用_parse_blender_output将输出解析为字典；若解析失败直接返回0.0。随后依次检查rule中存在的各个字段：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。对每个字段使用严格相等比较（result.get(key) == rule[key]）。所有在rule中指定的字段必须全部匹配，任一字段不匹配即记录警告并返回0.0；全部通过则返回1.0。"
+      },
+      {
+        "name": "check_blender_world_hdri",
+        "lineno": 77,
+        "description": "接收来自check_world.py的命令输出字符串command_output（格式为RESULT:{json}）和规则字典rule（应包含hdri_filename）。首先调用_parse_blender_output解析JSON，解析失败返回0.0。接着检查result中的has_hdri字段，若为假则直接返回0.0。然后比对HDRI文件名：取result中的hdri_filename与rule中的expected_filename，若满足子串包含关系（expected_filename in actual_filename）或完全相等（actual_filename == expected_filename），则返回1.0；否则记录不匹配警告并返回0.0。"
+      },
+      {
+        "name": "check_blender_render_output",
+        "lineno": 112,
+        "description": "接收渲染输出文件路径file_path和规则字典rule（可包含width、height、format）。首先检查file_path非空且文件存在于磁盘。尝试使用PIL.Image打开图像，获取实际宽高（img.size）与格式（img.format）。若rule指定width或height，则与实际尺寸进行严格数值比较；若rule指定format，则将期望格式转为大写，并与实际格式的大写形式比较，同时通过fmt_map处理JPG与JPEG的别名映射。任一条件不满足即返回0.0，全部满足返回1.0。若环境中未安装PIL，则退化为仅检查文件是否存在，存在返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 166,
+        "description": "接收字符串result（通常为shell命令输出）和规则字典rules（可包含include列表与exclude列表）。检查逻辑为：result必须同时满足包含所有include中的子串，且不包含任何exclude中的子串。两个条件同时成立返回1.0，任一条件不满足（缺少某个包含项或存在某个排除项）返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 17,
+        "description": "接收Blender检查脚本输出的原始字符串command_output（预期为RESULT:{json}格式）。去除首尾空白后使用json.loads解析为Python字典。若输出为空字符串、仅含空白，或解析时抛出JSONDecodeError/ValueError，则记录错误日志并返回None。该函数为check_blender_render_settings和check_blender_world_hdri等主函数提供统一的JSON解析入口，解析失败会导致调用方直接判定为0.0。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:33:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib14_lantern_day_night_001/evaluator_function_labels.json"
+}

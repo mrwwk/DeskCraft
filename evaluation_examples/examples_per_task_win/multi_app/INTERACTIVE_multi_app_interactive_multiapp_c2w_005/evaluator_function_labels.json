@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_005/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 总体在验证一段文本字符串是否同时满足正向包含规则与反向排除规则。最终产物要求是一个非 None 的字符串结果（result），该结果必须包含规则字典中 \"include\" 列表指定的全部子串，且不能包含 \"exclude\" 列表中的任何子串。核心检查对象是 result 字符串与 rules 配置之间的精确子串匹配关系。主要比较方式是通过 Python 的 `in` 运算符分别对 include 和 exclude 列表进行逐条全量检查。成功判定的总体思路为：若 result 为 None，直接判定失败（返回 0.0）；只有在 result 非 None、且同时满足“所有 include 子串均存在”与“所有 exclude 子串均不存在”这两个条件时，才返回 1.0 表示任务通过；任一条件不满足即返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 7,
+        "description": "该主函数接收两个参数：待检测文本 result（str）和规则字典 rules（Dict[str, List[str]]）。检查对象即为 result 字符串的内容。检查步骤如下：第一步，判断 result 是否为 None，若为 None 则直接返回 0.0，不再继续后续检查；第二步，从 rules 中通过 `.get(\"include\", [])` 和 `.get(\"exclude\", [])` 提取包含规则列表与排除规则列表；第三步，使用 `all(r in result for r in include)` 检查 result 是否包含 include 中的每一个子串，同时使用 `all(r not in result for r in exclude)` 检查 result 是否不包含 exclude 中的每一个子串。最终判定依据为：当且仅当 result 非 None、include 全部命中、且 exclude 全部未命中时，返回 1.0；否则返回 0.0。该函数未调用其他辅助函数，独立完成全部匹配逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:12:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_005/evaluator_function_labels.json"
+}

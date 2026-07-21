@@ -1,0 +1,70 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00019-0019-4000-8000-000000000019/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_aup3_track_count",
+      "lineno": 95
+    },
+    {
+      "name": "check_aup3_track_mute",
+      "lineno": 112
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_open_aup3",
+      "lineno": 23
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 29
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 49
+    },
+    {
+      "name": "check_aup3_track_count",
+      "lineno": 95
+    },
+    {
+      "name": "check_aup3_track_mute",
+      "lineno": 112
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Audacity音频编辑软件生成的.aup3项目文件是否满足特定任务要求。它通过将.aup3文件作为SQLite数据库直接读取，提取内部的项目XML数据，解析出所有音轨（包括波形音轨与标签音轨）的结构化信息。核心检查对象聚焦于两大维度：一是项目中的音轨总数，二是指定索引位置音轨的静音（mute）状态。评测逻辑采用严格的二元判定（精确匹配）：将解析得到的实际值与rule参数中的预期值进行一对一比较，完全一致则返回1.0表示成功；若文件缺失、解析失败、索引越界或数值不匹配，则返回0.0表示失败。两个主函数各自独立执行判定，不存在联合打分、加权累计或多指标组合逻辑。",
+    "main_functions": [
+      {
+        "name": "check_aup3_track_count",
+        "lineno": 95,
+        "description": "接收file_path（待检测的.aup3文件路径）和rule字典（必须包含键\"expected_track_count\"）。检查流程如下：首先使用os.path.isfile判断文件是否存在，若不存在直接返回0.0；若存在则调用辅助函数_parse_aup3_tracks解析项目XML并获取完整音轨列表；计算该列表长度得到actual实际音轨数；将rule[\"expected_track_count\"]转为整数expected；严格比较actual与expected是否相等。若相等返回1.0，否则返回0.0。整个流程包裹在try-except中，任何异常均捕获后返回0.0。"
+      },
+      {
+        "name": "check_aup3_track_mute",
+        "lineno": 112,
+        "description": "接收file_path和rule字典（必须包含键\"track_index\"与\"expected_mute\"）。检查流程如下：首先判断文件是否存在，不存在返回0.0；存在则调用_parse_aup3_tracks获取音轨列表；将rule[\"track_index\"]转为整数idx；校验idx是否大于等于音轨总数，若越界则记录错误日志并返回0.0；从tracks[idx]中取出mute字段（缺失时默认False）作为actual值；将rule[\"expected_mute\"]转为布尔值作为expected；严格比较actual与expected是否相等。相等返回1.0，否则返回0.0。异常时同样返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_open_aup3",
+        "lineno": 23,
+        "description": "接收file_path，使用sqlite3.connect将.aup3文件以SQLite数据库形式打开并返回连接对象。该函数是读取Audacity项目文件的底层封装，专供_get_aup3_project_xml调用。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 29,
+        "description": "接收file_path，调用_open_aup3获取数据库连接。依次执行查询：先从project表读取doc字段（LIMIT 1），若结果为None则回退到autosave表再次查询。对获取到的数据进行类型判断，若为bytes则解码为utf-8字符串，最终返回项目XML字符串；若两表均无数据则返回None。该函数为_parse_aup3_tracks提供原始XML数据源。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 49,
+        "description": "接收file_path，先调用_get_aup3_project_xml获取项目XML字符串；若为空直接返回空列表。使用ET.fromstring解析XML，并自动处理命名空间（提取根标签的ns前缀并在后续比较中剥离）。遍历根元素下所有子元素：若标签为\"wavetrack\"或\"WaveTrack\"，构建包含type=\"wave\"、name、gain、mute（属性值\"1\"映射为True，否则False）、solo、pan的字典；若标签为\"labeltrack\"或\"LabelTrack\"，则遍历其子元素，对\"label\"/\"Label\"提取time（兼容属性t与t0）、t1、text（兼容属性title与text）构建labels列表，再组装成type=\"label\"的音轨字典。最终返回所有音轨字典组成的列表，供主函数进行数量与状态检查。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:24:31",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L2_audacity_a1b00019-0019-4000-8000-000000000019/evaluator_function_labels.json"
+}

@@ -1,0 +1,103 @@
+{
+  "id": "a1b00037-0037-4000-8000-000000000037",
+  "snapshot": "audacity",
+  "instruction": "I want to set up a two-track project and set levels first. Open/home/user/Documents/vocals.wav in Audacity, import/home/user/Documents/bass.wav, set vocals gain to -2 dB and bass gain to -4 dB, then save as/home/user/Documents/two_track.aup3",
+  "source": "多轨工程整理场景：播客/采访粗混、配乐草稿、素材分轨检查",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/wav/vocals.wav",
+            "path": "/home/user/Documents/vocals.wav"
+          },
+          {
+            "local_path": "assets/wav/bass.wav",
+            "path": "/home/user/Documents/bass.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/vocals.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "postconfig": [],
+    "func": [
+      "check_aup3_track_count",
+      "check_aup3_track_gain",
+      "check_aup3_track_gain"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/two_track.aup3",
+        "dest": "two_track.aup3"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/two_track.aup3",
+        "dest": "two_track.aup3"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/two_track.aup3",
+        "dest": "two_track.aup3"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_track_count": 2
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "track_index": 0,
+          "expected_gain_db": -2.0,
+          "tolerance": 3.0,
+          "check_method": "auto",
+          "relative_to_track": 1,
+          "expected_relative_db": 2.0
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "track_index": 1,
+          "expected_gain_db": -4.0,
+          "tolerance": 3.0,
+          "check_method": "auto",
+          "relative_to_track": 0,
+          "expected_relative_db": -2.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

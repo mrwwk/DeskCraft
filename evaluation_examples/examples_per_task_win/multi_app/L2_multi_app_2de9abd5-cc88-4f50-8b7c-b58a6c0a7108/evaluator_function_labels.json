@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_2de9abd5-cc88-4f50-8b7c-b58a6c0a7108/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 98
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 98
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator为多应用任务（L2_multi_app_2de9abd5-cc88-4f50-8b7c-b58a6c0a7108）提供三种独立的指标检查能力，用于判定任务完成状态：1）Chrome浏览器活动标签页URL的正确性验证，通过去除URL查询参数后进行精确匹配，判断期望页面是否处于打开状态；2）文本或程序输出内容的规则检查，验证结果字符串是否同时满足“包含所有指定子串”且“不包含任何排除子串”；3）Python代码正确性验证，通过动态加载并执行外部测试套件文件（默认调用名为'test'的函数），依据其返回值（布尔、数值或真值）映射为0.0到1.0的分数。代码中未明确体现这三种检查在上层是全部满足、任一满足还是加权组合调用，它们作为独立的评分函数存在。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 57,
+        "description": "检查Chrome当前活动标签页是否为期望页面。接收active_tab_info（字典或字符串类型）和rule字典。若active_tab_info为空，直接返回0。当rule['type']为'url'时，从rule取出expected_url，从active_tab_info取出actual_url（若active_tab_info为字典则取'url'键值，否则直接视为URL字符串）。使用urllib.parse.urlparse和urlunparse去除两个URL的查询参数（query），仅比较协议、域名和路径部分；若去除query后完全一致则返回1，否则返回0。若rule['type']不是'url'，记录错误日志并返回0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 85,
+        "description": "对字符串结果进行包含与排除规则检查。接收result字符串和rules字典。若result为None，直接返回0.0。从rules中获取include列表（默认空）和exclude列表（默认空）。检查步骤为：验证result是否同时包含include中的每一个子串，并且不包含exclude中的任何一个子串。两个条件同时满足返回1.0，否则返回0.0。执行过程中会将result和rules打印到标准输出。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 98,
+        "description": "通过外部测试套件验证Python文件。接收actual_files、test_file路径和options选项。核心步骤为：1）校验test_file存在且为普通文件；2）生成唯一模块名，保存原始工作目录original_cwd和sys.path副本；3）切换工作目录到test_file所在目录，并将该目录插入sys.path；4）使用importlib.util.spec_from_file_location和module_from_spec动态加载并执行测试模块；5）从模块中获取名为test_function_name（默认'test'）的可调用对象并执行；6）依据返回值类型判定分数：bool类型True返回1.0、False返回0.0；int/float类型裁剪归一化到[0.0, 1.0]；其他类型按Python真值处理。无论执行成功与否，finally块会清理sys.modules中的临时模块、恢复原始工作目录和sys.path。若文件不存在、加载失败、找不到测试函数或执行抛出异常，均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:20:34",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_2de9abd5-cc88-4f50-8b7c-b58a6c0a7108/evaluator_function_labels.json"
+}
