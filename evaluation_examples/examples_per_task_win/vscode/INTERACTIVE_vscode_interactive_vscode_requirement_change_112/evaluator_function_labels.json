@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_requirement_change_112/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 文件服务于 INTERACTIVE_vscode_interactive_vscode_requirement_change_112 任务。从现有代码可见，其评测逻辑高度集中：仅通过 exact_match 函数将任务返回结果与规则中预设的 expected 值进行精确相等比较，输出二值化分数（1.0 表示完全匹配，0.0 表示不匹配）。由于提供的代码片段仅包含该单一判定函数，未展示结果来源（如文件读取、页面抓取、进程输出、图像识别或数据库查询等）、前置状态构造、多指标联合打分或容错阈值逻辑，因此该任务最终要求验证的具体产物形态、状态维度以及除精确相等外的其他判定规则在代码中未明确体现。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收 result（待评测的任务输出结果）和 rules（包含评测规则的字典）两个参数。检查步骤如下：1）从 rules 字典中取出键名为 'expected' 的参考值；2）使用 == 运算符对 result 与 expect 进行严格的精确相等比较；3）若两者完全一致则返回 1.0，否则返回 0.0。该函数未调用任何辅助函数，也未引入近似匹配、字段子集比对、顺序忽略、数值容差或正则匹配等逻辑，判定依据仅为简单的全等判断。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:40:34",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_requirement_change_112/evaluator_function_labels.json"
+}

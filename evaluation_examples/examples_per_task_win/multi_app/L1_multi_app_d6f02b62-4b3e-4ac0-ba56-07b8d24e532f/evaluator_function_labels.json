@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_d6f02b62-4b3e-4ac0-ba56-07b8d24e532f/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于对多应用任务产出进行二值化评分验证，核心验证思路分为两类：第一类是对输出文本字符串执行包含与排除规则检查，要求结果中必须同时出现所有指定的包含字符串，且绝对不能出现任何指定的排除字符串；第二类是对 JSON 配置文件执行键值对精确匹配，要求读取实际 JSON 文件后，其中必须完整包含所有期望的键值对（值需精确相等）。两类检查均采用“全有或全无”的判定逻辑，只有当所有条件全部满足时才返回 1.0 分，任一条件不满足即返回 0.0 分，不存在部分得分或近似匹配的容错阈值。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "该函数接收一个结果字符串 result 和一个规则字典 rules。首先检查 result 是否为 None，若为 None 直接返回 0.0 分。随后从 rules 中提取 include 列表（默认为空列表）和 exclude 列表（默认为空列表）。判定逻辑要求 result 必须同时包含 include 列表中的每一个字符串（子串精确包含），并且必须不包含 exclude 列表中的任何一个字符串。只有当包含条件与排除条件全部满足时返回 1.0 分，否则返回 0.0 分。函数内部通过 print 输出 result 和 rules 供调试，但不影响评分逻辑。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 56,
+        "description": "该函数接收一个实际文件路径字符串 actual 和一个期望配置对象 expected（字典结构，需包含键 'expected'）。首先判断 actual 是否为空，若为空则返回 0.0 分。随后尝试打开 actual 指向的文件并将其内容解析为 JSON 对象，若文件不存在、无法打开或 JSON 解析失败，则捕获异常并返回 0.0 分。接着从 expected['expected'] 中获取期望的字典键值对，遍历每一对 key 与 value：检查该 key 是否存在于实际 JSON 数据中，且实际值与期望值是否精确相等（使用 == 判断）。若所有期望键值对均存在且完全匹配，返回 1.0 分；若在遍历过程中发现任一 key 缺失或对应 value 不匹配，则立即返回 0.0 分。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:18:45",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_d6f02b62-4b3e-4ac0-ba56-07b8d24e532f/evaluator_function_labels.json"
+}

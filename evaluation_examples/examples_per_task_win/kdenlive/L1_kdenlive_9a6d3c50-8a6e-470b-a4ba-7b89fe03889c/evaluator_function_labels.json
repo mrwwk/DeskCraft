@@ -1,0 +1,622 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_9a6d3c50-8a6e-470b-a4ba-7b89fe03889c/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_import_video",
+      "lineno": 121
+    },
+    {
+      "name": "check_kdenlive_add_to_timeline",
+      "lineno": 178
+    },
+    {
+      "name": "check_kdenlive_grayscale_effect",
+      "lineno": 262
+    },
+    {
+      "name": "check_kdenlive_volume_adjustment",
+      "lineno": 326
+    },
+    {
+      "name": "check_kdenlive_render_mp4",
+      "lineno": 430
+    },
+    {
+      "name": "check_kdenlive_project_profile",
+      "lineno": 609
+    },
+    {
+      "name": "check_kdenlive_import_multiple_files",
+      "lineno": 704
+    },
+    {
+      "name": "check_kdenlive_file_exists",
+      "lineno": 764
+    },
+    {
+      "name": "check_kdenlive_bin_content",
+      "lineno": 818
+    },
+    {
+      "name": "check_kdenlive_clip_name",
+      "lineno": 887
+    },
+    {
+      "name": "check_kdenlive_bin_folder",
+      "lineno": 947
+    },
+    {
+      "name": "check_kdenlive_track_count",
+      "lineno": 1014
+    },
+    {
+      "name": "check_kdenlive_guide",
+      "lineno": 1124
+    },
+    {
+      "name": "check_kdenlive_track_mute",
+      "lineno": 1233
+    },
+    {
+      "name": "check_kdenlive_track_lock",
+      "lineno": 1320
+    },
+    {
+      "name": "check_kdenlive_timeline_empty",
+      "lineno": 1375
+    },
+    {
+      "name": "check_kdenlive_color_clip",
+      "lineno": 1446
+    },
+    {
+      "name": "check_kdenlive_clip_duration",
+      "lineno": 1521
+    },
+    {
+      "name": "check_kdenlive_snapshot_exists",
+      "lineno": 1635
+    },
+    {
+      "name": "check_kdenlive_proxy_setting",
+      "lineno": 1690
+    },
+    {
+      "name": "check_kdenlive_clip_position",
+      "lineno": 1778
+    },
+    {
+      "name": "check_kdenlive_clip_trim",
+      "lineno": 1904
+    },
+    {
+      "name": "check_kdenlive_transition",
+      "lineno": 1998
+    },
+    {
+      "name": "check_kdenlive_title_text",
+      "lineno": 2075
+    },
+    {
+      "name": "check_kdenlive_clip_speed",
+      "lineno": 2153
+    },
+    {
+      "name": "check_kdenlive_render_with_audio",
+      "lineno": 2248
+    },
+    {
+      "name": "check_kdenlive_effect_applied",
+      "lineno": 2332
+    },
+    {
+      "name": "check_kdenlive_effect_param",
+      "lineno": 2427
+    },
+    {
+      "name": "check_kdenlive_audio_fade",
+      "lineno": 2532
+    },
+    {
+      "name": "check_kdenlive_clip_split",
+      "lineno": 2642
+    },
+    {
+      "name": "check_kdenlive_multi_track_composition",
+      "lineno": 2722
+    },
+    {
+      "name": "check_kdenlive_clip_count",
+      "lineno": 2840
+    },
+    {
+      "name": "check_kdenlive_clip_group",
+      "lineno": 2918
+    },
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 3159
+    },
+    {
+      "name": "check_kdenlive_render_multi_clip_transition",
+      "lineno": 3262
+    },
+    {
+      "name": "check_kdenlive_render_effects_composite",
+      "lineno": 3356
+    },
+    {
+      "name": "check_kdenlive_render_title_video_title",
+      "lineno": 3428
+    },
+    {
+      "name": "check_kdenlive_render_speed_ramp",
+      "lineno": 3483
+    },
+    {
+      "name": "check_kdenlive_render_pip",
+      "lineno": 3554
+    },
+    {
+      "name": "check_kdenlive_render_audio_mix",
+      "lineno": 3610
+    },
+    {
+      "name": "check_kdenlive_render_color_grading",
+      "lineno": 3687
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 46
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 73
+    },
+    {
+      "name": "_collect_bin_resources",
+      "lineno": 90
+    },
+    {
+      "name": "check_kdenlive_import_video",
+      "lineno": 121
+    },
+    {
+      "name": "check_kdenlive_add_to_timeline",
+      "lineno": 178
+    },
+    {
+      "name": "check_kdenlive_grayscale_effect",
+      "lineno": 262
+    },
+    {
+      "name": "check_kdenlive_volume_adjustment",
+      "lineno": 326
+    },
+    {
+      "name": "check_kdenlive_render_mp4",
+      "lineno": 430
+    },
+    {
+      "name": "_frames_to_seconds",
+      "lineno": 552
+    },
+    {
+      "name": "_get_project_fps",
+      "lineno": 586
+    },
+    {
+      "name": "check_kdenlive_project_profile",
+      "lineno": 609
+    },
+    {
+      "name": "check_kdenlive_import_multiple_files",
+      "lineno": 704
+    },
+    {
+      "name": "check_kdenlive_file_exists",
+      "lineno": 764
+    },
+    {
+      "name": "check_kdenlive_bin_content",
+      "lineno": 818
+    },
+    {
+      "name": "check_kdenlive_clip_name",
+      "lineno": 887
+    },
+    {
+      "name": "check_kdenlive_bin_folder",
+      "lineno": 947
+    },
+    {
+      "name": "check_kdenlive_track_count",
+      "lineno": 1014
+    },
+    {
+      "name": "check_kdenlive_guide",
+      "lineno": 1124
+    },
+    {
+      "name": "check_kdenlive_track_mute",
+      "lineno": 1233
+    },
+    {
+      "name": "check_kdenlive_track_lock",
+      "lineno": 1320
+    },
+    {
+      "name": "check_kdenlive_timeline_empty",
+      "lineno": 1375
+    },
+    {
+      "name": "check_kdenlive_color_clip",
+      "lineno": 1446
+    },
+    {
+      "name": "check_kdenlive_clip_duration",
+      "lineno": 1521
+    },
+    {
+      "name": "check_kdenlive_snapshot_exists",
+      "lineno": 1635
+    },
+    {
+      "name": "check_kdenlive_proxy_setting",
+      "lineno": 1690
+    },
+    {
+      "name": "check_kdenlive_clip_position",
+      "lineno": 1778
+    },
+    {
+      "name": "check_kdenlive_clip_trim",
+      "lineno": 1904
+    },
+    {
+      "name": "check_kdenlive_transition",
+      "lineno": 1998
+    },
+    {
+      "name": "check_kdenlive_title_text",
+      "lineno": 2075
+    },
+    {
+      "name": "check_kdenlive_clip_speed",
+      "lineno": 2153
+    },
+    {
+      "name": "check_kdenlive_render_with_audio",
+      "lineno": 2248
+    },
+    {
+      "name": "check_kdenlive_effect_applied",
+      "lineno": 2332
+    },
+    {
+      "name": "check_kdenlive_effect_param",
+      "lineno": 2427
+    },
+    {
+      "name": "check_kdenlive_audio_fade",
+      "lineno": 2532
+    },
+    {
+      "name": "check_kdenlive_clip_split",
+      "lineno": 2642
+    },
+    {
+      "name": "check_kdenlive_multi_track_composition",
+      "lineno": 2722
+    },
+    {
+      "name": "check_kdenlive_clip_count",
+      "lineno": 2840
+    },
+    {
+      "name": "check_kdenlive_clip_group",
+      "lineno": 2918
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 3042
+    },
+    {
+      "name": "_load_project_xml",
+      "lineno": 3112
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 3131
+    },
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 3159
+    },
+    {
+      "name": "check_kdenlive_render_multi_clip_transition",
+      "lineno": 3262
+    },
+    {
+      "name": "check_kdenlive_render_effects_composite",
+      "lineno": 3356
+    },
+    {
+      "name": "check_kdenlive_render_title_video_title",
+      "lineno": 3428
+    },
+    {
+      "name": "check_kdenlive_render_speed_ramp",
+      "lineno": 3483
+    },
+    {
+      "name": "check_kdenlive_render_pip",
+      "lineno": 3554
+    },
+    {
+      "name": "check_kdenlive_render_audio_mix",
+      "lineno": 3610
+    },
+    {
+      "name": "check_kdenlive_render_color_grading",
+      "lineno": 3687
+    }
+  ],
+  "source_was_condensed": true,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务的完成情况。核心检查对象是.kdenlive项目文件（MLT XML格式）以及渲染输出的MP4文件。验证逻辑分为三个层面：1）项目结构验证——解析XML检查素材是否导入bin、是否放置到时间线、轨道配置、片段属性（名称、颜色、速度、修剪点等）是否正确；2）效果与转场验证——遍历<filter>和<transition>节点，匹配mlt_service标识符及参数值，确认灰度、音量、模糊、旋转、淡入淡出等效果已应用；3）渲染输出验证——调用ffprobe检查输出文件是否存在、编码格式（要求H.264）、时长、分辨率、是否包含音视频流等。对于复合任务（如多片段转场、画中画、调色等），采用联合判定逻辑：必须同时满足渲染输出检查+项目文件内容检查，全部通过才返回1.0，任一失败则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_import_video",
+        "lineno": 121,
+        "description": "验证指定视频文件是否已导入Kdenlive项目bin。接收参数project_file_path（.kdenlive文件路径）和rule字典（含expected_file键）。调用_load_project_xml加载项目XML，然后调用_collect_bin_resources收集所有元素（producer、chain、kdenlive_producer等）的resource属性值。检查收集到的资源列表中是否存在与expected_file匹配的文件名。若找到则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_add_to_timeline",
+        "lineno": 178,
+        "description": "验证视频片段是否已被放置到时间线轨道上。接收project_file_path和rule（含expected_file）。解析XML后，查找所有<playlist>节点，检查其中是否包含<entry>节点（排除仅含<blank>的情况），且该entry引用的producer的resource属性与expected_file匹配。只有同时满足'存在timeline entry'和'entry关联的素材匹配预期文件'才返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_grayscale_effect",
+        "lineno": 262,
+        "description": "验证是否对片段应用了灰度效果。接收project_file_path和rule（可为空）。解析XML后遍历所有<filter>节点，通过_get_mlt_service获取每个filter的mlt_service值，与已知的灰度效果标识符列表进行匹配。若任一filter的mlt_service匹配成功，返回1.0；否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_volume_adjustment",
+        "lineno": 326,
+        "description": "验证音频音量是否被调整到预期值。接收project_file_path和rule（含expected_level或expected_gain、tolerance等）。解析XML后查找mlt_service为'volume'的<filter>节点，提取其level或gain属性值，与rule中指定的期望值在容差范围内比较。若找到匹配的volume filter且数值在容差内，返回1.0；否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_mp4",
+        "lineno": 430,
+        "description": "验证项目是否被正确渲染为MP4（H.264）文件。接收result_file_path（渲染文件路径）和rule（可选min_duration、expected_codec）。依次检查：1）文件存在且大小大于0；2）调用ffprobe检查视频编码是否为H.264；3）视频时长大于1秒（或rule指定的min_duration）。全部满足返回1.0，任一失败返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_project_profile",
+        "lineno": 609,
+        "description": "验证项目profile设置是否符合预期。接收project_file_path和rule（支持width、height、frame_rate_num、frame_rate_den、display_aspect_num等键）。解析XML后读取<profile>元素的属性，与rule中指定的期望值逐一比较。所有指定字段均匹配才返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_import_multiple_files",
+        "lineno": 704,
+        "description": "验证多个文件是否全部导入项目bin。接收project_file_path和rule（含expected_files列表）。调用_collect_bin_resources收集所有resource属性，然后逐一检查expected_files中的每个文件名是否都出现在收集结果中。全部存在返回1.0，任一缺失返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_file_exists",
+        "lineno": 764,
+        "description": "验证项目文件是否存在且为有效XML。接收project_file_path和rule（可选valid_xml，默认True）。首先检查路径非None且文件存在于磁盘；若valid_xml为True，则进一步解析XML验证格式良好。全部通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_bin_content",
+        "lineno": 818,
+        "description": "验证项目bin中是否包含指定文件且不包含排除文件。接收project_file_path和rule（含expected_present和/或expected_absent列表）。调用_collect_bin_resources收集所有素材资源，检查expected_present中的文件全部存在，且expected_absent中的文件全部不存在。两部分检查均通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_name",
+        "lineno": 887,
+        "description": "验证bin中的指定片段是否被重命名。接收project_file_path和rule（含source_file和expected_name）。解析XML后查找resource属性匹配source_file的producer元素，检查其kdenlive:clipname属性是否等于expected_name。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_bin_folder",
+        "lineno": 947,
+        "description": "验证项目bin中是否存在指定文件夹。接收project_file_path和rule（含expected_folder）。解析XML后检查多种可能的文件夹表示形式：包括<folder>元素或<property name='kdenlive:foldernames'>等。若找到匹配的文件夹名返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_track_count",
+        "lineno": 1014,
+        "description": "验证视频/音频轨道数量是否满足要求。接收project_file_path和rule（含min_video_tracks、min_audio_tracks等）。解析XML后统计<tractor>下的<track>元素，通过kdenlive:audio_track属性区分音视频轨道（1为音频，缺失/0为视频）。分别计算音视频轨道数并与rule中的最小值要求比较。满足所有指定条件返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_guide",
+        "lineno": 1124,
+        "description": "验证指定时间位置是否存在标记/导览（guide）。接收project_file_path和rule（含guide_comment、guide_time_seconds、tolerance等）。解析XML后查找kdenlive:guide.*属性或<guide>元素，解析其位置（帧或时间码）和注释，与预期注释和时间（在容差内）比较。匹配成功返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_track_mute",
+        "lineno": 1233,
+        "description": "验证指定轨道是否被静音。接收project_file_path和rule（含muted_track，如'V1'、'A1'）。解析XML后检查<track>元素的hide属性（hide='1'或hide='video'表示视频轨道静音），或通过kdenlive:track_name匹配轨道名。若指定轨道处于静音状态返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_track_lock",
+        "lineno": 1320,
+        "description": "验证指定轨道是否被锁定。接收project_file_path和rule（含locked_track）。解析XML后查找对应轨道的playlist元素，检查其kdenlive:locked_track属性是否为'1'。是则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_timeline_empty",
+        "lineno": 1375,
+        "description": "验证时间线是否为空（如撤销操作后）。接收project_file_path和rule（含expected_in_bin和expected_not_on_timeline）。检查两部分：1）expected_in_bin指定的文件仍存在于项目bin中（通过resource属性确认）；2）所有timeline playlist中不存在引用该文件的<entry>元素。两部分均满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_color_clip",
+        "lineno": 1446,
+        "description": "验证是否存在指定颜色的颜色片段。接收project_file_path和rule（含expected_color，支持#RRGGBB、#RRGGBBAA、0xRRGGBBAA格式）。解析XML后查找mlt_service='color'的producer，检查其resource属性是否包含匹配的颜色值。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_duration",
+        "lineno": 1521,
+        "description": "验证时间线上片段的持续时间是否在指定范围内。接收project_file_path和rule（含min_duration、max_duration、source_file等）。解析XML后扫描timeline playlist（跳过bin和系统playlist），计算<entry>元素的out - in + 1帧数，转换为秒，检查是否在[min_duration, max_duration]区间内。任一匹配entry满足则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_snapshot_exists",
+        "lineno": 1635,
+        "description": "验证快照PNG文件是否存在且数量满足要求。接收command_output（shell命令输出字符串，如'ls *.png | wc -l'的结果）和rule（含min_count）。将command_output解析为整数计数，与min_count比较。大于等于则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_proxy_setting",
+        "lineno": 1690,
+        "description": "验证代理剪辑设置是否开启或关闭。接收project_file_path和rule（含proxy_enabled布尔值）。解析XML后检查<kdenlive_documentproperties>或bin playlist中的kdenlive:proxy、generateproxy等属性值，与rule中的期望值比较。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_position",
+        "lineno": 1778,
+        "description": "验证片段是否被放置在时间线的指定位置。接收project_file_path和rule（含source_file、expected_time_seconds、tolerance等）。解析XML后查找引用source_file的timeline <entry>元素，计算其在时间线上的起始位置（通过entry的in属性或上下文位置），与expected_time_seconds在容差内比较。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_trim",
+        "lineno": 1904,
+        "description": "验证片段的入点/出点修剪是否符合预期。接收project_file_path和rule（含source_file、in_time、out_time、tolerance）。解析XML后查找引用source_file的timeline <entry>，检查其in和out属性（或对应修剪属性）转换后的时间值，是否分别在in_time和out_time的容差范围内。均匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_transition",
+        "lineno": 1998,
+        "description": "验证片段之间是否存在指定转场。接收project_file_path和rule（含transition_type，如'luma'、'composite'、'qtblend'）。解析XML后查找<transition>或<link>节点，通过_get_mlt_service获取mlt_service值，与rule中的transition_type匹配。找到匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_title_text",
+        "lineno": 2075,
+        "description": "验证标题片段是否包含预期文本。接收project_file_path和rule（含expected_text）。解析XML后查找mlt_service='kdenlivetitle'的producer，读取其xmldata属性（SVG XML），在SVG内容中搜索expected_text字符串。找到返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_speed",
+        "lineno": 2153,
+        "description": "验证片段播放速度是否被修改为预期值。接收project_file_path和rule（含expected_speed、tolerance、source_file）。解析XML后检查timewarp producer/chain的warp_speed属性，或resource路径中的速度前缀（如'2.000000:path'），与expected_speed在容差内比较。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_with_audio",
+        "lineno": 2248,
+        "description": "验证渲染输出文件是否同时包含视频流和音频流。接收result_file_path和rule（含min_duration、require_audio）。调用ffprobe检查文件：1）存在且时长满足min_duration；2）包含视频流；3）若require_audio为True则必须包含音频流。全部满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_effect_applied",
+        "lineno": 2332,
+        "description": "通用效果验证：检查指定效果是否已应用。接收project_file_path和rule（含effect_service列表，支持多个备选名称）。解析XML后遍历所有<filter>节点，通过_get_mlt_service获取服务名，与effect_service列表中的任一值匹配。任一匹配成功返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_effect_param",
+        "lineno": 2427,
+        "description": "验证效果参数值是否符合预期。接收project_file_path和rule（含effect_service列表、param_name、expected_value、tolerance）。解析XML后查找mlt_service匹配effect_service的<filter>，再检查其param_name属性的数值是否在expected_value的容差范围内。匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_audio_fade",
+        "lineno": 2532,
+        "description": "验证音频淡入和/或淡出效果是否存在。接收project_file_path和rule（含fade_in、fade_out布尔值）。解析XML后查找mlt_service='volume'的filter并分析其关键帧数据（如level从0到1表示淡入），或查找kdenlive_id包含'fade_from_black'/'fade_to_black'的filter。根据rule要求检查淡入和/或淡出是否存在。满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_split",
+        "lineno": 2642,
+        "description": "验证片段是否被分割为多个段落。接收project_file_path和rule（含source_file、min_segments）。解析XML后统计所有timeline playlist中引用source_file的<entry>元素数量。若entry数量大于等于min_segments，返回1.0；否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_multi_track_composition",
+        "lineno": 2722,
+        "description": "验证多轨道合成（如画中画、水印）是否正确设置。接收project_file_path和rule（含main_file、overlay_file、require_transform）。解析XML后检查：1）main_file和overlay_file分别位于不同轨道；2）若require_transform为True，则存在transform/composite效果用于合成。全部满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_count",
+        "lineno": 2840,
+        "description": "验证时间线上指定片段的实例数量。接收project_file_path和rule（含source_file、min_count）。解析XML后统计所有timeline playlist中引用source_file的<entry>元素总数。若总数大于等于min_count，返回1.0；否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_group",
+        "lineno": 2918,
+        "description": "验证片段是否被分组。接收project_file_path和rule（含min_groups、min_clips_in_group）。解析XML后读取kdenlive:docproperties.groups属性（JSON数组），解析分组信息，检查组数量是否大于等于min_groups，且至少有一个组包含的片段数大于等于min_clips_in_group。满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_custom_resolution",
+        "lineno": 3159,
+        "description": "验证渲染输出是否具有预期分辨率。接收result_file_path和rule（含min_duration、expected_codec、expected_width、expected_height）。调用ffprobe检查：1）编码格式匹配；2）时长大于min_duration；3）视频分辨率宽度等于expected_width且高度等于expected_height。全部满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_multi_clip_transition",
+        "lineno": 3262,
+        "description": "复合验证：多片段+转场+渲染。接收result_paths（[output.mp4, project.kdenlive]）和rule。调用_extract_result_paths分离路径，然后依次执行：1）_verify_render_output检查渲染文件（编码、时长）；2）check_kdenlive_import_multiple_files验证所有预期片段已导入；3）check_kdenlive_transition验证存在dissolve/luma转场。三项全部通过返回1.0，任一失败返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_effects_composite",
+        "lineno": 3356,
+        "description": "复合验证：效果+渲染。接收result_paths和rule。调用_extract_result_paths分离路径，依次执行：1）_verify_render_output检查渲染文件；2）check_kdenlive_grayscale_effect验证灰度效果已应用；3）check_kdenlive_volume_adjustment验证音量调整到预期值。全部通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_title_video_title",
+        "lineno": 3428,
+        "description": "复合验证：标题-视频-标题结构+渲染。接收result_paths和rule。调用_extract_result_paths分离路径，依次执行：1）_verify_render_output检查渲染文件（编码、时长>=5秒）；2）check_kdenlive_title_text验证标题片段包含预期文本。全部通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_speed_ramp",
+        "lineno": 3483,
+        "description": "复合验证：速度变化+分割+渲染。接收result_paths和rule。调用_extract_result_paths分离路径，依次执行：1）_verify_render_output检查渲染文件；2）check_kdenlive_clip_split验证片段分割为不少于min_segments段；3）check_kdenlive_clip_speed验证速度变化匹配expected_speed。全部通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_pip",
+        "lineno": 3554,
+        "description": "复合验证：画中画+渲染。接收result_paths和rule。调用_extract_result_paths分离路径，依次执行：1）_verify_render_output检查渲染文件；2）check_kdenlive_multi_track_composition验证多轨道合成及transform效果。全部通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_audio_mix",
+        "lineno": 3610,
+        "description": "复合验证：音频混合+渲染。接收result_paths和rule。调用_extract_result_paths分离路径，依次执行：1）check_kdenlive_render_with_audio验证渲染文件包含音视频流；2）check_kdenlive_import_multiple_files验证所有预期音频文件已导入；3）check_kdenlive_volume_adjustment验证音量调整到预期值。全部通过返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_color_grading",
+        "lineno": 3687,
+        "description": "复合验证：调色流程+渲染。接收result_paths和rule。调用_extract_result_paths分离路径，依次执行：1）_verify_render_output检查渲染文件；2）check_kdenlive_effect_applied验证brightness效果已应用；3）check_kdenlive_effect_applied验证sepia效果已应用；4）check_kdenlive_audio_fade验证音频淡入淡出存在。全部通过返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 1,
+        "description": "从MLT XML元素中提取mlt_service值。支持两种形式：1）直接XML属性<filter mlt_service='volume'>；2）子属性元素<property name='mlt_service'>volume</property>。返回str或None。被所有需要识别MLT服务类型的检查函数复用，如效果检查、转场检查、颜色片段检查等。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 1,
+        "description": "从MLT XML元素的子<property>元素中提取指定名称属性的文本值。接收element和property_name，遍历该元素的所有<property>子节点，匹配name属性后返回其text内容。返回str或None。被各类需要读取特定属性（如resource、clipname、locked_track等）的检查逻辑复用。"
+      },
+      {
+        "name": "_collect_bin_resources",
+        "lineno": 1,
+        "description": "遍历整个XML树，收集所有可能包含素材引用的元素（producer、chain、kdenlive_producer等）中的<property name='resource'>文本值。返回资源路径集合。是素材导入验证、bin内容验证的基础数据源，被check_kdenlive_import_video、check_kdenlive_import_multiple_files、check_kdenlive_bin_content等函数调用。"
+      },
+      {
+        "name": "_frames_to_seconds",
+        "lineno": 1,
+        "description": "将MLT帧计数或时间码字符串转换为秒数。支持纯数字帧字符串（如'125'）或时间码格式（如'00:00:05.000'），使用fps参数（默认25.0）进行换算。返回float。被时间相关检查（如clip_duration、clip_position、clip_trim、guide等）用于统一时间单位。"
+      },
+      {
+        "name": "_get_project_fps",
+        "lineno": 1,
+        "description": "从MLT项目<profile>元素中提取帧率。解析frame_rate_num和frame_rate_den属性计算FPS，若未找到则返回默认值25.0。被_frames_to_seconds及需要时间精度计算的检查函数使用。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 1,
+        "description": "使用ffprobe验证渲染输出文件的通用辅助函数。接收result_file_path和rule字典（含min_duration、expected_codec）。检查：1）文件存在且非空；2）ffprobe获取视频编码匹配expected_codec（默认h264）；3）时长大于min_duration（默认1.0）。返回(success: bool, error_msg: str)元组。被所有渲染相关主函数复用。"
+      },
+      {
+        "name": "_load_project_xml",
+        "lineno": 1,
+        "description": "加载并解析.kdenlive项目文件。接收project_path，使用xml.etree.ElementTree.parse解析XML。成功返回(root: ET.Element, '')，失败返回(None, error_msg)。是所有需要读取项目文件的主函数的入口，提供统一的XML加载和错误处理。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 1,
+        "description": "从result_paths参数中提取渲染文件路径和项目文件路径。处理multi:true配置下的列表格式[output.mp4, project.kdenlive]或单文件字符串格式。返回(render_path, project_path)元组。被所有复合渲染检查函数（如render_multi_clip_transition、render_effects_composite等）用于分离两种产物路径。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:00:02",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_9a6d3c50-8a6e-470b-a4ba-7b89fe03889c/evaluator_function_labels.json"
+}

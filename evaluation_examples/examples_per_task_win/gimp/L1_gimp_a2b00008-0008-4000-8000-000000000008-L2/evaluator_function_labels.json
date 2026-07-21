@@ -1,0 +1,135 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a2b00008-0008-4000-8000-000000000008-L2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 60
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 78
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "check_perspective_overlay_region",
+      "lineno": 276
+    },
+    {
+      "name": "check_l2_street_billboard_mockup_complete",
+      "lineno": 347
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 60
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 78
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 103
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 132
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "check_perspective_overlay_region",
+      "lineno": 276
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 339
+    },
+    {
+      "name": "check_l2_street_billboard_mockup_complete",
+      "lineno": 347
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 GIMP L2-8 街道广告牌透视替换任务是否完成。最终要求用户产出一组文件：一张 2200×1365 像素的 JPEG 成品图（jpg_path）、对应的 GIMP 源文件 XCF（xcf_path），以及原始参考图（src_path）。评测逻辑采用“全量二进制通过与”模式：通过 check_l2_street_billboard_mockup_complete 依次执行 6 项独立检查——JPEG 文件存在性、JPEG 格式合法性、目标尺寸匹配、指定四边形广告牌区域是否发生显著透视替换变化（像素差异变化率不低于 0.14 且高于区域外变化率）、右上角区域是否包含文字边缘特征及 OCR 关键词 \"CITY DEALS\"、XCF 是否包含 Billboard_Art/Billboard_Text/Billboard_Composite 三个图层。所有子检查必须同时返回 1（通过），最终得分才为 1.0，否则为 0.0。",
+    "main_functions": [
+      {
+        "name": "check_image_dimensions",
+        "lineno": 23,
+        "description": "接收 image_path、expected_width、expected_height（可选，None 时仅检查宽度）和 tolerance（默认 5）。使用 PIL.Image.open 读取图片获取宽高，判断实际宽度与 expected_width 的绝对差是否不超过 tolerance；若 expected_height 不为 None，则同时判断高度。两项均满足返回 1，否则返回 0；文件不存在或读取异常也返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 60,
+        "description": "接收 file_path。调用 os.path.isfile 判断路径是否为真实文件。是则返回 1，否则返回 0；路径为 None 也返回 0。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 78,
+        "description": "接收 image_path。使用 PIL.Image.open 打开图片，检查 img.format 是否等于字符串 'JPEG'。是则返回 1，否则返回 0；文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 139,
+        "description": "接收 xcf_path 和 rule 字典（含 \"layers\" 列表与 \"ordered\" 布尔值，默认 False）。先检查文件存在且二进制头以 b'gimp xcf' 开头。优先尝试用 gimpformats 库解析图层名称列表，检查 expected_layers 是否全部存在于解析结果中；若 ordered 为 True，还要求这些图层在列表中的索引位置严格递增。若 gimpformats 解析失败，回退到二进制内容中逐层搜索每个图层名的 UTF-8 字节串，并比较出现位置是否按序。任一图层缺失或顺序错误返回 0，全部满足返回 1。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 217,
+        "description": "接收 image_path 和 rule 字典（含 \"regions\" 区域名列表默认 [\"center\"]、\"keywords\" 关键词列表、\"min_edge_density\" 默认 0.008、\"edge_threshold\" 默认 40.0）。将图片转灰度后，对每个指定区域调用 _resolve_region_bbox 裁剪，再调用 _edge_density 计算边缘密度；若任一区域密度低于 min_edge_density 则返回 0。若 rule 中提供了 keywords，尝试用 pytesseract.image_to_string 做 OCR，将结果正则替换空白为单空格并转小写，检查是否包含所有关键词（大小写不敏感）；OCR 模块缺失或识别失败仅记录 warning，不直接导致失败。区域密度与关键词（如有）均满足返回 1。"
+      },
+      {
+        "name": "check_perspective_overlay_region",
+        "lineno": 276,
+        "description": "接收 src_path（原始图）、tgt_path（目标图）、polygon（多边形顶点列表，默认 None）和 min_change_ratio（默认 0.15）。将两图转为 RGB 数组；若尺寸不一致，把 src resize 到 tgt 尺寸。默认 polygon 为中央偏右上的四边形坐标。使用 PIL.ImageDraw.polygon 生成布尔掩膜 mask，分别计算 mask 区域内与区域外的像素级绝对差（diff），统计 diff > 18.0 的像素占比。通过条件为：区域内变化率 changed_ratio >= min_change_ratio 且 changed_ratio > outside_ratio。满足返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_l2_street_billboard_mockup_complete",
+        "lineno": 347,
+        "description": "接收 result_paths 列表，要求至少包含 3 个元素，依次解包为 jpg_path、xcf_path、src_path。按顺序执行 6 项二进制检查：check_file_exists(jpg_path)、check_jpeg_format(jpg_path)、check_image_dimensions(jpg_path, 2200, 1365)、check_perspective_overlay_region(src_path, jpg_path, polygon=[[1130,260],[1580,250],[1600,620],[1100,640]], min_change_ratio=0.14)、check_text_in_region_keywords(jpg_path, {\"regions\":[\"top_right\"],\"keywords\":[\"CITY DEALS\"],\"min_edge_density\":0.006})、check_xcf_layers_structure(xcf_path, {\"layers\":[\"Billboard_Art\",\"Billboard_Text\",\"Billboard_Composite\"],\"ordered\":False})。将 6 项得分传入 _all_binary_checks_pass，仅当所有得分均 >=1.0 时返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 96,
+        "description": "接收图片 width、height 和 region_name 字符串。将区域名转小写后映射到具体的像素坐标元组 (x0, y0, x1, y1)，支持 top_left、top_center、top_right、bottom_left、bottom_center、bottom_right、center、left、right、top、bottom 等预设区域；若名称不匹配则默认返回全图 (0, 0, w, h)。用于 check_text_in_region_keywords 中按语义区域裁剪图像。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 125,
+        "description": "接收灰度图 numpy 数组 gray_array 和 edge_threshold（默认 40.0）。分别沿 x、y 轴计算梯度绝对值并相加得到 edges，返回 edges > edge_threshold 的像素占比（float）。用于 check_text_in_region_keywords 中判断区域是否含有足够丰富的边缘纹理，以推断存在文字。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 333,
+        "description": "接收 scores 列表，过滤 None 后转为 float。仅当列表非空且所有值均 >=1.0 时返回 1.0，否则返回 0.0；空列表返回 0.0。被 check_l2_street_billboard_mockup_complete 用作最终聚合器，实现“全部通过与”逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:14:15",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a2b00008-0008-4000-8000-000000000008-L2/evaluator_function_labels.json"
+}

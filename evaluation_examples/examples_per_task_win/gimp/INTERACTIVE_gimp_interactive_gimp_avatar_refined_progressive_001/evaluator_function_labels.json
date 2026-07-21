@@ -1,0 +1,165 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_avatar_refined_progressive_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 184
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 211
+    },
+    {
+      "name": "check_l2_avatar_refined_complete",
+      "lineno": 249
+    },
+    {
+      "name": "check_interactive_gimp_avatar_refined_complete",
+      "lineno": 272
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 67
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 92
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 133
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 151
+    },
+    {
+      "name": "_compute_sharpness_score",
+      "lineno": 176
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 184
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 211
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 241
+    },
+    {
+      "name": "check_l2_avatar_refined_complete",
+      "lineno": 249
+    },
+    {
+      "name": "check_interactive_gimp_avatar_refined_complete",
+      "lineno": 272
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator验证的是一个GIMP头像精修与双格式导出任务。任务要求用户对源图像进行处理后，最终产出三个文件：一个1024×1024像素的PNG文件、一个1024×1024像素且文件大小不超过256000字节的JPEG文件、以及一个XCF源文件。评测采用\"全部满足\"的通过标准：首先检查三个文件是否都存在且格式正确（PNG/JPEG/XCF），然后检查两个导出图像的尺寸是否严格符合1024×1024（允许5像素容差），接着检查JPEG文件大小是否超标，最后通过对比度和清晰度指标验证图像确实经过了精修处理——JPEG相比原始源图的对比度必须提升至少5%，清晰度必须提升至少1.5%。以上10项检查全部通过（每项返回1）时，任务才得满分1.0，任一失败即得0分。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "接收一个PIL Image对象，将其转换为灰度模式('L')后，使用ImageStat.Stat计算像素值的标准差，并将该标准差作为图像对比度值返回。该函数是图像对比度的量化器，服务于check_contrast_increase，用于获取单张图像的对比度基线。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "接收image_path、expected_width、expected_height和tolerance（默认5）。先用PIL打开图像获取实际宽高，然后判断实际宽度与expected_width的绝对差是否不超过tolerance；若expected_height不为None，则同时判断高度。宽度和高度（如要求）均在容差范围内返回1，否则返回0。该函数对尺寸匹配采用近似判断，默认允许5像素的偏差。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 67,
+        "description": "接收image_path，使用PIL打开文件后读取img.format属性，判断其是否等于'PNG'。若格式为PNG返回1，否则返回0。该函数验证文件是否为有效PNG图像。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 92,
+        "description": "接收src_path、tgt_path和min_increase_percent（默认10.0）。依次打开源图和目标图，分别调用calculate_contrast获取对比度，计算相对提升百分比：((tgt_contrast - src_contrast)/ src_contrast) * 100。若源图对比度为0则直接返回0。当提升百分比大于等于min_increase_percent时返回1，否则返回0。该函数用于验证目标图相比源图是否真正提升了对比度。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 133,
+        "description": "接收file_path，调用os.path.isfile判断文件是否存在。存在返回1，不存在返回0。该函数是最基础的文件存在性检查。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 151,
+        "description": "接收image_path，使用PIL打开文件后读取img.format属性，判断其是否等于'JPEG'。若格式为JPEG返回1，否则返回0。该函数验证文件是否为有效JPEG图像。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 184,
+        "description": "接收image_path和rule字典。从rule中提取min_size（默认0）和max_size（默认10**18），获取文件实际字节数，判断其是否落在[min_size, max_size]闭区间内。在范围内返回1，否则返回0。该函数用于限制输出文件的大小。"
+      },
+      {
+        "name": "check_sharpness_increase",
+        "lineno": 211,
+        "description": "接收src_path、tgt_path和min_increase_percent（默认5.0）。依次打开源图和目标图，调用_compute_sharpness_score分别计算清晰度得分，计算相对提升百分比：(tgt_sharp - src_sharp) * 100.0/ src_sharp。若源图清晰度小于等于1e-9则返回0。当提升百分比大于等于min_increase_percent时返回1，否则返回0。该函数用于验证目标图相比源图是否真正提升了清晰度。"
+      },
+      {
+        "name": "check_l2_avatar_refined_complete",
+        "lineno": 249,
+        "description": "接收result_paths列表，要求至少包含4个元素，依次解包为png_path、jpg_path、xcf_path、src_path。然后按顺序执行10项二进制检查：1) PNG文件存在；2) PNG格式正确；3) PNG尺寸为1024×1024（容差5像素）；4) JPG文件存在；5) JPG格式正确；6) JPG尺寸为1024×1024（容差5像素）；7) JPG文件大小不超过256000字节；8) JPG相比源图对比度提升≥5.0%；9) JPG相比源图清晰度提升≥1.5%；10) XCF文件存在。将10项得分传入_all_binary_checks_pass，仅当所有检查均返回1时才返回1.0，否则返回0.0。该函数是任务的核心组合判定器，采用\"全部满足\"策略。"
+      },
+      {
+        "name": "check_interactive_gimp_avatar_refined_complete",
+        "lineno": 272,
+        "description": "接收result_paths列表，直接将其原样转发给check_l2_avatar_refined_complete并返回其结果。该函数是交互式任务入口的薄封装，本身不增加额外检查逻辑。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_compute_sharpness_score",
+        "lineno": 175,
+        "description": "接收一个PIL Image对象，将其转为灰度并转为numpy数组，分别计算水平(axis=1)和垂直(axis=0)方向的梯度，求梯度幅值后返回其方差作为清晰度分数。分数越高代表图像边缘越锐利。该函数是清晰度的量化器，专供check_sharpness_increase使用。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 237,
+        "description": "接收scores列表，过滤掉None值并转为float。若列表为空返回0.0；仅当所有有效分数都大于等于1.0时返回1.0，否则返回0.0。该函数实现严格的\"全通过与\"逻辑，是组合多项二进制检查的最终裁决器。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:11:08",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_avatar_refined_progressive_001/evaluator_function_labels.json"
+}

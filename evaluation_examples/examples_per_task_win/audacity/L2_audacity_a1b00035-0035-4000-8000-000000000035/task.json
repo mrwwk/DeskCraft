@@ -1,0 +1,72 @@
+{
+  "id": "a1b00035-0035-4000-8000-000000000035",
+  "snapshot": "audacity",
+  "instruction": "This long recording has two extra sections to remove. Open/home/user/Documents/long_test.wav in Audacity, delete 10s-15s first, then delete 25s-30s on the current timeline, export to/home/user/Documents/exports/double_delete.wav, and save the project",
+  "source": "https://manual.audacityteam.org/man/tutorial_editing_an_existing_file.html",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/wav/long_test.wav",
+            "path": "/home/user/Documents/long_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/long_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": "check_audio_double_delete_content",
+    "result": {
+      "type": "vm_file",
+      "path": "/home/user/Documents/exports/double_delete.wav",
+      "dest": "double_delete.wav"
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "source_path": "assets/wav/long_test.wav",
+        "delete_ranges": [
+          [
+            10.0,
+            15.0
+          ],
+          [
+            25.0,
+            30.0
+          ]
+        ],
+        "expected_duration": 50.0,
+        "tolerance": 1.0,
+        "correlation_threshold": 0.999999,
+        "max_normalized_rmse": 0.001
+      }
+    },
+    "file": "evaluator.py"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L2"
+}

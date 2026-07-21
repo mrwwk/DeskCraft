@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_84b523c5-de36-4e84-b694-6d00d4928f76/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 50
+    },
+    {
+      "name": "exact_match",
+      "lineno": 78
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定任务 L1_chrome_84b523c5-de36-4e84-b694-6d00d4928f76 的完成状态，核心验证对象分为两类：一是 Chrome 浏览器当前活动标签页的 URL 是否匹配预期页面（忽略查询参数），二是任务返回结果是否与预期值严格相等。两个主函数各自独立执行、无组合或加权逻辑，均采用二元打分制：完全匹配返回 1.0 表示通过，不匹配返回 0.0 表示未通过。标注人员只需关注活动标签页 URL 去参后的比对结果，以及 result 与 rules['expected'] 的精确相等性。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 50,
+        "description": "接收 Chrome 活动标签页信息 active_tab_info（字典或字符串）和规则字典 rule。首先检查 active_tab_info 是否为空，为空则直接返回 0。随后读取 rule['type']，当前仅支持 'url' 分支：从 rule['url'] 获取预期 URL，从 active_tab_info 中获取实际 URL（若 active_tab_info 为字典则取 'url' 键，否则视其本身为 URL 字符串）。接着利用 urllib.parse 的 urlparse 与 urlunparse 将预期和实际 URL 的查询参数部分置空，对去参后的两个 URL 进行字符串相等比较，若一致返回 1，不一致返回 0。若 rule['type'] 为未知类型，则记录错误日志并返回 0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 78,
+        "description": "接收任务结果 result 和规则字典 rules。从 rules 中读取 'expected' 字段得到预期值 expect，通过标准相等运算符（==）将 result 与 expect 进行严格比较。若二者完全相等则返回 1.0，否则返回 0.0。函数执行过程中会将 result 与 expect 打印至标准输出以辅助调试。该函数作为通用精确比较器，直接判定结果值与预期值是否一致，无额外预处理或容错阈值。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:07:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_84b523c5-de36-4e84-b694-6d00d4928f76/evaluator_function_labels.json"
+}

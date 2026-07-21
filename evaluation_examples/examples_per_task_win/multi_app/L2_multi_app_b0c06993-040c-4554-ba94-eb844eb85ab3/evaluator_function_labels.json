@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_b0c06993-040c-4554-ba94-eb844eb85ab3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_project_audit",
+      "lineno": 12
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_project_audit",
+      "lineno": 12
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证project_audit_from_spec_and_reference_docs任务，要求被测系统最终同时达成三个子目标并在单一JSON结果中返回：①在~/Desktop/audit_summary.txt中生成包含py_files与total_lines字段的审计摘要；②配置VS Code:的settings.json，使其严格包含期望的编辑器设置项（如editor.tabSize、editor.rulers等）；③将Chrome浏览器当前活动标签页导航至指定URL（允许忽略查询参数的近似匹配）。evaluator将agent返回的result字符串解析为JSON后，依次对文本摘要、设置字典、浏览器URL进行三组比对。判定逻辑为合取关系（全部满足）：三组检查必须同时通过才计1.0分，任何一组失败（包括JSON解析失败、字段缺失、值不匹配、URL不一致）都会立即导致整体得分为0.0分，从而将多子任务聚合为单一指标。",
+    "main_functions": [
+      {
+        "name": "check_project_audit",
+        "lineno": 12,
+        "description": "该函数是唯一的评测入口，接收result（JSON字符串）与expected（期望字典），对三个子任务状态进行串联判定。处理流程如下：1）前置校验：若result为空或仅含空白，或无法被json.loads解析为字典，立即返回0.0。2）audit_summary.txt检查：从data中取summary字段，按换行符分割后逐行解析为key=value格式（以第一个等号为界，并对键值分别strip），存入summary_dict；随后将expected中audit_summary对应的py_files与total_lines转为字符串，与summary_dict中对应键进行精确字符串比对，任一不符返回0.0。3）VS Code: settings.json检查：从data中取vscode字典，遍历expected中vscode_settings的每个键值对，使用vscode.get(key)与期望值进行精确相等判断，若缺少某键或某值不匹配，立即返回0.0。4）Chrome活动标签URL检查：从data中取chrome_url，与expected中的chrome_url一同经内部逻辑_strip_query处理，利用urlparse去除查询参数（将query置为空字符串后通过urlunparse重组），再进行字符串精确比较，不相等则返回0.0。仅当所有检查全部通过时，才返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:22:13",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_b0c06993-040c-4554-ba94-eb844eb85ab3/evaluator_function_labels.json"
+}

@@ -1,0 +1,81 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_205/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_urls",
+      "lineno": 25
+    },
+    {
+      "name": "are_lists_equal",
+      "lineno": 42
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 56
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 87
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 110
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "compare_urls",
+      "lineno": 25
+    },
+    {
+      "name": "are_lists_equal",
+      "lineno": 42
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 56
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 87
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 110
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 服务于 interactive_chrome_interruption_205，定义了三项 Chrome 浏览器状态检查指标，外部调用方以 AND 逻辑联合判定任务是否完成。第一项检查打开的标签页集合：仅允许预期的 Dashboard 和 Onboarding 页面保持打开，且在比较前会过滤掉所有以 chrome:// 开头的内部页面（如 bookmarks-side-panel、设置页等 Chrome UI 面板），防止浏览器内部元素造成误判；第二项检查当前活动标签页：要求精确匹配预期的 Onboarding Prompts 页面 URL；第三项检查书签栏状态：要求书签栏中的文件夹名称集合或网址集合仅包含预期的 Dashboard 和 Onboarding 项。所有检查均采用精确匹配策略，URL 比较时会归一化 file:// 路径并去除尾部斜杠，列表比较时不考虑元素顺序，最终各指标独立返回 0.0（失败）或 1.0（成功），必须全部满足才算任务完成。",
+    "main_functions": [
+      {
+        "name": "compare_urls",
+        "lineno": 25,
+        "description": "接收两个 URL 字符串 url1 与 url2，对其进行归一化后判断是否相等。若任一参数为 None，则直接按 Python 相等性返回结果；若 URL 以 file:// 开头，则剥离该协议前缀，并对剩余路径去除尾部斜杠；对于普通 URL，仅去除尾部斜杠。最终比较归一化后的字符串是否一致，返回布尔值。该函数主要服务于 is_expected_tabs 和 is_expected_active_tab 中的 URL 精确匹配，用于消除 file:// 协议和末尾斜杠带来的差异。"
+      },
+      {
+        "name": "are_lists_equal",
+        "lineno": 42,
+        "description": "接收两个列表 list1、list2 以及一个自定义比较函数 comparison_func，判断两列表是否包含完全相同的元素且不考虑顺序。首先比较长度，若长度不同直接返回 False；随后遍历 list1 中的每个元素，检查 list2 中是否存在至少一个元素使得 comparison_func(item1, item2) 为 True。若 list1 中所有元素都能在 list2 中找到对应匹配，则返回 True，否则返回 False。该函数被 is_expected_tabs 调用，用于在忽略标签页顺序的前提下比较预期 URL 列表与实际 URL 列表。"
+      },
+      {
+        "name": "is_expected_tabs",
+        "lineno": 56,
+        "description": "接收 Chrome 打开标签页列表 open_tabs（元素为包含 url 键的字典）和规则字典 rule。若 open_tabs 为空，直接返回 0.0。当 rule['type'] 为 'url' 时，从 rule 中提取 expected_urls；在实际标签页数据中，先过滤掉所有 url 以 chrome:// 开头的内部页面（如书签侧边栏、设置页等 Chrome UI 面板），得到 actual_urls；然后调用 are_lists_equal，以 compare_urls 作为比较函数，对预期列表和实际列表进行无序精确比较。若两列表匹配则返回 1.0，不匹配则返回 0.0。若 rule['type'] 为其他未支持的类型，返回 0.0 并记录错误日志。"
+      },
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 87,
+        "description": "接收当前活动标签页信息 active_tab_info（可为字典或字符串）和规则字典 rule。若输入为空，直接返回 0.0。当 rule['type'] 为 'url' 时，从 rule 中提取 expected_url；若 active_tab_info 为字典，则取其中的 url 键值作为 actual_url，否则直接将输入视为 actual_url。随后调用 compare_urls 对 expected_url 与 actual_url 进行归一化比较，若相等则返回 1.0，否则返回 0.0。若 rule['type'] 为其他未支持的类型，返回 0.0 并记录错误日志。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 110,
+        "description": "接收 Chrome 书签数据 bookmarks（字典结构）和规则字典 rule。若 bookmarks 为空，直接返回 0.0。当 rule['type'] 为 'bookmark_bar_folders_names' 时，遍历 bookmarks['bookmark_bar']['children']，筛选出 type 为 'folder' 的项，提取其 name 字段组成列表，再与 rule['names'] 进行集合（set）比较，完全一致则返回 1.0，否则返回 0.0。当 rule['type'] 为 'bookmark_bar_websites_urls' 时，同样遍历上述 children，筛选出 type 为 'url' 的项，提取其 url 字段组成列表，与 rule['urls'] 进行集合比较，完全一致则返回 1.0，否则返回 0.0。若 rule['type'] 为其他值，则抛出 TypeError。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:01:13",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_interruption_205/evaluator_function_labels.json"
+}

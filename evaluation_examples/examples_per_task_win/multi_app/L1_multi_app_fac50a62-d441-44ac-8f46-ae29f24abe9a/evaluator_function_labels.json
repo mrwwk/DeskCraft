@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_fac50a62-d441-44ac-8f46-ae29f24abe9a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 98
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 98
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator针对多应用任务提供三种独立的验证指标，分别用于检查浏览器标签页状态、文本内容合规性与Python代码正确性。整体判定思路为：通过三个主函数各自独立地对不同维度的任务产出进行检查，每个函数返回0/1或0.0~1.0的分数，上层调用方根据具体任务需求选取对应指标并依据返回值判定成功或失败。具体而言：（1）检查Chrome当前活动标签页的URL是否与预期一致，比较时忽略查询参数，要求去除参数后完全相等；（2）检查目标字符串是否同时满足“包含所有指定内容”且“不包含任何排除内容”；（3）动态加载并执行指定的Python测试文件，调用其中指定的测试函数，依据其返回值转换为0.0~1.0的分数。任一检查失败或异常均返回0或0.0。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 57,
+        "description": "该函数检查Chrome浏览器当前活动标签页是否为预期页面。接收两个参数：active_tab_info（字典类型，包含当前标签页信息，其中应有'url'字段）和rule（字典类型，包含匹配规则）。检查步骤如下：首先判断active_tab_info是否为空，为空则直接返回0；然后从rule中读取match_type，目前仅支持'url'类型；在'url'模式下，从rule中取出expected_url，从active_tab_info中取出actual_url；使用urllib.parse.urlparse与urlunparse将两个URL的query参数去除（仅保留scheme、netloc、path等部分）；最后比较处理后的两个URL字符串是否完全相等。若相等返回1，否则返回0；若match_type不是'url'，则记录错误并返回0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 85,
+        "description": "该函数对一段结果文本进行包含与排除规则的合规性检查。接收两个参数：result（待检查的字符串）和rules（字典，包含'include'与'exclude'两个键，对应值为字符串列表）。检查步骤如下：首先判断result是否为None，为None则返回0；然后从rules中分别取出include列表与exclude列表（缺省为空列表）；接着检查result是否同时满足两个条件：包含include列表中的所有字符串，且不包含exclude列表中的任何一个字符串。若同时满足则返回1.0，否则返回0。该函数为纯字符串子串匹配，无近似匹配逻辑。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 98,
+        "description": "该函数通过动态执行外部Python测试文件来验证代码正确性。接收参数：actual_files（实际文件，函数签名中保留但未在函数体内直接使用）、test_file（测试文件路径字符串）以及**options（可选配置，其中test_function_name指定测试函数名，默认为'test'）。检查步骤如下：（1）校验test_file是否存在且为普通文件，否则返回0.0；（2）生成唯一模块名，保存原始工作目录original_cwd与原始sys.path；（3）将工作目录切换至test_file所在目录，并将该目录插入sys.path；（4）使用importlib.util.spec_from_file_location与module_from_spec动态加载测试模块，执行模块代码；（5）从模块中获取名为test_function_name的函数对象，验证其可调用；（6）执行该测试函数并处理返回值：布尔类型True返回1.0、False返回0.0；数值类型会被裁剪归一化到[0.0, 1.0]区间；其他类型按Python truthy规则转换为1.0或0.0；（7）无论执行成功与否，在finally块中清理环境：从sys.modules中移除临时模块、恢复原始工作目录、恢复原始sys.path。若加载模块、获取函数或执行过程中发生任何异常，均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:19:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L1_multi_app_fac50a62-d441-44ac-8f46-ae29f24abe9a/evaluator_function_labels.json"
+}

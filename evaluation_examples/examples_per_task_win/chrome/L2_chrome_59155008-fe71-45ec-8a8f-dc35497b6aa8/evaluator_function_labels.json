@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_59155008-fe71-45ec-8a8f-dc35497b6aa8/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器当前活动标签页的URL是否同时满足一组预期的正则表达式模式。它接收来自active_tab_info或get_active_url_from_accessTree的返回值作为待检测URL来源，核心检查对象是提取后的目标URL字符串。评测采用\"全部满足\"的严格逻辑：使用re.search将URL与rules[\"expected\"]中的每一个正则模式逐一进行子串匹配，只有所有模式均匹配成功时才返回1.0判定任务完成；若result为空、格式非法、或任一正则模式未命中，则立即返回0.0判定失败。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 7,
+        "description": "该函数接收两个参数：result（活动标签页信息，可以是字符串URL或包含'url'键的字典）和rules（包含\"expected\"键的字典，其值为正则表达式字符串列表）。执行步骤如下：1）若result为空，直接返回0.0；2）解析URL：若result为字符串则直接使用，若为含'url'字段的字典则提取该字段，否则记录错误并返回0.0；3）从rules[\"expected\"]读取正则模式列表；4）遍历每个pattern，使用re.search在目标URL中搜索匹配；5）采用短路逻辑，只要有一个pattern未匹配成功就立即返回0.0；6）若所有pattern均匹配成功，返回1.0。该函数本质上是一个基于正则子串匹配的布尔打分器，将多规则联合判定转化为0.0或1.0的浮点结果。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:08:17",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_59155008-fe71-45ec-8a8f-dc35497b6aa8/evaluator_function_labels.json"
+}

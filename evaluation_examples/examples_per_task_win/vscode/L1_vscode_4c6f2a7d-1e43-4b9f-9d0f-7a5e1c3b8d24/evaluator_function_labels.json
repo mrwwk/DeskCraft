@@ -1,0 +1,83 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_4c6f2a7d-1e43-4b9f-9d0f-7a5e1c3b8d24/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 68
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 92
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 20
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 24
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 39
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 49
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 68
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 92
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个UI Bundle（以zip压缩包形式存在）是否满足预设的多维度规则。核心检查对象是由actual参数指定的zip文件路径，evaluator会读取其内部文件清单及文本内容，从三个层面进行独立的二进制判定（通过返回1.0，不通过返回0.0）：第一，检查必需文件是否全部存在于zip中；第二，检查指定的文本类文件中是否全部包含必需关键词（不区分大小写）；第三，对HTML文件进行结构化检查，包括CSS选择器存在性、匹配元素数量、元素文本内容包含性、属性值严格相等以及全页文本包含性。所有主函数均采用“全部满足则通过，任一不满足则立即返回失败”的严格逻辑，且路径比较前会进行统一规范化（去除开头的“/”并将反斜杠转为斜杠）。若输入路径为空、对应规则项未配置或发生异常，会按既定策略返回0.0或1.0。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 49,
+        "description": "接收actual（zip文件路径字符串）和rules（字典，内含required_files列表）。若actual为空字符串或None，直接返回0.0；若required_files为空列表或不存在，直接返回1.0。调用_load_ui_bundle_entries读取zip，获取规范化后的文件名录。遍历required_files中的每个路径，先用_normalize_ui_bundle_path规范化，再判断该路径是否存在于zip的文件名录中。若任一必需文件缺失，立即返回0.0；全部存在则返回1.0。若读取zip过程中发生任何异常，捕获后返回0.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_keywords",
+        "lineno": 68,
+        "description": "接收actual（zip文件路径字符串）和rules（字典，内含required_file_keywords字典，键为文件名，值为关键词列表）。若actual为空返回0.0；若required_file_keywords为空字典或不存在，返回1.0。调用_load_ui_bundle_entries加载zip，获取文件名录和文本内容。遍历每个指定文件：先检查文件是否存在（通过规范化路径匹配），若不存在则返回0.0；若存在，则读取其文本内容并转为小写。随后遍历该文件对应的关键词列表，将每个关键词转为小写字符串，检查是否存在于文件内容中。若任一关键词缺失，立即返回0.0；所有文件的所有关键词均存在则返回1.0。若加载或检查过程中发生异常，返回0.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 92,
+        "description": "接收actual（zip文件路径字符串）和rules（字典，内含html_checks字典，键为HTML文件名，值为检查项列表）。若actual为空返回0.0；若html_checks为空字典或不存在，返回1.0。调用_load_ui_bundle_entries加载zip，再对每个HTML文件调用_get_ui_bundle_html_soup解析为BeautifulSoup对象。若文件不存在或解析失败，返回0.0。遍历该文件的checks列表，根据check_type执行不同检查：selector_exists要求CSS选择器能匹配到至少一个元素（soup.select_one不为None）；selector_count要求CSS选择器匹配的元素数量严格等于expected_count（经int转换后比较）；selector_text_contains要求CSS选择器匹配到元素，且该元素的get_text(\" \", strip=True)结果（转小写）包含expected_text（转小写）；selector_attribute_equals要求CSS选择器匹配到元素，且该元素的指定attribute严格等于expected_value；text_present要求整个soup的get_text(\" \", strip=True)结果（转小写）包含expected_text（转小写）。若遇到未知的check_type，返回0.0。任一检查失败立即返回0.0；全部通过返回1.0。异常时返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 24,
+        "description": "对zip内部文件路径进行规范化处理：去除左侧的“/”，并将所有反斜杠“//”替换为斜杠“/”。返回规范化后的路径字符串，用于统一不同操作系统或打包工具产生的路径格式差异，使主函数中的路径比较不受格式影响。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 28,
+        "description": "接收actual（zip文件路径），以只读方式打开zip文件并读取其内容。返回一个三元组：(normalized_to_raw, file_sizes, text_contents)。其中normalized_to_raw是字典，键为规范化路径，值为zip中的原始路径名；file_sizes是字典，键为规范化路径，值为对应原始路径的文件大小（通过zf.getinfo获取）；text_contents是字典，仅包含扩展名为.html、.css、.js、.json、.md、.txt、.svg的文件内容，键为规范化路径，值为以utf-8解码（errors=\"ignore\"）的字符串。该函数是三个主函数的数据基础，负责一次性加载zip并提供后续检查所需的文件清单、大小和文本内容。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 44,
+        "description": "接收text_contents字典和file_name文件名。先对file_name进行路径规范化，再从text_contents字典中获取对应的HTML文本字符串。若文本不存在则返回None；若存在则使用BeautifulSoup以\"html.parser\"解析并返回soup对象。专供check_ui_bundle_html_checks使用，将HTML文本转换为可进行CSS选择器查询的结构化对象。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:42:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_4c6f2a7d-1e43-4b9f-9d0f-7a5e1c3b8d24/evaluator_function_labels.json"
+}

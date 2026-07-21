@@ -1,0 +1,114 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/INTERACTIVE_audacity_interactive_audacity_interruption_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_channels",
+      "lineno": 108
+    },
+    {
+      "name": "check_audio_silence_at",
+      "lineno": 125
+    },
+    {
+      "name": "check_audio_duration_range",
+      "lineno": 150
+    },
+    {
+      "name": "check_interactive_audacity_ia04",
+      "lineno": 171
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "_extract_time_range",
+      "lineno": 99
+    },
+    {
+      "name": "check_audio_channels",
+      "lineno": 108
+    },
+    {
+      "name": "check_audio_silence_at",
+      "lineno": 125
+    },
+    {
+      "name": "check_audio_duration_range",
+      "lineno": 150
+    },
+    {
+      "name": "check_interactive_audacity_ia04",
+      "lineno": 171
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Audacity 交互式任务 IA-04（混合输出并在指定位置插入间隙后单声道导出）的最终完成质量。核心检查对象是用户导出的 WAV 音频文件。验证采用“全部满足”的联合判定逻辑：首先检查音频总时长是否落在指定区间（默认约 29.5 至 33.5 秒），其次检查在指定时间段内（默认约 15.0 至 16.8 秒）是否出现足够低的静音（RMS 默认不高于 -38 dB），最后检查导出文件是否为单声道（默认 1 通道）。三个子检查必须同时通过，任一失败即整体判为 0 分；全部通过则返回 1.0。比较方式为将实际音频文件的元数据与样本数据，与 rule 中给定的阈值进行精确比较，不涉及近似匹配或加权累计。",
+    "main_functions": [
+      {
+        "name": "check_audio_channels",
+        "lineno": 108,
+        "description": "检查对象：WAV 音频文件的声道数量。检查步骤：1) 判断 file_path 是否存在；2) 调用 _read_wav_info 读取文件头信息；3) 从 rule 中取 expected_channels 转为整数；4) 比对实际 channels 与期望值。判定依据：实际声道数等于 expected_channels 时返回 1.0，否则返回 0.0；文件不存在或发生异常也返回 0.0。"
+      },
+      {
+        "name": "check_audio_silence_at",
+        "lineno": 125,
+        "description": "检查对象：WAV 音频文件在指定时间区间内的静音程度。检查步骤：1) 判断 file_path 是否存在；2) 调用 _get_mono_samples 读取文件并转为单声道样本及采样率；3) 从 rule 解析 start_time、end_time 与 max_rms_db（默认 -40）；4) 调用 _extract_time_range 截取对应时间段样本；5) 若区间为空则报错并返回 0.0；6) 调用 _rms_db 计算该区间的 RMS 分贝值；7) 比对计算值与阈值。判定依据：区间 RMS 分贝值小于等于 max_rms_db 时返回 1.0，否则返回 0.0；异常或空区间返回 0.0。"
+      },
+      {
+        "name": "check_audio_duration_range",
+        "lineno": 150,
+        "description": "检查对象：WAV 音频文件的总时长。检查步骤：1) 判断 file_path 是否存在；2) 调用 _read_wav_info 获取 duration；3) 从 rule 解析 min_duration 与 max_duration；4) 判断实际时长是否落在闭区间内。判定依据：min_duration <= actual <= max_duration 时返回 1.0，否则返回 0.0；异常返回 0.0。"
+      },
+      {
+        "name": "check_interactive_audacity_ia04",
+        "lineno": 171,
+        "description": "检查对象：IA-04 任务导出的最终 WAV 文件，综合验证时长、静音段与声道数。检查步骤：1) 判断 file_path 是否存在；2) 构造 duration_rule（默认 min_duration=29.5, max_duration=33.5）并调用 check_audio_duration_range，若结果小于 1.0 立即返回 0.0；3) 构造 silence_rule（默认 silence_start=15.0, silence_end=16.8, max_rms_db=-38.0）并调用 check_audio_silence_at，若结果小于 1.0 立即返回 0.0；4) 构造 channel_rule（默认 expected_channels=1）并调用 check_audio_channels，若结果小于 1.0 立即返回 0.0。判定依据：上述三项子检查必须全部返回 1.0，最终才返回 1.0；任一失败或异常均返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 23,
+        "description": "使用标准库 wave 模块打开 WAV 文件，读取并返回基础元数据字典，包含 channels、sample_rate、n_frames、duration（秒）、sampwidth。被 check_audio_channels 与 check_audio_duration_range 复用，用于获取文件头信息。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 41,
+        "description": "使用 wave 模块读取 WAV 文件的全部原始帧数据，根据 sampwidth（支持 1/2/3/4 字节，即 8/16/24/32 位）将样本解析并归一化为 [-1.0, 1.0] 的浮点数列表；多声道时样本按交错顺序返回。被 _get_mono_samples 调用，是音频样本数据的基础读取器。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 75,
+        "description": "接收浮点样本列表，计算其均方根（RMS）并转换为分贝值：20 * log10(rms)。若样本为空或 rms 小于 1e-10，则返回 -100.0。被 check_audio_silence_at 调用，用于量化指定区间的音量水平。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 86,
+        "description": "先调用 _read_wav_info 与 _read_wav_samples 获取文件信息与交错样本；若声道数大于 1，则对每帧内各声道样本取算术平均，生成单声道样本列表。返回 (mono_samples, sample_rate)。被 check_audio_silence_at 调用，确保静音检查基于单声道数据。"
+      },
+      {
+        "name": "_extract_time_range",
+        "lineno": 99,
+        "description": "根据给定的采样率 sr，将 start_time 与 end_time（单位秒）转换为样本索引，并裁剪到有效范围后，返回样本列表的切片。被 check_audio_silence_at 调用，用于精确定位待检测的静音时间段。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:18:18",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/INTERACTIVE_audacity_interactive_audacity_interruption_001/evaluator_function_labels.json"
+}

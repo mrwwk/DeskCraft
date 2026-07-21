@@ -1,0 +1,57 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_dcd6f922-0976-40ba-bdf4-5d9a05d85432/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_all",
+      "lineno": 133
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_match_value_to_rule",
+      "lineno": 30
+    },
+    {
+      "name": "_check_json_content",
+      "lineno": 57
+    },
+    {
+      "name": "_check_settings_content",
+      "lineno": 101
+    },
+    {
+      "name": "check_all",
+      "lineno": 133
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证scan_spec_audit_and_metadata_update任务的完成状态。它采用组合式单指标检查策略，将原本可能分散在多个metric中的文件检查合并到check_all一个入口中，以避免框架中conj=\"and\"配置导致的短路问题（即前面metric失败时后续metric不再执行）。该evaluator最终要求两个可验证的文件条件同时满足：一是project_meta.json中关于pythonFiles、markdownFiles的计数及状态字段必须符合预期规则（支持正则匹配、数值比较、近似匹配等）；二是VS Code的settings.json中editor.tabSize和editor.rulers等配置项必须与预期值精确相等。此外，expected中虽然包含Chrome目标URL，但受限于框架无法在同一metric中同时获取文件和浏览器标签页信息，因此Chrome URL检查被显式跳过。只有当project_meta.json和settings.json的检查全部通过时，才返回1.0，否则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_all",
+        "lineno": 133,
+        "description": "这是唯一的评测入口。它接收result_state（一个包含两个文件路径的列表，分别对应project_meta.json和settings.json，由vm_file getter配合multi=true产生）和expected（包含project_meta、settings、chrome三个键的规则字典）。首先校验result_state是否为长度至少为2的列表，否则直接返回0.0。然后依次执行：1）从expected获取project_meta规则，调用_check_json_content检查第一个文件路径，若失败则记录日志并返回0.0；2）从expected获取settings规则，调用_check_settings_content检查第二个文件路径，若失败则记录日志并返回0.0；3）检查chrome预期值，仅记录日志说明因框架限制跳过URL验证。只有当上述两个文件检查全部通过时，才返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_match_value_to_rule",
+        "lineno": 29,
+        "description": "通用值比较器，被_check_json_content调用。它接收一个实际值和一个规则字典（含method和ref字段）。支持三种匹配方式：method以\"re\"开头时使用正则表达式匹配（支持组合re.IGNORECASE等标志，通过re.search实现）；method为eq/ne/le/lt/ge/gt时使用operator模块进行精确比较；method以\"approx\"开头时（格式如approx:0.05）进行浮点数近似匹配，阈值由method冒号后解析。返回布尔值表示是否匹配。"
+      },
+      {
+        "name": "_check_json_content",
+        "lineno": 53,
+        "description": "用于检查JSON文件内容是否符合预期/非预期规则。接收文件路径和规则字典（含expect和unexpect列表）。先读取并解析JSON文件，若文件不存在或解析失败返回False。对expect_rules中的每条规则，按r[\"key\"]的键路径逐层深入JSON对象获取实际值，若键不存在或值不匹配_match_value_to_rule则返回False。对unexpect_rules中的每条规则，同样按键路径获取值，若键不存在则跳过（不触发规则），若值匹配规则则返回False（表示出现了不应存在的内容）。全部通过返回True。"
+      },
+      {
+        "name": "_check_settings_content",
+        "lineno": 89,
+        "description": "专门用于检查VS Code settings.json。接收文件路径和规则字典（含expected字典）。读取JSON后，遍历expected中的每个键值对，要求settings.json中必须存在该键且值与预期完全相等（使用Python ==比较）。任一不匹配即返回False并记录具体差异（key、expected、actual）。全部匹配返回True。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:23:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_dcd6f922-0976-40ba-bdf4-5d9a05d85432/evaluator_function_labels.json"
+}

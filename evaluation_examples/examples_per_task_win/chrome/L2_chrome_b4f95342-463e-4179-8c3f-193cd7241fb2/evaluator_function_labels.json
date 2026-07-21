@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b4f95342-463e-4179-8c3f-193cd7241fb2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_page_has_availability_grid",
+      "lineno": 8
+    },
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 48
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_page_has_availability_grid",
+      "lineno": 8
+    },
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 48
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于休闲娱乐类桌面环境任务，提供两种独立的页面状态验证能力：一是验证页面HTML解析结果中是否呈现了营地可用性网格（通过检查camp-sortable-column-header键是否存在且内容非空），二是验证当前浏览器活动标签页的URL是否符合一组预期的正则表达式模式。两个主函数各自独立返回0.0或1.0的分数，evaluator内部不存在组合加权或联合判定逻辑，由外部框架根据任务配置决定调用其中一个或多个检查，并决定是否要求全部满足。核心比较方式包括：对特定字典键值进行非空判定，以及对URL进行多正则模式的逐一匹配（要求全部命中）。",
+    "main_functions": [
+      {
+        "name": "check_page_has_availability_grid",
+        "lineno": 8,
+        "description": "接收来自active_tab_html_parse的result（可为字典或JSON字符串）以及框架兼容用的expected参数。首先对字符串类型的result进行预处理：去除首尾空白、将单引号替换为双引号后尝试json.loads解析，若解析失败则记录警告并返回0.0；接着检查result是否为非空字典，否则返回0.0。随后提取字典中camp-sortable-column-header键对应的值，若该值不为None且转为字符串并去除首尾空白后长度大于0，则判定页面存在可用性网格，返回1.0；若键不存在或值为空，则返回0.0。"
+      },
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 48,
+        "description": "接收result（来自active_tab_info的URL字符串或含url键的字典）和rules字典。首先处理result：若为空则返回0.0；若为字符串则直接作为URL，若为字典则提取url键的值，格式无效则记录错误并返回0.0。然后从rules[\"expected\"]中获取正则模式列表，使用re.search依次检查每个模式是否在URL中匹配。采用短路逻辑：只要有一个模式未匹配立即返回0.0；仅当所有模式全部匹配时才返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:09:29",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_b4f95342-463e-4179-8c3f-193cd7241fb2/evaluator_function_labels.json"
+}

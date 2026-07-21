@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L2_kdenlive_493e49e3-e76b-4505-bfb9-f93df341f9eb/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_effect_applied",
+      "lineno": 65
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_effect_applied",
+      "lineno": 65
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务中，用户是否已在项目文件内成功应用了指定的视频或音频效果。它直接读取.kdenlive项目文件（底层为MLT XML格式），在XML中遍历所有<filter>节点，通过比对效果的mlt_service属性（支持多别名列表，不区分大小写）、kdenlive_id属性（子串包含匹配，不区分大小写）或tag属性（完全匹配，不区分大小写），判断目标效果是否存在于项目中。若rule中指定了source_file，会额外解析<producer>和<chain>节点，通过resource属性建立目标素材的ID映射集合，但当前实现出于简化，只要全局找到匹配效果即返回成功。最终返回1.0表示找到匹配效果，返回0.0表示未找到、文件不存在或解析异常。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_effect_applied",
+        "lineno": 47,
+        "description": "该函数接收project_file_path（.kdenlive项目文件路径）和rule（字典，必须包含effect_service效果名列表，可选包含source_file素材文件名）作为输入，执行以下检查步骤：1）检查项目文件是否存在，不存在则返回0.0；2）从rule提取effect_service列表并统一转为小写，若列表为空则返回0.0；3）若指定了source_file，遍历XML中所有<producer>和<chain>节点，调用_get_property_value读取resource属性，将包含source_file的节点id加入target_producer_ids集合；4）遍历XML中所有<filter>节点，对每个filter调用_get_mlt_service获取服务名，转小写后与effect_service列表进行完全匹配比对，若命中则直接返回1.0（即使指定了source_file，当前代码也直接接受全局匹配而不严格校验父子关联）；5）若mlt_service未命中，则通过_get_property_value读取该filter的kdenlive_id属性，将其转小写后与每个期望效果名进行子串包含比对（expected in kdenlive_id.lower()），若任一命中则返回1.0；6）若仍未命中，读取tag属性并与期望效果名进行完全匹配（不区分大小写），命中则返回1.0；7）全部遍历结束仍未找到匹配，返回0.0。过程中若发生XML解析错误或其他异常，也返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 20,
+        "description": "从MLT XML元素（xml.etree.ElementTree.Element）中提取mlt_service值。优先检查该元素的直接属性mlt_service，若不存在则遍历其所有子<property>节点，查找name属性等于'mlt_service'的节点的文本值。若均未找到则返回None。该函数被check_kdenlive_effect_applied用于识别<filter>节点所代表的效果类型。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 37,
+        "description": "从MLT XML元素的子<property>节点中，按指定的property_name（如'resource'、'kdenlive_id'、'tag'）查找对应name属性的<property>子节点，并返回其文本值；若未找到则返回None。该函数被主函数用于获取producer的素材路径、filter的效果标识等关键属性，是解析MLT属性值的核心读取器。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:06:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L2_kdenlive_493e49e3-e76b-4505-bfb9-f93df341f9eb/evaluator_function_labels.json"
+}

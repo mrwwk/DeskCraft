@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_f1a30ea3-6e7b-4cdc-94d2-65c901308713/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 57
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 85
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 98
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator面向多应用(multi_app)任务场景，用于判定任务完成后的浏览器状态、文本输出内容或JSON配置是否符合预期。核心验证对象包括三类：一是Chrome当前活动标签页的URL（忽略查询参数后进行精确匹配）；二是程序输出或文本字符串中是否同时满足“包含指定子串”且“不包含禁用子串”；三是JSON设置文件中是否包含预期的键值对。判定逻辑以独立精确匹配为主：各检查项分别返回1.0（完全通过）或0/0.0（不通过），不存在加权、累计或部分得分机制，任一检查项不通过即视为该维度失败。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 57,
+        "description": "接收Chrome活动标签页信息active_tab_info（字典或字符串类型）与匹配规则rule。首先判空：若active_tab_info为空，直接返回0。当rule['type']为\"url\"时，从rule中提取expected_url，从active_tab_info中提取actual_url；随后调用urllib.parse对两个URL去除查询参数(query)，再进行严格字符串比较。若去参后的URL完全一致则返回1，否则返回0。若rule['type']为其他未知类型，则记录错误日志并返回0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 85,
+        "description": "接收待检查文本result与规则字典rules。若result为None，直接返回0。从rules中读取\"include\"列表（必须全部出现在result中）和\"exclude\"列表（必须全部不出现在result中）。使用子串包含逻辑遍历检查：仅当result同时满足“包含所有include项”且“不包含任何exclude项”时返回1.0，否则返回0。执行过程中会打印result与rules的内容。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 98,
+        "description": "接收actual（字符串，表示结果JSON文件的路径）与expected（字典，要求内含键\"expected\"）。若actual为空，返回0。尝试打开actual路径的文件并解析为JSON对象；若文件读取或JSON解析异常，返回0.0。从expected['expected']中获取期望键值对字典，逐一遍历：检查实际JSON数据中是否存在对应key且value严格相等（使用==）。若所有键值对均匹配则返回1.0，任一键缺失或值不匹配则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:30:19",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_f1a30ea3-6e7b-4cdc-94d2-65c901308713/evaluator_function_labels.json"
+}

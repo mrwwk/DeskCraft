@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_f3b19d1e-2d48-44e9-b4e1-defcae1a0197/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 16
+    },
+    {
+      "name": "exact_match",
+      "lineno": 58
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 16
+    },
+    {
+      "name": "exact_match",
+      "lineno": 58
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于ticketek_delivery_faq_safe任务，总体验证两个独立条件是否成立：第一，Chrome浏览器当前活动标签页必须打开Ticketek帮助中心中关于Ticket Delivery的FAQ文章，验证方式是对活动标签页的URL进行正则模式匹配（或精确URL比较）；第二，Safe Browsing功能必须处于启用状态，验证方式是将实际结果与期望值进行不区分大小写的字符串比对，并兼容布尔真值（\"true\"/\"1\"）的等价语义。两个主检查函数各自独立返回1.0（通过）或0.0（失败），代码中未明确体现这两个检查在最终任务层面是需全部满足、任一满足还是加权组合。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 16,
+        "description": "该函数接收active_tab_info（当前活动标签页信息，可为字典或字符串）和rule（匹配规则字典）作为输入，判定当前活动标签页是否符合预期。检查步骤如下：1）若active_tab_info为空或None，直接返回0.0；2）从active_tab_info中提取实际URL——若为字典则取url键的值，否则将整个输入转为字符串；3）读取rule中的type字段以确定匹配方式：若type为\"url_pattern\"，则使用re.search将rule[\"pattern\"]的正则表达式与actual_url进行匹配，匹配成功返回1.0，失败返回0.0；若type为\"url\"，则先尝试从desktop_env.evaluators.metrics.utils导入compare_urls对expected_url与actual_url做比较，若导入失败则回退为字符串精确相等比较，相等返回1.0，否则返回0.0；若type为其他未知值，记录错误日志并返回0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 58,
+        "description": "该函数接收result（实际结果）和rules（规则字典）作为输入，用于判定Safe Browsing等布尔类状态是否与预期一致。检查步骤如下：1）若result为None，直接返回0.0；2）从rules中获取expected值，将result与expected均转为字符串并按小写处理；3）若actual_str与expected_str完全相等，返回1.0；4）额外容错：若expected_str和actual_str均属于(\"true\", \"1\")中的任意一个（即允许\"true\"与\"1\"互相等价），也返回1.0；5）其余情况返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:09:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_f3b19d1e-2d48-44e9-b4e1-defcae1a0197/evaluator_function_labels.json"
+}

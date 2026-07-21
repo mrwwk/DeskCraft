@@ -1,0 +1,57 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_c90a9935-b8c3-423f-a2f7-3338e66af138/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 43
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_find_element_by_id",
+      "lineno": 18
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 26
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 35
+    },
+    {
+      "name": "check_inkscape_zorder",
+      "lineno": 43
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Inkscape 编辑后的 SVG 文件中，指定 id 的元素在视觉层级（z-order）上是否处于正确的叠放位置。它通过解析 SVG 文件，定位目标元素，并检查该元素在其父节点的可见子元素序列中是否位于最顶层（top）或最底层（bottom）。检查时会自动排除 defs、metadata、namedview、title、desc 等非视觉标签的干扰，仅依据实际可见图形节点的兄弟顺序进行判定。最终采用二元打分：实际位置与 rule 中 expected_position 要求一致时返回 1.0，否则返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_zorder",
+        "lineno": 43,
+        "description": "该函数接收 svg_file_path 和 rule 两个参数，验证指定元素的叠放顺序。首先调用 _parse_svg 解析 SVG 文件，若解析失败返回 0.0。接着从 rule 中读取 element_id 与 expected_position，并调用 _find_element_by_id 在整棵树中查找目标元素，未找到则返回 0.0。随后通过字典推导式构建 parent_map 以获取该元素的父节点；若元素无父节点，返回 0.0。之后对父节点的所有子节点进行过滤，利用 _tag_local 排除标签名为 defs、metadata、namedview、title、desc 的非视觉子节点，得到 visual_children 列表；若过滤后列表为空，返回 0.0。最后进行位置判定：当 expected_position 为 'top' 时，要求目标元素必须是 visual_children 的最后一个节点（SVG 中后出现的节点渲染在上层）；当 expected_position 为 'bottom' 时，要求目标元素必须是 visual_children 的第一个节点。满足对应条件返回 1.0，不满足或 expected_position 为其他值均返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_element_by_id",
+        "lineno": 14,
+        "description": "遍历 SVG 根节点下的所有元素，检查每个元素的 'id' 属性是否等于传入的 element_id。若找到匹配元素则返回该元素，否则返回 None。为主函数提供按 id 精确定位 SVG 元素的能力。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 22,
+        "description": "接收 svg_file_path，使用 xml.etree.ElementTree.parse 解析指定路径的 SVG 文件。成功时返回 (tree, root) 元组；若发生任何异常，则返回 (None, None)。为主函数提供安全的 SVG 文件读取与解析入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 31,
+        "description": "处理 SVG 中可能带 XML 命名空间的标签名（如 '{namespace}tagname'），通过查找 '}' 字符并截取其后半部分，返回纯本地标签名字符串。主函数在过滤非视觉子节点时调用它，以统一处理带或不带命名空间的标签。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:42:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_c90a9935-b8c3-423f-a2f7-3338e66af138/evaluator_function_labels.json"
+}

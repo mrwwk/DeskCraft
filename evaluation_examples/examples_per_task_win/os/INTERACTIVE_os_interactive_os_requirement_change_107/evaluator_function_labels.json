@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_requirement_change_107/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 服务于特定交互式操作系统任务（INTERACTIVE_os_interactive_os_requirement_change_107），其核心判定逻辑为精确匹配：由外部系统或上游提取器将任务执行后的实际结果传入本评测器，评测器将其与配置中预设的期望值 rules[\"expected\"] 进行严格的相等比较。若两者完全一致，则任务判定为成功并返回分数 1.0；若存在任何差异（包括类型、格式、大小写、空格等），则判定为失败并返回 0.0。本 evaluator 自身不直接读取文件、页面、图像或数据库，也不进行近似匹配、正则匹配或阈值容忍，仅对已经格式化后的结果值做最终的一致性校验。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收两个参数：result（任务实际输出或状态值）和 rules（包含预期值的字典）。执行步骤如下：1) 从 rules 字典中通过键 \"expected\" 提取期望值 expect；2) 在控制台打印 result 与 expect 的值，用于调试；3) 使用 Python 的 == 运算符对 result 和 expect 进行严格相等比较；4) 若相等则返回浮点数 1.，表示完全匹配成功；否则返回 0.，表示匹配失败。判定依据为严格的值相等，代码中未体现近似匹配、阈值容忍、顺序忽略、字段子集匹配或类型转换逻辑。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:32:48",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_requirement_change_107/evaluator_function_labels.json"
+}

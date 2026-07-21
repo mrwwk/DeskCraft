@@ -1,0 +1,66 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_c9b13af7-01c1-46aa-b153-f0b752206295/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_element_geometry",
+      "lineno": 54
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_find_element_by_id",
+      "lineno": 18
+    },
+    {
+      "name": "_get_float",
+      "lineno": 26
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 37
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 46
+    },
+    {
+      "name": "check_inkscape_element_geometry",
+      "lineno": 54
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Inkscape 任务产出的 SVG 文件中，指定元素的几何属性是否符合预期要求。它通过解析 SVG 文件，依据 element_id 定位目标元素，随后对该元素的位置（x/y 或 cx/cy）、尺寸（width/height）或缩放痕迹（transform 属性中是否包含 scale/matrix）进行逐项检查。检查采用严格的“全部满足”逻辑：只要任一指标缺失、无法解析或超出 tolerance 阈值，立即返回 0.0 判定失败；所有被指定的指标均通过时才返回 1.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_element_geometry",
+        "lineno": 54,
+        "description": "接收 svg_file_path 和 rule 字典，验证 SVG 中指定元素的尺寸、位置或缩放状态。执行步骤如下：1) 调用 _parse_svg 解析 SVG 文件，若失败返回 0.0；2) 调用 _find_element_by_id 按 rule['element_id'] 查找元素，若未找到返回 0.0；3) 读取 rule['tolerance']，默认值为 5；4) 若 rule 中包含 expected_scale_factor，进入缩放检查分支：对 circle 元素检查 transform 属性字符串中是否含 'scale' 或 'matrix'，含则返回 1.0，否则返回 0.0；对非 circle 元素，若 transform 属性非空则返回 1.0，否则检查 width 与 height 属性是否均存在（非 None），是则返回 1.0，否则返回 0.0；5) 若未触发缩放检查，则依次检查位置与尺寸：expected_x 与元素的 x 或 cx 属性比较；expected_y 与元素的 y 或 cy 属性比较；expected_width 与 width 属性比较；expected_height 与 height 属性比较；以上任一比较中，若实际值缺失、期望值缺失，或绝对差值大于 tolerance，均立即返回 0.0；6) 全部检查通过则返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_element_by_id",
+        "lineno": 12,
+        "description": "遍历 SVG 根节点下的所有元素（root.iter()），匹配元素的 id 属性是否等于传入的 element_id。返回匹配到的元素对象；若遍历结束未找到，返回 None。该函数服务于主函数的元素定位环节。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 20,
+        "description": "安全地将字符串转换为 float。若输入为 None，返回 default；否则先通过正则 re.sub(r'[a-zA-Z%]+$', '', str(value).strip()) 去除末尾的单位字符（如 px、mm、% 等），再尝试 float 转换。转换失败时返回 default。该函数用于解析 SVG 属性中的数值，供位置、尺寸、容差等比较使用。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 30,
+        "description": "使用 xml.etree.ElementTree.parse 解析指定路径的 SVG 文件，返回 (tree, root) 元组；若解析过程中发生任何异常，返回 (None, None)。该函数是主函数读取 SVG 产物的入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 39,
+        "description": "提取元素的本地标签名。若 elem.tag 包含命名空间前缀（如 {namespace}tag），则按 '}' 分割并返回后半部分；否则直接返回原标签名。该函数用于主函数中判断元素是否为 circle 等特定标签类型。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:42:24",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_c9b13af7-01c1-46aa-b153-f0b752206295/evaluator_function_labels.json"
+}

@@ -1,0 +1,83 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_61ce9db5-525d-4479-bd83-056945582647/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 58
+    },
+    {
+      "name": "check_blender_animation_range",
+      "lineno": 171
+    },
+    {
+      "name": "check_blender_frame_range",
+      "lineno": 205
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 24
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 37
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 44
+    },
+    {
+      "name": "check_blender_animation_keyframes",
+      "lineno": 58
+    },
+    {
+      "name": "check_blender_animation_range",
+      "lineno": 171
+    },
+    {
+      "name": "check_blender_frame_range",
+      "lineno": 205
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender动画任务的关键帧与帧范围是否符合预期。它通过解析在Blender后台模式（--background --python）下执行Python检查脚本后输出的、以RESULT:为前缀的JSON数据，对指定物体的动画关键帧（总数量、location通道存在性、特定帧号分布、三维位置值）以及场景的动画帧范围（起始帧frame_start、结束帧frame_end）进行逐项检查。所有主函数均采用\"全部满足即得1.0，任一不满足即得0.0\"的硬阈值判定逻辑，不存在加权或累计打分。",
+    "main_functions": [
+      {
+        "name": "check_blender_animation_keyframes",
+        "lineno": 58,
+        "description": "接收result_str（Blender检查脚本输出的JSON字符串）和expected（规则字典）。首先调用_parse_blender_output解析JSON；接着按expected['object_name']从结果中提取对应物体的动画数据obj_anim，若不存在则失败。然后按顺序执行以下检查，任一失败即返回0.0：（1）若expected包含'min_keyframe_count'，比较obj_anim['keyframe_count']是否大于等于该值；（2）若expected['has_location_keys']为真，检查keyframes字典中是否存在键名包含'location'的通道；（3）若expected包含'expected_keyframe_frames'，对每个预期帧号，遍历所有location通道的关键帧条目，查找是否存在帧号差值小于0.001的匹配项；（4）若expected包含'expected_keyframes'，对每个预期帧，依次从'location[0]'、'location[1]'、'location[2]'三个通道中提取同帧号（差值<0.001）的value组成实际位置向量，再调用_check_vector_tolerance与预期的'location'向量比较，默认容差tolerance为0.01。所有检查通过则返回1.0。"
+      },
+      {
+        "name": "check_blender_animation_range",
+        "lineno": 171,
+        "description": "接收result_str（JSON字符串）和expected（可能包含'frame_start'和/或'frame_end'的字典）。首先调用_parse_blender_output解析JSON。然后若expected中存在'frame_start'，将其与result['frame_start']进行精确相等（==）比较；若expected中存在'frame_end'，将其与result['frame_end']进行精确相等比较。两项检查中任一不匹配即返回0.0，全部匹配则返回1.0。该检查不使用容差，要求整数值完全一致。"
+      },
+      {
+        "name": "check_blender_frame_range",
+        "lineno": 205,
+        "description": "该函数是check_blender_animation_range的薄封装/别名。它直接接收相同的result_str、expected和options参数，原样转发给check_blender_animation_range并返回其结果，本身不执行任何额外解析、比较或判定逻辑。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 24,
+        "description": "负责将Blender检查脚本输出的命令行字符串解析为Python对象。它先去除输入字符串的首尾空白，再调用json.loads进行转换。若输入为空/空白，或遇到JSONDecodeError/ValueError，则记录错误日志并返回None。该函数是所有主函数在入口处的通用数据预处理步骤，用于将RESULT:后的原始JSON文本转换为可供后续检查的字典结构。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 35,
+        "description": "对两个标量数值actual与expected进行容差比较。在两者均非None的前提下，计算绝对差值并判断是否小于等于tol。返回布尔值。该函数是底层数值比较器，主要被_check_vector_tolerance逐分量调用，也可用于单维度浮点比对。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 42,
+        "description": "对两个向量（列表/数组）进行逐分量容差比较。首先检查两者是否非空且长度一致，然后对每一对分量使用与_check_tolerance相同的逻辑（绝对差值<=tol）进行判断，只有当所有分量都满足时才返回True。该函数被check_blender_animation_keyframes用于比对关键帧的三维位置向量（location[0]、location[1]、location[2]）。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:37:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_61ce9db5-525d-4479-bd83-056945582647/evaluator_function_labels.json"
+}

@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00005-0005-4000-8000-000000000005-L1/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_brightness_decrease_30_percent",
+      "lineno": 23
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_brightness_decrease_30_percent",
+      "lineno": 23
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP任务\"将图像亮度降低30%\"的完成质量。它读取来自VM的结果图像与来自云端的原始图像，将二者转为灰度后比较平均亮度，要求结果图像必须比原图暗、亮度下降幅度严格落在20%至40%之间（目标30%，允许±10%容差），同时通过像素级皮尔逊相关系数（要求>0.8）确认图像内容结构未被破坏。三个检查条件必须全部同时满足才视为成功，返回1.0；任一条件失败或发生异常均返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_brightness_decrease_30_percent",
+        "lineno": 23,
+        "description": "该函数接收result_path（VM中的结果图像路径）与expected_path（云端原始图像路径）作为输入。首先检查路径非空且对应文件存在，随后使用PIL.Image.open加载两张图像并统一转换为灰度模式（'L'）。若结果图像与源图像尺寸不一致，则使用Image.Resampling.LANCZOS将结果图像缩放到源图像尺寸。接着将灰度图转为numpy数组，计算各自的平均亮度。评测依次执行三项检查：第一，结果图像平均亮度必须严格小于源图像，确保亮度确实降低；第二，计算实际降低比例（公式为(源亮度-结果亮度)/源亮度），要求该比例落在0.20到0.40之间；第三，将两张图像的灰度数组展平后计算皮尔逊相关系数，若两图标准差均大于0则要求相关系数大于0.8，若标准差为0则默认结构保留。只有当\"亮度降低\"、\"比例正确\"、\"结构保留\"三个条件全部满足时，才返回1.0；任一步骤失败或发生异常，均记录日志并返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:13:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L1_gimp_a1b00005-0005-4000-8000-000000000005-L1/evaluator_function_labels.json"
+}

@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_error_correction_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_calc_sort_and_total",
+      "lineno": 14
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_calc_sort_and_total",
+      "lineno": 14
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证LibreOffice Calc电子表格任务是否按要求完成。它读取从虚拟机拉取到本地的.xlsx结果文件，通过openpyxl解析活动工作表，执行三项必须全部通过的核心检查：第一，在指定的total_row行（默认第12行）第1列存在包含\"total\"文本（不区分大小写）的汇总行标签；第二，数据区域（默认第2行至第11行）在指定的sort_column（默认第4列）上必须按照sort_direction（默认descending）正确排序，且所有排序值必须为非空数字；第三，对于sum_columns中的每一列（默认第2至第7列），total_row行对应单元格的数值必须等于该列在数据区域内的数值之和，允许tolerance（默认0.01）的浮点误差容限。三项检查中任一失败即返回0.0，全部通过返回1.0。文件存在性、openpyxl可用性及工作簿可打开性是前置必要条件。",
+    "main_functions": [
+      {
+        "name": "check_calc_sort_and_total",
+        "lineno": 14,
+        "description": "该函数是唯一的评测入口，接收result_path（本地.xlsx文件路径）和expected（规则配置字典，可包含total_row、sort_column、sort_direction、sum_columns、data_start_row、data_end_row、tolerance等键）作为输入，**options未被使用。首先调用os.path.exists检查文件是否存在，不存在则返回0.0。随后从expected提取参数并设定默认值：total_row默认为12，sort_column默认为4，sort_direction默认为\"descending\"，sum_columns默认为[2,3,4,5,6,7]，data_start_row默认为2，data_end_row默认为11，tolerance默认为0.01。接着尝试导入openpyxl并以data_only=True加载工作簿获取活动工作表ws，导入或加载失败均返回0.0。评测逻辑为三个顺序检查，任一失败立即返回0.0，无自定义辅助函数调用：检查一，读取ws.cell(row=total_row, column=1)的值，要求非空且转为字符串并strip、lower后包含子串\"total\"；检查二，遍历row从data_start_row到data_end_row，读取每行sort_column列的值，要求非空且可转为float，构建sort_values列表后按sort_direction验证单调性——若为descending则要求每个值不小于后一个值，若为ascending则要求每个值不大于后一个值；检查三，对sum_columns中的每一列col，先遍历数据行将该列可转为float的数值累加得到col_sum，再读取ws.cell(row=total_row, column=col)的total_val，要求非空且为数值，最后判断abs(total_val_float - col_sum)是否不超过tolerance。若三项全部通过，关闭工作簿并返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 14:45:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/INTERACTIVE_calc_interactive_calc_error_correction_001/evaluator_function_labels.json"
+}

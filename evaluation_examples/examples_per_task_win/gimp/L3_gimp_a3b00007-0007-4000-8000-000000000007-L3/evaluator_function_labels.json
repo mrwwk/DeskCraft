@@ -1,0 +1,200 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00007-0007-4000-8000-000000000007-L3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_saturation",
+      "lineno": 23
+    },
+    {
+      "name": "calculate_contrast",
+      "lineno": 31
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 38
+    },
+    {
+      "name": "check_saturation_increase",
+      "lineno": 63
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 104
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 145
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 163
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 224
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 302
+    },
+    {
+      "name": "check_split_before_after_layout",
+      "lineno": 361
+    },
+    {
+      "name": "check_three_panel_tutorial_layout",
+      "lineno": 469
+    },
+    {
+      "name": "check_l3_tutorial_pack_complete",
+      "lineno": 537
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_saturation",
+      "lineno": 23
+    },
+    {
+      "name": "calculate_contrast",
+      "lineno": 31
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 38
+    },
+    {
+      "name": "check_saturation_increase",
+      "lineno": 63
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 104
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 145
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 163
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 188
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 217
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 224
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 302
+    },
+    {
+      "name": "check_split_before_after_layout",
+      "lineno": 361
+    },
+    {
+      "name": "check_three_panel_tutorial_layout",
+      "lineno": 469
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 529
+    },
+    {
+      "name": "check_l3_tutorial_pack_complete",
+      "lineno": 537
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP L3级别任务中一个完整教程包（tutorial pack）是否按规范生成。最终要求产出6项核心对象：原始素材图（src）、三张步骤导出图（step1.jpg、step2.jpg、step3.jpg）、一张总览图（overview.png）以及一个XCF源文件。评测逻辑为严格的“全或无”二元聚合：check_l3_tutorial_pack_complete依次执行13项子检查，涵盖文件存在性、格式合规性（JPEG/PNG）、图像处理效果（step2相对src的饱和度与对比度必须分别提升至少6%）、布局结构（step3必须是左右before/after分割布局，且左右两侧与原图具有合理的相似度差异；overview必须是三列面板布局，并在顶部区域包含\"STEP 1\"/\"STEP 2\"/\"STEP 3\"字样）、以及XCF图层结构（必须包含Step1_Base、Step2_Grade、Step3_Compare、Overview_Board四个图层，不要求顺序）。所有子检查必须同时返回1，最终总分才为1.0，任一失败即整体判为0.0。",
+    "main_functions": [
+      {
+        "name": "calculate_saturation",
+        "lineno": 23,
+        "description": "接收一个PIL.Image.Image对象，将图像转换为HSV色彩空间后提取S（饱和度）通道，利用ImageStat.Stat计算该通道的像素均值并返回浮点数。该数值作为图像平均饱和度的量化指标，供check_saturation_increase计算饱和度提升百分比时作为分子与分母使用。"
+      },
+      {
+        "name": "calculate_contrast",
+        "lineno": 31,
+        "description": "接收一个PIL.Image.Image对象，将图像转换为灰度（L模式），利用ImageStat.Stat计算像素值的标准差并返回浮点数。该标准差被当作图像对比度指标，供check_contrast_increase计算对比度提升百分比时使用。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 38,
+        "description": "接收image_path字符串。先判断路径非空且os.path.exists为真；再用PIL.Image.open打开图像，读取其format属性。若img.format等于'PNG'则返回1，否则返回0。若文件不存在或打开异常也返回0。用于验证输出文件是否为PNG格式。"
+      },
+      {
+        "name": "check_saturation_increase",
+        "lineno": 63,
+        "description": "接收src_path（源图路径）、tgt_path（目标图路径）和min_increase_percent（默认10.0）。依次检查两路径非空、对应文件存在后，用PIL打开两张图，分别调用calculate_saturation获取平均饱和度。若源图饱和度为0则直接返回0；否则计算百分比提升((tgt_saturation - src_saturation)/ src_saturation) * 100。若该值大于等于min_increase_percent则返回1，否则返回0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 104,
+        "description": "接收src_path、tgt_path和min_increase_percent（默认10.0）。逻辑与check_saturation_increase对称，但检测的是对比度。调用calculate_contrast获取源图与目标图的对比度（灰度标准差），计算百分比提升((tgt_contrast - src_contrast)/ src_contrast) * 100。要求提升值不低于min_increase_percent。源图对比度为0时返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 145,
+        "description": "接收file_path字符串。通过os.path.isfile判断该路径是否为真实存在的文件。若存在返回1，若路径为None或不存在返回0。用于基础的存在性校验。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 163,
+        "description": "与check_png_format逻辑完全一致，仅将判断条件改为img.format == 'JPEG'。接收image_path，验证文件是否为JPEG格式，是则返回1，否则返回0；文件缺失或打开失败也返回0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 224,
+        "description": "接收xcf_path和rule字典。rule中必须包含\"layers\"（期望图层名列表），可选\"ordered\"（布尔值，默认False）。首先检查文件存在且二进制内容以b'gimp xcf'开头。优先尝试导入gimpformats库解析XCF，提取所有非空图层名；若解析失败则回退到二进制内容中直接UTF-8字符串搜索图层名。检查是否包含rule中指定的所有图层名；若ordered为True，还需确认这些图层在文件中的出现顺序与rule列表顺序一致（即位置索引递增）。全部满足返回1，任一不满足或异常返回0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 302,
+        "description": "接收image_path和rule字典。rule可包含\"regions\"（区域名列表，默认[\"center\"]）、\"keywords\"（关键词列表，可选）、\"min_edge_density\"（最小边缘密度，默认0.008）、\"edge_threshold\"（边缘阈值，默认40.0）。先将图像转灰度，对每个指定区域调用_resolve_region_bbox裁剪子图，再调用_edge_density计算边缘密度；若任一区域密度低于min_edge_density则返回0。若rule提供了keywords，尝试导入pytesseract进行OCR，将识别结果经re.sub(r'/s+', ' ')归一化（去空白转小写）后，检查是否包含所有关键词；若OCR不可用或失败，仅记录warning，不因此直接判失败（前提是前面区域边缘密度检查已通过）。所有检查通过返回1。"
+      },
+      {
+        "name": "check_split_before_after_layout",
+        "lineno": 361,
+        "description": "验证目标图tgt_path是否为左右分栏的before/after布局，可选接收src_path进行一致性校验。步骤如下：1）打开目标图转RGB，按split_ratio（默认0.5）垂直分成左右两半，并对齐宽度；2）计算左右子图的平均绝对差lr_change_ratio，要求不低于min_right_change_ratio（默认0.08）；3）计算左右子图的SSIM相似度lr_ssim，要求落在[0.35, 0.995]区间；4）在分割线附近取带状区域，调用_edge_density检测可见分割线，要求divider_edge不低于0.008。若以上基础检查未通过返回0。5）若src_path存在，将源图resize到与左右子图相同尺寸后转灰度，分别计算源图与左右子图的SSIM；要求至少一侧SSIM不低于0.3（说明有一侧接近原图），且两侧SSIM差距sim_gap不低于max_left_change_ratio（默认0.03，代码中将其解释为最小所需相似度差距）。全部满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_three_panel_tutorial_layout",
+        "lineno": 469,
+        "description": "验证image_path是否为多列垂直面板布局（默认3列）。rule可含\"columns\"（默认3）、\"tolerance_px\"（默认25）、\"min_boundary_edge_density\"（默认0.012）以及可选的regions/keywords用于标题检查。对每一列边界（1到columns-1），在边界左右tolerance_px像素范围内取竖直条带，调用_edge_density计算边缘密度；若任一边界密度低于min_boundary_edge_density则返回0。若rule含keywords，进一步调用check_text_in_region_keywords在顶部区域（默认top_left、top_center、top_right）检查是否包含指定关键词。通过返回1，失败返回0。"
+      },
+      {
+        "name": "check_l3_tutorial_pack_complete",
+        "lineno": 537,
+        "description": "L3-7教程包的复合总评入口。要求result_paths为长度至少6的列表，依次解包为：step1_jpg、step2_jpg、step3_jpg、overview_png、xcf_path、src_path。依次执行13项二元检查：1-4）四个文件存在性（check_file_exists）；5-7）step1/2/3为JPEG格式（check_jpeg_format）；8）overview为PNG格式（check_png_format）；9）step2相对src对比度提升不低于6%（check_contrast_increase）；10）step2相对src饱和度提升不低于6%（check_saturation_increase）；11）step3为before/after分割布局（check_split_before_after_layout，参数split_ratio=0.5、min_right_change_ratio=0.06、max_left_change_ratio=0.04）；12）overview为三面板布局且顶部含\"STEP 1\"/\"STEP 2\"/\"STEP 3\"（check_three_panel_tutorial_layout）；13）xcf包含四个图层Step1_Base、Step2_Grade、Step3_Compare、Overview_Board且ordered=False（check_xcf_layers_structure）。将13个0/1结果传入_all_binary_checks_pass，仅当全部大于等于1.0时总评返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 183,
+        "description": "接收图像width、height和region_name字符串（如\"top_left\"、\"center\"、\"bottom\"等），将语义化区域名称映射为像素坐标元组(x0, y0, x1, y1)。例如\"top_left\"返回左上1/3区域，\"center\"返回中间1/2区域，\"bottom\"返回底部1/4区域。若传入未知区域名，默认返回整图(0, 0, width, height)。供check_text_in_region_keywords、check_three_panel_tutorial_layout等需要按语义区域裁剪图像的函数使用。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 210,
+        "description": "接收灰度numpy数组gray_array和edge_threshold（默认40.0）。分别计算水平与垂直方向的梯度绝对值（np.gradient），相加得到边缘强度图，统计强度超过阈值的像素占比作为边缘密度返回。该值用于判断区域内是否存在足够明显的边缘（如文字笔画、面板分割线）。被check_text_in_region_keywords、check_split_before_after_layout、check_three_panel_tutorial_layout等调用。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 530,
+        "description": "接收scores列表，过滤掉None值后，要求所有有效分数都大于等于1.0才返回1.0；若列表为空或任一分数低于1.0则返回0.0。是check_l3_tutorial_pack_complete的最终聚合器，实现“全部子检查通过才成功”的严格逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:19:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00007-0007-4000-8000-000000000007-L3/evaluator_function_labels.json"
+}
