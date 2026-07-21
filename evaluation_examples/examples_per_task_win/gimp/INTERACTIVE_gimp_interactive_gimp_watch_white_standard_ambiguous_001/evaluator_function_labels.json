@@ -1,0 +1,169 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_watch_white_standard_ambiguous_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 151
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 178
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 256
+    },
+    {
+      "name": "check_white_background_ratio",
+      "lineno": 323
+    },
+    {
+      "name": "check_l2_watch_white_standard_complete",
+      "lineno": 362
+    },
+    {
+      "name": "check_interactive_gimp_watch_white_standard_complete",
+      "lineno": 386
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 151
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 178
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 256
+    },
+    {
+      "name": "check_white_background_ratio",
+      "lineno": 323
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 354
+    },
+    {
+      "name": "check_l2_watch_white_standard_complete",
+      "lineno": 362
+    },
+    {
+      "name": "check_interactive_gimp_watch_white_standard_complete",
+      "lineno": 386
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 GIMP 交互式任务中“白色背景手表标准图”的完成结果。任务最终要求产出两张核心文件：一张 1600×1600 像素的 JPEG 图像，以及保留图层信息的 XCF 工程文件。 evaluator 对 JPG 从文件存在性、格式、尺寸、文件大小、白色背景占比（≥90%）、主体下方柔和阴影存在性、对比度相比原始源图提升幅度（≥8%）共 7 个维度进行二进制检查；同时对 XCF 工程文件检查是否包含 \"Watch_Main\"、\"Shadow_Soft\"、\"BG_White\" 三个图层。所有 8 项检查必须全部通过（每项返回 1），最终由 _all_binary_checks_pass 聚合为 1.0 分；任一检查失败即得 0.0，属于严格的“全或无”判定逻辑。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "接收一个 PIL Image.Image 对象，将其转换为灰度模式（'L'），利用 ImageStat.Stat 计算像素值的标准差（stddev[0]），并将该标准差作为图像对比度数值返回。该函数是单图对比度的量化工具，通常被 check_contrast_increase 调用以分别计算 src_path 与 tgt_path 的对比度。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "接收 image_path、expected_width、expected_height（可选，默认为 None）和 tolerance（默认 5 像素）。使用 PIL.Image.open 打开图像后读取实际 width 与 height。先判断宽度的绝对误差是否不超过 tolerance；若 expected_height 不为 None，则进一步判断高度的绝对误差是否也不超过 tolerance。宽度和高度（如要求）均满足容差时返回 1，否则返回 0。若文件不存在或读取异常也返回 0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 67,
+        "description": "接收 src_path（源图路径）、tgt_path（目标图路径）和 min_increase_percent（默认 10.0）。依次打开两张图像，分别调用 calculate_contrast 获取对比度值。若源图对比度为 0 则直接返回 0；否则计算目标图相对源图的对比度提升百分比：((tgt_contrast - src_contrast)/ src_contrast) * 100。当提升百分比大于等于 min_increase_percent 时返回 1，否则返回 0。文件缺失或读取异常也返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 108,
+        "description": "接收 file_path，使用 os.path.isfile 判断该路径是否为存在的普通文件。若存在返回 1，若路径为 None 或文件不存在返回 0。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 126,
+        "description": "接收 image_path，使用 PIL.Image.open 打开图像后读取其 format 属性。若 format 严格等于 'JPEG' 则返回 1，否则返回 0。文件不存在或读取异常返回 0。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 151,
+        "description": "接收 image_path 和 rule 字典（可选字段 min_size、max_size，缺省分别为 0 和 10**18）。使用 os.path.getsize 获取文件字节大小，检查其是否落在 [min_size, max_size] 闭区间内。满足返回 1，否则返回 0。文件不存在或异常返回 0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 178,
+        "description": "接收 xcf_path 和 rule 字典（必须包含 layers 列表，可选 ordered 布尔值，默认 False）。首先检查文件是否存在且文件头以 b'gimp xcf' 开头。优先尝试导入并使用 gimpformats 库解析 XCF 文件，提取所有图层名（过滤空名字符串），检查是否包含 rule[\"layers\"] 中指定的每一个图层名；若 ordered 为 True，还要求这些预期图层在解析出的图层列表中的出现顺序与给定顺序一致（即索引递增）。若 gimpformats 解析失败或提取不到有效图层名，则回退到二进制字节流搜索：读取文件全部字节，用 content.find(name.encode('utf-8')) 查找每个图层名 UTF-8 编码的字节位置，若 ordered 为 True 则要求这些位置按升序排列。所有条件满足返回 1，任一图层缺失、顺序错误或文件异常返回 0。"
+      },
+      {
+        "name": "check_soft_shadow_presence",
+        "lineno": 256,
+        "description": "接收 image_path 和 rule 字典（含 min_shadow_ratio、alpha_low、alpha_high，默认值分别为 0.01、20、220）。将图像转为 RGBA 模式并转为 numpy 数组，提取 alpha 通道。通过 alpha > 180 确定前景掩码，计算前景的最小 x、最大 x 以及最大 y（即主体底部 y1）。在主体正下方定义一个搜索带：垂直方向从 y1+1 到 y1+max(8, h//5)，水平方向在前景宽度两侧各扩展 max(10, (x1-x0)//8)。统计该搜索带内 alpha 值落在 [alpha_low, alpha_high] 的像素占比。若该比例低于 min_shadow_ratio，则启用回退逻辑：在相同区域检查 RGB 像素，统计“非纯白（<245）、整体偏暗（均值<220）、低饱和（通道差<20）”的灰色阴影像素占比。最终阴影比例达到 min_shadow_ratio 时返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_white_background_ratio",
+        "lineno": 323,
+        "description": "接收 image_path 和 rule 字典（含 white_threshold 默认 245、min_ratio 默认 0.9）。将图像转为 RGB 模式后转为 numpy 数组，统计三个通道值均大于等于 white_threshold 的像素占比。若该比例大于等于 min_ratio 则返回 1，否则返回 0。文件缺失或读取异常返回 0。"
+      },
+      {
+        "name": "check_l2_watch_white_standard_complete",
+        "lineno": 362,
+        "description": "接收 result_paths 列表，要求至少包含 3 个元素，依次视为 jpg_path、xcf_path、src_path。依次执行 8 项二进制检查：1) check_file_exists(jpg_path) —— JPG 文件存在；2) check_jpeg_format(jpg_path) —— 格式为 JPEG；3) check_image_dimensions(jpg_path, 1600, 1600) —— 尺寸 1600×1600（容差 5 像素）；4) check_image_file_size_range(jpg_path, {\"max_size\": 460800}) —— 文件大小不超过 460800 字节；5) check_white_background_ratio(jpg_path, {\"white_threshold\": 245, \"min_ratio\": 0.9}) —— 白色背景占比≥90%；6) check_soft_shadow_presence(jpg_path, {\"min_shadow_ratio\": 0.004}) —— 存在柔和阴影；7) check_contrast_increase(src_path, jpg_path, min_increase_percent=8.0) —— 对比度较源图提升≥8%；8) check_xcf_layers_structure(xcf_path, {\"layers\": [\"Watch_Main\", \"Shadow_Soft\", \"BG_White\"], \"ordered\": False}) —— XCF 包含三个指定图层（不要求顺序）。将 8 项得分传入 _all_binary_checks_pass，仅当全部得分均为 1 时返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_interactive_gimp_watch_white_standard_complete",
+        "lineno": 386,
+        "description": "接收 result_paths 列表，作为交互式任务的入口包装器。直接调用 check_l2_watch_white_standard_complete(result_paths) 并返回其结果，本身不增加额外检查逻辑，仅做函数转发。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 347,
+        "description": "接收 scores 列表，过滤掉 None 值后将其余元素转为浮点数。仅当所有有效分数均大于等于 1.0 时返回 1.0，否则返回 0.0；若过滤后列表为空也返回 0.0。该函数是 check_l2_watch_white_standard_complete 的最终聚合器，实现“全部通过才成功”的严格二进制逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:11:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_watch_white_standard_ambiguous_001/evaluator_function_labels.json"
+}

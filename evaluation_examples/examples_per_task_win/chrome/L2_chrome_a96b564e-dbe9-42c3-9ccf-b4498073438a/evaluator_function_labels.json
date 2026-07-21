@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_a96b564e-dbe9-42c3-9ccf-b4498073438a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 72
+    },
+    {
+      "name": "exact_match",
+      "lineno": 95
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 105
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 72
+    },
+    {
+      "name": "exact_match",
+      "lineno": 95
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 105
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 服务于任务 L2_chrome_a96b564e-dbe9-42c3-9ccf-b4498073438a，总体目标是验证 Chrome 浏览器相关任务的完成状态。其核心检查分为两类：一是验证 Chrome 当前活动标签页是否为期望页面，通过对活动标签页的 URL 进行规范化比对实现；二是对通用任务结果进行精确匹配。URL 比对采用了一套特殊的等价规则：自动补全缺失的 scheme（默认 http://）、去除单独的 www 子域名、忽略顶级域后缀（如 .com 与 .com.sg 视为等价）、将根路径 '/' 标准化为空字符串，并可依据 full 参数选择是否忽略 URL 的 params、query 与 fragment。所有检查均以打分形式返回 0.0（未通过）或 1.0（通过），不存在加权累计，各检查项独立判定。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 72,
+        "description": "检查对象：Chrome 当前活动标签页信息 active_tab_info（字典或字符串）与期望规则 rule（字典）。检查步骤：首先判断 active_tab_info 是否为空，为空则直接返回 0.0；随后读取 rule['type']，当类型为 'url' 时，从 rule 中取出 expected_url，并从 active_tab_info 中提取 actual_url（若 active_tab_info 为字典则取 'url' 键值，否则直接将其视为 URL 字符串）；最后调用 compare_urls(expected_url, actual_url) 进行规范化比对。判定依据：若 compare_urls 返回 True，则函数返回 1.0；若返回 False，则返回 0.0。若 rule['type'] 不是 'url'，则记录错误日志并返回 0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 95,
+        "description": "检查对象：实际结果 result 与规则字典 rules 中的预期值 rules['expected']。检查步骤：从 rules 中提取键 'expected' 对应的值 expect，打印 result 与 expect 供调试，随后使用 Python 的 == 运算符进行严格比较。判定依据：若 result 与 expect 在值和类型上完全相等，则返回 1.0；否则返回 0.0。该函数不做任何模糊匹配、类型转换或容差处理。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 105,
+        "description": "检查对象：两个待比较的 URL 字符串 url1 与 url2。检查步骤：1）若任一参数为 None，直接比较 url1 == url2；2）通过内部逻辑 parse_with_default_scheme 为缺少 scheme 的 URL 自动补全 'http://'；3）通过内部逻辑 normalize_url 执行深度规范化——将 scheme 转为小写，使用 tldextract 提取域名并忽略顶级域后缀（TLD suffix），去除单独的 'www' 子域名，将根路径 '/' 置为空字符串；4）依据 full 参数（默认为 True）决定是否保留 URL 的 params、query 和 fragment（full=True 时保留，full=False 时将其清空）；5）比较规范化后的两个 URL 字符串是否完全相等。判定依据：规范化后的字符串完全一致则返回 True，否则返回 False。该函数是 is_expected_active_tab 的核心依赖。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:08:45",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_a96b564e-dbe9-42c3-9ccf-b4498073438a/evaluator_function_labels.json"
+}

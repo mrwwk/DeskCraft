@@ -1,0 +1,65 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L2_kdenlive_383b7e01-d1e1-44ce-9eb4-ab50489a4235/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_import_multiple_files",
+      "lineno": 42
+    },
+    {
+      "name": "check_kdenlive_add_to_timeline",
+      "lineno": 101
+    },
+    {
+      "name": "check_kdenlive_clip_group",
+      "lineno": 181
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_property_value",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_import_multiple_files",
+      "lineno": 42
+    },
+    {
+      "name": "check_kdenlive_add_to_timeline",
+      "lineno": 101
+    },
+    {
+      "name": "check_kdenlive_clip_group",
+      "lineno": 181
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对 Kdenlive 视频编辑任务（任务编号 383b7e01）进行自动化评测，核心验证目标为：用户是否已将指定的音视频文件导入项目素材库、是否将其添加到时间线轨道（V1/A1 等），以及是否对片段进行了分组并保存项目。评测的唯一输入是最终生成的 `.kdenlive` 项目文件（MLT XML 格式）。三个主指标各自独立解析该 XML，分别检查 `<producer>` 资源引用、`<playlist>` 中的 `<entry>` 时间线引用，以及分组元数据（JSON 属性、groupid、`<group>` 元素等）。每个指标独立返回 1.0（完全满足）或 0.0（不满足），属于“各自独立、满分/零分”的判定模式，而非加权累计。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_import_multiple_files",
+        "lineno": 42,
+        "description": "该函数验证“素材导入”指标。接收 `project_file_path` 与 `rule`（其中 `expected_files` 为待查找文件名列表）。首先检查项目文件是否存在，随后用 `ET.parse` 解析 XML，遍历所有 `<producer>` 节点，通过辅助函数 `_get_property_value` 提取 `resource` 属性值，收集为列表。接着对每个 `expected_file` 执行子串匹配（`expected_file in res`），要求所有预期文件都至少出现在某一个 producer 的 resource 中。若全部命中则返回 1.0；任一文件缺失、文件不存在、XML 解析失败或规则为空，均返回 0.0。"
+      },
+      {
+        "name": "check_kdenlive_add_to_timeline",
+        "lineno": 101,
+        "description": "该函数验证“片段已放置到时间线”指标。接收 `project_file_path` 与 `rule`（其中 `expected_file` 为单个目标文件名）。先检查文件存在性并解析 XML。第一步建立映射表 `producer_resources`：遍历所有 `<producer>`，记录其 `id` 与 `resource` 的对应关系。第二步遍历所有 `<playlist>` 下的 `<entry>` 节点（跳过无 entry 的 playlist，从而间接排除 bin playlist）。对每个 `<entry>` 读取其 `producer` 属性，进行两级匹配：1）直接匹配——`entry.producer` 作为 key 在映射表中查到 resource，且该 resource 包含 `expected_file`；2）间接匹配——遍历映射表，若某 producer 的 resource 包含 `expected_file`，且其 `id` 出现在 `entry.producer` 字符串中（子串包含关系）。任一匹配成功即返回 1.0；全部遍历结束仍未命中，或发生异常，则返回 0.0。"
+      },
+      {
+        "name": "check_kdenlive_clip_group",
+        "lineno": 181,
+        "description": "该函数验证“片段分组”指标。接收 `project_file_path` 与 `rule`（含 `min_groups` 和 `min_clips_in_group`，默认分别为 1 和 2）。解析 XML 后按四种方法依次检查，任一方法满足即返回 1.0，全部失败返回 0.0。方法 1：读取任意 `<playlist>` 下 `name=\"kdenlive:docproperties.groups\"` 的 `<property>`，将其文本按 JSON 解析，若为数组则统计每个对象的 `children` 长度，满足 `>= min_clips` 的组数 `>= min_groups` 即成功。方法 2：遍历非 bin 的 `<playlist>` 下的 `<entry>`，根据 `producer` 属性在全局 `<producer>` 或 `<chain>` 中查找对应元素，提取 `kdenlive:groupid` 属性值，按 group_id 聚合同一组内的剪辑引用；若存在至少 `min_groups` 个组，其剪辑数 `>= min_clips`，即成功。方法 3：直接查找 `<group>` XML 元素，统计其子节点数，满足阈值即成功。方法 4：遍历 `<playlist>` 下所有 `<property>`，若属性名包含 \"group\" 且文本非空，尝试 JSON 解析；若结果为数组且长度 `>= min_groups`，再检查其中每个字典的 `children` 或 `clips` 数组长度 `>= min_clips`，满足即成功。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_property_value",
+        "lineno": 28,
+        "description": "通用 XML 属性提取器。接收一个 `xml.etree.ElementTree.Element` 和一个 `property_name` 字符串。在该元素的所有直接子节点 `<property>` 中查找 `name` 属性与传入值相等的节点，返回其文本内容（text）；若未找到则返回 None。该函数被主函数用于从 MLT XML 的 `<producer>`、`<playlist>` 等节点中提取 `resource`、`kdenlive:docproperties.groups`、`kdenlive:groupid` 等关键字段，是连接 XML 结构与业务规则的核心解析器。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:05:37",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L2_kdenlive_383b7e01-d1e1-44ce-9eb4-ab50489a4235/evaluator_function_labels.json"
+}

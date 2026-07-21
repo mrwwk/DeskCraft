@@ -1,0 +1,132 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_ea372358-579a-4832-a721-9a5af2d054a8/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 137
+    },
+    {
+      "name": "check_inkscape_gradient",
+      "lineno": 184
+    },
+    {
+      "name": "check_inkscape_l2_gradient_shadow",
+      "lineno": 247
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 40
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 59
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 67
+    },
+    {
+      "name": "_get_float",
+      "lineno": 75
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 86
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 95
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 103
+    },
+    {
+      "name": "check_inkscape_filter",
+      "lineno": 137
+    },
+    {
+      "name": "check_inkscape_gradient",
+      "lineno": 184
+    },
+    {
+      "name": "check_inkscape_l2_gradient_shadow",
+      "lineno": 247
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape SVG编辑任务的最终产物，核心检查对象是用户保存的SVG文件。它通过解析SVG文档结构，对指定id的图形元素进行属性级验证，涵盖描边颜色与宽度、滤镜效果（如feGaussianBlur、feDropShadow）、以及填充渐变的类型与色标数量。比较过程中，颜色值会被统一规范化（例如将3位十六进制扩展为6位并转为小写），数值型属性会剥离单位后按浮点数比对并允许容差。各主函数采用二元打分（1.0表示通过，0.0表示不通过），而对于组合任务（如同时要求渐变、投影与描边），则要求所有子项检查全部满足才视为整体成功。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_stroke",
+        "lineno": 103,
+        "description": "接收svg_file_path和rule字典，rule中需包含element_id，并可包含expected_stroke与expected_stroke_width。首先调用_parse_svg解析SVG文件，若失败返回0.0。接着调用_find_element_by_id定位目标元素，若找不到返回0.0。若rule包含expected_stroke，则通过_get_style_prop获取stroke属性，经_normalize_color规范化后与预期颜色比对；若预期为none，则实际必须为none或None，否则返回0.0；若颜色不一致返回0.0。若rule包含expected_stroke_width，则通过_get_float转换预期值与实际值，默认容差tolerance为0.5，若任一值为None或绝对差值超过容差则返回0.0。全部通过返回1.0。"
+      },
+      {
+        "name": "check_inkscape_filter",
+        "lineno": 137,
+        "description": "接收svg_file_path和rule字典，rule中需包含element_id与expected_filter_type。解析SVG并查找目标元素，失败则返回0.0。通过_get_style_prop获取filter属性，使用正则url/(#([^)]+)/)提取引用的filter ID。在SVG中遍历查找id匹配的filter元素，检查其直接子元素的本地标签名是否包含expected_filter_type（不区分大小写）。若未找到，继续检查该filter元素是否通过xlink:href或href属性链接到另一个filter定义，并在链接目标中递归查找匹配的滤镜原语。任一环节找到匹配返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_gradient",
+        "lineno": 184,
+        "description": "接收svg_file_path和rule字典，rule中需包含element_id与expected_gradient_type，并可包含min_stops。解析SVG并查找目标元素，失败返回0.0。通过_get_style_prop获取fill属性，使用正则url/(#([^)]+)/)提取渐变ID。查找该ID对应的渐变元素，并沿xlink:href或href链追踪（最多5层）找到基础渐变定义。检查渐变元素或其链接目标的本地标签名是否包含expected_gradient_type（不区分大小写）。若rule指定min_stops且大于0，则统计基础渐变（或原始渐变）中标签为stop的子元素数量，若少于min_stops则返回0.0。全部满足返回1.0。"
+      },
+      {
+        "name": "check_inkscape_l2_gradient_shadow",
+        "lineno": 247,
+        "description": "接收svg_file_path和rule字典，rule中需包含gradient_check、filter_check、stroke_check三个子规则。依次调用check_inkscape_gradient、check_inkscape_filter、check_inkscape_stroke分别检查渐变、滤镜和描边。采用全部满足逻辑：只要任一子检查返回值小于1.0，立即返回0.0；仅当三项检查全部返回1.0时，才返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 24,
+        "description": "解析CSS样式字符串（如fill:#ff0000;stroke:#000），按分号分割后提取键值对，返回字典。服务于_get_style_prop等需要读取内联样式的检查逻辑。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 34,
+        "description": "规范化颜色值：将3位十六进制（如#f00）扩展为6位（#ff0000），将8位（#rrggbbaa）截断为6位（#rrggbb），统一转为小写；none保持为none；空值返回None。用于check_inkscape_stroke等函数中的颜色比对。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 48,
+        "description": "遍历SVG根节点下的所有元素，匹配id属性等于传入element_id的元素，找到则返回该元素，否则返回None。被所有需要定位特定图形元素的主函数调用。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 54,
+        "description": "优先从元素的style属性中解析指定CSS属性（通过_parse_style），若不存在则回退到该属性的直接XML属性值。用于获取stroke、filter、fill等可能以内联样式或独立属性形式存在的值。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 62,
+        "description": "将字符串安全转换为浮点数，使用正则[a-zA-Z%]+$去除末尾的单位字符（如px、mm、%）。转换失败或输入为None时返回default。用于处理stroke-width等带单位的数值属性。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 72,
+        "description": "使用xml.etree.ElementTree.parse解析SVG文件，成功返回(tree, root)元组，失败返回(None, None)。是所有主函数的入口数据读取器。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 80,
+        "description": "去除XML标签中的命名空间前缀（如{http://www.w3.org/2000/svg}rect转为rect），返回本地标签名。用于filter、gradient、stop等SVG元素的类型识别。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:44:41",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_ea372358-579a-4832-a721-9a5af2d054a8/evaluator_function_labels.json"
+}

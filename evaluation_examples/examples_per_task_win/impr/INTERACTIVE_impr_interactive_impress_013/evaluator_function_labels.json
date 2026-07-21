@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_013/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_pptx_author_info",
+      "lineno": 8
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_pptx_author_info",
+      "lineno": 8
+    },
+    {
+      "name": "_extract_presentation_text",
+      "lineno": 76
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证\"向幻灯片添加作者信息\"任务的完成质量。它不预设特定作者姓名，而是检查提交到result_path的PPTX/ODP演示文稿中是否包含任何合理的作者或联系人信息。核心检查对象是演示文稿内的全部可见文本，通过调用_extract_presentation_text提取文本后，利用多组正则表达式进行\"任一匹配即成功\"的扫描，包括职称+姓名、电子邮箱、机构隶属、显式作者标签以及双词人名fallback模式。只要文本命中任一模式即返回1.0，全部未命中则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_pptx_author_info",
+        "lineno": 8,
+        "description": "该函数接收参数result_path（从VM通过vm_file结果获取器拉取的演示文稿本地路径）。首先检查result_path是否为None或文件不存在，若不存在则返回0.0。随后调用_extract_presentation_text(filepath)提取文件全部可见文本；若返回文本为空或仅含空白字符，则返回0.0。接着对文本执行多模式正则扫描（均使用re.IGNORECASE）：依次检查职称类模式（r'Dr//s+/w+'、r'Professor/s+/w+'、r'Prof//s+/w+'）、邮箱模式（r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/.[A-Za-z]{2,}'）、机构线索模式（r'Department/s+of/s+/w+'、r'University/s+of/s+/w+'、r'Institute/s+of/s+/w+'）以及显式标签模式（r'Author/s*:'、r'Prepared/s+by/s*:'、r'Presented/s+by/s*:'、r'By/s*:'）。若任一模式匹配成功，立即记录日志并返回1.0。若上述模式均未命中，则执行fallback检查：使用区分大小写的正则r'/b[A-Z][a-z]{2,}/s+[A-Z][a-z]{2,}/b'扫描是否存在两个连续的首字母大写单词（如人名格式），若匹配则返回1.0。最终若全部失败，返回0.0。判定逻辑为\"任一满足即成功\"的单点触发机制。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_extract_presentation_text",
+        "lineno": 83,
+        "description": "该函数负责从PPTX（OOXML格式）文件中提取所有可见文本，供主函数进行作者信息正则匹配。接收参数filepath。采用双路降级提取策略：第一路尝试导入python-pptx库，加载Presentation对象后遍历所有slide、shape、text_frame、paragraph和run，收集所有run.text并以空格拼接；若提取结果非空则直接返回。若python-pptx导入失败或抛出异常，则进入第二路回退：将PPTX视为ZIP压缩包，读取所有以ppt/slides/slide开头且以.xml结尾的文件，使用xml.etree.ElementTree解析，提取命名空间http://schemas.openxmlformats.org/drawingml/2006/main下的所有<a:t>节点文本，拼接后返回。若两路均失败，返回空字符串。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:22:18",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_013/evaluator_function_labels.json"
+}

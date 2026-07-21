@@ -1,0 +1,105 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_f11a0c21-75cc-4d13-8a91-1c01b4d51001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 66
+    },
+    {
+      "name": "check_ui_bundle_required_patterns",
+      "lineno": 85
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 109
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 131
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 20
+    },
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 37
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 41
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 56
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 66
+    },
+    {
+      "name": "check_ui_bundle_required_patterns",
+      "lineno": 85
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 109
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 131
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证任务最终生成的 UI bundle（一个 zip 压缩包）是否符合预期规范。它通过四个独立的检查维度对 zip 文件进行二元评分（1.0 表示通过，0.0 表示不通过）：第一，检查 zip 内是否包含所有必需文件；第二，检查指定文本文件内是否存在符合要求的正则模式；第三，检查 manifest.json 的内容是否包含预期的字段子集；第四，检查 HTML 文件是否满足基于 CSS 选择器的结构、数量、文本、属性等条件。每个主函数各自读取 zip 包，独立执行“全部满足即通过、任一不满足或发生异常即失败”的判定逻辑，函数之间不存在加权累计，而是分别由外部调用者决定如何组合使用。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 66,
+        "description": "接收 actual（zip 文件路径字符串）和 rules（字典）。首先判断 actual 是否为空，为空直接返回 0.0。从 rules 中提取 required_files 列表，若列表为空则直接返回 1.0。随后调用 _load_ui_bundle_entries(actual) 加载 zip 内所有条目，得到规范化路径到原始路径的映射。遍历 required_files 中的每个文件路径，先经 _normalize_ui_bundle_path 规范化，再检查该路径是否存在于 zip 映射中。若任一必需文件缺失，立即返回 0.0；若加载过程中发生任何异常，也返回 0.0。只有当所有文件均存在时才返回 1.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_patterns",
+        "lineno": 85,
+        "description": "接收 actual 和 rules。actual 为空则返回 0.0。从 rules 中获取 required_file_patterns（字典，键为文件名，值为正则模式列表），若为空则返回 1.0。调用 _load_ui_bundle_entries(actual) 获取 zip 的规范化路径映射及文本内容字典。遍历 required_file_patterns 的每一项：先用 _normalize_ui_bundle_path 规范化文件名并检查其是否存在于 zip 中，缺失则返回 0.0；获取该文件的文本内容后，对其中的每个 pattern 使用 re.search(str(pattern), content, re.IGNORECASE | re.DOTALL) 进行不区分大小写且跨行的正则匹配。若任一 pattern 未匹配到，立即返回 0.0；异常时返回 0.0。全部匹配成功返回 1.0。"
+      },
+      {
+        "name": "check_ui_bundle_manifest_subset",
+        "lineno": 109,
+        "description": "接收 actual 和 rules。actual 为空返回 0.0。从 rules 中获取 expected_manifest（字典或列表等），若为 None 则返回 1.0。调用 _load_ui_bundle_entries(actual) 加载 zip，并检查规范化后的 \"manifest.json\" 是否存在于 zip 中，不存在则返回 0.0。读取 manifest.json 的文本内容并用 json.loads 解析为 Python 对象。随后调用 _is_subset(expected_manifest, manifest_obj) 判断预期 manifest 是否为实际 manifest 的子集（字典递归检查键值包含关系，列表要求完全相等，标量要求相等）。若子集关系不成立，返回 0.0；异常返回 0.0；成立则返回 1.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 131,
+        "description": "接收 actual 和 rules。actual 为空返回 0.0。从 rules 中获取 html_checks（字典，键为 HTML 文件名，值为检查项列表），若为空返回 1.0。调用 _load_ui_bundle_entries(actual) 加载 zip。对每个文件：规范化文件名并检查存在性，不存在返回 0.0；调用 _get_ui_bundle_html_soup 解析为 BeautifulSoup 对象，解析失败返回 0.0。然后遍历该文件的 checks 列表，根据 check_type 执行不同检查：selector_exists 使用 soup.select_one(selector) 检查元素是否存在，selector 为空或元素不存在则返回 0.0；selector_count 使用 soup.select(selector) 获取元素列表，检查其长度是否严格等于 check[\"count\"] 的整数值，selector 或 count 缺失也返回 0.0；selector_text_contains 使用 soup.select_one(selector) 定位元素，提取其文本（空格连接、strip）并转小写，检查 expected_text 是否被包含（不区分大小写），元素不存在或文本不包含则返回 0.0；selector_attribute_equals 使用 soup.select_one(selector) 定位元素，检查其 attribute 属性值是否严格等于 expected_value，元素不存在或值不等返回 0.0；text_present 检查 expected_text 是否出现在整个 soup 的合并文本中（不区分大小写），不包含则返回 0.0；若遇到未知的 check_type，直接返回 0.0。任一检查失败或发生异常均返回 0.0，全部通过返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 18,
+        "description": "这是一个递归子集判定器。当 expected 为 dict 时，要求 actual 也是 dict，且 expected 中的每个键都存在于 actual 中，对应值递归满足子集关系；当 expected 为 list 时，要求 expected 与 actual 完全相等；其他情况直接比较相等性。返回值语义为布尔值。该函数服务于 check_ui_bundle_manifest_subset，用于判断预期的 manifest 字段结构是否被实际的 manifest.json 完整包含。"
+      },
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 34,
+        "description": "对传入的 zip 内文件路径进行规范化处理：去除左侧的 \"/\" 前缀，并将所有反斜杠 \"//\" 替换为斜杠 \"/\"。返回值是规范化后的路径字符串。该函数被所有主函数及 _get_ui_bundle_html_soup 调用，用于统一 zip 条目路径的比对标准，避免因为路径写法差异导致匹配失败。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 37,
+        "description": "接收 actual（zip 文件路径），打开 zip 文件后执行以下操作：收集所有原始文件名并构建规范化路径到原始路径的映射（normalized_to_raw）；计算每个规范化路径对应的 file_size；对扩展名为 .html、.css、.js、.json、.md、.txt、.svg 的文件（不区分大小写），读取其原始字节并以 utf-8 解码（忽略错误），存入 text_contents 字典。最终返回三元组 (normalized_to_raw, file_sizes, text_contents)。该函数是所有主函数的入口读取器，负责将 zip 包解析为可供后续检查使用的路径映射和文本内容。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 51,
+        "description": "接收 text_contents（字典，键为规范化路径，值为文件文本）和 file_name（待查找的 HTML 文件名）。先调用 _normalize_ui_bundle_path 规范化文件名，再从 text_contents 中取出对应 HTML 文本；若文本缺失返回 None，否则使用 BeautifulSoup 以 \"html.parser\" 解析并返回 soup 对象。该函数专门服务于 check_ui_bundle_html_checks，将 HTML 文本转换为可进行 CSS 选择器查询的结构化对象。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:46:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_f11a0c21-75cc-4d13-8a91-1c01b4d51001/evaluator_function_labels.json"
+}

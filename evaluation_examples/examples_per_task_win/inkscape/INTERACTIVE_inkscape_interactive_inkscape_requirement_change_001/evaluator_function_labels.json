@@ -1,0 +1,87 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_requirement_change_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 53
+    },
+    {
+      "name": "check_inkscape_element_deleted",
+      "lineno": 75
+    },
+    {
+      "name": "check_interactive_inkscape_ii05",
+      "lineno": 92
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 109
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_find_element_by_id",
+      "lineno": 32
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 40
+    },
+    {
+      "name": "check_inkscape_text_content",
+      "lineno": 53
+    },
+    {
+      "name": "check_inkscape_element_deleted",
+      "lineno": 75
+    },
+    {
+      "name": "check_interactive_inkscape_ii05",
+      "lineno": 92
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 109
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于Inkscape交互任务interactive_inkscape_requirement_change_001，从两个独立指标验证任务完成度。指标0（II-05）检查SVG文档是否按需求变更正确修改：要求指定文本元素的内容必须与预期文本精确匹配（strip后完全相等），且指定元素必须已被彻底删除（以id遍历整棵SVG树均找不到该元素）；所有子检查必须全部通过才返回1.0，任一失败即返回0.0。指标1检查PNG导出结果：优先接收本地PNG文件路径，验证文件真实存在，若expected规则中提供了expected_width则进一步用PIL打开图片校验宽度像素值是否严格相等；同时保留对旧版vm_command_line短字符串输出的向后兼容逻辑，将输出与expected[\"expected\"]做strip后的精确字符串比对。整体采用二元打分，不满足精确条件即得0.0，全部满足得1.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_text_content",
+        "lineno": 53,
+        "description": "接收svg_file_path和rule字典（含element_id与expected_text）。首先调用_parse_svg解析SVG文件，若解析失败返回0.0；接着调用_find_element_by_id在整棵SVG树中按element_id定位目标元素，若找不到返回0.0；然后使用elem.itertext()提取该元素及其所有子孙节点的文本内容，拼接后strip，与expected_text进行精确字符串比对。实际文本与预期文本完全一致返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_element_deleted",
+        "lineno": 75,
+        "description": "接收svg_file_path和rule字典（含deleted_element_id）。首先调用_parse_svg解析SVG文件，解析失败返回0.0；然后调用_find_element_by_id在整棵SVG树中查找被标记为已删除的元素id。若元素不存在（返回None）说明删除成功，返回1.0；若元素仍存在，返回0.0。"
+      },
+      {
+        "name": "check_interactive_inkscape_ii05",
+        "lineno": 92,
+        "description": "接收svg_file_path和rule字典（可包含text_check与delete_checks）。这是II-05需求变更的复合检查，采用全部满足的串联逻辑。若rule中包含text_check，先调用check_inkscape_text_content验证文本修改，若返回值小于1.0则立即返回0.0；随后遍历rule[\"delete_checks\"]列表，对每个删除规则调用check_inkscape_element_deleted验证对应元素已删除，若任一返回值小于1.0也立即返回0.0。只有当文本检查通过且所有删除检查均通过时，才返回1.0。"
+      },
+      {
+        "name": "check_inkscape_export_file_exists",
+        "lineno": 109,
+        "description": "接收png_path、expected字典及options。首先若png_path为空返回0.0。然后处理向后兼容分支：若png_path是字符串、不是真实文件路径且strip后长度小于256，同时expected为字典且包含\"expected\"键，则将png_path.strip()与expected[\"expected\"].strip()做精确字符串比较，相等返回1.0，否则返回0.0。主路径下：若png_path不是真实文件返回0.0。若expected为字典且包含\"expected_width\"，则尝试用PIL.Image.open打开图片，比较img.width是否严格等于int(expected_width)，不匹配或打开失败均返回0.0。通过所有检查返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_find_element_by_id",
+        "lineno": 36,
+        "description": "接收SVG的root节点和element_id。通过root.iter()遍历SVG文档树中的所有元素，检查elem.get('id')是否等于传入的element_id。返回匹配到的元素对象，未找到则返回None。该函数被文本内容检查和元素删除检查复用，是SVG元素定位的核心工具。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 44,
+        "description": "接收svg_file_path。使用xml.etree.ElementTree.parse解析SVG文件，成功时返回(tree, tree.getroot())元组；若解析过程中发生任何异常，则返回(None, None)。该函数为所有SVG相关检查提供统一的文件解析入口和错误兜底。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:38:01",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_requirement_change_001/evaluator_function_labels.json"
+}

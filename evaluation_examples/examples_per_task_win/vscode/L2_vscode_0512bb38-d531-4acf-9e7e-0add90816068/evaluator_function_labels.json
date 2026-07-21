@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_0512bb38-d531-4acf-9e7e-0add90816068/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    },
+    {
+      "name": "is_extension_installed",
+      "lineno": 53
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    },
+    {
+      "name": "is_extension_installed",
+      "lineno": 53
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证VS Code相关任务的完成状态，核心检查两类对象：一是VS Code的JSON配置文件（如settings.json）内容，要求文件能被正常读取和解析，且其中必须严格包含所有预期的键值对设置，采用完全相等比较，任一缺失或不匹配即判定该检查项失败；二是VS Code扩展安装状态或相关文本输出，通过字符串包含/不包含规则，验证指定扩展标识是否出现（或不应出现）在实际输出中。两个主函数各自独立执行检查，均返回0.0到1.0的二元分数，成功要求对应检查项完全满足条件，不存在加权或累计逻辑。",
+    "main_functions": [
+      {
+        "name": "check_json_settings",
+        "lineno": 25,
+        "description": "该函数接收actual（字符串，指向待检查的JSON文件路径）和expected（字典，需包含键'expected'，其值为期望的键值对字典；代码中虽类型注解为str，实际逻辑按dict处理）。执行步骤如下：首先判断actual是否为空，为空直接返回0.0；接着尝试打开actual路径的文件并用json.load解析为JSON对象，若文件不存在、无法打开或解析失败则返回0.0；然后从expected中提取'expected'字段得到期望字典；遍历该期望字典中的每一对key-value，逐一检查解析后的实际JSON对象中是否存在同名key且值完全相等（使用!=判断）；若存在任一key缺失或值不匹配，立即返回0.0；若全部键值对均严格匹配，则返回1.0。该函数要求预期键值对全部满足，不做部分匹配、近似匹配或阈值打分。"
+      },
+      {
+        "name": "is_extension_installed",
+        "lineno": 53,
+        "description": "该函数接收actual（字符串，通常为命令输出、扩展列表文本或日志内容）和rules（字典，需包含'type'和'expected'键）。执行步骤如下：首先读取rules['type']的值；若type为'contain'，则判断rules['expected']是否出现在actual字符串中，存在返回1.0，否则返回0.0；若type为'not_contain'，则判断rules['expected']是否未出现在actual字符串中，不存在返回1.0，否则返回0.0；若type为其他值，则抛出NotImplementedError。该函数仅做简单的字符串包含性检查，区分大小写，不支持正则或模糊匹配。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:48:08",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L2_vscode_0512bb38-d531-4acf-9e7e-0add90816068/evaluator_function_labels.json"
+}

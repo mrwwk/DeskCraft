@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_e1e75309-3ddb-4d09-92ec-de869c928143/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "compare_pdfs",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 108
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "compare_pdfs",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 108
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于评测 Chrome 浏览器相关任务的完成状态，核心验证对象分为两类：一是浏览器当前活动标签页的 URL 是否符合预期，二是 PDF 文件文本内容是否与参考一致。对于标签页检查，evaluator 将实际 URL 与预期 URL 进行语义级规范化比对（去除 \"www\" 子域名、忽略顶级域名后缀、统一 scheme 与路径格式、可选丢弃查询参数），返回 1.0（匹配）或 0.0（不匹配）的离散分数。对于 PDF 检查，evaluator 使用 fitz 逐页提取全文，通过 rapidfuzz 模糊字符串匹配计算相似度，返回 0 到 1 之间的连续分数。代码中未明确体现多种指标的联合判定逻辑，三个主函数可被独立调用，各自独立返回分数，具体阈值与通过标准由外部调用方决定。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收当前 Chrome 活动标签页信息 active_tab_info（字典或字符串）和匹配规则 rule（字典）。首先检查 active_tab_info 是否为空，若为空直接返回 0.0。随后读取 rule['type']，当前仅支持 \"url\" 类型：从 rule 中提取 expected_url，从 active_tab_info 中提取 actual_url（若 active_tab_info 为字典则取 'url' 键值，否则将其视为 URL 字符串本身）。接着调用 compare_urls(expected_url, actual_url) 进行规范化 URL 比对，若返回 True 则得 1.0，否则得 0.0。若 rule['type'] 为其他未知类型，记录错误日志并返回 0.0。"
+      },
+      {
+        "name": "compare_pdfs",
+        "lineno": 82,
+        "description": "接收两个 PDF 文件路径 pdf1_path 和 pdf2_path，支持传入单个字符串或字符串列表；若输入非列表，会自动包装为单元素列表。内部定义 extract_text_from_pdf 函数，使用 fitz（PyMuPDF）打开 PDF 并逐页提取文本内容，去除首尾空白后返回。随后对两组路径按顺序配对（zip），逐对提取文本后使用 rapidfuzz.fuzz.ratio 计算文本相似度，除以 100 转换为 0 到 1 之间的分数并累加。最终返回平均分（总分除以 pdf2_path 的长度）。若某对 PDF 处理过程中发生异常，会记录错误日志，但该对 PDF 不参与计分（异常时 score 不增加）。判定依据是文本模糊匹配分数，1.0 表示文本完全相同，0.0 表示完全不同。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 108,
+        "description": "接收两个 URL 字符串 url1、url2，以及可选参数 full（默认为 True）。若任一 URL 为 None，直接进行相等性比较（返回 url1 == url2）。否则进入规范化流程：内部定义 parse_with_default_scheme 函数，使用正则表达式检查 URL 是否包含 scheme，若无则自动添加 \"http://\" 前缀；内部定义 normalize_url 函数，使用 urlparse 解析 URL 结构，利用 tldextract 提取域名组成部分，强制去除唯一子域名 \"www\"，并完全忽略顶级域名后缀（如 .com 或 .com.sg 均被忽略，仅保留主域名），将根路径 \"/\" 规范为空字符串，scheme 转为小写，按 full 参数决定是否保留 params、query 和 fragment（默认 full=True 时保留），最后通过 urlunparse 重新组装为规范化 URL。最终比较两个规范化后的 URL 字符串是否完全相等，返回布尔值。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:10:30",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_e1e75309-3ddb-4d09-92ec-de869c928143/evaluator_function_labels.json"
+}

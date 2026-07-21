@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_a68611d8-9bba-40d8-9243-903c3480ba25/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender渲染任务完成后，场景的渲染设置是否符合预期要求。它通过读取Blender检查脚本输出的JSON文本，解析出引擎（engine）、水平分辨率（resolution_x）、垂直分辨率（resolution_y）、帧率（fps）、采样数（samples）、图像格式（image_format）和活动相机（active_camera）等参数，并与rule中指定的期望值进行严格相等比对。只有当rule中列出的所有字段全部匹配成功时，才判定任务完成并返回1.0分；若任一指定字段不匹配、JSON解析失败或发生异常，则返回0.0分。检查逻辑采用“全部满足”的硬判定模式，不存在加权或部分得分。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "该函数接收两个参数：command_output为Blender检查脚本输出的原始JSON字符串，rule为包含期望渲染参数的字典。首先调用_parse_blender_output将原始输出解析为字典；若解析失败则直接返回0.0。随后针对rule中可能出现的7个键（engine、resolution_x、resolution_y、fps、samples、image_format、active_camera），依次检查result字典中对应字段的值是否与rule中的期望值严格相等。检查顺序按checks字典固定顺序执行，一旦发现任一指定字段不匹配，立即记录警告并返回0.0；若所有指定字段均通过，则返回1.0。整个过程中任何异常都会被捕获并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 21,
+        "description": "该函数接收Blender检查脚本的原始命令输出字符串，先判断其是否为空或仅含空白字符，若为空则记录错误并返回None。否则对字符串去除首尾空白后使用json.loads解析为Python字典。若解析过程中抛出json.JSONDecodeError或ValueError，则记录错误及原始输出调试信息，并返回None。该函数为check_blender_render_settings提供前置数据解析服务，将原始文本转换为结构化数据，供后续字段级严格比对使用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:35:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_a68611d8-9bba-40d8-9243-903c3480ba25/evaluator_function_labels.json"
+}

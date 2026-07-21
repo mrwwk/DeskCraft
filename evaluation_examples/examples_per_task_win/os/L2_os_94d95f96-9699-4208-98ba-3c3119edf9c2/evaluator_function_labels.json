@@ -1,0 +1,585 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_94d95f96-9699-4208-98ba-3c3119edf9c2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_gnome_favorite_apps",
+      "lineno": 12
+    },
+    {
+      "name": "is_utc_0",
+      "lineno": 28
+    },
+    {
+      "name": "check_text_enlarged",
+      "lineno": 36
+    },
+    {
+      "name": "check_moved_jpgs",
+      "lineno": 44
+    },
+    {
+      "name": "is_in_vm_clickboard",
+      "lineno": 57
+    },
+    {
+      "name": "check_os_timezone_utc",
+      "lineno": 83
+    },
+    {
+      "name": "check_os_gnome_favorites",
+      "lineno": 105
+    },
+    {
+      "name": "check_os_accessibility",
+      "lineno": 126
+    },
+    {
+      "name": "check_os_screen_lock",
+      "lineno": 153
+    },
+    {
+      "name": "check_os_night_light",
+      "lineno": 175
+    },
+    {
+      "name": "check_os_notifications",
+      "lineno": 195
+    },
+    {
+      "name": "check_os_power_settings",
+      "lineno": 215
+    },
+    {
+      "name": "check_os_battery_config",
+      "lineno": 235
+    },
+    {
+      "name": "check_os_audio_config",
+      "lineno": 260
+    },
+    {
+      "name": "check_os_file_manifest",
+      "lineno": 284
+    },
+    {
+      "name": "check_os_file_operations",
+      "lineno": 302
+    },
+    {
+      "name": "check_os_file_permissions",
+      "lineno": 321
+    },
+    {
+      "name": "check_os_copy_filter",
+      "lineno": 340
+    },
+    {
+      "name": "check_os_dir_hierarchy",
+      "lineno": 363
+    },
+    {
+      "name": "check_os_compress_logs",
+      "lineno": 383
+    },
+    {
+      "name": "check_os_deploy_files",
+      "lineno": 401
+    },
+    {
+      "name": "check_os_trash_recovery",
+      "lineno": 419
+    },
+    {
+      "name": "check_os_rename_dirs",
+      "lineno": 437
+    },
+    {
+      "name": "check_os_terminal_size",
+      "lineno": 459
+    },
+    {
+      "name": "check_os_python_alias",
+      "lineno": 479
+    },
+    {
+      "name": "check_os_php_line_count",
+      "lineno": 498
+    },
+    {
+      "name": "check_os_text_transform",
+      "lineno": 516
+    },
+    {
+      "name": "check_os_meeting_template",
+      "lineno": 534
+    },
+    {
+      "name": "check_os_bluetooth_service",
+      "lineno": 555
+    },
+    {
+      "name": "check_os_install_local_app",
+      "lineno": 575
+    },
+    {
+      "name": "check_os_switch_user",
+      "lineno": 596
+    },
+    {
+      "name": "check_os_sftp_user",
+      "lineno": 615
+    },
+    {
+      "name": "check_os_extract_services",
+      "lineno": 639
+    },
+    {
+      "name": "check_os_recent_manifest",
+      "lineno": 657
+    },
+    {
+      "name": "check_os_cron_job",
+      "lineno": 679
+    },
+    {
+      "name": "check_os_disk_cleanup",
+      "lineno": 702
+    },
+    {
+      "name": "check_os_batch_extract",
+      "lineno": 719
+    },
+    {
+      "name": "check_os_hosts_block",
+      "lineno": 736
+    },
+    {
+      "name": "check_os_systemd_timer_basic",
+      "lineno": 754
+    },
+    {
+      "name": "check_os_quota_dirs",
+      "lineno": 777
+    },
+    {
+      "name": "check_os_log_rotate_pipeline",
+      "lineno": 794
+    },
+    {
+      "name": "check_os_systemd_custom_service",
+      "lineno": 812
+    },
+    {
+      "name": "check_os_firewall_rules",
+      "lineno": 830
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_gnome_favorite_apps",
+      "lineno": 12
+    },
+    {
+      "name": "is_utc_0",
+      "lineno": 28
+    },
+    {
+      "name": "check_text_enlarged",
+      "lineno": 36
+    },
+    {
+      "name": "check_moved_jpgs",
+      "lineno": 44
+    },
+    {
+      "name": "is_in_vm_clickboard",
+      "lineno": 57
+    },
+    {
+      "name": "_parse_kv",
+      "lineno": 66
+    },
+    {
+      "name": "check_os_timezone_utc",
+      "lineno": 83
+    },
+    {
+      "name": "check_os_gnome_favorites",
+      "lineno": 105
+    },
+    {
+      "name": "check_os_accessibility",
+      "lineno": 126
+    },
+    {
+      "name": "check_os_screen_lock",
+      "lineno": 153
+    },
+    {
+      "name": "check_os_night_light",
+      "lineno": 175
+    },
+    {
+      "name": "check_os_notifications",
+      "lineno": 195
+    },
+    {
+      "name": "check_os_power_settings",
+      "lineno": 215
+    },
+    {
+      "name": "check_os_battery_config",
+      "lineno": 235
+    },
+    {
+      "name": "check_os_audio_config",
+      "lineno": 260
+    },
+    {
+      "name": "check_os_file_manifest",
+      "lineno": 284
+    },
+    {
+      "name": "check_os_file_operations",
+      "lineno": 302
+    },
+    {
+      "name": "check_os_file_permissions",
+      "lineno": 321
+    },
+    {
+      "name": "check_os_copy_filter",
+      "lineno": 340
+    },
+    {
+      "name": "check_os_dir_hierarchy",
+      "lineno": 363
+    },
+    {
+      "name": "check_os_compress_logs",
+      "lineno": 383
+    },
+    {
+      "name": "check_os_deploy_files",
+      "lineno": 401
+    },
+    {
+      "name": "check_os_trash_recovery",
+      "lineno": 419
+    },
+    {
+      "name": "check_os_rename_dirs",
+      "lineno": 437
+    },
+    {
+      "name": "check_os_terminal_size",
+      "lineno": 459
+    },
+    {
+      "name": "check_os_python_alias",
+      "lineno": 479
+    },
+    {
+      "name": "check_os_php_line_count",
+      "lineno": 498
+    },
+    {
+      "name": "check_os_text_transform",
+      "lineno": 516
+    },
+    {
+      "name": "check_os_meeting_template",
+      "lineno": 534
+    },
+    {
+      "name": "check_os_bluetooth_service",
+      "lineno": 555
+    },
+    {
+      "name": "check_os_install_local_app",
+      "lineno": 575
+    },
+    {
+      "name": "check_os_switch_user",
+      "lineno": 596
+    },
+    {
+      "name": "check_os_sftp_user",
+      "lineno": 615
+    },
+    {
+      "name": "check_os_extract_services",
+      "lineno": 639
+    },
+    {
+      "name": "check_os_recent_manifest",
+      "lineno": 657
+    },
+    {
+      "name": "check_os_cron_job",
+      "lineno": 679
+    },
+    {
+      "name": "check_os_disk_cleanup",
+      "lineno": 702
+    },
+    {
+      "name": "check_os_batch_extract",
+      "lineno": 719
+    },
+    {
+      "name": "check_os_hosts_block",
+      "lineno": 736
+    },
+    {
+      "name": "check_os_systemd_timer_basic",
+      "lineno": 754
+    },
+    {
+      "name": "check_os_quota_dirs",
+      "lineno": 777
+    },
+    {
+      "name": "check_os_log_rotate_pipeline",
+      "lineno": 794
+    },
+    {
+      "name": "check_os_systemd_custom_service",
+      "lineno": 812
+    },
+    {
+      "name": "check_os_firewall_rules",
+      "lineno": 830
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Linux 桌面环境（GNOME）及系统管理任务的执行结果。其核心机制是通过 shell 采集器获取系统状态或文件内容的文本输出，利用 _parse_kv 将 key=value 格式解析为字典，或直接对原始文本进行精确匹配。检查范围涵盖四大类：A. GNOME 桌面设置（时区、收藏夹应用顺序、无障碍参数、屏幕锁、夜间模式、通知、电源、电池显示、音频）；B. 文件系统操作（文件清单内容、文件存在性与内容、权限模式、复制/移动过滤、目录层级、压缩日志、多目录部署、回收站恢复、重命名）；C. Shell/终端环境（终端尺寸持久化、Python 别名、PHP 行数统计、文本转换、会议模板）；D. 系统管理与服务（蓝牙服务、本地应用安装、用户切换、SFTP 用户、cron 任务、磁盘清理、批量解压、hosts 拦截、systemd 定时器与服务、目录配额、日志轮转流水线、防火墙规则）。判定逻辑以二元“全部满足”为主：所有指定字段必须与预期值完全相等，任一条件失败即返回 0.0，全部通过返回 1.0。部分遗留函数返回整数 0 或 1。无加权或累计打分逻辑。",
+    "main_functions": [
+      {
+        "name": "check_gnome_favorite_apps",
+        "lineno": 12,
+        "description": "接收 apps_str 字符串与 rule 字典。使用 eval 将 apps_str 解析为 Python 列表，与 rule['expected'] 进行比对。检查步骤：1) 比较两个列表长度是否相等；2) 使用 set 比较两个列表的元素集合是否完全相等（不考虑顺序）。判定：两项均满足返回 1，否则返回 0。"
+      },
+      {
+        "name": "is_utc_0",
+        "lineno": 28,
+        "description": "接收 timedatectl_output 字符串。检查步骤：将输出按换行符分割，取索引为 3 的第 4 行，判断该行是否以 '+0000)' 结尾。判定：若结尾匹配返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_text_enlarged",
+        "lineno": 36,
+        "description": "接收 scaling_factor_str 字符串。检查步骤：将其转换为 float 类型的 scaling_factor，判断该值是否大于 1.0。判定：大于 1.0 返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_moved_jpgs",
+        "lineno": 44,
+        "description": "接收 directory_list 字典与 rule 字典。检查步骤：从 directory_list['children'] 中提取每个 node 的 name 字段，组成 moved_jpgs 列表；与 rule['expected'] 比较长度是否相等；再用 set 比较两个列表的元素集合是否完全相等。判定：长度与集合均匹配返回 1，否则返回 0。"
+      },
+      {
+        "name": "is_in_vm_clickboard",
+        "lineno": 57,
+        "description": "接收 config 与 terminal_output 两个参数。函数体内仅执行 print 打印 terminal_output，未实现任何返回评分或断言的逻辑。代码中未明确体现判定依据与返回值语义。"
+      },
+      {
+        "name": "check_os_timezone_utc",
+        "lineno": 83,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['timezone'] 必须等于 rules['timezone']（默认值为 'Etc/UTC'）；2) kv['ntp'] 必须等于 rules['ntp']（默认值为 'active'）；3) kv['file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，任一不满足返回 0.0。"
+      },
+      {
+        "name": "check_os_gnome_favorites",
+        "lineno": 105,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['file_ok'] 必须为 'true'；2) 使用 ast.literal_eval 将 kv['favorites']（默认为 '[]'）解析为列表；3) 将该列表与 rules['expected_apps']（默认为 []）进行精确顺序比较（==）。判定：完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_accessibility",
+        "lineno": 126,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) 将 kv['text_scale'] 转为 float，必须大于等于 rules['min_text_scale']（默认 1.2）；2) 将 kv['cursor_size'] 转为 int，必须大于等于 rules['min_cursor_size']（默认 48）；3) kv['mag_enabled'] 必须等于 'true'；4) 将 kv['mag_factor'] 转为 float，必须大于 rules['min_mag_factor']（默认 1.5）。判定：四项全部满足返回 1.0，任一不满足返回 0.0。"
+      },
+      {
+        "name": "check_os_screen_lock",
+        "lineno": 153,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['lock_enabled'] 必须等于 rules['lock_enabled']（默认 'true'）；2) kv['idle_delay'] 必须等于 rules['idle_delay']（默认 '300'）；3) kv['lock_delay'] 必须等于 rules['lock_delay']（默认 '0'）；4) kv['file_ok'] 必须等于 'true'。判定：四项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_night_light",
+        "lineno": 175,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['enabled'] 必须等于 rules['enabled']（默认 'true'）；2) kv['temperature'] 必须等于 rules['temperature']（默认 '3700'）；3) kv['file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_notifications",
+        "lineno": 195,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['show_banners'] 必须等于 rules['show_banners']（默认 'false'）；2) kv['show_in_lock_screen'] 必须等于 rules['show_in_lock_screen']（默认 'false'）；3) kv['file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_power_settings",
+        "lineno": 215,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['idle_dim'] 必须等于 rules['idle_dim']（默认 'false'）；2) kv['idle_delay'] 必须等于 rules['idle_delay']（默认 '0'）；3) kv['file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_battery_config",
+        "lineno": 235,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['show_battery'] 必须等于 rules['show_battery']（默认 'true'）；2) 若 rules 中存在 'power_profile'，则 kv['power_profile'] 必须与其精确相等；3) 若 rules 中存在 'allowed_power_profiles'，则 kv['power_profile'] 必须位于该允许列表内；4) kv['file_ok'] 必须等于 'true'。判定：全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_audio_config",
+        "lineno": 260,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['volume'] 必须等于 rules['volume']（默认 '100'）；2) kv['mute'] 必须等于 rules['mute']（默认 'no'）；3) kv['sink_file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_file_manifest",
+        "lineno": 284,
+        "description": "接收 result 字符串与 rules 字典。检查步骤：若 result 为 None 直接返回 0.0；否则将 result.strip() 与 rules['expected'].strip() 进行完全相等的字符串比较。判定：完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_file_operations",
+        "lineno": 302,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典中的每一对 key 与 expected_val，逐一检查 kv[key] 是否精确等于 expected_val。判定：所有检查项全部匹配返回 1.0，任一不匹配返回 0.0。"
+      },
+      {
+        "name": "check_os_file_permissions",
+        "lineno": 321,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['permissions'] 字典，对每个文件名 fname 构造键名 perm_{fname}，检查 kv 中该键值是否精确等于期望的权限模式（如 '640'、'755'）。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_copy_filter",
+        "lineno": 340,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) 遍历 rules['present'] 列表，对每个文件名 f 检查 present_{f} 是否等于 'true'；2) 遍历 rules['absent'] 列表，对每个文件名 f 检查 absent_{f} 是否等于 'true'；3) 遍历 rules['extra_checks'] 字典，检查对应 key 的值是否精确匹配。判定：全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_dir_hierarchy",
+        "lineno": 363,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) 遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected_val；2) 若 rules 中存在 'manifest_match' 且其布尔值为真，则额外检查 kv['manifest_match'] 是否等于 'true'。判定：全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_compress_logs",
+        "lineno": 383,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected_val。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_deploy_files",
+        "lineno": 401,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected_val。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_trash_recovery",
+        "lineno": 419,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected_val。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_rename_dirs",
+        "lineno": 437,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected_val。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_terminal_size",
+        "lineno": 459,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['size_ok'] 必须等于 'true'；2) kv['backup_ok'] 必须等于 'true'；3) kv['bashrc_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_python_alias",
+        "lineno": 479,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['python_ok'] 必须等于 'true'；2) kv['pip_ok'] 必须等于 'true'；3) kv['file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_php_line_count",
+        "lineno": 498,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['file_exists'] 必须等于 'true'；2) kv['content_ok'] 必须等于 'true'。判定：两项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_text_transform",
+        "lineno": 516,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['output_ok'] 必须等于 'true'；2) kv['summary_ok'] 必须等于 'true'。判定：两项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_meeting_template",
+        "lineno": 534,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['template_ok'] 必须等于 'true'；2) kv['status_ok'] 必须等于 'true'。判定：两项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_bluetooth_service",
+        "lineno": 555,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['enabled'] 必须等于 rules['enabled']（默认 'enabled'）；2) kv['active'] 必须等于 rules['active']（默认 'active'）；3) kv['file_ok'] 必须等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_install_local_app",
+        "lineno": 575,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['binary_ok'] 等于 'true'；2) kv['launcher_ok'] 等于 'true'；3) kv['desktop_ok'] 等于 'true'；4) kv['version_ok'] 等于 'true'。判定：四项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_switch_user",
+        "lineno": 596,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：1) kv['file_exists'] 等于 'true'；2) kv['content_ok'] 等于 'true'；3) kv['owner_ok'] 等于 'true'。判定：三项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_sftp_user",
+        "lineno": 615,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤分两支：若 rules['checks'] 存在且非空，则遍历该字典，逐一比较 kv[key] 是否精确等于 expected；若不存在，则强制检查 group_ok、user_ok、home_ok、shell_ok、home_perm_ok、upload_perm_ok 是否均等于 'true'。判定：对应分支下全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_extract_services",
+        "lineno": 639,
+        "description": "接收 result 字符串与 rules 字典。检查步骤：若 result 为 None 返回 0.0；否则将 result.strip() 与 rules['expected'].strip() 进行完全相等的字符串比较。判定：完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_recent_manifest",
+        "lineno": 657,
+        "description": "接收 result 字符串与 rules 字典。检查步骤：若 result 为 None 返回 0.0；否则将 result.strip() 与 rules['expected'].strip() 进行完全相等的字符串比较。判定：完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_cron_job",
+        "lineno": 679,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤分两支：若 rules['checks'] 存在且非空，则遍历该字典逐一比较 kv[key] 是否精确等于 expected；若不存在，则默认检查 cron_exists、schedule_ok、command_ok、output_ok 是否均等于 'true'。判定：对应分支下全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_disk_cleanup",
+        "lineno": 702,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_batch_extract",
+        "lineno": 719,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_hosts_block",
+        "lineno": 736,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_systemd_timer_basic",
+        "lineno": 754,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤分两支：若 rules['checks'] 存在且非空，则遍历该字典逐一比较 kv[key] 是否精确等于 expected；若不存在，则默认检查 service_file_ok、timer_file_ok、timer_enabled、timer_active 是否均等于 'true'。判定：对应分支下全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_quota_dirs",
+        "lineno": 777,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_log_rotate_pipeline",
+        "lineno": 794,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_systemd_custom_service",
+        "lineno": 812,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_firewall_rules",
+        "lineno": 830,
+        "description": "接收 result 字符串与 rules 字典。调用 _parse_kv 解析出字典 kv。检查步骤：遍历 rules['checks'] 字典，逐一比较 kv[key] 是否精确等于 expected。判定：全部匹配返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 66,
+        "description": "接收 output 字符串，将其按行分割，对每一行去除首尾空白后，以第一个等号为界分割为键和值，再去除键值两端的空白，存入字典并返回。若 output 为空或 None，返回空字典。该函数是绝大多数 check_os_* 主函数的基础解析器，负责将 shell 采集器输出的 'key=value' 文本转换为可供精确查找的字典结构。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:34:31",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_94d95f96-9699-4208-98ba-3c3119edf9c2/evaluator_function_labels.json"
+}

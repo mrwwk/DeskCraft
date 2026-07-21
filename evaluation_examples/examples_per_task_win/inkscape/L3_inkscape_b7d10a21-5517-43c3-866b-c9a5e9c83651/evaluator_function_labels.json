@@ -1,0 +1,158 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_b7d10a21-5517-43c3-866b-c9a5e9c83651/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 94
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 127
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 161
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 226
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 264
+    },
+    {
+      "name": "check_inkscape_infographic_rebrand",
+      "lineno": 275
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_get_float",
+      "lineno": 66
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 77
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 86
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 94
+    },
+    {
+      "name": "check_inkscape_stroke",
+      "lineno": 127
+    },
+    {
+      "name": "check_inkscape_text_style",
+      "lineno": 161
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 226
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 264
+    },
+    {
+      "name": "check_inkscape_infographic_rebrand",
+      "lineno": 275
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape相关任务产出的SVG文件是否满足指定的视觉与文档属性要求，以及导出文件是否成功生成。核心检查对象包括：SVG元素的填充颜色、描边颜色与宽度、文本字体样式（大小、粗细、斜体、字体族、填充色）、文档尺寸（宽度与高度）。检查方式是通过xml.etree.ElementTree解析SVG XML，按element_id定位目标元素，读取inline style或直接属性，经规范化或数值转换后与期望值比较。颜色采用严格匹配（经_normalize_color规范化后），数值型属性（如stroke-width、font-size、文档宽高）采用容差近似匹配，字体族采用去除引号后的子串包含匹配。对于综合性任务（如infographic重品牌），采用多维度联合判定，所有子检查必须全部通过才视为成功。导出文件存在性通过比对命令行输出字符串与期望值（默认\"OK\"）的严格相等性来判断。任一检查失败即返回0.0，全部通过返回1.0。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 94,
+        "description": "接收svg_file_path与rule（含element_id、expected_fill）。首先调用_parse_svg解析SVG文件，解析失败返回0.0；接着调用_find_element_by_id按element_id定位元素，未找到返回0.0；然后调用_get_style_prop获取该元素的fill属性，若元素标签为text且自身无fill，则遍历其tspan子元素继续查找fill。实际值与期望值均经_normalize_color规范化。若期望为'none'，要求实际严格等于'none'；否则要求二者严格相等。满足返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_stroke",
+        "lineno": 127,
+        "description": "接收svg_file_path与rule（含element_id，可选expected_stroke、expected_stroke_width）。先调用_parse_svg解析SVG并调用_find_element_by_id定位元素，任一失败返回0.0。若rule包含expected_stroke，对实际值与期望值均调用_normalize_color：期望为'none'时要求实际为'none'或None；否则要求严格相等，不符即返回0.0。若rule包含expected_stroke_width，使用_get_float转换期望与实际值，默认容差tolerance为0.5，若绝对差值超过容差则返回0.0。所有项通过返回1.0。"
+      },
+      {
+        "name": "check_inkscape_text_style",
+        "lineno": 161,
+        "description": "接收svg_file_path与rule（含element_id，可选expected_font_size、expected_font_weight、expected_font_style、expected_font_family、expected_fill）。解析SVG并定位元素，失败返回0.0。内部通过_get_text_style从元素或其tspan子元素获取样式属性。各项检查如下：font-size使用_get_float转换，实际与期望差值大于2则失败；font-weight中，期望bold要求实际为bold或700，期望normal要求实际为normal、400、空字符串或None；font-style要求严格匹配；font-family去除单双引号后转小写，要求期望字符串为实际字符串的子串；fill使用_normalize_color严格匹配。任一条件失败返回0.0，全部通过返回1.0。"
+      },
+      {
+        "name": "check_inkscape_document_properties",
+        "lineno": 226,
+        "description": "接收svg_file_path与rule（可选expected_width、expected_height）。调用_parse_svg解析SVG，失败返回0.0。对于width，优先读取root的width属性，若缺失则从viewBox属性字符串中按空白分割取第3个值；对于height，优先读取root的height属性，若缺失则从viewBox取第4个值。使用_get_float转换后与期望值比较，宽或高的绝对差值大于5即返回0.0。通过返回1.0。"
+      },
+      {
+        "name": "check_inkscape_export_file_exists",
+        "lineno": 264,
+        "description": "接收result_str（通常为vm_command_line的标准输出）与rule（含expected，默认值为\"OK\"）。对result_str与expected分别执行strip后进行严格字符串相等比较。若相等返回1.0，否则返回0.0。用于判断导出文件是否已在目标路径生成。"
+      },
+      {
+        "name": "check_inkscape_infographic_rebrand",
+        "lineno": 275,
+        "description": "接收svg_file_path与rule（含fill_checks列表，可选text_check、doc_check、stroke_check）。属于组合式检查，要求所有子项全部满足。执行顺序为：遍历fill_checks中每个子规则并调用check_inkscape_fill_color，任一返回值小于1.0则整体返回0.0；若存在text_check，调用check_inkscape_text_style；若存在doc_check，调用check_inkscape_document_properties；若存在stroke_check，调用check_inkscape_stroke。任一子检查返回值小于1.0即返回0.0，全部通过返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 14,
+        "description": "将CSS样式字符串（如\"fill:#ff0000;stroke:#000\"）按分号分割为多个部分，再按冒号拆分为键值对，去除空白后返回字典。供_get_style_prop调用，用于解析SVG元素的inline style属性。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 24,
+        "description": "规范化颜色字符串：去除空白并转小写；3位十六进制如#f00扩展为6位#ff0000；8位#rrggbbaa截断为前6位#rrggbb；保留'none'不变；具名颜色原样返回。供check_inkscape_fill_color、check_inkscape_stroke、check_inkscape_text_style等颜色比较逻辑复用。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 40,
+        "description": "遍历SVG根节点的所有后代元素（root.iter()），查找id属性等于给定element_id的元素，找到则返回该元素，否则返回None。供所有需要按id精确定位SVG元素的主函数使用。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 47,
+        "description": "优先通过_parse_style解析元素的style属性字符串以获取指定属性值；若inline style中不存在该属性，则回退到元素的直接属性（elem.get(prop)）。供主函数获取fill、stroke、font-size等样式值。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 54,
+        "description": "安全将输入值转为浮点数。若值为None返回default；否则使用正则re.sub(r'[a-zA-Z%]+$', '', ...)去除末尾的单位字符（如px、mm等），再尝试float转换。转换失败返回default。供所有数值型属性（stroke-width、font-size、文档宽高）比较时复用。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 65,
+        "description": "使用xml.etree.ElementTree.parse解析指定路径的SVG文件，返回(tree, root)元组；若发生任何异常则返回(None, None)。供所有需要读取SVG文件的主函数作为数据入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 73,
+        "description": "处理带XML命名空间的标签名（如\"{http://www.w3.org/2000/svg}text\"），提取并返回本地标签名（如\"text\"）。用于判断元素类型是否为text或tspan，以决定是否需要遍历子元素获取样式。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:49:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_b7d10a21-5517-43c3-866b-c9a5e9c83651/evaluator_function_labels.json"
+}

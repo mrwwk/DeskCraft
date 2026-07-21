@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_6f56bf42-85b8-4fbb-8e06-6c44960184ba/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_deploy_files",
+      "lineno": 19
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 6
+    },
+    {
+      "name": "check_os_deploy_files",
+      "lineno": 19
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证文件批量部署到多节点目录的最终聚合状态。核心检查对象是外部shell收集器动态枚举所有node*目录（排除/backup/路径）后，预先检查文件存在性、内容一致性（cmp）、权限是否为600、以及修改时间（mtime）是否保留，并将结果汇总为若干布尔标志（如all_nodes_ok、no_backup_node4、no_backup_deep）以key=value形式输出。evaluator读取这些聚合标志，与rules.checks中预期的字符串值进行精确匹配。判定逻辑为“全部满足”：仅当checks中所有指定的键值对完全等于预期值时返回1.0，任一项不匹配或发生异常则返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_os_deploy_files",
+        "lineno": 19,
+        "description": "该函数接收shell收集器返回的result字符串与包含预期规则的rules字典。首先调用辅助函数_parse_kv将result按key=value格式解析为字典kv；随后从rules中提取checks子字典，遍历其中每一对key与expected_val；依次检查kv中对应key的值是否与expected_val完全相等。其检查对象是外部shell已预先验证过的聚合标志，涵盖多节点文件部署一致性、backup节点排除情况等。判定依据为严格的“全部满足”逻辑：遍历过程中若发现任一键值不匹配，立即返回0.0；若全部匹配则返回1.0。若解析或比较过程中抛出任何异常，同样返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 6,
+        "description": "该函数接收shell输出的字符串output，将其按换行符拆分为多行，对每行去除首尾空白后，检查是否包含等号\"=\"；若包含，则以第一个等号为界将行分割为键k和值v，分别去除首尾空白后存入结果字典。它忽略空行、不含等号的行以及原始空字符串。返回值为包含所有解析键值对的字典。该函数服务于主评测逻辑，负责将shell的文本输出转换为结构化字典，以便后续进行精确的键值相等比较。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:37:04",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_6f56bf42-85b8-4fbb-8e06-6c44960184ba/evaluator_function_labels.json"
+}

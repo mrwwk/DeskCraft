@@ -1,0 +1,146 @@
+{
+  "id": "interactive_inkscape_social_cover_ambiguous_001",
+  "snapshot": "inkscape",
+  "interactive": true,
+  "scenario_type": "ambiguous_instruction",
+  "scenario_description": "内容创作者先给模糊目标，再补齐平台尺寸和文案，最终产出社媒封面图。",
+  "user_persona": {
+    "expertise_level": "beginner",
+    "communication_style": "casual_chinese"
+  },
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/svg/export_test.svg",
+            "path": "/home/user/Documents/export_test.svg"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/inkscape",
+          "/home/user/Documents/export_test.svg"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": 1,
+      "instruction": "帮我做个小红书封面，吸睛一点。",
+      "trigger": {
+        "type": "agent_asks"
+      }
+    },
+    {
+      "phase_id": 2,
+      "instruction": "具体要求：画布改成 1080x1440，把 scene_title 改成 春季露营清单，并新增一行副文案 5件装备不踩坑。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    },
+    {
+      "phase_id": 3,
+      "instruction": "再加一个角标文案 收藏备用，然后导出到/home/user/Desktop/cover_final.png，并保存 SVG。",
+      "trigger": {
+        "type": "agent_done"
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "inkscape"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_inkscape_document_properties",
+      "check_inkscape_text_content",
+      "check_inkscape_text_element",
+      "check_inkscape_text_element",
+      "check_png_dimensions"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/export_test.svg",
+        "dest": "interactive_inkscape_social_cover_ambiguous_001_doc.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/export_test.svg",
+        "dest": "interactive_inkscape_social_cover_ambiguous_001_title.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/export_test.svg",
+        "dest": "interactive_inkscape_social_cover_ambiguous_001_subtitle.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/export_test.svg",
+        "dest": "interactive_inkscape_social_cover_ambiguous_001_badge.svg"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Desktop/cover_final.png",
+        "dest": "cover_final.png"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_width": "1080",
+          "expected_height": "1440"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "element_id": "scene_title",
+          "expected_text": "春季露营清单"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_text": "5件装备不踩坑"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_text": "收藏备用",
+          "region": "top_right"
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_width": 1080,
+          "expected_height": 1440
+        }
+      }
+    ],
+    "file": "evaluator.py"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3",
+  "source": "真实需求原型：社媒封面从模糊需求到定稿"
+}

@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_23393935-50c7-4a86-aeea-2b78fd089c5c/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_file_operations",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_file_operations",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统文件操作类任务的执行结果。它通过读取shell收集器输出的key=value格式文本，将其解析为键值对后，与预设规则中的多项检查条件进行精确比对。核心检查对象是文件的存在性、缺失性或内容等状态（由外部收集器转换为键值对形式传入），主要比较方式为字符串完全相等匹配。只有当rules中声明的所有检查项（checks）的键和值都完全匹配时，才判定任务成功并返回1.0；任一项不匹配或发生异常，则返回0.0。这是一种\"全部满足\"式的二元打分逻辑。",
+    "main_functions": [
+      {
+        "name": "check_os_file_operations",
+        "lineno": 31,
+        "description": "该主函数接收两个参数：result（shell收集器输出的原始字符串）和rules（包含预期检查条件的字典）。其执行步骤如下：首先调用辅助函数_parse_kv将result按行解析为键值对字典；然后从rules中提取checks字典（默认为空）；接着遍历checks中的每一个键值对，使用kv.get(key)与expected_val进行严格相等比较。如果所有检查项的值都与解析结果完全一致，则返回1.0表示成功；若在遍历过程中发现任一键的值不匹配，立即返回0.0表示失败。此外，整个逻辑被try-except包裹，若解析或比较过程中抛出任何异常，也会捕获异常并返回0.0。该函数要求所有检查条件必须同时满足，不存在部分得分或近似匹配。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 14,
+        "description": "该辅助函数负责将shell命令输出的原始文本（key=value格式）转换为Python字典。具体处理流程为：若输入为空则返回空字典；否则按换行符分割文本，逐行去除首尾空白后，检查是否包含'='字符；若存在，则以第一个'='为界将行拆分为键和值，并分别去除首尾空白后存入字典。该函数被check_os_file_operations调用，用于将收集器返回的原始字符串预处理为可供精确比对的键值映射结构。返回值语义为：键是检查项标识，值是收集器报告的实际状态字符串。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:36:37",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_23393935-50c7-4a86-aeea-2b78fd089c5c/evaluator_function_labels.json"
+}

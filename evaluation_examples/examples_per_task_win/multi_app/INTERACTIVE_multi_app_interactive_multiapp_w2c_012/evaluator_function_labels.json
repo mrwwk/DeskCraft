@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_012/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 的核心评测逻辑是对任务产出的字符串结果进行基于规则的包含与排除检查。它接收一个待验证的字符串 result 以及包含 include/exclude 规则的字典，判定该字符串是否同时满足“包含所有必须出现的子串”且“不包含任何禁止出现的子串”。若满足则返回 1.0，不满足则返回 0.0，属于二值化打分逻辑；若 result 为 None 则直接判定失败。代码头部虽导入了 csv、pdfplumber、docx、yaml、lxml、sqlite3、rapidfuzz 等大量与文档解析、数据提取、模糊匹配相关的库，但在当前提供的代码片段中未明确体现这些库是否被用于读取文件、解析 PDF/Word/网页、查询数据库或进行模糊相似度计算等更复杂的评测环节，因此无法确认完整的评测闭环是否还涉及对文件系统、应用程序输出或多模态文档的联合检查。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收 result（待检查的字符串）和 rules（规则字典）作为输入。检查步骤如下：1）首先判断 result 是否为 None，若为 None 直接返回 0.0；2）从 rules 中提取 include（必须包含的字符串列表，默认空）和 exclude（必须排除的字符串列表，默认空）；3）打印 result 和 rules 的内容用于调试；4）核心判定：使用 all(r in result for r in include) 检查 result 是否包含 include 列表中的每一个字符串，同时使用 all(r not in result for r in exclude) 检查 result 是否不包含 exclude 列表中的任何一个字符串。判定依据为：当且仅当上述两个条件同时成立时返回 1.0，否则返回 0.0。该检查对大小写敏感，要求精确子串匹配，不涉及模糊匹配、正则匹配或顺序要求。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:43",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_012/evaluator_function_labels.json"
+}

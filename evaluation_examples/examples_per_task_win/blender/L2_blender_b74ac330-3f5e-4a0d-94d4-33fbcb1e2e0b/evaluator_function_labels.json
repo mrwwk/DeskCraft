@@ -1,0 +1,84 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_b74ac330-3f5e-4a0d-94d4-33fbcb1e2e0b/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_multi_light_config",
+      "lineno": 89
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_srgb_to_linear",
+      "lineno": 24
+    },
+    {
+      "name": "_srgb_color_to_linear",
+      "lineno": 38
+    },
+    {
+      "name": "_parse_blender_output",
+      "lineno": 47
+    },
+    {
+      "name": "_find_object",
+      "lineno": 60
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 68
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 75
+    },
+    {
+      "name": "check_blender_multi_light_config",
+      "lineno": 89
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该评测器用于验证Blender场景中多盏灯光的配置是否完全符合任务规则。它读取来自check_object.py输出的JSON字符串（内含场景中各物体的灯光属性），针对rule中定义的每一盏指定名称的灯光，依次检查其类型是否为LIGHT，并核验点光源的能量与颜色、聚光灯的锥角、区域光的形状与尺寸。由于Blender内部输出的颜色为线性空间值，而规则中的期望颜色是用户在UI中设置的sRGB值，因此评测器在比较颜色前会先将期望的sRGB值转换为线性空间。所有灯光的所有指定参数必须全部在各自容差范围内匹配，评测器才返回1.0；只要任何一项检查失败或发生异常，立即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_blender_multi_light_config",
+        "lineno": 89,
+        "description": "接收command_output（来自check_object.py的JSON字符串）和rule（包含lights列表的字典）。首先调用_parse_blender_output解析JSON，若解析失败或输出为空则返回0.0。随后遍历rule['lights']中的每个light_spec：使用_find_object按name精确查找对应物体，若找不到或obj['type']不是'LIGHT'则返回0.0。接着依据light_spec中存在的键进行分支检查：1) energy检查：使用_check_tolerance比较obj['energy']与期望值，容差默认50；2) color检查：将期望的sRGB颜色通过_srgb_color_to_linear转换为线性空间，再使用_check_vector_tolerance与obj['light_color']比较，容差默认0.05；3) spot_size_deg检查：先确认obj['light_type']为'SPOT'，再用_check_tolerance比较obj['spot_size_deg']与期望值，容差默认取spot_tolerance、angle_tolerance或5.0；4) shape检查：确认obj['light_type']为'AREA'，直接字符串比较obj['area_shape']与期望值；5) area_size检查：使用_check_tolerance比较obj['area_size']与期望值（规则键可为area_size或size），容差默认0.1。以上所有检查必须全部通过，任一失败立即返回0.0；全部通过则返回1.0。若执行过程中捕获异常，也返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_srgb_to_linear",
+        "lineno": 24,
+        "description": "将单个sRGB颜色分量转换为线性空间。依据IEC 61966-2-1标准：若c <= 0.04045则返回c/ 12.92，否则返回((c + 0.055)/ 1.055) ^ 2.4。被_srgb_color_to_linear调用，服务于颜色空间转换逻辑。"
+      },
+      {
+        "name": "_srgb_color_to_linear",
+        "lineno": 35,
+        "description": "对[R, G, B]三元组的每个分量调用_srgb_to_linear，返回线性空间的颜色向量。在主函数的颜色检查环节中使用，将规则中用户可见的sRGB期望值转换为Blender内部线性空间值，以便与check_object.py输出的light_color进行公平比较。"
+      },
+      {
+        "name": "_parse_blender_output",
+        "lineno": 44,
+        "description": "解析来自Blender检查脚本的JSON输出字符串。先去除首尾空白，再使用json.loads加载为Python字典。若command_output为空或解析失败，则记录错误日志并返回None。主函数依赖此函数将原始输出转换为可遍历的场景数据结构。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 56,
+        "description": "在解析后的结果字典result的'objects'列表中，按obj['name']与传入的name进行精确字符串匹配，返回匹配到的物体字典；若遍历完未找到则返回None。主函数使用它来定位每一盏待检查的灯光对象。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 64,
+        "description": "通用数值容差比较器。检查actual与expected是否均不为None，且两者的绝对差值是否小于等于tol。返回布尔值。被主函数中的能量、聚光角度、区域光尺寸检查复用。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 71,
+        "description": "向量分量级容差比较器。要求actual与expected均非空且长度相同，然后逐分量检查绝对差是否均不超过tol。返回布尔值。被主函数中的颜色检查复用，用于比较RGB三元组。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:39:15",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_b74ac330-3f5e-4a0d-94d4-33fbcb1e2e0b/evaluator_function_labels.json"
+}

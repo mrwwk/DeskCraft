@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_aa4c78e7-70d4-4644-bc37-469b99b7201e/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器相关任务的完成状态，核心检查两类对象：一是Chrome当前活动标签页是否导航到了预期的URL；二是桌面是否创建了符合特定名称或执行命令的快捷方式。对于URL比较，采用深度规范化策略：统一scheme为http、去除www子域名、忽略顶级域名后缀差异（如.com与.com.sg视为相同域名）、去除路径尾部斜杠，并可选择是否保留URL参数与片段，最终通过字符串精确匹配判定。对于桌面快捷方式，则解析.desktop文件内容，提取Name=或Exec=行，进行精确匹配或双向子串包含匹配。各检查函数独立返回0或1的离散分数，由外部评测框架按需调用，属于打分式判定逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收Chrome当前活动标签页信息active_tab_info（字典或字符串）与匹配规则rule。首先判空，若为空直接返回0分。当rule['type']为'url'时，从active_tab_info中提取实际URL（字典取'url'键，字符串则直接用），再调用compare_urls将预期URL与实际URL做规范化比较。若compare_urls返回True则得1分，否则0分。若rule['type']为其他值，记录错误日志并返回0。该函数是标签页正确性的直接判定入口。"
+      },
+      {
+        "name": "is_shortcut_on_desktop",
+        "lineno": 82,
+        "description": "接收桌面快捷方式字典shortcuts（键为文件路径，值为文件文本内容）与规则rule。根据rule['type']分三支处理：1）'name'类型：遍历所有快捷方式内容，先查找'Name=' + 预期名称 + '/n'的精确匹配；未命中则逐行提取Name=后的实际名称，进行精确匹配或双向子串包含匹配（不区分大小写）。2）'exec'类型：同理查找'Exec='行，进行精确匹配或双向子串包含匹配（区分大小写）。任一快捷方式满足即返回1.0，全部遍历后未找到返回0.0。3）'url'、'id'或其他类型：直接抛出TypeError。该函数判定桌面快捷方式是否存在且内容正确。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 173,
+        "description": "通用URL规范化比较器。接收两个URL字符串url1、url2及可选参数full（默认True，控制是否保留params/query/fragment）。若任一URL为None，直接按Python相等性比较。否则先通过内部辅助逻辑parse_with_default_scheme为无scheme的URL补全'http://'；再由normalize_url执行规范化：scheme转小写、用tldextract提取域名并去除'www'子域名、忽略域名后缀（TLD）差异、去除路径尾部斜杠、根据full参数决定是否保留查询参数与片段；最后将两个规范化后的URL字符串进行精确相等比较，返回布尔值。该函数被is_expected_active_tab调用，也可独立作为URL等价性判定工具。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:07:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_aa4c78e7-70d4-4644-bc37-469b99b7201e/evaluator_function_labels.json"
+}

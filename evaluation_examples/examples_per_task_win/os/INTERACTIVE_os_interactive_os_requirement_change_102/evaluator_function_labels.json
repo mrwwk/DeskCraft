@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_requirement_change_102/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于对任务结果进行基于字符串包含关系的二值判定。核心检查对象是一个字符串 result（通常为程序输出、页面文本或文件内容），通过读取外部传入的 rules 字典获取 include 与 exclude 两个子串列表。主要比较方式为朴素的子串存在性检查：要求 result 同时包含 include 列表中的所有子串，且不包含 exclude 列表中的任何子串。成功判定思路为严格的与逻辑——仅当双重条件全部满足时返回 1.0（成功），否则返回 0.0（失败）；若 result 本身为 None，也直接返回 0.0。代码中未明确体现该 result 具体对应何种系统输出或文件内容。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收两个参数：result（待检查的字符串结果）和 rules（包含 include 与 exclude 键的字典）。其检查步骤如下：1）若 result 为 None，直接返回 0.0；2）从 rules 中提取 include 列表（默认为空）和 exclude 列表（默认为空）；3）检查 result 是否包含 include 中所有子串（all(r in result for r in include)）；4）检查 result 是否不包含 exclude 中任何子串（all(r not in result for r in exclude)）；5）仅当步骤 3 和步骤 4 同时满足时返回 1.0，否则返回 0.0。判定依据是严格的子串全包含与全排除的与逻辑，输出为二值分数，不存在部分得分或加权累计。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:32:48",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_requirement_change_102/evaluator_function_labels.json"
+}

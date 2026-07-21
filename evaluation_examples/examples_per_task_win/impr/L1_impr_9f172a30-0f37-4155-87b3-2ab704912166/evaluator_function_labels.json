@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_9f172a30-0f37-4155-87b3-2ab704912166/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_slide1_title_format",
+      "lineno": 69
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_identify_title_shape",
+      "lineno": 18
+    },
+    {
+      "name": "check_slide1_title_format",
+      "lineno": 69
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 验证的是：在对指定 PowerPoint 文件（任务场景中为 work_summary_template_english.pptx）进行修改后，第 1 张幻灯片（默认索引 0）的标题形状（title shape）内的所有非空文本运行（run）是否同时满足三项严格的格式要求——粗体（bold）、48pt 字号（对应 4800 EMU）、下划线（underline）。它采用“全有或全无”的判定策略：先通过辅助函数定位标题形状，再逐一遍历该形状下所有段落（paragraph）中的非空 run，检查每个 run 的 font.bold 必须为真值 True（None 或 False 均视为失败）、font.size 必须严格等于预期值（默认 4800 EMU）、font.underline 必须为真值 True（None 或 False 均视为失败）。只要存在一个非空 run 不满足其中任意一项，或未能定位到标题形状，或找不到任何非空 run，即返回 0.0；仅当所有非空 run 全部通过三项检查时，才返回 1.0。该 evaluator 明确不检查背景色、形状位置、形状类型、幻灯片数量、备注、项目符号、对齐方式等其他属性。",
+    "main_functions": [
+      {
+        "name": "check_slide1_title_format",
+        "lineno": 69,
+        "description": "该函数接收 result_path（被修改后的 PPTX 文件路径）和 rules（配置字典，可包含 slide_index、expected_font_size、check_bold、check_underline 等键，默认值分别为 0、4800、True、True）。首先使用 Presentation(result_path) 打开演示文稿，若失败则返回 0.0；接着校验 slide_index 是否越界，越界则返回 0.0。然后调用辅助函数 _identify_title_shape(slide) 定位目标幻灯片的标题形状，若返回 None 则判 0.0。之后遍历该标题形状 text_frame 下所有 paragraph 的 runs，跳过文本为空或仅含空白的 run，对每个非空 run 依次执行三项严格检查：（1）若 check_bold 为 True，则要求 run.font.bold 必须为 True（None 和 False 均视为未加粗）；（2）要求 run.font.size 必须严格等于 expected_font_size（默认 4800 EMU，即 48pt），不允许近似偏差；（3）若 check_underline 为 True，则要求 run.font.underline 必须为 True（None 和 False 均视为无下划线）。任一 run 触发上述任一失败条件，即将 all_ok 置为 False。遍历结束后，若未找到任何非空 run，返回 0.0；若 all_ok 仍为 True，返回 1.0，否则返回 0.0。整个逻辑为“全部满足才通过”的组合判定。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_identify_title_shape",
+        "lineno": 18,
+        "description": "该辅助函数接收一个 slide 对象，负责在单张幻灯片中识别“标题形状”。它采用两级优先策略：第一级优先使用 slide.shapes.title 获取标题占位符，若该属性存在、不为 None 且包含非空文本，则直接返回；第二级作为兜底，遍历 slide.shapes 中所有具备 text 和 text_frame 属性的文本形状，排除无文本的形状，再逐层遍历每个 shape 的 text_frame.paragraphs.runs，记录其中最大的 font.size（EMU 单位），最终在所有候选形状中按最大字号降序排列，返回字号最大的那个形状。若没有任何候选，则返回 None。该函数的核心作用是为 check_slide1_title_format 提供稳定的标题定位能力，即使在标题占位符缺失或异常时，也能通过“最大字号文本形状”这一启发式规则回退定位。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:23:41",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L1_impr_9f172a30-0f37-4155-87b3-2ab704912166/evaluator_function_labels.json"
+}

@@ -1,0 +1,135 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_9b55a239-39e0-4953-9f19-f30dc9ba9a03/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_object_deleted",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_object_exists",
+      "lineno": 76
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 106
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 141
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 225
+    },
+    {
+      "name": "check_blender_modifier_subsurf",
+      "lineno": 263
+    },
+    {
+      "name": "check_blender_render_engine",
+      "lineno": 305
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "_check_vector_tolerance",
+      "lineno": 40
+    },
+    {
+      "name": "check_blender_object_deleted",
+      "lineno": 50
+    },
+    {
+      "name": "check_blender_object_exists",
+      "lineno": 76
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 106
+    },
+    {
+      "name": "check_blender_material_pbr",
+      "lineno": 141
+    },
+    {
+      "name": "check_blender_smooth_shading",
+      "lineno": 225
+    },
+    {
+      "name": "check_blender_modifier_subsurf",
+      "lineno": 263
+    },
+    {
+      "name": "check_blender_render_engine",
+      "lineno": 305
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender 3D场景编辑任务的完成状态。它通过解析外部Blender检查脚本（如check_object.py、check_render.py、check_material.py、check_mesh.py、check_modifier.py）输出的JSON数据，对场景中的对象存在性/删除状态、渲染设置（引擎、分辨率、采样率、帧率、输出格式、活动相机）、材质PBR参数（基础色、金属度、粗糙度）、网格平滑着色状态以及修改器堆栈进行逐项比对。评测采用二元打分制（1.0表示通过，0.0表示不通过），其中渲染设置为\"全部满足\"逻辑（所有指定字段必须严格相等），材质检查为\"任一满足\"逻辑（多个候选对象或材质中只要有一个符合全部指定条件即可），对象存在性检查亦为\"任一满足\"逻辑。核心比较方式包括严格相等、子串包含、标量数值容差和向量分量容差。",
+    "main_functions": [
+      {
+        "name": "check_blender_object_deleted",
+        "lineno": 50,
+        "description": "接收check_object.py输出的JSON字符串和rule字典。首先调用_parse_blender_output解析JSON；若解析失败或为空则返回0.0。随后从rule中提取deleted_object字段作为目标对象名，并从解析结果中提取object_names列表。若目标对象名不在该列表中，说明对象已被删除，返回1.0；若目标对象名仍在列表中，说明对象仍存在，返回0.0并记录警告。任何异常均捕获后返回0.0。"
+      },
+      {
+        "name": "check_blender_object_exists",
+        "lineno": 76,
+        "description": "接收check_object.py输出的JSON字符串和rule字典。调用_parse_blender_output解析JSON后，遍历结果中objects数组。对每个对象，同时检查两项：type字段是否等于rule中的object_type或expected_type（二者为别名关系，优先取object_type，若不存在则取expected_type），以及name字段是否包含rule中的name_contains子串。若rule未指定对应字段，则该条件视为自动通过。只要数组中存在任一对象同时满足type和name条件，即返回1.0并记录匹配对象名；若遍历完无匹配，返回0.0并记录警告。"
+      },
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 106,
+        "description": "接收check_render.py输出的JSON字符串和rule字典。调用_parse_blender_output解析JSON后，对rule中可能出现的engine、resolution_x、resolution_y、fps、samples、image_format、active_camera等键逐一进行严格相等检查。所有在rule中显式指定的键都必须与解析结果中的对应字段完全匹配；若任一不匹配，立即记录警告并返回0.0。只有全部指定键均通过严格相等比对后，才返回1.0。属于\"全部满足\"的合取逻辑。"
+      },
+      {
+        "name": "check_blender_material_pbr",
+        "lineno": 141,
+        "description": "接收check_material.py输出的JSON字符串和rule字典。调用_parse_blender_output解析JSON后，按三种模式定位候选对象的材质列表：1）若rule提供object_name，精确取该键对应的材质；2）若提供object_name_contains或name_contains，遍历结果中所有非下划线开头的键，取名称包含该子串的对象材质；3）若均未提供，则全局遍历所有非下划线开头的键。对每个候选对象的材质列表（若非列表则包装为列表），逐一检查：若rule指定material_name则要求材质name字段严格相等；若指定expected_color则调用_check_vector_tolerance比对base_color数组，在默认容差0.05（可通过rule.tolerance覆盖）内逐分量判断；若指定metallic或roughness则调用_check_tolerance在容差范围内进行标量比对。只要任一材质满足rule中所有指定条件，即返回1.0；全部候选遍历完毕无匹配则返回0.0。属于\"任一满足\"的析取逻辑。"
+      },
+      {
+        "name": "check_blender_smooth_shading",
+        "lineno": 225,
+        "description": "接收check_mesh.py输出的JSON字符串和rule字典。调用_parse_blender_output解析JSON后，若rule提供object_name则精确查找该键对应的mesh_info字典；若提供object_name_contains则遍历所有键进行子串匹配，取第一个匹配项的mesh_info。获取mesh_info后，检查其has_smooth字段是否等于rule中的has_smooth（默认为True）。若匹配成功返回1.0，否则返回0.0。若未提供任何对象选择器或查找失败，也返回0.0。"
+      },
+      {
+        "name": "check_blender_modifier_subsurf",
+        "lineno": 263,
+        "description": "接收check_modifier.py输出的JSON字符串和rule字典。调用_parse_blender_output解析JSON后，通过object_name精确查找或object_name_contains子串匹配定位目标对象的修改器列表。遍历该列表，查找type字段等于rule中modifier_type（若未指定则默认为SUBSURF）的修改器；若rule中包含levels键，则额外要求该修改器的levels字段严格等于rule中的levels。一旦找到同时满足类型和层级（如指定）的修改器，立即返回1.0；遍历完未找到则返回0.0。"
+      },
+      {
+        "name": "check_blender_render_engine",
+        "lineno": 305,
+        "description": "作为check_blender_render_settings的薄封装，直接将其接收的command_output和rule原样转发给check_blender_render_settings处理。用于仅验证渲染引擎类型的场景，逻辑与后者完全一致，即要求rule中的engine字段与渲染设置严格相等。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 24,
+        "description": "接收Blender检查脚本输出的原始字符串。先判断是否为空或仅含空白，若非空则strip后调用json.loads解析为Python对象（通常为dict或list）。解析成功返回该对象；若输出为空、JSON解码失败或值错误，则记录错误日志并返回None。被所有主函数用于统一预处理外部JSON输出，是后续所有字段比对的前置步骤。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 35,
+        "description": "接收actual、expected、tol三个参数。在actual和expected均非None的前提下，将其转换为浮点数后计算绝对差值，判断是否小于等于tol。返回布尔值。专用于材质检查中metallic、roughness等标量属性的容差比对，被check_blender_material_pbr调用。"
+      },
+      {
+        "name": "_check_vector_tolerance",
+        "lineno": 41,
+        "description": "接收actual、expected、tol三个参数。先检查两个序列是否均非空且长度相等，再逐分量转换为浮点数后计算绝对差值，要求所有分量的差值均小于等于tol。返回布尔值。专用于材质检查中base_color等向量属性的容差比对，被check_blender_material_pbr调用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:41:33",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L3_blender_9b55a239-39e0-4953-9f19-f30dc9ba9a03/evaluator_function_labels.json"
+}

@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_106/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 40
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 66
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_compare_urls_scheme_tolerant",
+      "lineno": 8
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 40
+    },
+    {
+      "name": "is_expected_bookmarks",
+      "lineno": 66
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器的两项核心状态：一是当前活动标签页是否打开预期网页，二是书签栏内容是否符合预期配置。检查对象包括活动标签页信息（active_tab_info）和Chrome书签树数据（bookmarks）。核心比较方式采用scheme-tolerant的URL比对（允许协议头差异，只要path与netloc一致即视为同一地址），以及对书签文件夹名称进行精确集合比对。成功判定采用二元打分制：各项检查中，被测对象与规则定义的预期值完全匹配则返回1.0，任一不匹配则返回0.0；书签URL检查还需满足双向集合相等（既无遗漏也无多余）。不存在部分得分、加权或累计逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 40,
+        "description": "该函数检查Chrome当前活动标签页是否为预期页面。接收active_tab_info（字典或字符串形式的活动标签页信息）和rule（匹配规则字典）。首先判断active_tab_info是否为空，为空则直接返回0.0。随后根据rule['type']分支处理：目前仅支持'url'类型。在'url'分支中，从rule读取expected_url；若active_tab_info为字典则提取其'url'键值作为actual_url，否则直接将active_tab_info视为actual_url。接着调用_compare_urls_scheme_tolerant对预期与实际URL进行scheme-tolerant比较。若匹配则返回1.0，不匹配返回0.0。若rule['type']为未知类型，记录错误日志并返回0.0。"
+      },
+      {
+        "name": "is_expected_bookmarks",
+        "lineno": 66,
+        "description": "该函数检查Chrome书签栏内容是否符合预期。接收bookmarks（书签数据字典）和rule（匹配规则字典）。若bookmarks为空直接返回0.0。根据rule['type']分两支处理：1) bookmark_bar_folders_names：遍历bookmarks['bookmark_bar']['children']，筛选type为'folder'的节点，提取其'name'字段构成集合，与rule['names']进行精确集合比对，完全相等返回1.0，否则0.0。2) bookmark_bar_websites_urls：遍历bookmarks['bookmark_bar']['children']，筛选type为'url'的节点，提取其'url'字段作为实际URL列表；与rule['urls']进行双向scheme-tolerant集合比对——先检查每个expected_url是否都能在实际列表中找到匹配，再检查每个actual_url是否都能在预期列表中找到匹配。双向均通过返回1.0；若任一方向存在不匹配项，记录日志并立即返回0.0。若rule['type']为其他值，抛出TypeError。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_compare_urls_scheme_tolerant",
+        "lineno": 7,
+        "description": "该辅助函数对两个URL进行scheme-tolerant（协议容错）比较，服务于活动标签页和书签URL的匹配逻辑。接收url1和url2两个字符串。若任一为空，直接进行相等比较。否则先去除尾部斜杠并统一转小写，尝试快速精确匹配；若失败，则使用urlparse解析，分别比较path（再次去除尾部斜杠）和netloc字段。只要path与netloc完全一致，即使scheme不同（例如file://与https://）也视为匹配成功并返回True。该函数主要用于处理Chrome accessibility tree可能将本地文件URL以非file scheme上报导致的误判问题。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:57:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_ambiguous_106/evaluator_function_labels.json"
+}

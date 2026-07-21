@@ -1,0 +1,79 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00009-0009-4000-8000-000000000009/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 120
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 137
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 22
+    },
+    {
+      "name": "_open_aup3",
+      "lineno": 44
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 50
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 70
+    },
+    {
+      "name": "check_audio_sample_rate",
+      "lineno": 120
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 137
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对 Audacity 音频编辑任务，从两个独立维度验证任务结果：一是检查用户导出的 WAV 音频文件是否符合指定的采样率要求；二是检查 Audacity 项目文件（.aup3）是否为有效可解析状态，并满足轨道数量的最低门槛。核心检查对象分别是 WAV 文件的采样率字段，以及 .aup3 内部 SQLite 数据库中存储的项目 XML 所解析出的轨道（track）列表。比较方式上，采样率采用精确数值匹配（actual == expected），轨道数量采用阈值判定（count >= min）。每个主函数独立执行，返回 1.0 表示完全通过，返回 0.0 表示不满足条件，属于“全部满足即通过、任一子条件不满足即失败”的硬判定逻辑。",
+    "main_functions": [
+      {
+        "name": "check_audio_sample_rate",
+        "lineno": 120,
+        "description": "该函数验证指定 WAV 音频文件的采样率是否与任务要求一致。接收参数 file_path 为待测 WAV 文件路径，rule 为字典，必须包含键 expected_sr（期望采样率，整型）。执行步骤如下：首先检查 file_path 对应的文件是否存在，若不存在直接返回 0.0；随后调用辅助函数 _read_wav_info 读取该 WAV 文件的元数据，提取实际采样率 actual；最后将 actual 与 expected 进行精确数值比较，若两者相等则返回 1.0，否则返回 0.0。若读取或比较过程中发生任何异常，同样返回 0.0。"
+      },
+      {
+        "name": "check_aup3_project_valid",
+        "lineno": 137,
+        "description": "该函数验证指定的 Audacity 项目文件（.aup3）能否被正常解析，并且其内部轨道数量满足多重最低要求。接收参数 file_path 为 .aup3 文件路径，rule 为字典，可包含 min_track_count（最小总轨道数，默认 1）、min_wave_tracks（最小波形轨道数，默认 0）、min_label_tracks（最小标签轨道数，默认 0）。执行步骤如下：首先检查文件是否存在，不存在则返回 0.0；接着调用辅助函数 _parse_aup3_tracks 从 .aup3 的 SQLite 数据库中读取项目 XML 并解析出所有轨道信息；然后分别统计总轨道数 total、波形轨道数 wave_count 和标签轨道数 label_count；最后进行三重阈值判定：total 必须大于等于 min_track_count，wave_count 必须大于等于 min_wave_tracks，label_count 必须大于等于 min_label_tracks。只有当这三个条件全部同时满足时才返回 1.0，任一条件不满足即返回 0.0。解析或统计过程中发生异常也返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 24,
+        "description": "使用 Python 标准库 wave 模块打开指定路径的 WAV 文件，读取其基础元数据并返回字典。返回字典包含以下键：channels（声道数）、sample_rate（采样率）、n_frames（总帧数）、sampwidth（采样宽度）以及计算得到的 duration（时长，秒）。该函数是 WAV 文件分析的底层读取器，专供 check_audio_sample_rate 调用，用于提取实际采样率进行精确比较。"
+      },
+      {
+        "name": "_open_aup3",
+        "lineno": 48,
+        "description": "将指定路径的 .aup3 文件作为 SQLite 数据库打开，返回 sqlite3 连接对象（conn）。该函数本身不做任何查询或验证，仅提供数据库连接封装，供 _get_aup3_project_xml 调用以访问项目内部数据。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 55,
+        "description": "负责从 .aup3 文件中提取 Audacity 项目 XML 字符串。具体流程为：先调用 _open_aup3 建立数据库连接；然后优先执行 SQL 查询 SELECT doc FROM project LIMIT 1 获取项目文档；若 project 表无数据，则回退查询 autosave 表的 doc 字段；若仍无数据则返回 None；若取出的数据为 bytes 类型，则按 utf-8 解码为字符串后返回。该函数是 .aup3 解析的数据入口，被 _parse_aup3_tracks 调用。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 72,
+        "description": "解析 .aup3 项目 XML，返回轨道信息列表。首先调用 _get_aup3_project_xml 获取 XML 字符串；若为空则返回空列表。使用 xml.etree.ElementTree 解析根节点，并自动处理 XML 命名空间（ns）。遍历根节点下所有子元素，识别标签名为 wavetrack/WaveTrack 的波形轨道和 labeltrack/LabelTrack 的标签轨道。对于波形轨道，提取 name、gain、mute、solo、pan 等属性，封装为 type='wave' 的字典；对于标签轨道，进一步遍历其内部的 label/Label 子元素，提取时间戳 t/t0、t1 和文本 title/text，封装为 type='label' 的字典。最终返回包含所有轨道字典的列表，供 check_aup3_project_valid 进行数量阈值判定。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:20:11",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00009-0009-4000-8000-000000000009/evaluator_function_labels.json"
+}

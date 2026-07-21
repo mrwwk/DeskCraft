@@ -1,0 +1,75 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_515259fd-5e7e-43fb-bbb3-c033ae5f3693/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_text_align",
+      "lineno": 64
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 31
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 39
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 47
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 56
+    },
+    {
+      "name": "check_inkscape_text_align",
+      "lineno": 64
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape任务生成的SVG文件中，指定ID的文本元素（或其直接子tspan元素）的水平对齐属性text-anchor是否与预期值完全一致。它通过读取SVG文件并按ID定位目标元素，优先检查元素自身的text-anchor样式或属性；若不匹配，则进一步检查其直接子tspan。判定采用二元打分：任一位置匹配预期值（不区分大小写）即返回1.0，否则返回0.0。核心比较方式为字符串精确匹配（转小写后对比），无近似阈值或加权逻辑。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_text_align",
+        "lineno": 66,
+        "description": "接收svg_file_path和rule字典（需包含element_id与expected_text_anchor）。首先调用_parse_svg解析SVG文件，若解析失败返回0.0；接着用_find_element_by_id按element_id定位元素，若元素不存在返回0.0。然后调用_get_style_prop读取该元素的text-anchor属性（或style内的CSS属性），转小写后与expected_text_anchor比较，若相等返回1.0。若不相等，则遍历该元素的直接子元素，通过_tag_local筛选本地标签名为tspan的子元素，再对每个tspan调用_get_style_prop读取text-anchor，任一子元素匹配成功即返回1.0；全部遍历后仍无匹配则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 20,
+        "description": "将CSS样式字符串（如'fill:#ff0000;stroke:#000'）按分号分割为键值对字典，用于解析SVG元素inline style属性中的text-anchor等样式值。被_get_style_prop调用。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 33,
+        "description": "遍历XML树的全部元素，通过比对id属性查找与传入element_id相等的元素并返回；找不到则返回None。是主函数在SVG中定位目标文本元素的核心查找器。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 41,
+        "description": "统一读取SVG元素上某一样式属性的值：先调用_parse_style解析元素style属性中的CSS键值对，若目标prop存在则返回；否则回退到读取该元素的直接XML属性（elem.get(prop)）。用于兼容text-anchor既可能写在style内也可能作为独立属性的情况。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 49,
+        "description": "使用xml.etree.ElementTree.parse读取指定svg_file_path，成功时返回(tree, root)元组；任何异常（如文件不存在或XML格式错误）均返回(None, None)。是主函数的文件读取与XML解析入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 58,
+        "description": "去除XML标签的命名空间前缀（如将'{http://www.w3.org/2000/svg}tspan'转为'tspan'），返回本地标签名。主函数在遍历子元素时用它准确识别tspan标签，避免命名空间干扰。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:38:44",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L1_inkscape_515259fd-5e7e-43fb-bbb3-c033ae5f3693/evaluator_function_labels.json"
+}

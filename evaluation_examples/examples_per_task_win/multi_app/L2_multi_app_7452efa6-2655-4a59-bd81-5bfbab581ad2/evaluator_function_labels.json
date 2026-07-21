@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_7452efa6-2655-4a59-bd81-5bfbab581ad2/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_settings",
+      "lineno": 6
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 35
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 73
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_settings",
+      "lineno": 6
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 35
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 73
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 总体用于验证三类任务产出的正确性，采用严格的二元评分机制（通过返回 1.0，不通过返回 0.0）。第一类验证 VS Code 的配置文件 settings.json，要求其中必须完整存在所有预期的键值对，且值必须精确相等；第二类验证 Chrome 浏览器当前活动标签页的 URL，要求实际 URL 在去除查询参数后必须与预期 URL 完全一致；第三类验证命令行输出或文件文本内容，要求必须同时满足“包含所有指定子串”和“不包含任何禁止子串”。三个主函数各自独立，均遵循“全部满足才通过”的严格逻辑，不存在加权累计、部分给分或容错阈值，任一条件失败即判定为 0.0。",
+    "main_functions": [
+      {
+        "name": "check_json_settings",
+        "lineno": 6,
+        "description": "该函数负责验证 VS Code 的 settings.json 文件是否包含预期的键值对。检查对象是 actual 参数给出的 JSON 配置文件路径，以及 expected 参数中 'expected' 键对应的期望配置字典。检查步骤如下：首先判断 actual 路径是否非空，若为空直接返回 0.0；随后尝试打开并解析该路径的 JSON 文件，若文件不存在或解析失败也返回 0.0；接着从 expected['expected'] 中提取期望键值对，遍历每一对 key-value，检查该键是否存在于实际 JSON 中且对应的值完全相等；只要出现任一键缺失或值不匹配，立即返回 0.0。仅当所有期望键值对全部精确匹配时，才返回 1.0。判定依据为严格的全有或全无（all-or-nothing）逻辑，无近似匹配或容错阈值。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 35,
+        "description": "该函数负责验证 Chrome 浏览器当前活动标签页的 URL 是否与预期一致，且忽略 URL 查询参数。检查对象是 active_tab_info（通常为包含 'url' 键的字典，但也可能直接是 URL 字符串）和 rule（匹配规则字典，包含 'type' 和 'url' 键）。检查步骤如下：首先判断 active_tab_info 是否为空，为空则返回 0.0；然后读取 rule['type']，仅当 type 为 'url' 时继续处理，否则返回 0.0；提取 expected_url 和 actual_url（若 active_tab_info 为字典则取 'url' 键值，否则直接视为 URL 字符串）；通过 urlparse 将两个 URL 的查询参数部分去除，仅保留协议、域名、路径等部分；最后比较处理后的两个 URL 是否完全相等。相等返回 1.0，否则返回 0.0。判定依据为去查询参数后的精确字符串匹配，属于近似匹配中的严格相等逻辑。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 73,
+        "description": "该函数负责验证某段文本内容或文件是否同时满足“必须包含指定子串”和“不得包含禁止子串”的双重要求。检查对象是 result（可能是文件路径或原始字符串）和 rules（包含 'include' 和 'exclude' 列表的字典）。检查步骤如下：首先判断 result 是否为 None，为 None 则返回 0.0；接着判断 result 是否为存在的文件路径，若是则尝试读取文件内容作为待检查文本，若读取失败返回 0.0，若不存在则直接将 result 视为待检查文本；然后从 rules 中获取 include 和 exclude 列表（缺省为空列表）；最后检查待检查文本是否包含 include 中所有子串，且不包含 exclude 中任何子串。两项条件同时满足返回 1.0，任一不满足返回 0.0。判定依据为子串存在性的全有或全无逻辑，无正则匹配、无顺序要求、无数量阈值。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:22:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_7452efa6-2655-4a59-bd81-5bfbab581ad2/evaluator_function_labels.json"
+}

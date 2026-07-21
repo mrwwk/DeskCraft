@@ -1,0 +1,97 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00026-0026-4000-8000-000000000026/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_peak_amplitude",
+      "lineno": 163
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 199
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 24
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 42
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 72
+    },
+    {
+      "name": "_open_aup3",
+      "lineno": 89
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 95
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 114
+    },
+    {
+      "name": "check_audio_peak_amplitude",
+      "lineno": 163
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 199
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于Audacity mini-osworld任务，包含两个完全独立、各自打分的判定指标，不存在联合加权或累计逻辑。第一个指标验证用户导出的WAV音频文件的峰值振幅：通过读取WAV文件并将多声道混音为单声道后，计算最大绝对样本值，再使用公式20*log10转换为dB值（若峰值小于1e-10则视为-100.0 dB），最终检查该dB值是否严格落在rule给定的[min_peak_db, max_peak_db]闭区间内，满足返回1.0，否则返回0.0。第二个指标验证用户保存的.aup3项目文件的完整性与音轨数量：将.aup3文件作为SQLite数据库打开，优先从project表提取项目XML，无则回退到autosave表，随后解析XML统计总音轨数、波形音轨（wave）数和标签音轨（label）数，最终检查这三项是否分别同时满足rule中min_track_count（默认1）、min_wave_tracks（默认0）、min_label_tracks（默认0）的阈值要求，全部满足返回1.0，任一不满足返回0.0。两个指标各自独立返回0.0或1.0。",
+    "main_functions": [
+      {
+        "name": "check_audio_peak_amplitude",
+        "lineno": 163,
+        "description": "该函数接收file_path（导出WAV文件的路径）与rule（字典，必须包含min_peak_db和max_peak_db两个浮点键，分别表示可接受的峰值下界与上界，单位为dB）。执行步骤如下：首先使用os.path.isfile检查文件是否存在，若不存在则记录错误日志并直接返回0.0；随后调用_get_mono_samples(file_path)将WAV解码为单声道浮点样本列表（多声道时按帧取各声道算术平均）并获取采样率；接着计算所有样本绝对值的最大值peak，若peak小于1e-10则将峰值dB视为-100.0，否则使用peak_db = 20.0 * math.log10(peak)将线性振幅转换为dB；最后严格判断peak_db是否落在闭区间[min_peak_db, max_peak_db]之内，若满足则返回1.0，否则返回0.0。整个流程被try-except包裹，任何异常（如文件不存在、WAV格式损坏、采样宽度不支持等）均会被捕获，记录错误日志后返回0.0。"
+      },
+      {
+        "name": "check_aup3_project_valid",
+        "lineno": 199,
+        "description": "该函数接收file_path（.aup3项目文件的路径）与rule（字典，可选键包括min_track_count默认值为1、min_wave_tracks默认值为0、min_label_tracks默认值为0）。执行步骤如下：首先使用os.path.isfile检查.aup3文件是否存在，不存在则返回0.0；存在则调用_parse_aup3_tracks(file_path)打开SQLite数据库并解析项目XML以获取音轨信息列表；若解析结果为空列表，说明项目无音轨或XML读取失败，记录错误后返回0.0。随后分别统计总音轨数total、type字段为wave的波形音轨数wave_count、type字段为label的标签音轨数label_count。接着依次进行三项阈值检查：total必须大于等于min_track_count、wave_count必须大于等于min_wave_tracks、label_count必须大于等于min_label_tracks。上述三项条件必须全部同时满足，任一不满足即返回0.0；全部满足则返回1.0。整个流程被try-except包裹，任何异常（如数据库损坏、XML解析失败、字段缺失等）均会被捕获，记录错误日志后返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 24,
+        "description": "使用Python标准库wave模块以\"rb\"模式打开指定WAV文件，提取并返回包含基础元数据的字典，键包括channels（声道数）、sample_rate（采样率）、n_frames（总采样帧数）、duration（按采样率计算的时长，单位为秒）、sampwidth（每个采样的字节宽度）。该函数是WAV信息读取的基础层，通常被_get_mono_samples调用，用于获取声道数以决定是否需要进行多声道转单声道处理。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 42,
+        "description": "使用wave模块读取WAV文件的全部原始音频帧数据，依据sampwidth字段的值（支持1、2、3、4字节）分别通过struct.unpack或int.from_bytes将原始字节序列解析为归一化到[-1.0, 1.0]范围的浮点样本列表；若WAV为多声道，返回的样本按声道交错排列。若遇到不支持的采样宽度，则抛出ValueError。该函数是WAV数据解码的核心，通常被_get_mono_samples调用。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 72,
+        "description": "整合WAV读取流程：先调用_read_wav_info获取文件元数据，再调用_read_wav_samples获取交错样本列表；若元数据中的channels大于1，则将样本按帧分组（每组channels个样本）并计算算术平均值，生成单声道样本列表；若原本就是单声道则直接返回原始样本。最终返回单声道样本列表与采样率。该函数被check_audio_peak_amplitude调用，确保峰值振幅计算基于单声道信号，避免多声道峰值计算方式差异导致结果偏差。"
+      },
+      {
+        "name": "_open_aup3",
+        "lineno": 89,
+        "description": "对sqlite3.connect的薄封装，接收.aup3文件路径，将其作为SQLite数据库打开并返回数据库连接对象conn。该函数被_get_aup3_project_xml调用，负责建立与Audacity项目数据库的连接。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 95,
+        "description": "负责从.aup3数据库中提取项目XML字符串。具体流程为：调用_open_aup3建立连接后，首先执行SQL语句\"SELECT doc FROM project LIMIT 1\"查询project表；若未返回数据，则回退执行\"SELECT doc FROM autosave LIMIT 1\"查询autosave表；若仍未查到则返回None。对查询结果若为bytes类型则进行utf-8解码，最终返回XML字符串。该函数被_parse_aup3_tracks调用，是连接SQLite二进制存储与XML文本解析的桥梁。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 114,
+        "description": "负责解析.aup3项目XML并提取音轨结构信息。首先调用_get_aup3_project_xml获取XML字符串，若为None则直接返回空列表。使用xml.etree.ElementTree.fromstring解析根节点，自动检测并剥离XML命名空间前缀。遍历根节点的所有直接子元素：若标签为wavetrack或WaveTrack，则构建包含type=\"wave\"、name、gain、mute、solo、pan的字典；若标签为labeltrack或LabelTrack，则进一步遍历其内部的label/Label子元素，提取时间信息（优先读取t属性，回退t0）、t1（优先读取t1属性，回退t）、文本内容（优先读取title属性，回退text属性），构建包含type=\"label\"、name、labels列表的字典。最终返回所有音轨字典组成的列表。该函数被check_aup3_project_valid调用，用于判定项目是否包含足够数量与类型的音轨。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:20:52",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00026-0026-4000-8000-000000000026/evaluator_function_labels.json"
+}

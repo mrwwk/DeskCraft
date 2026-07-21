@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_bluetooth_service",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_bluetooth_service",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统中蓝牙服务的最终运行状态。它通过读取shell收集器输出的原始文本，解析其中enabled、active、file_ok三个键值对字段，来判定蓝牙服务是否已被启用、是否处于活动状态，以及关联文件标记是否正常。核心检查方式为字符串精确相等比较：enabled字段必须匹配rules参数中指定的期望值（若rules未显式指定则默认要求为\"enabled\"），active字段必须匹配rules中指定的期望值（默认要求为\"active\"），且file_ok字段必须严格等于\"true\"。三项条件必须全部同时满足，evaluator才返回1.0；任一条件不匹配，或解析过程中发生任何异常，均返回0.0。这是一种无部分得分、无近似匹配的硬阈值全部满足式判定逻辑。",
+    "main_functions": [
+      {
+        "name": "check_os_bluetooth_service",
+        "lineno": 31,
+        "description": "该函数接收shell收集器输出的字符串result和规则字典rules。首先调用辅助函数_parse_kv将result解析为键值对字典。随后依次执行三项严格相等检查：第一，检查字典中\"enabled\"键的值是否等于rules.get(\"enabled\", \"enabled\")，即优先使用rules传入的期望值，未传入时默认期望字符串\"enabled\"；第二，检查\"active\"键的值是否等于rules.get(\"active\", \"active\")，默认期望字符串\"active\"；第三，检查\"file_ok\"键的值是否严格等于字符串\"true\"。以上三项检查必须全部通过，函数才返回1.0表示任务成功；若任意一项不匹配，或在try块内发生任何异常，则立即返回0.0表示失败。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该辅助函数接收单个字符串参数output，将其按行分割，对每一行去除首尾空白后，若包含\"=\"号，则以第一个\"=\"为界分割为键和值，再分别去除首尾空白，构建并返回一个字典。若output为空或None，则直接返回空字典。该函数为check_os_bluetooth_service提供基础解析服务，将原始shell文本输出转换为结构化字典，使主函数能够按字段名提取enabled、active、file_ok等状态值进行后续精确比较。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:34:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa/evaluator_function_labels.json"
+}

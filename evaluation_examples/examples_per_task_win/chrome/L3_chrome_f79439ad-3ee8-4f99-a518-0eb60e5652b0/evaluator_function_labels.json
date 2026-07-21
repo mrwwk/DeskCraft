@@ -1,0 +1,94 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_f79439ad-3ee8-4f99-a518-0eb60e5652b0/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_tabs",
+      "lineno": 72
+    },
+    {
+      "name": "check_font_size",
+      "lineno": 95
+    },
+    {
+      "name": "exact_match",
+      "lineno": 109
+    },
+    {
+      "name": "match_in_list",
+      "lineno": 119
+    },
+    {
+      "name": "are_lists_equal",
+      "lineno": 129
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 144
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_tabs",
+      "lineno": 72
+    },
+    {
+      "name": "check_font_size",
+      "lineno": 95
+    },
+    {
+      "name": "exact_match",
+      "lineno": 109
+    },
+    {
+      "name": "match_in_list",
+      "lineno": 119
+    },
+    {
+      "name": "are_lists_equal",
+      "lineno": 129
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 144
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测Chrome浏览器任务（任务ID：L3_chrome_f79439ad-3ee8-4f99-a518-0eb60e5652b0）的完成状态与输出正确性。核心验证对象包括三类：一是Chrome当前打开的标签页URL集合，二是页面默认字体大小，三是通用数据匹配结果。对于标签页检查，evaluator从open_tabs中提取实际URL列表，与rule中给定的expected_urls进行无序列表相等比对，比对时使用自定义的URL规范化逻辑（自动补全缺失的http协议、去除www子域名、忽略顶级域名后缀、并可按full参数决定是否保留查询参数与片段），通过则返回1.0，失败返回0.0。对于字体大小，支持精确值相等检查与开区间范围检查。此外，exact_match与match_in_list提供通用判定能力，分别用于严格相等检查和列表成员检查。各函数独立评分，成功返回1.0，失败返回0.0（或抛出异常），整体采用“单项规则必须精确满足”的判定思路，无加权累计逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_tabs",
+        "lineno": 72,
+        "description": "检查对象：Chrome当前打开的标签页列表。输入参数open_tabs为标签页字典列表（每个字典包含url等字段），rule为匹配规则字典。检查步骤：1）若open_tabs为空列表，直接返回0.0；2）读取rule['type']，当前仅支持\"url\"类型；3）从rule中提取expected_urls，从open_tabs各元素中提取actual_urls；4）调用are_lists_equal(expected_urls, actual_urls, compare_urls)进行无序列表相等比对。判定依据：若are_lists_equal返回True，返回1.0；若返回False，记录error日志（输出预期与实际URL列表）并返回0；若rule['type']为不支持的类型，同样记录error并返回0。"
+      },
+      {
+        "name": "check_font_size",
+        "lineno": 95,
+        "description": "检查对象：页面默认字体大小。输入参数font_size为包含default_font_size键的字典，rule为规则字典。检查步骤：1）若rule['type']为'value'，比较default_font_size是否精确等于rule['value']；2）若rule['type']为'range'，检查default_font_size是否严格大于rule['min']且严格小于rule['max']。判定依据：满足对应条件返回1.0，否则返回0.0；若rule['type']为其他值，抛出TypeError。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 109,
+        "description": "检查对象：通用精确匹配结果。输入参数result为实际结果，rules为包含\"expected\"键的规则字典。检查步骤：使用==运算符比较result与rules[\"expected\"]。判定依据：完全相等返回1.0，否则返回0.0。执行过程中会通过print输出result与expect的值。"
+      },
+      {
+        "name": "match_in_list",
+        "lineno": 119,
+        "description": "检查对象：通用列表成员匹配。输入参数result为实际结果，rules为包含\"expected\"键的规则字典（其值为列表）。检查步骤：使用in运算符检查result是否存在于rules[\"expected\"]列表中。判定依据：若存在返回1.0，否则返回0.0。执行过程中会通过print输出result与expect的值。"
+      },
+      {
+        "name": "are_lists_equal",
+        "lineno": 129,
+        "description": "检查对象：两个列表的无序相等性。输入参数list1、list2为待比较的两个列表，comparison_func为外部传入的元素级比较函数。检查步骤：1）先比较两列表长度，不一致直接返回False；2）遍历list1中的每个item1，在list2中查找是否存在至少一个item2使得comparison_func(item1, item2)为True；若list1中有任何元素找不到匹配，返回False。判定依据：长度一致且list1中所有元素均在list2中找到匹配，则返回True；否则返回False。该逻辑不保证元素顺序一致，依赖comparison_func定义元素等价性。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 144,
+        "description": "检查对象：两个URL字符串的等价性。输入参数url1、url2为待比较URL，full为可选布尔参数（默认True）。检查步骤：1）若任一URL为None，直接通过==比较并返回结果；2）内部调用parse_with_default_scheme为无scheme的URL自动补全\"http://\"前缀；3）通过normalize_url进行多步规范化：scheme转小写；使用tldextract提取域名，若子域名仅为\"www\"则去除；忽略顶级域名后缀（suffix），仅保留主域名；路径若为根目录\"/\"则置空；根据full参数决定是否保留params、query、fragment（full=True时保留，否则清空）；4）比较规范化后的URL字符串是否完全相等。判定依据：规范化后字符串相等返回True，否则返回False。过程中会记录info日志输出原始URL与规范化后的URL。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:10:32",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_f79439ad-3ee8-4f99-a518-0eb60e5652b0/evaluator_function_labels.json"
+}

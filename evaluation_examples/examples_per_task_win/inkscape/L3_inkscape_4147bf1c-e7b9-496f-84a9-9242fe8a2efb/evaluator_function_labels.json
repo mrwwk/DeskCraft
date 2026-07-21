@@ -1,0 +1,145 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_4147bf1c-e7b9-496f-84a9-9242fe8a2efb/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 94
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 127
+    },
+    {
+      "name": "check_inkscape_align",
+      "lineno": 165
+    },
+    {
+      "name": "check_inkscape_group_children",
+      "lineno": 223
+    },
+    {
+      "name": "check_inkscape_icon_composition",
+      "lineno": 270
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 18
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 31
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 50
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 58
+    },
+    {
+      "name": "_get_float",
+      "lineno": 66
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 77
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 86
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 94
+    },
+    {
+      "name": "check_inkscape_document_properties",
+      "lineno": 127
+    },
+    {
+      "name": "check_inkscape_align",
+      "lineno": 165
+    },
+    {
+      "name": "check_inkscape_group_children",
+      "lineno": 223
+    },
+    {
+      "name": "check_inkscape_icon_composition",
+      "lineno": 270
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape编辑后生成的SVG文件是否满足特定任务要求。核心检查对象包括：指定矢量元素的填充颜色、SVG文档的宽高尺寸、多个元素是否沿水平或垂直中心轴对齐、以及多个元素是否被正确归入同一个<g>分组。检查方式以读取并解析SVG XML为基础，通过元素id定位目标节点，提取style属性或几何属性进行精确匹配或容差比较。成功判定采用严格阈值机制：颜色必须经过规范化后严格相等（含'none'特殊处理），尺寸偏差绝对值不得超过5个单位，对齐偏差不得超过指定容差（默认10个单位），分组要求所有元素指向同一父对象且父节点必须为<g>标签。对于复杂图标组合任务，采用多指标串联判定逻辑，所有子检查必须全部通过（返回值严格等于1.0）才算整体成功，任一子检查失败即整体失败。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 94,
+        "description": "验证指定id元素的fill填充颜色。首先调用_parse_svg解析SVG文件，若解析失败返回0.0；再通过_find_element_by_id定位目标元素，若元素不存在返回0.0。获取实际fill值时，优先通过_get_style_prop从元素的style属性或直接属性中读取；若元素本地标签为'text'且自身无fill，则遍历其<tspan>子元素继续查找fill。随后使用_normalize_color将实际颜色与rule中的expected_fill统一规范化（处理3位hex扩展、8位hex截断、大小写统一及'none'保留）。若预期为'none'，则实际必须为'none'才返回1.0；否则要求两者严格相等。完全匹配返回1.0，任何环节失败返回0.0。"
+      },
+      {
+        "name": "check_inkscape_document_properties",
+        "lineno": 127,
+        "description": "验证SVG文档的宽高尺寸。首先调用_parse_svg解析SVG文件，失败返回0.0。若rule包含expected_width，从根元素root的width属性读取实际宽度；若缺失则从viewBox属性（格式为'min-x min-y width height'）的第3个分量提取，并通过_get_float转为浮点数。将实际宽度与预期宽度比较，绝对差值超过5即返回0.0。同理检查expected_height：优先读取root的height属性，缺失时取viewBox第4个分量。任一维度差值超过5返回0.0；全部在容差范围内返回1.0。"
+      },
+      {
+        "name": "check_inkscape_align",
+        "lineno": 165,
+        "description": "验证多个指定元素是否沿同一中心轴对齐。调用_parse_svg解析SVG，失败返回0.0。遍历rule中的element_ids，通过_find_element_by_id定位每个元素，缺失则返回0.0。根据元素类型计算几何中心：rect取x+width/2与y+height/2，circle/ellipse取cx/cy，其他类型取x/y。若align_axis为'horizontal_center'，计算所有元素cx的平均值，要求每个cx与平均值的偏差不超过tolerance（默认10）；若为'vertical_center'，则对cy做同样检查。任一元素超差返回0.0，全部满足返回1.0。"
+      },
+      {
+        "name": "check_inkscape_group_children",
+        "lineno": 223,
+        "description": "验证多个元素是否属于同一个<g>分组。调用_parse_svg解析SVG，失败返回0.0。构建parent_map字典记录每个子元素到其父元素的映射。遍历element_ids确认所有元素存在且均有父节点，否则返回0.0。要求所有元素共享同一个父对象（通过id(parent)判断唯一性）。若rule提供group_id，则父元素的id属性必须严格匹配该值。最后通过_tag_local验证父元素的本地标签名必须为'g'。任一条件不满足返回0.0，全部满足返回1.0。"
+      },
+      {
+        "name": "check_inkscape_icon_composition",
+        "lineno": 270,
+        "description": "针对图标组合任务执行多维度串联检查，所有子检查必须全部通过才算成功。检查顺序为：若rule包含group_check，调用check_inkscape_group_children；遍历rule中的fill_checks列表，对每个子rule调用check_inkscape_fill_color；若包含doc_check，调用check_inkscape_document_properties；若包含align_check，调用check_inkscape_align。每个子检查的返回值必须严格大于等于1.0，任一不满足立即返回0.0；所有检查通过后返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 14,
+        "description": "解析CSS样式字符串（如'fill:#ff0000;stroke:#000'），按分号分割后提取键值对并去除空白，返回字典。服务于_get_style_prop，用于从SVG元素的inline style属性中提取具体样式值。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 25,
+        "description": "规范化颜色值以便统一比较：将3位hex（如#f00）扩展为6位（#ff0000），将8位hex（#rrggbbaa）截断为6位（#rrggbb），统一转换为小写，保留'none'原值。被check_inkscape_fill_color调用，用于统一预期颜色与实际颜色的比较基准。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 40,
+        "description": "遍历SVG根元素下的所有后代节点，匹配id属性等于传入element_id的元素并返回；未找到返回None。是多个主函数定位目标SVG元素的核心查找器。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 47,
+        "description": "获取元素的指定样式属性：先通过_parse_style解析该元素的style属性字符串，若目标属性存在则返回；否则回退到该元素的直接属性（如fill）。被check_inkscape_fill_color用于提取元素的fill值。"
+      },
+      {
+        "name": "_get_float",
+        "lineno": 55,
+        "description": "安全地将字符串转为浮点数，自动去除末尾的单位字符（如px、mm、%等）。若转换失败或输入为None，返回default。被check_inkscape_document_properties、check_inkscape_align等用于解析几何尺寸、坐标和容差值。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 65,
+        "description": "使用xml.etree.ElementTree解析指定路径的SVG文件，成功返回(tree, root)元组；任何异常导致解析失败则返回(None, None)。是所有主函数的入口级文件读取与XML解析器。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 73,
+        "description": "去除XML命名空间前缀，返回元素的本地标签名（如将'{http://www.w3.org/2000/svg}g'转为'g'）。被check_inkscape_fill_color、check_inkscape_group_children等用于判断元素类型或分组标签。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:46:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L3_inkscape_4147bf1c-e7b9-496f-84a9-9242fe8a2efb/evaluator_function_labels.json"
+}

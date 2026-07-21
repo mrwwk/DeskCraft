@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_82bc8d6a-36eb-4d2d-8801-ef714fb1e55a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_flight_search",
+      "lineno": 9
+    },
+    {
+      "name": "check_do_not_track",
+      "lineno": 81
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_flight_search",
+      "lineno": 9
+    },
+    {
+      "name": "check_do_not_track",
+      "lineno": 81
+    },
+    {
+      "name": "_recursive_search_dnt",
+      "lineno": 150
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对两类独立的浏览器相关任务进行判定：第一类是验证智能体是否成功在 Chrome 中访问了 Qatar Airways 的航班搜索结果页，判定依据是 Chrome History SQLite 数据库的 urls 表中是否存在一条 URL，该 URL 必须同时包含 rules 中指定的所有关键词片段（不区分大小写），且若提供了日期片段则也必须出现在该 URL 中（区分大小写）；第二类是验证 Chrome 的\"请勿跟踪\"（Do Not Track）隐私选项是否被开启，判定依据是 Chrome Preferences JSON 文件中是否存在代表 DNT 启用的配置项。两个主函数各自独立执行文件读取、数据解析、条件匹配，最终都以 1.0（成功）或 0.0（失败）的二分方式返回结果。",
+    "main_functions": [
+      {
+        "name": "check_flight_search",
+        "lineno": 9,
+        "description": "该函数用于检查 Chrome 历史记录数据库，验证智能体是否访问过符合要求的 Qatar Airways 航班搜索页面。输入 result_path 为从 VM 中捕获的 Chrome History SQLite 文件路径，rules 中需提供 url_contains（字符串列表）和可选的 date_contains（字符串）。执行步骤如下：首先校验路径非 None 且文件存在，否则直接返回 0.0；随后从 rules 中提取 url_contains 与 date_contains，若 url_contains 为空列表也直接返回 0.0；接着使用 sqlite3 连接数据库并执行 SELECT url FROM urls 获取全部历史 URL；遍历每一行 URL 时，先将 URL 转为小写，逐一检查 url_contains 中的每个模式是否都出现在该 URL 中（全部匹配，不区分大小写）；若全部匹配且 date_contains 为空或出现在原始 URL 中（区分大小写），则立即返回 1.0；若遍历完所有 URL 均未命中，返回 0.0。过程中若发生 sqlite3.OperationalError 或其他异常，也返回 0.0。"
+      },
+      {
+        "name": "check_do_not_track",
+        "lineno": 81,
+        "description": "该函数用于检查 Chrome 偏好设置文件，验证\"请勿跟踪\"（Do Not Track）功能是否已启用。输入 result_path 为从 VM 中捕获的 Chrome Preferences JSON 文件路径，rules 中通常包含 expected: \"true\"。执行步骤如下：首先校验路径非 None 且文件存在，否则返回 0.0；然后以 UTF-8 编码读取并解析 JSON，若解析失败返回 0.0；接着按三种方法依次检查 DNT 状态，任一方法命中即视为启用：方法一是检查 prefs['profile']['enable_do_not_track'] 是否为 True（适用于旧版 Chrome）；方法二是检查 prefs['profile']['content_settings']['exceptions']['do_not_track'] 下是否存在某个键的 value['setting'] 为 1 或 \"1\"（适用于新版 Chrome）；方法三是在前两种均未命中时，调用辅助函数 _recursive_search_dnt 对整个 JSON 对象进行递归兜底搜索。最终若 dnt_enabled 为 True 返回 1.0，否则返回 0.0。读取或解析异常均返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_recursive_search_dnt",
+        "lineno": 149,
+        "description": "该辅助函数为 check_do_not_track 的第三种检测方法提供兜底能力。它接收一个可能是嵌套字典或列表的 JSON 对象 obj，递归遍历其所有层级（最大深度 12 层），查找是否存在任何键名包含子串 'do_not_track'（不区分大小写）且对应值为真值（True、1 或字符串 \"true\"）的项。若找到则立即返回 True，否则遍历完成后返回 False。该函数通过递归同时处理 dict 与 list 结构，用于兼容 Chrome Preferences 中 DNT 配置可能出现在非标准路径的情况。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:10:16",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_82bc8d6a-36eb-4d2d-8801-ef714fb1e55a/evaluator_function_labels.json"
+}

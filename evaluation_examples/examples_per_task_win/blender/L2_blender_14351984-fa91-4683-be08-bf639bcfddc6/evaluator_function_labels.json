@@ -1,0 +1,65 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_14351984-fa91-4683-be08-bf639bcfddc6/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_animation_extended",
+      "lineno": 68
+    },
+    {
+      "name": "check_blender_fps",
+      "lineno": 101
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "check_blender_render_settings",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_animation_extended",
+      "lineno": 68
+    },
+    {
+      "name": "check_blender_fps",
+      "lineno": 101
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Blender 相关任务的完成状态，核心思路是读取外部 Blender 检查脚本（如 check_render.py、check_animation.py）打印的 JSON 输出，并对渲染参数与动画属性做精确匹配。检查采用严格的“全部满足”逻辑：针对 rule 中列出的每一项指标（如引擎类型、分辨率、帧率、采样数、输出格式、活动相机、关键帧数量、最大帧范围等），要求解析后的 JSON 值与期望值完全相等或满足阈值要求，任何一项不匹配即判定失败（返回 0.0），全部通过则判定成功（返回 1.0）。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_settings",
+        "lineno": 33,
+        "description": "接收 command_output（来自 Blender 检查脚本的 JSON 字符串）和 rule（字典）。首先调用 _parse_blender_output 将原始输出解析为字典；若解析失败返回 0.0。随后对 rule 中可能出现的以下字段进行逐项精确比对：engine、resolution_x、resolution_y、fps、samples、image_format、active_camera。每一项均要求 result[key] == rule[key]，属于严格相等比较。若 rule 中指定的任一字段与解析结果不符，立即记录警告并返回 0.0；所有指定字段全部匹配则返回 1.0。"
+      },
+      {
+        "name": "check_blender_animation_extended",
+        "lineno": 68,
+        "description": "接收 command_output（来自 check_animation.py 等脚本的 JSON 字符串）和 rule（字典，预期包含 object_name、可选 min_keyframe_count 与 max_frame）。首先调用 _parse_blender_output 解析 JSON；若失败返回 0.0。接着以 rule['object_name'] 为键从结果字典中提取该对象的动画数据 obj_anim，若对象不存在返回 0.0。然后分两支检查：若 rule 包含 min_keyframe_count，要求 obj_anim['keyframe_count'] 大于等于该阈值；若 rule 包含 max_frame，要求 obj_anim['frame_range'] 列表的第二个元素（最大帧）大于等于该阈值。任一条件不满足即返回 0.0，全部满足返回 1.0。"
+      },
+      {
+        "name": "check_blender_fps",
+        "lineno": 101,
+        "description": "该函数是 check_blender_render_settings 的薄封装，仅用于专门校验 FPS 设置。接收参数与 check_blender_render_settings 完全相同（command_output 与 rule），内部直接原样调用 check_blender_render_settings(command_output, rule) 并返回其结果。判定逻辑完全复用父函数，即要求解析结果中的 fps 字段与 rule['fps'] 精确相等。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 18,
+        "description": "负责将 Blender 检查脚本的原始命令行输出字符串转换为 Python 字典。具体行为：先判断输出是否为空或仅含空白，若是则记录错误并返回 None；否则对字符串 strip 后执行 json.loads。若遇到 JSONDecodeError 或 ValueError，记录错误及原始输出内容后返回 None。该函数被 check_blender_render_settings、check_blender_animation_extended 等主函数复用，作为主评测链路的数据入口；返回 None 时主函数会直接判定为失败（0.0）。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:35:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_14351984-fa91-4683-be08-bf639bcfddc6/evaluator_function_labels.json"
+}

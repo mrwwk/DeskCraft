@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_2824f346-6ec2-4cf8-968c-99ccbd3421d8/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 43
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 56
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 针对多应用任务的结果进行二元判定（0.0 或 1.0）。它通过两种独立机制验证任务产出：一是对输出文本进行包含与排除规则检查，要求结果字符串必须同时包含所有指定片段且不得出现任何禁用片段；二是对 JSON 配置文件进行键值对精确比对，要求实际 JSON 文件中的字段和值与预期设置完全一致。两种检查均采用“全部满足则得 1.0，任一不满足则得 0.0”的严格判定逻辑，不存在加权或累计打分。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 43,
+        "description": "该函数接收 result（待检查的字符串）和 rules（规则字典）作为输入。首先从 rules 中提取 include 列表（必须包含的字符串）和 exclude 列表（必须排除的字符串）。若 result 为 None，直接返回 0.0。随后执行组合条件判断：result 必须同时满足“包含 include 中所有字符串”且“不包含 exclude 中任何字符串”。两项条件全部满足返回 1.0，否则返回 0.0。该函数不涉及文件读取，仅对传入的字符串做纯文本包含性检查。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 56,
+        "description": "该函数接收 actual（实际 JSON 文件的路径字符串）和 expected（包含预期配置的字典）作为输入。首先判断 actual 是否为空，为空则返回 0.0。接着打开 actual 路径对应的文件并解析为 JSON 对象。然后从 expected 字典中取出键 'expected' 对应的子字典，遍历该子字典中的每一对 key-value，逐一检查实际 JSON 对象中是否存在相同键且值完全相等。若出现键缺失或值不匹配，立即返回 0.0；仅当所有预期键值对全部精确匹配时，才返回 1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:20:30",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_2824f346-6ec2-4cf8-968c-99ccbd3421d8/evaluator_function_labels.json"
+}

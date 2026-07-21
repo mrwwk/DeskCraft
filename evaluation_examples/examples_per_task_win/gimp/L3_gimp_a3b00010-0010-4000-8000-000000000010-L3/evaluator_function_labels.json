@@ -1,0 +1,131 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00010-0010-4000-8000-000000000010-L3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "check_l3_transparency_course_assets_complete",
+      "lineno": 327
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 60
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 85
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 103
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 132
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 276
+    },
+    {
+      "name": "_check_infographic_step_modules",
+      "lineno": 284
+    },
+    {
+      "name": "check_l3_transparency_course_assets_complete",
+      "lineno": 327
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP任务L3-10（透明度课程资源包）的最终产出是否完整且符合规范。它要求被测环境提供三个文件：封面图cover_png、信息图infographic_png、以及GIMP源文件xcf_path。验证采用严格的二元累积逻辑：依次检查文件存在性、PNG格式、图像尺寸（封面1600×900、信息图1600×2000）、封面关键区域（top_left、center、bottom_right）的边缘密度与OCR关键词（TRANSPARENCY、COURSE）、信息图是否包含至少4个水平文本/内容模块、以及XCF图层结构（必须包含Cover_Group、Infographic_Group、Icons_Group、Text_Group）共9项子检查。所有子检查必须全部通过（由_all_binary_checks_pass聚合），任一失败则整体返回0.0，只有全部满足才返回1.0。",
+    "main_functions": [
+      {
+        "name": "check_image_dimensions",
+        "lineno": 23,
+        "description": "接收image_path、expected_width、expected_height（可选）及tolerance（默认5）。使用PIL打开图像获取实际宽高，先判断宽度与expected_width的绝对差是否在容差范围内；若提供了expected_height，则高度也必须同时在容差范围内匹配。宽度和高度（如适用）均满足时返回1，否则返回0。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 60,
+        "description": "接收image_path。使用PIL打开图像文件，读取img.format字段，严格判断其是否等于'PNG'。是则返回1，文件不存在、打开失败或格式非PNG均返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 85,
+        "description": "接收file_path。直接调用os.path.isfile判断指定路径是否为存在的文件。若文件存在返回1，路径为None或文件不存在返回0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 139,
+        "description": "接收xcf_path和rule字典（必须包含layers列表，ordered布尔值默认False）。首先验证文件存在且二进制内容以b'gimp xcf'开头。优先尝试使用gimpformats库解析XCF，提取所有图层名，检查是否包含全部expected_layers；若ordered为True，还要求这些图层在文件中的出现顺序与expected_layers列表顺序一致。若gimpformats解析失败或不可用，回退到二进制字节流搜索：在文件内容中查找每个图层名UTF-8编码的字节位置，确保全部存在；若ordered为True，还要求各位置按expected_layers顺序递增。任一环节失败返回0，全部通过返回1。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 217,
+        "description": "接收image_path和rule字典（regions默认['center']，keywords可选，min_edge_density默认0.008，edge_threshold默认40.0）。先将图像转为灰度图，对每个指定region调用_resolve_region_bbox裁剪出子区域，计算_edge_density边缘密度。若任一区域边缘密度低于min_edge_density，立即返回0。若rule中提供了keywords，则尝试使用pytesseract进行OCR，将识别到的全文转小写并归一化空白字符后，检查每个keyword是否被包含；OCR若失败仅记录warning，不会直接导致失败（前提是前面边缘密度已通过）。所有区域边缘密度达标且关键词（如有）均命中时返回1。"
+      },
+      {
+        "name": "check_l3_transparency_course_assets_complete",
+        "lineno": 327,
+        "description": "接收result_paths列表，要求至少包含3个元素，依次提取cover_png、infographic_png、xcf_path。顺序执行9项二元检查：cover_png与infographic_png的文件存在性、两者的PNG格式验证、封面尺寸1600×900、信息图尺寸1600×2000、封面文本区域检查（regions为['top_left','center','bottom_right']，keywords为['TRANSPARENCY','COURSE']，min_edge_density为0.006）、信息图模块检查（_check_infographic_step_modules要求至少4个水平内容带）、XCF图层结构检查（要求包含['Cover_Group','Infographic_Group','Icons_Group','Text_Group']且ordered为False）。将9个得分传入_all_binary_checks_pass，仅当所有得分均≥1.0时返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 103,
+        "description": "接收图像width、height和region_name字符串。将语义区域名（如'top_left'、'top_center'、'center'、'bottom'、'left'等）映射为具体的像素坐标元组(x0, y0, x1, y1)。例如'top_left'对应(0, 0, w//3, h//3)，'center'对应(w//4, h//4, 3*w//4, 3*h//4)。供需要按区域裁剪图像的检查函数（如check_text_in_region_keywords）调用。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 131,
+        "description": "接收灰度numpy数组gray_array和edge_threshold（默认40.0）。分别计算图像在x轴和y轴方向的梯度绝对值，求和得到边缘强度图，统计其中强度超过阈值的像素所占比例，返回该比例值（float）。用于量化图像某区域是否含有足够的纹理或文字边缘，是文本区域检测和模块检测的核心度量。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 296,
+        "description": "接收scores列表，过滤掉None值后，将所有有效分数转为float。仅当所有有效分数均大于等于1.0时返回1.0，否则返回0.0。是check_l3_transparency_course_assets_complete的最终聚合器，实现“全部子检查通过才算通过”的严格逻辑。"
+      },
+      {
+        "name": "_check_infographic_step_modules",
+        "lineno": 305,
+        "description": "接收image_path和min_modules（默认4）。将图像垂直均分为min_modules个水平条带，每条带在横向上取0.12*w到0.88*w的中心区域。对每个区域计算_edge_density（阈值40.0）以及灰度标准差std_v，仅当edge_d≥0.007且std_v≥10.0时才计为一个有效模块。若检测到的有效模块数大于等于min_modules则返回1，否则返回0。用于验证信息图是否包含足够数量的内容区块或步骤条带。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:20:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00010-0010-4000-8000-000000000010-L3/evaluator_function_labels.json"
+}

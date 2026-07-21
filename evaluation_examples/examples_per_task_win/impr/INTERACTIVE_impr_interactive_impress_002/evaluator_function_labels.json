@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_002/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_summary_slide",
+      "lineno": 9
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_summary_slide",
+      "lineno": 9
+    },
+    {
+      "name": "_extract_pptx_slide_texts",
+      "lineno": 54
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "The evaluator verifies that the final PPTX has a summary slide at the end. It reads the PPTX as a zip/xml archive, extracts text from each slide in slide order, checks that the total slide count is at least the expected minimum, and confirms that the last slide contains all required strings.",
+    "main_functions": [
+      {
+        "name": "check_summary_slide",
+        "lineno": 9,
+        "description": "Validates the result PPTX by extracting slide text, enforcing the minimum slide count, and checking that the last slide contains the requested title and body text."
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_extract_pptx_slide_texts",
+        "lineno": 54,
+        "description": "Uses Python standard-library zip/xml parsing to return a list of slide text strings ordered by slide number."
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:21:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/INTERACTIVE_impr_interactive_impress_002/evaluator_function_labels.json"
+}

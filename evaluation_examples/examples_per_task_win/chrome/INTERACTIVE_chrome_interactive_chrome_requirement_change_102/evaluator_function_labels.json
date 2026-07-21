@@ -1,0 +1,52 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_requirement_change_102/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 62
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_normalize_access_tree_url",
+      "lineno": 10
+    },
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 33
+    },
+    {
+      "name": "is_expected_tabs",
+      "lineno": 62
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器标签页状态是否达到任务预期。它核心检查两类对象：一是当前活动标签页的URL（通过active_tab_info获取），二是当前所有打开标签页的URL列表（通过open_tabs获取）。评测时，将实际获取的URL与规则（rule）中指定的期望URL进行比对：对于活动标签页，使用compare_urls进行单URL等价比较；对于标签页集合，使用are_lists_equal结合compare_urls进行列表级匹配。由于accessibility tree获取URL时可能错误地给本地文件路径添加https://前缀，evaluator会先通过_normalize_access_tree_url将形如https:///path的损坏URL修复为file:///path。判定采用二元打分制：URL（或URL列表）完全匹配则返回1，否则返回0；若规则类型不支持，同样返回0。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 33,
+        "description": "检查Chrome当前活动标签页的URL是否与规则期望一致。接收active_tab_info（通常为包含'url'键的字典，也可能直接是URL字符串）和rule（包含'type'和'url'字段的规则字典）。首先判断active_tab_info是否为空，为空则直接返回0。随后解析rule['type']，目前仅支持'url'类型：提取rule['url']作为期望URL，从active_tab_info中解析实际URL（字典则取'url'键值，否则视为URL本身）；若实际URL非空，先调用_normalize_access_tree_url对其进行规范化以修复可能的https:///前缀错误；最后调用compare_urls(expected_url, actual_url)进行比较，若返回True则得1分，否则得0分。若rule['type']不是'url'，则记录错误日志并返回0。"
+      },
+      {
+        "name": "is_expected_tabs",
+        "lineno": 62,
+        "description": "检查Chrome当前所有打开标签页的URL列表是否与规则期望完全一致。接收open_tabs（标签页字典列表，每个字典应包含'url'键）和rule（包含'type'和'urls'字段的规则字典）。首先判断open_tabs是否为空，为空则直接返回0。解析rule['type']，目前仅支持'url'类型：提取rule['urls']作为期望URL列表，并从open_tabs的每个元素中抽取'url'组成实际URL列表actual_urls；然后调用are_lists_equal(expected_urls, actual_urls, compare_urls)进行列表比对，其中compare_urls作为元素级比较函数。若列表不匹配，记录错误日志并返回0；若匹配则返回1。若rule['type']不是'url'，则记录错误日志并返回0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_access_tree_url",
+        "lineno": 12,
+        "description": "修复因accessibility tree getter错误添加前缀而损坏的本地文件URL。输入为url字符串，若为空则原样返回。使用正则表达式 '^https://(/[^/].*)$' 检测'https://'后紧跟单斜杠与绝对路径的模式（例如https:///home/user/foo.html），若匹配则将其替换为'file://'前缀并返回修复后的URL；若不匹配则返回原始URL。该函数在is_expected_active_tab中被调用，用于预处理从accessibility tree获取的实际URL，防止本地文件路径因错误前缀导致与期望URL比较失败。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:03:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/INTERACTIVE_chrome_interactive_chrome_requirement_change_102/evaluator_function_labels.json"
+}

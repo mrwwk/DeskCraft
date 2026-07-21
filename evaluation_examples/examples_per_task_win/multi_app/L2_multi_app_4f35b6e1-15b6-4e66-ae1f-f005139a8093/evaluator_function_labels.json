@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_4f35b6e1-15b6-4e66-ae1f-f005139a8093/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_chrome_tab_url",
+      "lineno": 14
+    },
+    {
+      "name": "check_trimmed_match",
+      "lineno": 49
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 66
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_chrome_tab_url",
+      "lineno": 14
+    },
+    {
+      "name": "check_trimmed_match",
+      "lineno": 49
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 66
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证一个涉及Chrome与VS Code:的多步骤任务是否完成，采用\"全部满足（conj='and'）\"的联合判定逻辑。任务要求最终同时达成三个状态：1）Chrome浏览器通过DevTools Protocol（localhost:9222/json）暴露的标签页列表中，存在URL与目标地址精确匹配或以目标地址开头的标签页（兼容尾部斜杠、查询参数等浏览器自动追加内容）；2）指定文本文件（如~/Desktop/docs_url.txt）经去除首尾空白后，内容与预期URL完全一致；3）VS Code:的settings.json文件中包含所有预期的键值对，且值精确相等。三个检查函数分别返回1.0（通过）或0.0（不通过），必须全部返回1.0任务才算成功。",
+    "main_functions": [
+      {
+        "name": "check_chrome_tab_url",
+        "lineno": 14,
+        "description": "接收Chrome DevTools Protocol返回的JSON字符串（通常通过curl http://localhost:9222/json获取）和包含目标URL的rules字典。首先检查result是否为None，并提取rules中的\"url\"作为target_url；若任一为空直接返回0.0。接着将result解析为JSON，要求顶层必须是列表；遍历列表中的每个tab对象，跳过非字典项，读取tab的\"url\"字段。判定条件为：tab_url与target_url精确相等，或tab_url以target_url开头（用于兼容Chrome自动追加的尾部斜杠、片段或查询参数）。只要有一个tab满足即返回1.0，全部遍历后无匹配则返回0.0。"
+      },
+      {
+        "name": "check_trimmed_match",
+        "lineno": 49,
+        "description": "接收命令输出字符串（例如cat ~/Desktop/docs_url.txt的结果）和包含预期内容的rules字典。首先检查result是否为None；然后提取rules中的\"expected\"，将result与expected分别执行strip()去除首尾空白后进行相等比较。若完全一致则返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 66,
+        "description": "接收VS Code: settings.json的本地文件路径（由vm_file getter提供）和包含预期键值对的expected字典。首先检查路径是否为空或文件不存在；随后以utf-8编码打开文件并解析为JSON。从expected中获取\"expected\"字段作为待匹配的键值对字典，遍历其中每一项，检查该键是否存在于实际JSON中且对应的值完全相等。若所有键值对均存在且匹配则返回1.0，任一缺失或值不匹配则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:21:46",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_4f35b6e1-15b6-4e66-ae1f-f005139a8093/evaluator_function_labels.json"
+}

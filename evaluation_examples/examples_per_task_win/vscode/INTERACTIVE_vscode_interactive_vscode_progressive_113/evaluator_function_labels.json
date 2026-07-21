@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_progressive_113/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 采用严格的精确匹配策略判定任务是否完成。它接收任务产生的实际结果 result 与包含预期答案的规则字典 rules，直接通过 Python 的 == 运算符将实际结果与 rules['expected'] 进行严格相等比较。若两者完全一致（包括数据类型、格式、大小写、空白字符等），则返回 1.0 表示任务成功；若存在任何差异，则返回 0.0 表示任务失败。这是一种无容错、无近似匹配的零容忍判定方式，适用于要求输出必须与标准答案完全相同的确定性任务。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该函数接收任务实际输出 result 和评测规则字典 rules 作为输入。其检查步骤如下：首先从 rules 字典中提取键名为 'expected' 的预期值；随后通过 print 打印 result 与 expect 以便调试观察；最后执行 result == expect 的严格相等比较。判定依据为：若 result 与 expect 完全相等，则返回浮点数 1.0 表示成功；否则返回 0.0 表示失败。该函数不调用任何其他辅助函数，直接基于严格相等性完成判定，对字符串大小写、空白字符、数据类型等均不做任何容错或归一化处理。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:39:51",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_progressive_113/evaluator_function_labels.json"
+}
