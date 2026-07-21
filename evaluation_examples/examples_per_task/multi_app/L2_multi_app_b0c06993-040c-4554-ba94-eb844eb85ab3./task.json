@@ -52,7 +52,7 @@
     "file": "evaluator.py",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 << 'EOF'\nimport json, urllib.request\nr = {}\ntry:\n    with open('/home/user/Desktop/audit_summary.txt') as f:\n        r['summary'] = f.read().strip()\nexcept Exception:\n    r['summary'] = ''\ntry:\n    with open('/home/user/.config/Code/User/settings.json') as f:\n        r['vscode'] = json.load(f)\nexcept Exception:\n    r['vscode'] = {}\ntry:\n    tabs = json.loads(urllib.request.urlopen('http://localhost:9222/json', timeout=5).read())\n    r['chrome_url'] = next((t.get('url', '') for t in tabs if t.get('type') == 'page'), '')\nexcept Exception:\n    r['chrome_url'] = ''\nprint(json.dumps(r))\nEOF",
+      "command": "python3 << 'EOF'\nimport json, urllib.request\nfrom pathlib import Path\nsummary = Path('/home/user/Desktop/audit_summary.txt').read_text(encoding='utf-8').splitlines() if Path('/home/user/Desktop/audit_summary.txt').exists() else []\nif len(summary) != 2 or summary != ['py_files=4', 'total_lines=73']:\n    print('{}')\n    raise SystemExit\nr = {}\nr['summary'] = '\\n'.join(summary)\nr['vscode'] = json.loads(Path('/home/user/.config/Code/User/settings.json').read_text(encoding='utf-8')) if Path('/home/user/.config/Code/User/settings.json').exists() else {}\ntry:\n    tabs = json.loads(urllib.request.urlopen('http://localhost:9222/json', timeout=5).read())\n    r['chrome_url'] = next((t.get('url', '') for t in tabs if t.get('type') == 'page'), '')\nexcept Exception:\n    r['chrome_url'] = ''\nprint(json.dumps(r))\nEOF",
       "shell": true
     },
     "expected": {
@@ -64,7 +64,9 @@
         },
         "vscode_settings": {
           "editor.tabSize": 4,
-          "editor.rulers": [79]
+          "editor.rulers": [
+            79
+          ]
         },
         "chrome_url": "https://peps.python.org/pep-0008/"
       }

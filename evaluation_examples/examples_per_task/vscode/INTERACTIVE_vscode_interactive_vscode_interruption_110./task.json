@@ -67,14 +67,15 @@
     "func": "check_customer_update_file",
     "file": "evaluator.py",
     "result": {
-      "type": "vm_file",
-      "path": "/home/user/Desktop/vscode_customer_update_110/customer_update.md",
-      "dest": "customer_update.md"
+      "type": "vm_command_line",
+      "command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nbase = Path('/home/user/Desktop/vscode_customer_update_110')\ncustomer = base / 'customer_update.md'\nincident = base / 'incident_report.md'\npayload = {\n    'customer_content': customer.read_text(encoding='utf-8') if customer.exists() else None,\n    'incident_exists': incident.exists(),\n    'incident_nonempty': incident.exists() and bool(incident.read_text(encoding='utf-8').strip())\n}\nprint(json.dumps(payload, ensure_ascii=False))\nPY",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected_content": "# Customer Update\nWe identified elevated API latency and are monitoring recovery.\n## Next Update\nTomorrow 10:00 AM UTC\n"
+        "expected_content": "# Customer Update\nWe identified elevated API latency and are monitoring recovery.\n## Next Update\nTomorrow 10:00 AM UTC\n",
+        "incident_must_be_absent_or_empty": true
       }
     }
   },

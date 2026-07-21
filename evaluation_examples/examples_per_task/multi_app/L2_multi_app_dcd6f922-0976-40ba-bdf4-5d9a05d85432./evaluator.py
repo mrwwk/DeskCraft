@@ -195,3 +195,19 @@ def check_all(result_state, expected=None, **options):
         )
 
     return 1.0
+
+
+from urllib.parse import urlparse, urlunparse
+
+
+def is_expected_active_tab_approximate(active_tab_info, rule, **options) -> float:
+    if not active_tab_info or not isinstance(active_tab_info, dict):
+        return 0.0
+    if rule.get('type') != 'url':
+        return 0.0
+    expected_url = rule.get('url', '')
+    actual_url = active_tab_info.get('url', '')
+    def strip_query(url):
+        parsed = urlparse(url)
+        return urlunparse(parsed._replace(query=""))
+    return 1.0 if strip_query(expected_url) == strip_query(actual_url) else 0.0

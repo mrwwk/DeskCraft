@@ -67,14 +67,16 @@
     "file": "evaluator.py",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 -c \"import json,os;from pathlib import Path;d=Path('/home/user/Desktop/vscode_handoff_106');fs=[f for f in d.iterdir() if f.suffix in('.txt','.md')];tc=sum(len(f.read_text('utf-8','ignore')) for f in fs);print(json.dumps({'file_count':len(fs),'total_chars':tc}))\"",
+      "command": "python3 - <<'PY'\nimport json\nfrom pathlib import Path\nworkspace = Path('/home/user/Desktop/vscode_handoff_106')\nhandoff = workspace / 'HANDOFF.md'\nsettings_path = Path('/home/user/.config/Code/User/settings.json')\ntry:\n    settings = json.loads(settings_path.read_text(encoding='utf-8'))\nexcept Exception:\n    settings = {}\npayload = {\n    'handoff_content': handoff.read_text(encoding='utf-8') if handoff.exists() else None,\n    'files_autoSave': settings.get('files.autoSave'),\n    'files_autoSaveDelay': settings.get('files.autoSaveDelay'),\n    'editor_wordWrap': settings.get('editor.wordWrap')\n}\nprint(json.dumps(payload, ensure_ascii=False))\nPY",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "min_files": 2,
-        "min_total_chars": 200
+        "handoff_content": "# Handoff Notes\n## Open Items\n- Verify login redirect\n- Confirm billing export\n",
+        "files_autoSave": "afterDelay",
+        "files_autoSaveDelay": 1200,
+        "editor_wordWrap": "on"
       }
     }
   },

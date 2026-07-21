@@ -63,16 +63,17 @@
     "file": "evaluator.py",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/employee_roster.xlsx'); s = df.to_string(); required = ['EMP20250316', 'Su Chenxi', 'Product Dept', 'Product Manager', 'Zhang Hua', '2025-03-16', 'P6']; print('PASSED' if all(v in s for v in required) else 'FAILED')\""
+      "command": "python3 -c \"import pandas as pd; df=pd.read_excel('/home/user/Desktop/employee_roster.xlsx'); s=df.to_string(); print('PASS' if all(v in s for v in ['EMP20250316', 'Su Chenxi', 'Product Dept', 'Product Manager', 'Zhang Hua', '2025-03-16', 'P6']) else 'FAIL')\"",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
         "include": [
-          "PASSED"
+          "PASS"
         ],
         "exclude": [
-          "FAILED"
+          "FAIL"
         ]
       }
     }

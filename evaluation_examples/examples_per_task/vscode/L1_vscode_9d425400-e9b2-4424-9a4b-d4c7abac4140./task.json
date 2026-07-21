@@ -3,7 +3,7 @@
   "task_slug": "wrapped_tabs_close_button_left",
   "difficulty": "L1",
   "snapshot": "vscode",
-  "instruction": "Please tune VS Code tab behavior in User Settings by enabling wrapped tabs, disabling tab pinning, and setting tab close button visibility to left.",
+  "instruction": "Please tune VS Code tab behavior in User Settings by enabling wrapped tabs, disabling preview tabs, and setting tab close button visibility to left.",
   "source": [
     "https://code.visualstudio.com/docs/getstarted/userinterface",
     "https://code.visualstudio.com/docs/getstarted/settings"

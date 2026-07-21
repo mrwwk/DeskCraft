@@ -33,7 +33,7 @@
     "func": [
       "check_json",
       "check_include_exclude",
-      "check_file_content"
+      "check_include_exclude"
     ],
     "file": "evaluator.py",
     "result": [
@@ -48,9 +48,9 @@
         "dest": "site.json.bak"
       },
       {
-        "type": "vm_file",
-        "path": "/home/user/Desktop/project_site/RELEASE_NOTE.txt",
-        "dest": "RELEASE_NOTE.txt"
+        "type": "vm_command_line",
+        "command": "python3 -c \"from pathlib import Path; p=Path('/home/user/Desktop/project_site/RELEASE_NOTE.txt'); s=p.read_text(encoding='utf-8').strip() if p.exists() else ''; print('PASS' if s=='metadata updated' else 'FAIL')\"",
+        "shell": true
       }
     ],
     "expected": [
@@ -95,9 +95,11 @@
         "type": "rule",
         "rules": {
           "include": [
-            "metadata updated"
+            "PASS"
           ],
-          "exclude": []
+          "exclude": [
+            "FAIL"
+          ]
         }
       }
     ],

@@ -153,6 +153,25 @@
               {
                 "type": "selector_exists",
                 "selector": "dialog#demoDialog button#closeDialog"
+              },
+              {
+                "type": "selector_exists",
+                "selector": "section.hero"
+              },
+              {
+                "type": "selector_text_contains",
+                "selector": "section.hero .eyebrow",
+                "text": "Prototype demo"
+              },
+              {
+                "type": "selector_text_contains",
+                "selector": "section.hero h1",
+                "text": "Modal preview needs accessibility repair."
+              },
+              {
+                "type": "selector_text_contains",
+                "selector": "section.hero button#openDialog",
+                "text": "Open demo"
               }
             ]
           }
