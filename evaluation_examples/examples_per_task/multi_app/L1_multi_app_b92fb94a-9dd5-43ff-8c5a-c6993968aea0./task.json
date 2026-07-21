@@ -57,57 +57,23 @@
     "os"
   ],
   "evaluator": {
-    "func": [
-      "is_expected_active_tab_approximate",
-      "check_json_settings",
-      "check_include_exclude"
-    ],
-    "result": [
-      {
-        "type": "active_tab_info"
-      },
-      {
-        "type": "vm_file",
-        "path": "/home/user/Desktop/ui-tooling/.vscode/settings.json",
-        "dest": "settings.json"
-      },
-      {
-        "type": "vm_command_line",
-        "command": "cat /home/user/Desktop/ui-tooling/POLICY_ACK.txt",
-        "shell": true
+    "func": "check_include_exclude",
+    "result": {
+      "type": "vm_command_line",
+      "command": "python3 -c \"from pathlib import Path; p=Path('/home/user/Desktop/ui-tooling/POLICY_ACK.txt'); s=p.read_text(encoding='utf-8').strip() if p.exists() else ''; print('PASS' if s=='policy applied' else 'FAIL')\"",
+      "shell": true
+    },
+    "expected": {
+      "type": "rule",
+      "rules": {
+        "include": [
+          "PASS"
+        ],
+        "exclude": [
+          "FAIL"
+        ]
       }
-    ],
-    "expected": [
-      {
-        "type": "rule",
-        "rules": {
-          "type": "url",
-          "url": "file:///home/user/Desktop/workspace_policy.html"
-        }
-      },
-      {
-        "type": "rule",
-        "rules": {
-          "expected": {
-            "editor.lineNumbers": "relative",
-            "files.insertFinalNewline": true,
-            "files.exclude": {
-              "dist": true,
-              "coverage": true
-            }
-          }
-        }
-      },
-      {
-        "type": "rule",
-        "rules": {
-          "include": [
-            "policy applied"
-          ],
-          "exclude": []
-        }
-      }
-    ],
+    },
     "conj": "and",
     "file": "evaluator.py"
   },

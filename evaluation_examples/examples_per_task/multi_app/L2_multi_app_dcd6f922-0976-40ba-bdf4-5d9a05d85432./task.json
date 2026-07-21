@@ -48,56 +48,84 @@
     "chrome"
   ],
   "evaluator": {
-    "func": "check_all",
+    "func": [
+      "check_all",
+      "is_expected_active_tab_approximate"
+    ],
     "file": "evaluator.py",
-    "result": {
-      "type": "vm_file",
-      "multi": true,
-      "path": [
-        "/home/user/Desktop/repo_audit/project_meta.json",
-        "/home/user/.config/Code/User/settings.json"
-      ],
-      "dest": [
-        "project_meta.json",
-        "settings.json"
-      ],
-      "gives": [0, 1]
-    },
-    "expected": {
-      "type": "rule",
-      "rules": {
-        "project_meta": {
-          "expect": [
-            {
-              "key": ["pythonFiles"],
-              "method": "eq",
-              "ref": 3
-            },
-            {
-              "key": ["markdownFiles"],
-              "method": "eq",
-              "ref": 2
-            },
-            {
-              "key": ["status"],
-              "method": "eq",
-              "ref": "audited"
+    "result": [
+      {
+        "type": "vm_file",
+        "multi": true,
+        "path": [
+          "/home/user/Desktop/repo_audit/project_meta.json",
+          "/home/user/.config/Code/User/settings.json"
+        ],
+        "dest": [
+          "project_meta.json",
+          "settings.json"
+        ],
+        "gives": [
+          0,
+          1
+        ]
+      },
+      {
+        "type": "active_tab_info"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "project_meta": {
+            "expect": [
+              {
+                "key": [
+                  "pythonFiles"
+                ],
+                "method": "eq",
+                "ref": 3
+              },
+              {
+                "key": [
+                  "markdownFiles"
+                ],
+                "method": "eq",
+                "ref": 2
+              },
+              {
+                "key": [
+                  "status"
+                ],
+                "method": "eq",
+                "ref": "audited"
+              }
+            ]
+          },
+          "settings": {
+            "expected": {
+              "editor.tabSize": 4,
+              "editor.rulers": [
+                90
+              ]
             }
-          ]
-        },
-        "settings": {
-          "expected": {
-            "editor.tabSize": 4,
-            "editor.rulers": [90]
           }
-        },
-        "chrome": {
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
           "type": "url",
           "url": "https://code.visualstudio.com/docs/editor/codebasics"
         }
       }
-    },
-    "conj": "and"
+    ],
+    "conj": "and",
+    "options": [
+      null,
+      null
+    ]
   },
   "proxy": true,
   "fixed_ip": false,

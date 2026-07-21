@@ -62,22 +62,16 @@
     "vscode"
   ],
   "evaluator": {
-    "func": "check_json_settings",
+    "func": "check_workspace_multiroot",
     "file": "evaluator.py",
     "expected": {
       "type": "rule",
       "rules": {
         "expected": {
           "folders": [
-            {
-              "path": "/home/user/project"
-            },
-            {
-              "path": "/home/user/docs"
-            },
-            {
-              "path": "/home/user/scripts"
-            }
+            "/home/user/project",
+            "/home/user/docs",
+            "/home/user/scripts"
           ],
           "settings": {
             "files.exclude": {

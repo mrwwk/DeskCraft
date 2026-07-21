@@ -62,16 +62,17 @@
     "func": "check_include_exclude",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/visit_record.xlsx'); s = df.to_string(); print('PASSED' if 'Qiao Yong' in s else 'FAILED')\""
+      "command": "python3 -c \"import pandas as pd; df=pd.read_excel('/home/user/Desktop/visit_record.xlsx'); s=df.to_string(); print('PASS' if all(v in s for v in ['2025-03-14', 'North China Medical Group', 'Fang Lei', 'Qiao Yong', 'Annual framework contract renewal', '320', 'Send contract draft']) else 'FAIL')\"",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
         "include": [
-          "PASSED"
+          "PASS"
         ],
         "exclude": [
-          "FAILED"
+          "FAIL"
         ]
       }
     },

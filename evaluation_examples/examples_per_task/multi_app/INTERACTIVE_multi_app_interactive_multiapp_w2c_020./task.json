@@ -62,16 +62,17 @@
     "func": "check_include_exclude",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/forecast_table.xlsx'); s = df.to_string(); print('PASSED' if 'Miao Ze' in s else 'FAILED')\""
+      "command": "python3 -c \"import pandas as pd; df=pd.read_excel('/home/user/Desktop/forecast_table.xlsx'); s=df.to_string(); print('PASS' if all(v in s for v in ['North Region', '480', '12', 'Miao Ze', 'South Region', '620', '8', 'East Region', '710', '15']) else 'FAIL')\"",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
         "include": [
-          "PASSED"
+          "PASS"
         ],
         "exclude": [
-          "FAILED"
+          "FAIL"
         ]
       }
     },
