@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_workflow_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于任务 INTERACTIVE_writ_interactive_writer_workflow_001，核心验证目标是检查任务最终产出的文本内容（result）是否满足“必须包含指定内容”且“必须排除指定内容”的双重要求。评测方式属于二元通过/失败制：只有当结果字符串同时包含 rules 中 include 列表的所有子串，并且完全不包含 exclude 列表中的任何子串时，才判定为成功（返回 1.0）；若结果为 None、缺少任一 include 项、或出现任一 exclude 项，则判定为失败（返回 0.0）。这是一种基于精确子串匹配的严格内容合规性检查。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收两个参数：result（待检查的字符串）和 rules（字典，预期包含 include 与 exclude 两个键，对应值为字符串列表）。执行流程如下：1）首先进行判空处理，若 result 为 None 则直接返回 0.0；2）通过 print 输出 result 与 rules 供调试；3）从 rules 中安全提取 include 列表（默认为空）和 exclude 列表（默认为空）；4）使用 all(r in result for r in include) 检查 result 是否包含所有 include 字符串，要求全部满足；5）使用 all(r not in result for r in exclude) 检查 result 是否不包含任何 exclude 字符串，要求全部排除；6）仅当第 4 步和第 5 步同时为真时返回 1.0，否则返回 0.0。该函数不调用其他辅助函数，直接在内部完成规则解析与字符串包含性判断。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:56:15",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/writ/INTERACTIVE_writ_interactive_writer_workflow_001/evaluator_function_labels.json"
+}

@@ -1,0 +1,93 @@
+{
+  "id": "a1b00025-0025-4000-8000-000000000025",
+  "snapshot": "audacity",
+  "instruction": "I am organizing this audio structure: remove a small middle section and add markers for later editing. Open/home/user/Documents/complex_sections.wav, delete 15s-18s, add a label track with Part1 at 0.0s, Gap at 7.0s, and End at 14.0s, then export a WAV and also save the project as .aup3",
+  "source": "https://manual.audacityteam.org/man/label_tracks.html",
+  "difficulty": "L3",
+  "_task_config_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/results/replay_full/kimi-replay-full/pyautogui/screenshot/Kimi-K2.6/audacity/L3_audacity_a1b00025-0025-4000-8000-000000000025/revise_task/task.json",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/wav/complex_sections.wav",
+            "path": "/home/user/Documents/complex_sections.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/complex_sections.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "file": "evaluator.py",
+    "postconfig": [],
+    "func": [
+      "check_audio_duration",
+      "check_aup3_labels"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/sections_edit.wav",
+        "dest": "sections_edit.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/sections.aup3",
+        "dest": "sections.aup3"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "expected_duration": 17.0,
+          "tolerance": 0.5
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_labels": [
+            {
+              "time": 0.0,
+              "text": "Part1"
+            },
+            {
+              "time": 7.0,
+              "text": "Gap"
+            },
+            {
+              "time": 14.0,
+              "text": "End"
+            }
+          ],
+          "time_tolerance": 1.0
+        }
+      }
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_da46d875-6b82-4681-9284-653b0c7ae241/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器相关任务的完成状态，采用0/1二值打分机制。核心检查对象分为两类：一是浏览器当前激活标签页的URL文本，二是程序返回或页面提取的JSON结构化数据。对于URL检查，evaluator要求从任务结果中提取出URL字符串（支持直接字符串或含'url'键的字典），并验证其是否同时满足配置中给出的所有正则表达式模式，任一模式不匹配即判失败。对于JSON对象检查，evaluator先将结果统一解析为Python字典，然后依据rules中的'expect_in_result'标志决定比较模式：在严格相等模式下，要求结果字典与预期JSON的指定键值完全相等（若预期字典中设置'ignore_list_order'为True，则对列表值排序后比较以忽略顺序）；在包含模式下，要求结果中对应字段包含预期字符串（子串匹配）或包含预期列表中的至少一个元素。此外，若预期值中出现'__EVALUATION_FAILED__'标记，或结果解析失败、格式异常，均直接判0分。只有全部检查项通过才返回1.0。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "该函数负责检查浏览器当前URL是否匹配预期正则模式。输入参数result为待检查的URL信息，可以是纯字符串URL，也可以是包含'url'键的字典；rules为配置字典，其中'expected'键对应一个正则表达式模式列表。函数首先提取result中的URL字符串，若格式非法则返回0.0。随后遍历rules['expected']中的每一个正则pattern，使用re.search在URL字符串中逐一搜索。判定依据为'全部满足'：只要有一个pattern未匹配成功，立即返回0.0；只有当所有pattern均匹配成功时，才返回1.0。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 82,
+        "description": "该函数负责直接比较任务返回的JSON对象与预期结构。输入result可以是JSON字符串或字典，rules包含预期配置。执行步骤如下：1）若result为字符串，先strip去除首尾空白，将单引号替换为双引号，再用json.loads解析为字典；若解析后仍为None则返回0.0。2）检查rules['expected']中是否存在值为'__EVALUATION_FAILED__'的键，若存在直接返回0.0。3）读取rules中的'expect_in_result'布尔标志（默认False）。若该标志为False，进入严格相等模式：遍历预期字典的每个键，若预期字典中设置'ignore_list_order'为True，则对预期和实际的列表值排序后比较；否则直接比较键值，任一不等即返回0.0，全部相等返回1.0。若'expect_in_result'为True，进入包含模式：遍历预期键，若预期值为列表，则检查实际值（列表时检查元素是否存在，字符串时检查是否完全相等）是否包含列表中至少一个元素；若预期值为字符串，则检查该字符串是否为实际值的子串；若预期值为其他类型或不满足包含关系，返回0.0。全部通过返回1.0。任何异常捕获后均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:10:25",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L3_chrome_da46d875-6b82-4681-9284-653b0c7ae241/evaluator_function_labels.json"
+}

@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_ae78f875-5b98-4907-bbb5-9c737fc68c03/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 13
+    },
+    {
+      "name": "exact_match",
+      "lineno": 51
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 13
+    },
+    {
+      "name": "exact_match",
+      "lineno": 51
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator服务于任务google_search_pdf_dnt，总体目标是验证两项独立条件：第一，浏览器当前活动标签页必须已打开Google搜索结果页面，且其URL能够通过一组正则表达式模式的校验（确认包含正确的查询参数）；第二，Chrome浏览器的安全浏览（Safe Browsing）保护功能必须处于启用状态，通过与预期值进行大小写不敏感的精确字符串比对来确认。两个主函数is_expected_url_pattern_match和exact_match分别独立执行上述两项检查，各自返回0.0（失败）或1.0（成功）。代码中未明确体现这两个检查最终是如何联合判定任务总体成功或失败的（例如是要求全部满足、任一满足还是加权累计）。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 13,
+        "description": "该函数负责验证浏览器当前活动标签页的URL是否符合预期模式。检查对象为当前活动标签页的URL字符串。它接收两个参数：result（由active_tab_info获取器输出的当前标签页信息，可以是字符串URL或包含'url'键的字典）和rules（包含'expected'键的字典，其值为待匹配的正则表达式字符串列表）。检查步骤如下：首先判断result是否为falsy，若为空则直接返回0.0；接着从result中提取URL字符串，若格式既不是字符串也不是含'url'字段的字典，则记录错误并返回0.0；然后遍历rules[\"expected\"]中的每一个正则表达式模式，使用re.search在提取到的URL中进行搜索匹配；只有当所有模式都匹配成功时，才返回1.0，若任一模式不匹配则立即返回0.0。"
+      },
+      {
+        "name": "exact_match",
+        "lineno": 51,
+        "description": "该函数负责验证Chrome安全浏览（Safe Browsing）功能的启用状态是否与预期一致。检查对象为安全浏览设置的状态值。它接收两个参数：result（由enable_safe_browsing获取器输出的状态值，通常为\"true\"或\"false\"等字符串）和rules（包含'expected'键的字典，其值为预期状态）。检查步骤如下：首先判断result是否为None，若为None则直接返回0.0；接着将result和rules[\"expected\"]的值都转换为字符串，去除首尾空白字符后统一转为小写；最后进行大小写不敏感的精确字符串比较。若两者完全一致则返回1.0，否则返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:09:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_ae78f875-5b98-4907-bbb5-9c737fc68c03/evaluator_function_labels.json"
+}

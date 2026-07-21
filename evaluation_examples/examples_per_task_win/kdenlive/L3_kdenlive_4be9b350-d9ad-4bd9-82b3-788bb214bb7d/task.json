@@ -1,0 +1,119 @@
+{
+  "id": "4be9b350-d9ad-4bd9-82b3-788bb214bb7d",
+  "snapshot": "kdenlive",
+  "instruction": "Open Kdenlive, import video '/home/user/Videos/15368811_1920_1080_30fps.mp4' and audio '/home/user/Music/804c6281f9d23fa77df71776a6cca3c2.mp3', place the video on track V1 and the audio on track A1, save the project as '/home/user/Videos/project.kdenlive', render the project to '/home/user/Videos/output.mp4'",
+  "source": "https://docs.kdenlive.org/en/exporting/render.html",
+  "_task_config_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/results/replay_full/kimi-replay-full/pyautogui/screenshot/Kimi-K2.6/kdenlive/L3_kdenlive_4be9b350-d9ad-4bd9-82b3-788bb214bb7d/revise_task",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/mp4/15368811_1920_1080_30fps.mp4",
+            "path": "/home/user/Videos/15368811_1920_1080_30fps.mp4"
+          },
+          {
+            "local_path": "assets/mp3/804c6281f9d23fa77df71776a6cca3c2.mp3",
+            "path": "/home/user/Music/804c6281f9d23fa77df71776a6cca3c2.mp3"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/home/user/.local/bin/kdenlive"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "kdenlive"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_kdenlive_render_with_audio",
+      "check_kdenlive_import_multiple_files",
+      "check_kdenlive_clip_position",
+      "check_kdenlive_clip_position"
+    ],
+    "file": "evaluator.py",
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/output.mp4",
+        "dest": "output.mp4"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/project.kdenlive",
+        "dest": "project.kdenlive"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/project.kdenlive",
+        "dest": "project.kdenlive"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Videos/project.kdenlive",
+        "dest": "project.kdenlive"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "min_duration": 280.0,
+          "require_audio": true
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "expected_files": [
+            "15368811_1920_1080_30fps.mp4",
+            "804c6281f9d23fa77df71776a6cca3c2.mp3"
+          ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "source_file": "15368811_1920_1080_30fps.mp4",
+          "start_time": 0.0,
+          "tolerance": 300.0
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "source_file": "804c6281f9d23fa77df71776a6cca3c2.mp3",
+          "start_time": 0.0,
+          "tolerance": 300.0
+        }
+      }
+    ],
+    "options": [
+      {},
+      {},
+      {},
+      {}
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low",
+  "difficulty": "L3"
+}

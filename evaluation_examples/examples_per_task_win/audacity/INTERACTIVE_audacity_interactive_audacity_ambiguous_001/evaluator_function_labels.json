@@ -1,0 +1,132 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/INTERACTIVE_audacity_interactive_audacity_ambiguous_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 171
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 192
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 232
+    },
+    {
+      "name": "check_interactive_audacity_ia03",
+      "lineno": 275
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "_read_wav_samples",
+      "lineno": 41
+    },
+    {
+      "name": "_rms_db",
+      "lineno": 75
+    },
+    {
+      "name": "_get_mono_samples",
+      "lineno": 86
+    },
+    {
+      "name": "_open_aup3",
+      "lineno": 99
+    },
+    {
+      "name": "_get_aup3_project_xml",
+      "lineno": 105
+    },
+    {
+      "name": "_parse_aup3_tracks",
+      "lineno": 125
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 171
+    },
+    {
+      "name": "check_audio_fade_out",
+      "lineno": 192
+    },
+    {
+      "name": "check_aup3_project_valid",
+      "lineno": 232
+    },
+    {
+      "name": "check_interactive_audacity_ia03",
+      "lineno": 275
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Audacity交互式音频编辑任务（特别是IA-03任务）的最终产出质量与项目状态。核心检查对象包括导出的WAV音频文件以及可选的.aup3项目文件。对于音频文件，它验证实际时长是否符合预期（允许一定容差），并验证音频末尾是否包含淡出效果——具体做法是将末尾指定时长区间划分为多个窗口，比较各窗口的RMS能量是否总体呈递减趋势。对于项目文件，它验证.aup3能否被正常解析为SQLite数据库并提取项目XML，同时检查其中包含的音轨总数、波形音轨数和标签音轨数是否满足最低门槛。主要比较方式是将实际读取的音频属性或项目结构与rule中给定的阈值、期望值进行数值比较与计数比较。成功判定采用\"全部满足\"的串联逻辑：在综合验证器check_interactive_audacity_ia03中，必须同时通过时长检查和淡出检查才能返回成功；各单项检查也均采用二元判定（1.0为通过，0.0为不通过）。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 171,
+        "description": "接收file_path和rule参数，其中rule必须包含expected_duration，可选tolerance字段（默认0.5秒）。首先检查文件是否存在；若不存在直接返回0.0。随后调用_read_wav_info读取WAV文件基本信息，获取实际duration。将实际时长与expected_duration做绝对差值比较，若abs(actual - expected) <= tolerance则返回1.0，否则返回0.0。任何异常也会被捕获并返回0.0。"
+      },
+      {
+        "name": "check_audio_fade_out",
+        "lineno": 192,
+        "description": "接收file_path和rule参数，其中rule必须包含fade_duration，可选num_windows字段（默认5）。首先检查文件是否存在。随后调用_get_mono_samples将音频转为单声道浮点样本并获取采样率sr。根据fade_duration * sr计算淡出采样数；若淡出采样数超过音频总长度则返回0.0。将淡出区间均分为num_windows个窗口（window_size = fade_samples// num_windows），对每个窗口内的样本调用_rms_db计算RMS能量（单位dB），得到一组RMS序列。统计相邻窗口间RMS递减的次数，若递减次数 >= num_windows - 2（允许最多出现2次非递减或上升）则判定存在淡出效果并返回1.0，否则返回0.0。异常时同样返回0.0。"
+      },
+      {
+        "name": "check_aup3_project_valid",
+        "lineno": 232,
+        "description": "接收file_path和rule参数，rule可选min_track_count（默认1）、min_wave_tracks（默认0）、min_label_tracks（默认0）。首先检查.aup3文件是否存在。随后调用_parse_aup3_tracks解析项目XML，获取所有音轨信息列表。分别统计总音轨数total、波形音轨(wave)数wave_count、标签音轨(label)数label_count。只有当total >= min_track_count且wave_count >= min_wave_tracks且label_count >= min_label_tracks三个条件同时满足时才返回1.0；任一条件不满足即返回0.0。解析失败或异常也返回0.0。"
+      },
+      {
+        "name": "check_interactive_audacity_ia03",
+        "lineno": 275,
+        "description": "IA-03任务专用综合验证器，接收file_path和rule参数。rule中需包含expected_duration，可选duration_tolerance（默认0.8）、fade_duration（默认3.0）、num_windows（默认5）。首先检查文件是否存在。随后构造duration_rule并调用check_audio_duration进行时长验证，若返回值小于1.0则直接返回0.0。接着构造fade_rule并调用check_audio_fade_out进行淡出验证，若返回值小于1.0也直接返回0.0。只有两个子检查全部通过时才返回1.0，体现严格的\"全部满足\"串联逻辑。异常时返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 16,
+        "description": "使用标准库wave模块打开指定WAV文件，读取并返回包含channels、sample_rate、n_frames、sampwidth和duration的字典。duration由n_frames/ sample_rate计算得出。该函数是音频时长检查和样本读取的基础入口。"
+      },
+      {
+        "name": "_read_wav_samples",
+        "lineno": 30,
+        "description": "使用wave模块读取WAV全部原始帧，根据sampwidth（1/2/3/4字节）分别采用struct.unpack或int.from_bytes将原始字节解析为[-1.0, 1.0]范围的浮点样本列表。多声道时返回交错样本（interleaved）。该函数为能量分析和单声道转换提供原始数据。"
+      },
+      {
+        "name": "_rms_db",
+        "lineno": 58,
+        "description": "接收浮点样本列表，计算其均方根(RMS)并转换为dB值（公式20.0 * math.log10(rms)）。若样本为空或rms小于1e-10，则返回-100.0。该函数被check_audio_fade_out用于量化每个窗口的能量水平。"
+      },
+      {
+        "name": "_get_mono_samples",
+        "lineno": 68,
+        "description": "先调用_read_wav_info和_read_wav_samples获取音频信息与交错样本。若通道数大于1，则对每个采样点取各声道的算术平均值，生成单声道样本列表。最终返回单声道样本列表与采样率。该函数为淡出检查提供统一单声道数据，避免多声道干扰RMS计算。"
+      },
+      {
+        "name": "_open_aup3",
+        "lineno": 83,
+        "description": "使用sqlite3.connect将.aup3文件作为SQLite数据库打开并返回连接对象。这是所有.aup3项目文件解析的第一步，为后续读取项目XML提供数据库连接。"
+      },
+      {
+        "name": "_get_aup3_project_xml",
+        "lineno": 89,
+        "description": "通过_open_aup3打开数据库后，首先尝试从project表的doc列读取项目XML；若未找到，则回退到autosave表的doc列。将读取到的内容进行UTF-8解码后返回字符串；若均不存在则返回None。该函数是_parse_aup3_tracks的前置数据提取步骤。"
+      },
+      {
+        "name": "_parse_aup3_tracks",
+        "lineno": 106,
+        "description": "调用_get_aup3_project_xml获取项目XML字符串，使用xml.etree.ElementTree解析并处理命名空间。遍历根元素下所有子节点，识别tag为wavetrack/WaveTrack或labeltrack/LabelTrack的元素。对于波形音轨，提取name、gain、mute、solo、pan等属性；对于标签音轨，提取其下label/Label子节点的时间t/t1和文本title/text。最终返回音轨信息字典列表，供项目有效性检查使用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:18:18",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/INTERACTIVE_audacity_interactive_audacity_ambiguous_001/evaluator_function_labels.json"
+}

@@ -1,0 +1,183 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00009-0009-4000-8000-000000000009-L3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 195
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 222
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 300
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 359
+    },
+    {
+      "name": "check_l3_restore_banner_complete",
+      "lineno": 397
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "calculate_contrast",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 30
+    },
+    {
+      "name": "check_contrast_increase",
+      "lineno": 67
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 108
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 126
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 151
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 180
+    },
+    {
+      "name": "_compute_sharpness_score",
+      "lineno": 187
+    },
+    {
+      "name": "check_image_file_size_range",
+      "lineno": 195
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 222
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 300
+    },
+    {
+      "name": "check_sharpness_increase",
+      "lineno": 359
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 389
+    },
+    {
+      "name": "check_l3_restore_banner_complete",
+      "lineno": 397
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测L3-9老照片修复横幅任务。它要求任务最终产出两个核心文件：一张名为banner_jpg的JPEG格式横幅图像，以及一个包含特定图层结构的XCF工程文件。evaluator对横幅图执行8项严格的二进制检查：文件必须存在且为JPEG格式；尺寸必须接近2000×1200像素（容差5像素）；文件大小不得超过819200字节（约800KB）；相比源图src_path，对比度必须提升至少5%，清晰度必须提升至少1%；在top_center和bottom_center区域必须检测到文本边缘特征（边缘密度≥0.006），且OCR识别结果中必须同时包含\"SUMMER\"和\"2026\"关键词；XCF文件必须包含\"Restore_Base\"、\"Color_Grade\"、\"Title\"、\"Meta_Info\"四个图层（顺序不限）。最终通过_all_binary_checks_pass聚合，8项检查必须全部返回1才算任务完成（得1.0分），任一失败则总分为0.0。",
+    "main_functions": [
+      {
+        "name": "calculate_contrast",
+        "lineno": 23,
+        "description": "计算单张图像的对比度。将输入的PIL Image对象转为灰度模式（'L'），使用ImageStat.Stat统计像素值的标准差并返回浮点数。该数值越大表示对比度越高，主要服务于check_contrast_increase的对比度量化。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 30,
+        "description": "检查图像宽高是否符合预期。接收image_path、expected_width、expected_height（可选，为None时仅检查宽度）和tolerance（默认5像素）。使用PIL打开图像后，比较实际宽高与预期值的绝对差是否在容差内，全部满足返回1，否则返回0。若文件不存在或打开失败也返回0。"
+      },
+      {
+        "name": "check_contrast_increase",
+        "lineno": 67,
+        "description": "检查目标图像相对源图像的对比度提升是否达标。接收src_path、tgt_path和min_increase_percent（默认10.0）。先校验路径存在性，再用PIL打开两张图，分别调用calculate_contrast获取对比度。若源图对比度为0直接返回0；否则计算(tgt_contrast - src_contrast)/ src_contrast * 100，当提升百分比≥min_increase_percent时返回1，否则返回0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 108,
+        "description": "检查给定file_path是否为存在的文件。调用os.path.isfile判断，存在返回1，不存在或路径为None返回0。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 126,
+        "description": "检查图像是否为有效JPEG格式。接收image_path，校验路径存在后使用PIL打开，读取img.format属性，仅当等于'JPEG'时返回1，否则返回0。若打开失败也返回0。"
+      },
+      {
+        "name": "check_image_file_size_range",
+        "lineno": 195,
+        "description": "检查图像文件大小是否落在指定区间。接收image_path和rule字典（可选键min_size、max_size，分别默认为0和10**18字节）。通过os.path.getsize获取实际大小，判断是否满足min_size ≤ size ≤ max_size，满足返回1，否则返回0。若文件不存在返回0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 222,
+        "description": "检查XCF文件的图层结构。接收xcf_path和rule字典（必须包含layers图层名列表，可选ordered布尔值默认False）。首先检查文件存在且文件头以b'gimp xcf'开头；优先尝试用gimpformats库解析出图层名列表，验证所有预期图层名均存在，若ordered为True则进一步验证这些图层在列表中的index位置严格递增（即顺序一致，但不要求连续）。若gimpformats解析失败或没有图层名，回退到二进制字节串搜索，在文件内容中查找各图层名utf-8编码的位置，同样支持ordered校验（要求字节位置递增）。全部通过返回1，任一失败返回0。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 300,
+        "description": "检查图像指定区域是否具备文本特征，并可选验证OCR关键词。接收image_path和rule字典（regions区域名列表默认[\"center\"]；keywords关键词列表可选；min_edge_density默认0.008；edge_threshold默认40.0）。将图像转为灰度numpy数组后，对每个region调用_resolve_region_bbox裁剪子区域，再调用_edge_density计算边缘密度（梯度幅值超过阈值的像素占比）。若任一区域密度低于min_edge_density则返回0。若提供了keywords，尝试使用pytesseract对全图OCR，将识别文本归一化空白并转小写，检查每个关键词是否都被包含；OCR异常仅记录warning，不直接导致失败（前提是区域密度检查已通过）。全部满足返回1。"
+      },
+      {
+        "name": "check_sharpness_increase",
+        "lineno": 359,
+        "description": "检查目标图像相对源图像的清晰度提升是否达标。接收src_path、tgt_path和min_increase_percent（默认5.0）。校验路径存在后，用PIL打开两张图，分别调用_compute_sharpness_score（基于灰度梯度幅值方差）获取清晰度。若源图清晰度≤1e-9返回0；否则计算(tgt_sharp - src_sharp)/ src_sharp * 100，提升百分比≥阈值时返回1，否则返回0。"
+      },
+      {
+        "name": "check_l3_restore_banner_complete",
+        "lineno": 397,
+        "description": "L3-9任务的复合主评测函数。接收result_paths列表，要求至少包含3个元素，依次解包为banner_jpg、xcf_path、src_path。依次执行8项二进制检查：check_file_exists(banner_jpg)；check_jpeg_format(banner_jpg)；check_image_dimensions(banner_jpg, 2000, 1200)；check_image_file_size_range(banner_jpg, {\"max_size\": 819200})；check_contrast_increase(src_path, banner_jpg, 5.0)；check_sharpness_increase(src_path, banner_jpg, 1.0)；check_text_in_region_keywords(banner_jpg, {\"regions\": [\"top_center\", \"bottom_center\"], \"keywords\": [\"SUMMER\", \"2026\"], \"min_edge_density\": 0.006})；check_xcf_layers_structure(xcf_path, {\"layers\": [\"Restore_Base\", \"Color_Grade\", \"Title\", \"Meta_Info\"], \"ordered\": False})。最后调用_all_binary_checks_pass聚合结果，仅当8项全部返回1时总得分为1.0，否则为0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 148,
+        "description": "将语义化区域名解析为像素级包围框坐标。接收图像width、height和region_name字符串，支持\"top_left\"、\"top_center\"、\"top_right\"、\"bottom_left\"、\"bottom_center\"、\"bottom_right\"、\"center\"、\"left\"、\"right\"、\"top\"、\"bottom\"等区域。通过整数除法将图像划分为不同区块，返回四元组(x0, y0, x1, y1)。专供check_text_in_region_keywords使用，用于定位待检测的文本区域。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 175,
+        "description": "计算灰度图像的边缘密度。接收灰度numpy数组gray_array和edge_threshold（默认40.0）。分别计算x轴和y轴的梯度绝对值，相加得到边缘强度图，统计强度大于阈值的像素占全区域的比例并返回浮点数。该值用于衡量区域内是否存在足够丰富的边缘纹理（如文字笔画），被check_text_in_region_keywords调用。"
+      },
+      {
+        "name": "_compute_sharpness_score",
+        "lineno": 181,
+        "description": "计算图像清晰度分数。接收PIL Image对象，先转为灰度numpy数组，再计算x、y方向梯度，求梯度幅值后返回其方差。方差越大表示图像边缘越锐利、清晰度越高。被check_sharpness_increase调用以量化图像锐化效果。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 389,
+        "description": "二进制检查聚合器。接收scores列表，过滤掉None值后，若有效分数非空且所有值均≥1.0则返回1.0，否则返回0.0（空列表也视为失败）。被check_l3_restore_banner_complete作为最终判定器，实现\"全票通过\"的严格逻辑。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:20:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00009-0009-4000-8000-000000000009-L3/evaluator_function_labels.json"
+}

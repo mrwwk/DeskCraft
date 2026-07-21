@@ -1,0 +1,35 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_f2b7a4c1-98dd-41d5-b0d1-2a0f6f53c8de/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_recent_manifest",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_os_recent_manifest",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Shell 收集器输出的最近文件清单（recent file manifest）CSV 文本内容是否与预期完全一致。核心检查对象是直接输出的 CSV 字符串，包含路径和计数等字段。评测时会先对实际输出和预期输出的每一行进行路径规范化（统一去除行首的 '/' 相对路径前缀），过滤空行后，进行逐行的精确字符串列表比对。成功判定的总体思路是：只有在规范化后的实际行列表与预期行列表完全相等时，才返回满分 1.0；若实际输出为 None、比对不一致或发生异常，均返回 0.0。这是一种严格的精确匹配逻辑，要求行顺序和内容都必须一致。",
+    "main_functions": [
+      {
+        "name": "check_os_recent_manifest",
+        "lineno": 7,
+        "description": "该函数接收两个参数：result 为 Shell 收集器直接输出的 CSV 文件内容字符串，rules 为包含键 \"expected\" 的字典，其值为预期的 CSV 字符串。检查步骤如下：首先尝试从 rules 中提取 expected 内容，若 result 为 None 则直接返回 0.0；接着调用内部辅助函数 _normalize_path，对 result 和 expected 按换行符分割后的每一行分别去除行首空白、过滤空行，并统一去除路径前的 '/' 前缀；最后将处理后的两个字符串列表进行相等比较。若两列表完全一致则返回 1.0，否则返回 0.0。整个逻辑被 try-except 包裹，任何异常都会捕获并记录日志后返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_normalize_path",
+        "lineno": 19,
+        "description": "该函数接收一行 CSV 文本 line，先执行 strip() 去除首尾空白，再通过正则表达式 re.sub(r'^//', '', line) 去除行首的 '/' 相对路径前缀。它服务于主评测逻辑，用于规范化实际输出与预期输出的每一行路径表示，消除因 find . 命令自然产生 '/' 前缀而预期路径未包含此前缀所导致的差异。返回处理后的字符串，通常被主函数逐行调用于实际结果和预期结果的双边规范化。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:37:50",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_f2b7a4c1-98dd-41d5-b0d1-2a0f6f53c8de/evaluator_function_labels.json"
+}

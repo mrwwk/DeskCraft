@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_76840308-38a7-4263-a5b5-224dee202056/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于任务L1_chrome_76840308-38a7-4263-a5b5-224dee202056的评分判定。代码中未明确体现最终产物或状态的具体业务类型（如浏览器页面内容、文件数据或操作状态）。其核心检查对象是传入的result值与rules配置中\"expected\"字段值的严格相等性。主要比较方式为使用Python的==运算符进行精确匹配，无近似匹配、模糊匹配或容错阈值。成功判定总体思路为：若result与expected完全相等则返回1.0表示成功，否则返回0.0表示失败。判定逻辑为单一条件分支，无多指标联合判定或加权累计逻辑。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "接收任务输出结果result和包含预期值的规则字典rules。执行步骤为：1) 从rules字典中提取键名为\"expected\"的期望值；2) 在控制台打印result和expect的值；3) 使用==运算符对result与expect进行严格相等比较。若两者完全相等，返回1.0表示检查通过；若不相等，返回0.0表示检查未通过。该函数不调用任何辅助函数，无数据预处理、文件读取、正则匹配或循环检查逻辑，判定依据仅为简单的严格相等比较。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:06:22",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_76840308-38a7-4263-a5b5-224dee202056/evaluator_function_labels.json"
+}

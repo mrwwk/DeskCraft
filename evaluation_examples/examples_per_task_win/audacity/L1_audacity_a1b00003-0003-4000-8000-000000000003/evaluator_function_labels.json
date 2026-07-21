@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00003-0003-4000-8000-000000000003/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_audio_duration",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_read_wav_info",
+      "lineno": 23
+    },
+    {
+      "name": "check_audio_duration",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Audacity任务最终导出的WAV音频文件时长是否满足预期要求。其核心检查对象是音频文件的播放时长(duration)，通过读取目标WAV文件并提取实际时长，与规则中指定的expected_duration进行近似匹配比较。评测采用单一指标的二元打分逻辑：若实际时长与期望时长的绝对差值落在给定的tolerance容差范围内（默认0.5秒），则判定成功并返回1.0；若文件缺失、读取异常或时长偏差超出容差，则判定失败并返回0.0。整个测试闭环围绕\"文件存在性检查→WAV元数据解析→时长容差比较→二元得分返回\"展开。",
+    "main_functions": [
+      {
+        "name": "check_audio_duration",
+        "lineno": 41,
+        "description": "该函数接收file_path（待检测音频文件路径）和rule（评测规则字典）作为输入，执行分步检查：第一步，验证file_path指向的文件是否真实存在于磁盘上，若不存在则记录错误日志并直接返回0.0；第二步，调用辅助函数_read_wav_info解析该WAV文件，获取包含实际时长(actual duration)在内的音频元数据；第三步，从rule字典中提取必需字段expected_duration（期望时长）和可选字段tolerance（容差阈值，默认值为0.5秒）；第四步，计算实际时长与期望时长的绝对差值abs(actual - expected)，若该差值小于等于tolerance则返回1.0表示通过，否则返回0.0表示不通过。整个流程被try-except包裹，若在文件读取、数据转换或计算过程中发生任何异常，函数将捕获异常、记录错误并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_read_wav_info",
+        "lineno": 24,
+        "description": "该函数是一个WAV文件基础信息读取器，使用Python标准库wave模块以二进制只读模式(rb)打开指定file_path的WAV文件。它提取并返回一个字典，包含以下字段：channels（声道数）、sample_rate（采样率）、n_frames（总采样帧数）、sampwidth（采样宽度/位深）以及计算得到的duration（时长，由n_frames除以sample_rate得出，若采样率为0则时长记为0.0）。该函数将底层wave模块的调用封装为结构化数据返回，主要服务于check_audio_duration以获取实际音频时长，也可被其他需要WAV元数据（如声道、采样率、时长）的评测逻辑复用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:19:18",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/audacity/L1_audacity_a1b00003-0003-4000-8000-000000000003/evaluator_function_labels.json"
+}

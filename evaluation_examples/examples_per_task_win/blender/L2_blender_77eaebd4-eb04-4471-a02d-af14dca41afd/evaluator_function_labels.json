@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_77eaebd4-eb04-4471-a02d-af14dca41afd/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_particle_params",
+      "lineno": 40
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_particle_params",
+      "lineno": 40
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender任务中指定物体的粒子系统参数是否符合预期。它通过解析外部检查脚本（如check_particles.py）输出的JSON数据，定位到指定物体上的第一个粒子系统，然后对count（粒子数量）、lifetime（生命周期）、frame_start（起始帧）、frame_end（结束帧）、normal_factor（法向因子）等关键参数进行逐项容差比较（默认容差为1.0）。只有当rule中指定的所有参数的实际值与预期值的偏差均在容差范围内时，才判定任务成功并返回1.0；若JSON解析失败、指定物体不存在粒子系统、或任一参数超出容差，则立即返回0.0。整体采用严格的“全部满足”二分判定逻辑。",
+    "main_functions": [
+      {
+        "name": "check_blender_particle_params",
+        "lineno": 40,
+        "description": "该函数接收来自Blender检查脚本的命令行输出字符串（command_output）和评测规则字典（rule）。首先调用_parse_blender_output将输出解析为JSON对象；若解析失败则直接返回0.0。接着从rule中获取object_name（默认空字符串）和tolerance（默认1.0），并在解析结果中查找该物体名下的粒子系统列表。若列表为空，返回0.0。随后取该物体的第一个粒子系统（particles[0]），对checks列表中的参数（count、lifetime、frame_start、frame_end、normal_factor）进行遍历：仅当rule中显式包含某参数时，才从粒子系统数据中提取实际值，并调用_check_tolerance与预期值进行容差比较。若任一参数超出容差范围，立即记录警告并返回0.0。若所有指定参数均通过检查，最终返回1.0。整个流程采用“全部满足即成功，任一失败即整体失败”的严格判定策略，且所有异常均被捕获并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 16,
+        "description": "该辅助函数负责将Blender检查脚本输出的原始字符串解析为Python对象（通常为字典）。它首先检查输入是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试调用json.loads进行解析。若遇到JSONDecodeError或ValueError，则记录错误及原始输出内容，并返回None。该函数是主评测逻辑的数据入口，为check_blender_particle_params提供结构化的粒子系统数据，解析失败会直接导致评测返回0.0。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 27,
+        "description": "该辅助函数是一个通用数值容差比较器。它接收实际值（actual）、预期值（expected）和容差阈值（tol）三个参数。若任一参数为None，直接返回False；否则将三者均转换为浮点数，计算实际值与预期值的绝对差，并判断是否小于等于给定容差。该函数被check_blender_particle_params用于逐项验证粒子系统参数（如count、lifetime等），是实现近似匹配而非精确相等判断的核心工具。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:37:40",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_77eaebd4-eb04-4471-a02d-af14dca41afd/evaluator_function_labels.json"
+}

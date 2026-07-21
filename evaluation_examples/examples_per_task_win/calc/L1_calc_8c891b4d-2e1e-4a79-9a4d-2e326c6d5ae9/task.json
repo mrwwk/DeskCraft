@@ -1,0 +1,118 @@
+{
+  "id": "8c891b4d-2e1e-4a79-9a4d-2e326c6d5ae9",
+  "task_slug": "calc_calculate_the_gross_margin_percentage_fo",
+  "difficulty": "L1",
+  "source": "authors",
+  "snapshot": "libreoffice_calc",
+  "instruction": "Calculate the gross margin percentage for each product using the formula (Revenue - COGS)/ Revenue × 100, rounded to 2 decimal places, and fill in the \"Gross Margin (%)\" column",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/xlsx/Product_Gross_Margin.xlsx",
+            "path": "/home/user/Product_Gross_Margin.xlsx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "open",
+      "parameters": {
+        "path": "/home/user/Product_Gross_Margin.xlsx"
+      }
+    }
+  ],
+  "trajectory": "trajectories/8c891b4d-2e1e-4a79-9a4d-2e326c6d5ae9",
+  "related_apps": [
+    "libreoffice_calc"
+  ],
+  "evaluator": {
+    "postconfig": [
+      {
+        "type": "activate_window",
+        "parameters": {
+          "window_name": "Product_Gross_Margin.xlsx - LibreOffice Calc",
+          "strict": true
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      },
+      {
+        "type": "execute",
+        "parameters": {
+          "command": [
+            "python",
+            "-c",
+            "import pyautogui; pyautogui.hotkey('ctrl','s');"
+          ]
+        }
+      },
+      {
+        "type": "sleep",
+        "parameters": {
+          "seconds": 0.5
+        }
+      }
+    ],
+    "func": [
+      "compare_table",
+      "check_gross_margin_formulas"
+    ],
+    "expected": [
+      {
+        "type": "cache_file",
+        "path": "Product_Gross_Margin_gold.xlsx"
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "sheet_index": 0,
+          "header_row": 1,
+          "data_start_row": 2,
+          "data_end_row": 19,
+          "target_header": "Gross Margin (%)",
+          "revenue_header": "Revenue ($)",
+          "cogs_header": "COGS ($)",
+          "require_round": true,
+          "require_two_decimals": true,
+          "require_percent_100": true
+        }
+      }
+    ],
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Product_Gross_Margin.xlsx",
+        "dest": "Product_Gross_Margin.xlsx"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Product_Gross_Margin.xlsx",
+        "dest": "Product_Gross_Margin.xlsx"
+      }
+    ],
+    "options": [
+      {
+        "rules": [
+          {
+            "type": "sheet_data",
+            "sheet_idx0": 0,
+            "sheet_idx1": "EI0"
+          }
+        ]
+      },
+      {}
+    ],
+    "conj": "and",
+    "file": "evaluator.py"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

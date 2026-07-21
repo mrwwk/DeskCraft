@@ -1,0 +1,81 @@
+{
+  "id": "a1b00007-0007-4000-8000-000000000007",
+  "snapshot": "audacity",
+  "instruction": "This track is a little quiet overall. Open/home/user/Documents/volume_test.wav in Audacity, select all, amplify by +6 dB, export to/home/user/Documents/exports/amplified.wav, and save the project",
+  "source": "https://manual.audacityteam.org/man/amplify.html",
+  "difficulty": "L1",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/wav/volume_test.wav",
+            "path": "/home/user/Documents/volume_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/volume_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_amplified_by_db",
+      "check_project_file_exists"
+    ],
+    "conj": "and",
+    "file": "evaluator.py",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/amplified.wav",
+        "dest": "amplified.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/volume_test.aup",
+        "dest": "volume_test.aup"
+      }
+    ],
+    "expected": [
+      {
+        "type": "rule",
+        "rules": {
+          "source_path": "assets/wav/volume_test.wav",
+          "expected_gain_db": 6.0,
+          "gain_tolerance_db": 1.0,
+          "duration_tolerance": 0.2,
+          "min_output_rms_db": -6.0,
+          "max_output_rms_db": -4.0
+        }
+      },
+      null
+    ],
+    "options": [
+      {},
+      {}
+    ]
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

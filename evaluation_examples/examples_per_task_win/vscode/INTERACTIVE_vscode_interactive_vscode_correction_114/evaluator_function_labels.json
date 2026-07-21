@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_correction_114/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "exact_match",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于评测INTERACTIVE_vscode_interactive_vscode_correction_114任务，其总体验证逻辑极为直接：通过exact_match主函数对任务返回结果与预设预期值进行严格精确匹配。它不读取外部文件、不解析页面或图像、不查询数据库，也不进行任何数据预处理或格式转换，仅依赖调用方传入的result参数和rules配置中的expected字段进行直接比对。核心比较方式为Python的相等运算符（==），要求结果在值和类型上完全一致，不存在近似匹配、阈值容忍或顺序忽略等容错机制。成功判定采用零一打分思路：只有当result与rules[\"expected\"]完全相等时，才返回1.0表示任务成功；任何差异（包括数据类型差异、空格、换行或大小写不一致等）均返回0.0表示失败。",
+    "main_functions": [
+      {
+        "name": "exact_match",
+        "lineno": 36,
+        "description": "该主函数接收两个参数：result（任务返回结果）和rules（评测规则字典）。执行步骤如下：首先，从rules字典中提取键名为\"expected\"的期望值；随后，将result与expect的值打印到标准输出；最后，使用Python的相等运算符（==）对二者进行严格比较。判定依据为：若result与expect完全相等，则返回浮点数1.0（成功/满分）；否则返回浮点数0.0（失败/零分）。该函数不支持部分匹配、模糊匹配或容差比较，任何不一致均直接判定为失败。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:38:47",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_correction_114/evaluator_function_labels.json"
+}

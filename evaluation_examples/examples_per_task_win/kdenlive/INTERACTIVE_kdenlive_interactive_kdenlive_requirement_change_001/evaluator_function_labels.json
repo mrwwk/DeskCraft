@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_requirement_change_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_file_exists",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 71
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_kdenlive_file_exists",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 71
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于Kdenlive交互任务，通过验证磁盘上的最终产物来判定任务完成度。它包含两条独立的二元判定链路（通过得1.0，失败得0.0）：第一条链路验证.kdenlive项目文件的存在性与结构合法性，读取文件系统状态并解析XML，要求文件必须存在、非空且具备有效根元素；第二条链路验证渲染输出MP4的技术规格，通过ffprobe子进程读取视频流元数据，对编码格式（默认要求包含h264）、分辨率（宽和高需与预期值精确相等）以及时长（默认至少1.0秒）进行精确值比对。两条链路各自内部采用严格的串联判定，任一环节失败即整体返回0.0，不存在加权或累计打分。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_file_exists",
+        "lineno": 21,
+        "description": "接收project_file_path（项目文件路径）和rule（校验规则字典）作为输入，对.kdenlive项目文件执行存在性与XML合法性检查。检查步骤依次为：1）验证project_file_path非None且文件在磁盘上真实存在；2）通过os.path.getsize确认文件大小非零；3）若rule中valid_xml为True（默认True），则使用xml.etree.ElementTree解析XML文件，并验证其是否包含非None的根元素（如mlt或kdenlive）。以上任一检查失败即记录错误日志并返回0.0，全部通过则返回1.0。"
+      },
+      {
+        "name": "check_kdenlive_render_custom_resolution",
+        "lineno": 71,
+        "description": "接收result_file_path（渲染后的MP4文件路径）和rule（包含预期视频参数的规则字典）作为输入，对视频文件执行技术规格检查。首先验证文件存在且非空；随后构造ffprobe命令并以子进程执行（超时30秒），以JSON格式提取streams与format信息；在streams中遍历定位codec_type为video的视频流。接着进行四项精确匹配检查：1）codec_name（转小写后）是否包含rule中expected_codec指定的编码（默认h264）；2）若rule指定了expected_width，视频宽度必须精确等于该值；3）若rule指定了expected_height，视频高度必须精确等于该值；4）从video_stream或format_info中提取duration，验证其是否大于等于rule中的min_duration（默认1.0秒）。任一条件不满足即返回0.0，全部满足返回1.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:52:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_requirement_change_001/evaluator_function_labels.json"
+}

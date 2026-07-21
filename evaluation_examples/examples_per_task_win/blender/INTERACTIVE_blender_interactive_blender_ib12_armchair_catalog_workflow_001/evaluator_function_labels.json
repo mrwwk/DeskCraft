@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib12_armchair_catalog_workflow_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_render_output",
+      "lineno": 14
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_blender_render_output",
+      "lineno": 14
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender渲染任务是否成功输出了符合规格要求的图像文件，针对扶手椅目录工作流（armchair catalog workflow）的渲染产物进行闭环检查。核心验证对象是下载到本地的渲染输出文件（预期为PNG格式）。评估器通过PIL库读取图像文件，依次校验文件物理存在性、图像像素尺寸（宽度与高度）以及图像编码格式。所有检查项必须全部满足（如宽2000像素、高2000像素、格式为PNG），函数才会返回1.0表示任务成功；任一检查失败均立即返回0.0。若运行环境中缺少PIL库，则降级为仅检查文件是否存在，存在返回1.0，否则返回0.0。整体采用严格的二元判定逻辑，不存在部分得分或加权累计。",
+    "main_functions": [
+      {
+        "name": "check_blender_render_output",
+        "lineno": 14,
+        "description": "该函数是评测入口，接收file_path（渲染输出文件路径）和rule（包含预期width、height、format的字典）作为输入。其测试逻辑按以下顺序执行：首先验证file_path非空且文件在磁盘上真实存在，若不存在则记录错误并直接返回0.0；接着尝试导入PIL并用Image.open()加载图像，解析实际宽度、高度（img.size）以及图像格式（img.format）。随后进行三项严格比对：1）若rule中包含width字段，比较实际宽度与rule['width']，不匹配则记录警告并返回0.0；2）若rule中包含height字段，比较实际高度与rule['height']，不匹配则返回0.0；3）若rule中包含format字段，将预期格式与实际格式均转为大写后比较，并通过fmt_map兼容JPG与JPEG的别名映射，若映射后仍不匹配则返回0.0。当所有检查均通过时返回1.0。异常处理分支：若触发ImportError（PIL未安装），降级为仅检查文件是否存在，存在返回1.0，否则返回0.0；其他任意异常均捕获后返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 14:33:23",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/INTERACTIVE_blender_interactive_blender_ib12_armchair_catalog_workflow_001/evaluator_function_labels.json"
+}

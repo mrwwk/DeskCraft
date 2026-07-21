@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_a3c7d8e9-0f12-4eab-b678-9c0d1e2f3a4b/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_log_rotate_pipeline",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_log_rotate_pipeline",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证操作系统日志轮转（log rotation）、压缩（compression）与归档（archival）流水线的完整执行结果。它通过比对 shell 收集器输出的键值对文本与预设规则，检查轮转文件、压缩归档、清理状态及报告文件等核心对象是否全部达到预期状态。比较方式为严格的字符串相等（==）逐键匹配，采用“全部满足”的二元判定逻辑：只有当 rules 中 checks 定义的所有键值对在 shell 输出中均存在且完全匹配时，才返回 1.0（成功）；任一不匹配、缺失或发生异常，均返回 0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "check_os_log_rotate_pipeline",
+        "lineno": 31,
+        "description": "该函数接收两个参数：result（shell 收集器输出的原始字符串）和 rules（包含预期检查规则的字典）。其执行流程为：首先调用辅助函数 _parse_kv 将 result 解析为键值对字典；然后从 rules 中提取 checks 子字典，遍历其中每一个 key 与 expected 值；在循环中通过 kv.get(key) != expected 进行严格相等判断，若出现任何不匹配立即返回 0.0；若循环结束所有项均匹配，则返回 1.0。整个逻辑包裹在 try-except 中，任何异常都会触发错误日志记录并返回 0.0。判定依据是“全部键值对精确匹配”的刚性条件，不存在阈值或近似匹配。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该函数接收 shell 输出的原始字符串，按行扫描并解析其中包含等号（=）的行，使用 split(\"=\", 1) 将每行分割为 key 和 value，并去除首尾空白字符，最终组装为字典返回。若输入为空或不包含合法键值对，则返回空字典。其作用是为 check_os_log_rotate_pipeline 提供数据预处理，将非结构化的 shell 文本转换为结构化字典，以支持后续的精确键值相等比较。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:37:34",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_a3c7d8e9-0f12-4eab-b678-9c0d1e2f3a4b/evaluator_function_labels.json"
+}

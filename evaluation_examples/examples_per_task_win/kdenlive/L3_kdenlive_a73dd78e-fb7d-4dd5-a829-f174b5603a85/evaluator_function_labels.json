@@ -1,0 +1,79 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_a73dd78e-fb7d-4dd5-a829-f174b5603a85/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_multi_track_composition",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_render_pip",
+      "lineno": 273
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_multi_track_composition",
+      "lineno": 65
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 179
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 249
+    },
+    {
+      "name": "check_kdenlive_render_pip",
+      "lineno": 273
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务中的多轨道合成（如画中画、水印）及最终渲染输出是否合格。它采用串联逻辑，必须同时满足\"渲染输出文件检查\"和\"项目文件多轨道合成检查\"两大环节。具体而言，先验证生成的MP4文件真实存在、非空、包含视频流、编码格式符合预期（默认包含h264）且时长达到阈值（默认不少于1.0秒）；再解析.kdenlive项目文件的MLT XML结构，确认rule中指定的main_file与overlay_file分别位于不同时间线轨道（playlist）上，且在require_transform为true时，项目中存在变换/合成类效果（filter或transition的mlt_service属于指定列表）。任一环节失败即返回0.0，全部通过才返回1.0。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_multi_track_composition",
+        "lineno": 65,
+        "description": "该函数接收project_file_path与rule，验证Kdenlive项目文件中的多轨道合成布局。检查流程如下：1) 确认项目文件存在且rule中包含main_file与overlay_file；2) 使用ET.parse解析MLT XML，遍历所有producer与chain元素，通过_get_property_value(elem, \"resource\")建立id到资源路径的映射；3) 遍历playlist元素，跳过id中包含\"bin\"的项，再遍历其entry子元素，根据producer属性查找对应resource，若resource中包含main_file或overlay_file（子串匹配），则记录该playlist_id；4) 检查两个文件是否各自至少出现在一个时间线轨道中，且main_playlists与overlay_playlists不相等（确保不在同一轨道）；5) 若rule中的require_transform为true（默认true），则遍历所有filter与transition元素，通过_get_mlt_service获取service名称并转小写，检查是否属于transform_services列表（\"affine\", \"qtblend\", \"composite\", \"movit.overlay\", \"frei0r.composition\", \"cairoblend\", \"frei0r.cairoblend\"）；6) 以上全部满足返回1.0，任一条件失败或发生XML解析异常则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_pip",
+        "lineno": 273,
+        "description": "该函数接收result_paths与rule，作为画中画渲染任务的复合验证入口。检查流程如下：1) 调用_extract_result_paths(result_paths)分离渲染文件路径render_path与项目文件路径project_path，以适配multi:true返回的列表格式[output.mp4, project.kdenlive]或单文件字符串；2) 调用_verify_render_output(render_path, rule)验证渲染输出，检查文件存在性、非空性、视频流编码（默认需包含h264）及最低时长（默认1.0秒），若返回失败则记录错误并返回0.0；3) 从rule中提取main_file、overlay_file、require_transform构造comp_rule，调用check_kdenlive_multi_track_composition(project_path, comp_rule)验证项目内部的多轨道合成与变换效果，若返回值小于1.0则返回0.0；4) 仅当渲染验证与项目合成验证均通过时，返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 20,
+        "description": "该函数从MLT XML元素（filter或transition）中提取mlt_service值。优先检查元素的mlt_service属性，若不存在则遍历其子property元素，查找name属性等于\"mlt_service\"的节点并返回其文本内容。该函数服务于主函数中对变换/合成效果的判定，用于识别filter或transition是否属于指定的合成服务类型。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 44,
+        "description": "该函数从MLT XML元素的子property元素中，根据传入的property_name匹配name属性，返回对应property节点的文本值。若未找到则返回None。在主评测逻辑中，主要用于提取producer或chain元素的\"resource\"属性值，以建立素材路径映射。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 165,
+        "description": "该函数调用ffprobe以JSON格式（-print_format json -show_streams -show_format）探测渲染文件，timeout设为30秒。解析返回的JSON后，查找codec_type为\"video\"的流，检查codec_name（转小写）是否包含expected_codec（默认\"h264\"，转小写，子串匹配）；随后提取duration，优先取视频流的duration，其次取format的duration，转为float后检查是否不小于min_duration（默认1.0）。同时检查文件存在且大小不为0。最终返回(success: bool, error_msg: str)元组，供主函数判定渲染输出是否合格。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 233,
+        "description": "该函数用于统一处理result_paths的输入格式：若传入的是列表，则取索引0作为render_path（渲染MP4文件），索引1作为project_path（项目文件）；若传入的是字符串，则整体作为render_path，project_path设为None。该封装使得evaluator能够兼容multi:true配置下的多文件返回与单文件返回两种场景，为check_kdenlive_render_pip提供标准化的路径拆分。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:10:55",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_a73dd78e-fb7d-4dd5-a829-f174b5603a85/evaluator_function_labels.json"
+}

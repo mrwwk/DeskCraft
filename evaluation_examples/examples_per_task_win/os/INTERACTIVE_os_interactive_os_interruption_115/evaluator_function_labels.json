@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_interruption_115/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_manifest",
+      "lineno": 20
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_manifest",
+      "lineno": 20
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务最终产物 press_pick/manifest.txt 的生成质量。核心检查对象是一个清单文件，要求该文件必须存在且可读，其内容必须严格符合指定格式：每行包含一个64位十六进制sha256哈希值、两个空格作为分隔符、以及一个相对路径；文件必须包含与预期完全一致的条目（根据注释为 event/a.jpg 和 event/stage/speaker.jpg 两项），且所有条目必须按相对路径字典序升序排列；同时任何路径中都不能出现预期的禁止子串模式（如 private、_raw）。评测逻辑采用全有或全无的二元打分制：check_manifest 函数会依次执行文件存在性、行数匹配、格式校验、哈希有效性、路径合规性、排序正确性、内容一致性共7层检查，只要任一环节失败即返回 0.0，全部通过才返回 1.0。",
+    "main_functions": [
+      {
+        "name": "check_manifest",
+        "lineno": 20,
+        "description": "该函数接收 manifest_path（从虚拟机拉取到本地的 press_pick/manifest.txt 路径，可能为 None）和 expected 字典（包含 \"expected_entries\" 与 \"forbidden_patterns\" 两个键）作为输入。评测流程如下：首先检查 manifest_path 是否为 None 或指向的文件不存在，若失败直接返回 0.0；接着以 utf-8 编码读取整个文件内容，按换行符分割并过滤掉空行，得到有效行列表。第一步校验有效行数是否与 expected_entries 长度一致，不一致则返回 0.0。第二步逐行解析，要求每行必须包含双空格分隔符 \"  \"，将其分割为 file_hash 和 rel_path 两部分；其中 file_hash 必须是恰好64位的十六进制字符（0-9及a-f），否则失败；rel_path 中若包含 forbidden_patterns 列表中的任一子串，也立即失败。第三步将解析出的 (file_hash, rel_path) 元组按顺序存入列表后，校验该列表是否严格按照 rel_path 升序排列，若出现相邻条目顺序非递增则失败。第四步将实际解析的条目集合与 expected_entries 转换后的集合进行比对，确认二者完全一致（无缺失、无多余）。以上所有检查全部通过后记录日志并返回 1.0，否则在首次失败处记录警告日志并返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:32:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_interruption_115/evaluator_function_labels.json"
+}

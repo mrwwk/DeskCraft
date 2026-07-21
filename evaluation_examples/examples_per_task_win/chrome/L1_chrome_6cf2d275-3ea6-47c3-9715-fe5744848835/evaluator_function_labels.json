@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_6cf2d275-3ea6-47c3-9715-fe5744848835/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Chrome 浏览器当前激活标签页是否符合预期规则。核心检查对象是活动标签页的 URL：它接收外部提供的活动标签页信息（通常包含当前页面 URL）与预期规则（指定目标 URL），通过 URL 标准化流程（自动补全 http 协议、统一小写 scheme、去除 www 子域名、忽略顶级域后缀差异如 .com 与 .com.sg、将根路径“/”置空、并依据 full 参数决定是否保留参数/查询/片段）进行精确字符串比对。若标准化后的预期 URL 与实际 URL 完全一致，则判定任务成功（返回 1），否则判定失败（返回 0）。当前仅支持对 type 为 \"url\" 的规则进行匹配验证。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收活动标签页信息 active_tab_info（字典或字符串类型）和匹配规则 rule。首先判断 active_tab_info 是否为空，为空则直接返回 0 分。随后读取 rule['type']，当前仅处理 \"url\" 类型：从 rule['url'] 获取预期地址，若 active_tab_info 为字典则取其 'url' 键值作为实际地址，否则将 active_tab_info 本身视为实际地址。接着调用 compare_urls(expected_url, actual_url) 进行标准化比对，若返回 True 则得 1 分，否则得 0 分。若 rule['type'] 为未知类型，记录错误日志并返回 0。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 82,
+        "description": "接收两个待比较 URL（url1, url2）及布尔参数 full（默认为 True）。若任一 URL 为 None，直接进行相等性比较（==）。否则依次执行标准化：①通过内部函数 parse_with_default_scheme 为缺少 scheme 的 URL 默认添加 \"http://\" 前缀；②通过内部函数 normalize_url 解析 URL，使用 tldextract 提取域名组成部分，若子域名仅为 \"www\" 则丢弃，完全忽略后缀（如 .com 或 .com.sg），仅保留主域名，将 scheme 转为小写，将根路径 \"/\" 转为空字符串；③根据 full 参数决定是否保留 params、query 和 fragment（full=True 时保留，否则全部清空）。最终比较两个标准化后的 URL 字符串是否完全一致，一致返回 True，否则返回 False。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:06:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L1_chrome_6cf2d275-3ea6-47c3-9715-fe5744848835/evaluator_function_labels.json"
+}

@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_002/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_project_register",
+      "lineno": 11
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_project_register",
+      "lineno": 11
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证任务最终产物 project_register.xlsx 是否在第2行正确录入了五个指定字段。它以从VM拉取到本地的 xlsx 文件路径为入口，使用 openpyxl 打开工作簿并读取活动工作表，依次核对 A2 至 E2 单元格的内容是否与预期完全一致（默认预期为：A2=PRJ-2025-008、B2=Smart Customer Service System Upgrade、C2=Lin Zhiwei、D2=85、E2=High）。比较时会对单元格实际值和预期值均做字符串转换并去除首尾空白，任一单元格不匹配即判定失败并返回 0.0，全部匹配则返回 1.0。同时支持通过 expected 参数传入自定义单元格映射来覆盖或扩展默认值。若文件缺失、路径为空、openpyxl 未安装或读取过程发生异常，也一律返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_project_register",
+        "lineno": 11,
+        "description": "该函数接收 result_path（从VM拉取到本地的 xlsx 文件路径）以及可选的 expected 字典。首先检查 result_path 是否为 None 或文件是否真实存在，若不存在直接返回 0.0。随后构建待检查的单元格预期映射：以默认值 A2=PRJ-2025-008、B2=Smart Customer Service System Upgrade、C2=Lin Zhiwei、D2=85、E2=High 为基础，若 expected 字典中提供了 expected['cells']，则用其覆盖或合并默认值。接着通过 openpyxl.load_workbook 加载工作簿并取活动工作表，遍历所有预期单元格引用，将实际单元格值与预期值均转为字符串并 strip 后进行精确比较。若发现任一单元格不一致，立即记录警告并返回 0.0；若全部一致则返回 1.0。在整个过程中，如果 openpyxl 未安装或发生任何读取异常，也会捕获异常并返回 0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:14:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_002/evaluator_function_labels.json"
+}

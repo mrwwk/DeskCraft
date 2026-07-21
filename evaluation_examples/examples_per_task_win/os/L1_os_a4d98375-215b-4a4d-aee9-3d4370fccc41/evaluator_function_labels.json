@@ -1,0 +1,585 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_a4d98375-215b-4a4d-aee9-3d4370fccc41/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_gnome_favorite_apps",
+      "lineno": 12
+    },
+    {
+      "name": "is_utc_0",
+      "lineno": 28
+    },
+    {
+      "name": "check_text_enlarged",
+      "lineno": 36
+    },
+    {
+      "name": "check_moved_jpgs",
+      "lineno": 44
+    },
+    {
+      "name": "is_in_vm_clickboard",
+      "lineno": 57
+    },
+    {
+      "name": "check_os_timezone_utc",
+      "lineno": 83
+    },
+    {
+      "name": "check_os_gnome_favorites",
+      "lineno": 105
+    },
+    {
+      "name": "check_os_accessibility",
+      "lineno": 126
+    },
+    {
+      "name": "check_os_screen_lock",
+      "lineno": 153
+    },
+    {
+      "name": "check_os_night_light",
+      "lineno": 175
+    },
+    {
+      "name": "check_os_notifications",
+      "lineno": 195
+    },
+    {
+      "name": "check_os_power_settings",
+      "lineno": 215
+    },
+    {
+      "name": "check_os_battery_config",
+      "lineno": 235
+    },
+    {
+      "name": "check_os_audio_config",
+      "lineno": 260
+    },
+    {
+      "name": "check_os_file_manifest",
+      "lineno": 284
+    },
+    {
+      "name": "check_os_file_operations",
+      "lineno": 302
+    },
+    {
+      "name": "check_os_file_permissions",
+      "lineno": 321
+    },
+    {
+      "name": "check_os_copy_filter",
+      "lineno": 340
+    },
+    {
+      "name": "check_os_dir_hierarchy",
+      "lineno": 363
+    },
+    {
+      "name": "check_os_compress_logs",
+      "lineno": 383
+    },
+    {
+      "name": "check_os_deploy_files",
+      "lineno": 401
+    },
+    {
+      "name": "check_os_trash_recovery",
+      "lineno": 419
+    },
+    {
+      "name": "check_os_rename_dirs",
+      "lineno": 437
+    },
+    {
+      "name": "check_os_terminal_size",
+      "lineno": 459
+    },
+    {
+      "name": "check_os_python_alias",
+      "lineno": 479
+    },
+    {
+      "name": "check_os_php_line_count",
+      "lineno": 498
+    },
+    {
+      "name": "check_os_text_transform",
+      "lineno": 516
+    },
+    {
+      "name": "check_os_meeting_template",
+      "lineno": 534
+    },
+    {
+      "name": "check_os_bluetooth_service",
+      "lineno": 555
+    },
+    {
+      "name": "check_os_install_local_app",
+      "lineno": 575
+    },
+    {
+      "name": "check_os_switch_user",
+      "lineno": 596
+    },
+    {
+      "name": "check_os_sftp_user",
+      "lineno": 615
+    },
+    {
+      "name": "check_os_extract_services",
+      "lineno": 639
+    },
+    {
+      "name": "check_os_recent_manifest",
+      "lineno": 657
+    },
+    {
+      "name": "check_os_cron_job",
+      "lineno": 679
+    },
+    {
+      "name": "check_os_disk_cleanup",
+      "lineno": 702
+    },
+    {
+      "name": "check_os_batch_extract",
+      "lineno": 719
+    },
+    {
+      "name": "check_os_hosts_block",
+      "lineno": 736
+    },
+    {
+      "name": "check_os_systemd_timer_basic",
+      "lineno": 754
+    },
+    {
+      "name": "check_os_quota_dirs",
+      "lineno": 777
+    },
+    {
+      "name": "check_os_log_rotate_pipeline",
+      "lineno": 794
+    },
+    {
+      "name": "check_os_systemd_custom_service",
+      "lineno": 812
+    },
+    {
+      "name": "check_os_firewall_rules",
+      "lineno": 830
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_gnome_favorite_apps",
+      "lineno": 12
+    },
+    {
+      "name": "is_utc_0",
+      "lineno": 28
+    },
+    {
+      "name": "check_text_enlarged",
+      "lineno": 36
+    },
+    {
+      "name": "check_moved_jpgs",
+      "lineno": 44
+    },
+    {
+      "name": "is_in_vm_clickboard",
+      "lineno": 57
+    },
+    {
+      "name": "_parse_kv",
+      "lineno": 66
+    },
+    {
+      "name": "check_os_timezone_utc",
+      "lineno": 83
+    },
+    {
+      "name": "check_os_gnome_favorites",
+      "lineno": 105
+    },
+    {
+      "name": "check_os_accessibility",
+      "lineno": 126
+    },
+    {
+      "name": "check_os_screen_lock",
+      "lineno": 153
+    },
+    {
+      "name": "check_os_night_light",
+      "lineno": 175
+    },
+    {
+      "name": "check_os_notifications",
+      "lineno": 195
+    },
+    {
+      "name": "check_os_power_settings",
+      "lineno": 215
+    },
+    {
+      "name": "check_os_battery_config",
+      "lineno": 235
+    },
+    {
+      "name": "check_os_audio_config",
+      "lineno": 260
+    },
+    {
+      "name": "check_os_file_manifest",
+      "lineno": 284
+    },
+    {
+      "name": "check_os_file_operations",
+      "lineno": 302
+    },
+    {
+      "name": "check_os_file_permissions",
+      "lineno": 321
+    },
+    {
+      "name": "check_os_copy_filter",
+      "lineno": 340
+    },
+    {
+      "name": "check_os_dir_hierarchy",
+      "lineno": 363
+    },
+    {
+      "name": "check_os_compress_logs",
+      "lineno": 383
+    },
+    {
+      "name": "check_os_deploy_files",
+      "lineno": 401
+    },
+    {
+      "name": "check_os_trash_recovery",
+      "lineno": 419
+    },
+    {
+      "name": "check_os_rename_dirs",
+      "lineno": 437
+    },
+    {
+      "name": "check_os_terminal_size",
+      "lineno": 459
+    },
+    {
+      "name": "check_os_python_alias",
+      "lineno": 479
+    },
+    {
+      "name": "check_os_php_line_count",
+      "lineno": 498
+    },
+    {
+      "name": "check_os_text_transform",
+      "lineno": 516
+    },
+    {
+      "name": "check_os_meeting_template",
+      "lineno": 534
+    },
+    {
+      "name": "check_os_bluetooth_service",
+      "lineno": 555
+    },
+    {
+      "name": "check_os_install_local_app",
+      "lineno": 575
+    },
+    {
+      "name": "check_os_switch_user",
+      "lineno": 596
+    },
+    {
+      "name": "check_os_sftp_user",
+      "lineno": 615
+    },
+    {
+      "name": "check_os_extract_services",
+      "lineno": 639
+    },
+    {
+      "name": "check_os_recent_manifest",
+      "lineno": 657
+    },
+    {
+      "name": "check_os_cron_job",
+      "lineno": 679
+    },
+    {
+      "name": "check_os_disk_cleanup",
+      "lineno": 702
+    },
+    {
+      "name": "check_os_batch_extract",
+      "lineno": 719
+    },
+    {
+      "name": "check_os_hosts_block",
+      "lineno": 736
+    },
+    {
+      "name": "check_os_systemd_timer_basic",
+      "lineno": 754
+    },
+    {
+      "name": "check_os_quota_dirs",
+      "lineno": 777
+    },
+    {
+      "name": "check_os_log_rotate_pipeline",
+      "lineno": 794
+    },
+    {
+      "name": "check_os_systemd_custom_service",
+      "lineno": 812
+    },
+    {
+      "name": "check_os_firewall_rules",
+      "lineno": 830
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Linux 桌面环境（GNOME）及底层系统管理任务的执行结果。最终产物或状态要求涵盖：GNOME 桌面配置（时区、收藏夹、辅助功能、锁屏、夜灯、通知、电源、电池、音频）、文件系统操作（文件清单、权限、复制过滤、目录层级、压缩、部署、回收站恢复、重命名）、终端与 Shell 环境（终端大小、Python 别名、PHP 行数、文本转换、会议模板）、系统服务与用户管理（蓝牙、本地应用安装、用户切换、SFTP 用户、服务提取、最近文件清单、cron 任务、磁盘清理、批量解压、hosts 屏蔽、systemd 定时器、配额目录、日志轮转、防火墙规则）。核心检查对象主要是 shell 收集器输出的 key=value 格式文本，以及部分直接读取的文件内容或目录列表。主要比较方式包括：精确字符串匹配、数值阈值比较（大于/大于等于）、布尔标志检查、列表集合相等或顺序精确相等。成功判定的总体思路为“全部满足即成功”：绝大多数主函数要求所有子检查项同时符合预期才返回 1.0；若任一项不匹配、文件标志不为 true、解析异常或结果缺失，则立即返回 0.0。辅助函数 _parse_kv 负责将 shell 输出统一解析为字典，支撑了绝大部分检查项的键值比对。",
+    "main_functions": [
+      {
+        "name": "check_gnome_favorite_apps",
+        "lineno": 12,
+        "description": "接收 apps_str（形如 Python 列表的字符串）和 rule 字典。使用 eval 将字符串转为列表，提取 rule 中的 expected 作为预期列表。先比较长度是否一致，再比较两个列表的集合是否完全相等（忽略顺序）。长度不等或集合不等返回 0，否则返回 1。"
+      },
+      {
+        "name": "is_utc_0",
+        "lineno": 28,
+        "description": "接收 timedatectl_output 字符串。按换行符分割后取第 4 行（索引 3），检查该行是否以 +0000) 结尾。是则返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_text_enlarged",
+        "lineno": 36,
+        "description": "接收 scaling_factor_str 字符串。将其转换为 float，判断是否严格大于 1.0。大于返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_moved_jpgs",
+        "lineno": 44,
+        "description": "接收 directory_list（字典，含 children 列表）和 rule 字典。遍历 children 提取每个节点的 name 字段，形成 moved_jpgs 列表。与 rule 中的 expected 比较：先判长度是否相等，再判集合是否完全相等。任一不满足返回 0，否则返回 1。"
+      },
+      {
+        "name": "is_in_vm_clickboard",
+        "lineno": 57,
+        "description": "接收 config 和 terminal_output。仅将 terminal_output 打印到标准输出，未对 config 进行任何处理，也未返回明确的 0 或 1（隐式返回 None）。代码中未明确体现完整的成功/失败判定逻辑。"
+      },
+      {
+        "name": "check_os_timezone_utc",
+        "lineno": 83,
+        "description": "验证系统时区与 NTP 状态。接收 result（shell 输出的 key=value 文本）和 rules 字典。调用 _parse_kv 解析字典。依次检查：timezone 必须等于 rules 中的预期值（默认 Etc/UTC）；ntp 必须等于预期值（默认 active）；file_ok 必须等于 true。三项全部精确匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_gnome_favorites",
+        "lineno": 105,
+        "description": "验证 GNOME 收藏夹应用列表的顺序与内容。接收 result 和 rules。调用 _parse_kv 解析。先检查 file_ok 是否为 true；再用 ast.literal_eval 解析 favorites 键对应的字符串为 Python 列表；将该列表与 rules 中的 expected_apps 进行精确顺序比较（列表相等）。全部通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_accessibility",
+        "lineno": 126,
+        "description": "验证无障碍辅助功能设置。接收 result 和 rules。调用 _parse_kv 解析。提取 text_scale（转 float）、cursor_size（转 int）、mag_enabled（字符串）、mag_factor（转 float）。依次判定：text_scale 必须大于等于 rules 中的 min_text_scale（默认 1.2）；cursor_size 必须大于等于 min_cursor_size（默认 48）；mag_enabled 必须等于 true；mag_factor 必须严格大于 min_mag_factor（默认 1.5）。四项全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_screen_lock",
+        "lineno": 153,
+        "description": "验证屏幕锁定配置。接收 result 和 rules。调用 _parse_kv 解析。依次精确比较：lock_enabled 等于 rules 中的值（默认 true）；idle_delay 等于规则值（默认 300）；lock_delay 等于规则值（默认 0）；file_ok 等于 true。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_night_light",
+        "lineno": 175,
+        "description": "验证夜灯设置。接收 result 和 rules。调用 _parse_kv 解析。依次精确比较：enabled 等于 rules 中的值（默认 true）；temperature 等于规则值（默认 3700）；file_ok 等于 true。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_notifications",
+        "lineno": 195,
+        "description": "验证通知设置。接收 result 和 rules。调用 _parse_kv 解析。依次精确比较：show_banners 等于 rules 中的值（默认 false）；show_in_lock_screen 等于规则值（默认 false）；file_ok 等于 true。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_power_settings",
+        "lineno": 215,
+        "description": "验证电源设置。接收 result 和 rules。调用 _parse_kv 解析。依次精确比较：idle_dim 等于 rules 中的值（默认 false）；idle_delay 等于规则值（默认 0）；file_ok 等于 true。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_battery_config",
+        "lineno": 235,
+        "description": "验证电池与电源配置。接收 result 和 rules。调用 _parse_kv 解析。先检查 show_battery 精确等于规则值（默认 true）。再检查 power_profile：若 rules 中指定了 power_profile，则实际值必须精确等于该值；若指定了 allowed_power_profiles 列表，则实际值必须在该列表内。最后检查 file_ok 等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_audio_config",
+        "lineno": 260,
+        "description": "验证音频配置。接收 result 和 rules。调用 _parse_kv 解析。依次精确比较：volume 等于规则值（默认 100）；mute 等于规则值（默认 no）；sink_file_ok 等于 true。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_file_manifest",
+        "lineno": 284,
+        "description": "验证文件清单内容精确匹配。接收 result（文件内容字符串）和 rules。若 result 为 None 直接返回 0.0。将 result.strip() 与 rules 中的 expected.strip() 进行精确字符串比较。完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_file_operations",
+        "lineno": 302,
+        "description": "验证通用文件操作的多项条件。接收 result（shell 输出的 key=value 文本）和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求解析结果中每个对应键的值与预期值精确相等。所有检查项通过返回 1.0，任一不匹配返回 0.0。"
+      },
+      {
+        "name": "check_os_file_permissions",
+        "lineno": 321,
+        "description": "验证文件权限模式。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 permissions 字典，对每个文件名 fname 构造键名 perm_<fname>，检查解析结果中该键的值是否精确等于预期的权限模式（如 640、755）。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_copy_filter",
+        "lineno": 340,
+        "description": "验证带过滤条件的复制/移动操作结果。接收 result 和 rules。调用 _parse_kv 解析。分三组检查：遍历 rules 中的 present 列表，要求 present_<文件名> 等于 true；遍历 absent 列表，要求 absent_<文件名> 等于 true；遍历 extra_checks 字典，要求对应键值精确匹配。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_dir_hierarchy",
+        "lineno": 363,
+        "description": "验证目录层级操作结果。接收 result 和 rules。调用 _parse_kv 解析。先遍历 rules 中的 checks 字典进行精确键值匹配；若 rules 中指定了 manifest_match 且其值为真值，则额外要求 manifest_match 等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_compress_logs",
+        "lineno": 383,
+        "description": "验证压缩日志操作结果。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求所有键值精确匹配。全部通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_deploy_files",
+        "lineno": 401,
+        "description": "验证文件部署到多目录的结果。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典进行精确键值匹配。全部通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_trash_recovery",
+        "lineno": 419,
+        "description": "验证从回收站恢复文件的结果。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典进行精确键值匹配。全部通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_rename_dirs",
+        "lineno": 437,
+        "description": "验证目录重命名操作及重命名日志。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典进行精确键值匹配。全部通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_terminal_size",
+        "lineno": 459,
+        "description": "验证终端大小持久化与 bashrc 备份。接收 result 和 rules。调用 _parse_kv 解析。依次检查 size_ok、backup_ok、bashrc_ok 是否均等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_python_alias",
+        "lineno": 479,
+        "description": "验证 python/pip 别名配置。接收 result 和 rules。调用 _parse_kv 解析。依次检查 python_ok、pip_ok、file_ok 是否均等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_php_line_count",
+        "lineno": 498,
+        "description": "验证 PHP 行数统计结果。接收 result 和 rules。调用 _parse_kv 解析。依次检查 file_exists 等于 true，content_ok 等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_text_transform",
+        "lineno": 516,
+        "description": "验证文本转换输出（如 HTML 列表生成）。接收 result 和 rules。调用 _parse_kv 解析。依次检查 output_ok 等于 true，summary_ok 等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_meeting_template",
+        "lineno": 534,
+        "description": "验证会议模板创建结果。接收 result 和 rules。调用 _parse_kv 解析。依次检查 template_ok 等于 true，status_ok 等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_bluetooth_service",
+        "lineno": 555,
+        "description": "验证蓝牙服务状态。接收 result 和 rules。调用 _parse_kv 解析。依次精确比较：enabled 等于规则值（默认 enabled）；active 等于规则值（默认 active）；file_ok 等于 true。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_install_local_app",
+        "lineno": 575,
+        "description": "验证本地应用安装完整性。接收 result 和 rules。调用 _parse_kv 解析。依次检查 binary_ok、launcher_ok、desktop_ok、version_ok 是否均等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_switch_user",
+        "lineno": 596,
+        "description": "验证用户会话切换结果。接收 result 和 rules。调用 _parse_kv 解析。依次检查 file_exists、content_ok、owner_ok 是否均等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_sftp_user",
+        "lineno": 615,
+        "description": "验证 SFTP 专用用户创建及权限配置。接收 result 和 rules。调用 _parse_kv 解析。若 rules 中包含 checks 字典，则遍历该字典进行精确键值匹配；否则检查固定键列表：group_ok、user_ok、home_ok、shell_ok、home_perm_ok、upload_perm_ok 是否均等于 true。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_extract_services",
+        "lineno": 639,
+        "description": "验证提取的失败服务列表文件内容。接收 result（文件内容字符串）和 rules。若 result 为 None 返回 0.0。将 result.strip() 与 rules 中的 expected.strip() 进行精确字符串比较。相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_recent_manifest",
+        "lineno": 657,
+        "description": "验证最近文件清单 CSV 内容。接收 result（文件内容字符串）和 rules。若 result 为 None 返回 0.0。将 result.strip() 与 rules 中的 expected.strip() 进行精确字符串比较。相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_cron_job",
+        "lineno": 679,
+        "description": "验证 cron 任务创建结果。接收 result 和 rules。调用 _parse_kv 解析。若 rules 中无 checks 字典，则检查固定键：cron_exists、schedule_ok、command_ok、output_ok 是否均等于 true；若存在 checks 字典，则遍历其键值进行精确匹配。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_disk_cleanup",
+        "lineno": 702,
+        "description": "验证磁盘清理操作结果。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_batch_extract",
+        "lineno": 719,
+        "description": "验证批量解压与按类型分类结果。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_hosts_block",
+        "lineno": 736,
+        "description": "验证/etc/hosts 域名屏蔽配置。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_systemd_timer_basic",
+        "lineno": 754,
+        "description": "验证基础 systemd 定时器与服务单元创建。接收 result 和 rules。调用 _parse_kv 解析。若 rules 中无 checks 字典，则检查固定键：service_file_ok、timer_file_ok、timer_enabled、timer_active 是否均等于 true；若存在 checks 字典，则遍历其键值进行精确匹配。全部满足返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_quota_dirs",
+        "lineno": 777,
+        "description": "验证多用户目录配额与权限设置。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_log_rotate_pipeline",
+        "lineno": 794,
+        "description": "验证日志轮转、压缩与归档流水线。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_systemd_custom_service",
+        "lineno": 812,
+        "description": "验证自定义 systemd 服务与定时器的完整生命周期。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "check_os_firewall_rules",
+        "lineno": 830,
+        "description": "验证 UFW/iptables 防火墙规则配置。接收 result 和 rules。调用 _parse_kv 解析。遍历 rules 中的 checks 字典，要求每个键对应的值与预期精确相等。全部匹配返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 67,
+        "description": "接收 output 字符串，按换行符分割，对每行去除空白后，以第一个等号为界拆分为键和值，去除两端空白后存入字典返回。若输出为空或 None 则返回空字典。该函数被绝大多数 check_os_* 主函数调用，用于统一将 shell 收集器输出的多行 key=value 文本转换为 Python 字典，以便后续进行精确键值比较。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:21",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L1_os_a4d98375-215b-4a4d-aee9-3d4370fccc41/evaluator_function_labels.json"
+}

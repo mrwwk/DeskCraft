@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_interruption_110/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_customer_update_file",
+      "lineno": 6
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_customer_update_file",
+      "lineno": 6
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证从虚拟机(VM)中提取的 customer_update.md 文件内容是否与预期文本完全一致。核心检查对象是本地文件系统中的 customer_update.md 文本内容，主要比较方式为：对实际文件内容与预期内容分别进行规范化处理（将Windows换行符/r/n统一替换为/n并去除尾部空白字符），然后进行精确字符串比对。成功判定的总体思路是二元制——只有当规范化后的文件内容与 expected[\"expected_content\"] 完全相同时才判定任务成功并返回1.0；若文件缺失、读取失败、未提供预期内容或内容存在任何差异，均判定失败并返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_customer_update_file",
+        "lineno": 6,
+        "description": "该函数接收 result_path（从VM获取的 customer_update.md 本地文件路径）和 expected（包含键 expected_content 的字典）作为输入，**options 未被使用。检查步骤如下：1）若 result_path 为 None，直接返回 0.0；2）尝试以 UTF-8 编码打开并读取 result_path 指向的文件全部内容，若捕获到 FileNotFoundError、IOError、OSError 或其他任何异常，则记录日志并返回 0.0；3）从 expected 字典中获取 expected_content，若该键不存在或值为空，则返回 0.0；4）对实际内容 content 和预期内容 expected_content 进行规范化：将字符串中的/r/n 替换为/n，然后调用 rstrip() 去除尾部空白字符与换行；5）进行精确字符串比较，若 content_norm 与 expected_norm 完全一致则返回 1.0，否则记录包含长度和预期内容前200字符的日志并返回 0.0。该函数未调用任何其他辅助函数，独立完成文件读取、异常处理、文本规范化与精确匹配判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:39:12",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/INTERACTIVE_vscode_interactive_vscode_interruption_110/evaluator_function_labels.json"
+}

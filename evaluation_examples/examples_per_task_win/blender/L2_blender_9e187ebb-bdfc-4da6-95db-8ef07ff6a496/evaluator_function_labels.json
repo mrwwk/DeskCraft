@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_9e187ebb-bdfc-4da6-95db-8ef07ff6a496/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_modifier_order",
+      "lineno": 40
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_check_tolerance",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_modifier_order",
+      "lineno": 40
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Blender场景中指定对象的修改器（Modifier）配置是否符合任务要求。它通过读取外部检查脚本（如check_modifier.py）输出的JSON文本，提取目标对象上的修改器列表，并执行两项刚性检查：一是修改器类型的排列顺序必须与rule中modifier_order指定的顺序完全一致（通过索引位置严格递增判定）；二是各修改器的具体参数必须与rule中params的设定匹配，其中数值型参数采用容差近似比较（默认容差0.01），非数值型参数采用精确匹配。评测逻辑为“全部满足”模式——顺序检查或参数检查中任一环节失败即判定为0分（失败），只有全部通过才返回1分（成功）。因此，该evaluator的核心是确保Blender对象的修改器不仅存在，而且顺序正确、参数准确。",
+    "main_functions": [
+      {
+        "name": "check_blender_modifier_order",
+        "lineno": 40,
+        "description": "该函数接收两个参数：command_output为字符串，是外部Blender检查脚本（如check_modifier.py）运行后打印的JSON文本；rule为字典，包含object_name（目标对象名，如\"Cube\"）、modifier_order（期望的修改器类型顺序列表，如[\"SUBSURF\", \"SOLIDIFY\"]）、params（各修改器的期望参数字典，如{\"SOLIDIFY\": {\"thickness\": 0.1}}）和tolerance（数值容差，默认0.01）。执行流程：首先调用_parse_blender_output将command_output解析为字典；若解析失败则直接返回0.0。接着从字典中提取目标对象对应的修改器列表。然后进行两项核心检查：1. 顺序检查：遍历rule中的modifier_order，依次查找每个修改器类型在实际列表中的索引位置（使用list.index）。如果某个类型找不到，或后续类型的索引不大于前一个（即未按期望顺序排列），则记录警告并返回0.0。2. 参数检查：遍历rule中的params，对每个修改器类型在列表中找到匹配的实例，然后比对其中的每个参数。若预期值为整数或浮点数，则调用_check_tolerance进行容差比对（|actual - expected| <= tolerance）；否则进行严格的相等比对（==）。任一参数不匹配即返回0.0。若顺序和参数检查全部通过，返回1.0表示成功。整个过程中若抛出异常，捕获后记录错误并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 21,
+        "description": "负责将Blender检查脚本的原始命令行输出转换为结构化字典。接收command_output字符串，先判断是否为空或仅包含空白字符，若是则记录错误并返回None；否则尝试使用json.loads解析。若遭遇JSONDecodeError或ValueError，则记录错误日志及原始输出内容，返回None。该函数是主函数的数据预处理入口，只有返回有效字典时评测才能继续。"
+      },
+      {
+        "name": "_check_tolerance",
+        "lineno": 34,
+        "description": "提供数值型参数的近似相等判断。接收actual（实际值）、expected（预期值）和tol（容差阈值）。若actual或expected为None则返回False；否则将两者转为浮点数后计算绝对差值，判断是否小于等于tol。该函数专门用于主函数中修改器数值参数（如厚度、强度等）的比对，避免因浮点精度或微小误差导致严格相等判断失败。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:38:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L2_blender_9e187ebb-bdfc-4da6-95db-8ef07ff6a496/evaluator_function_labels.json"
+}

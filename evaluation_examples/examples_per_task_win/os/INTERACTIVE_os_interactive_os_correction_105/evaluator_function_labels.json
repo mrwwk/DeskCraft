@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_correction_105/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于对某个字符串结果（如命令输出、文件内容或页面文本等，具体来源代码中未明确体现）进行二元判定，验证其是否同时满足预设的内容包含规则与排除规则。核心检查对象是传入的 result 字符串；主要比较方式为 Python 的子串包含检查（in/ not in）。成功判定要求 result 必须包含 rules['include'] 中列出的所有子串，并且不包含 rules['exclude'] 中列出的任何子串。只有当这两项条件全部满足时，才视为任务成功并返回 1.0；若 result 为 None，或任一条件不满足，则返回 0.0。该逻辑为严格的“全有或全无”打分方式，不存在部分得分、近似匹配或顺序要求。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收两个参数：待检查的字符串 result，以及包含 include 和 exclude 规则的字典 rules。检查步骤如下：首先判断 result 是否为 None，若为 None 则直接返回 0.0；随后通过 rules.get 提取 include 列表与 exclude 列表（缺省为空列表）；接着执行组合条件判断——使用 all(r in result for r in include) 确认 result 包含所有要求子串，同时使用 all(r not in result for r in exclude) 确认 result 不包含任何排除子串。只有当“全部包含”与“全部不包含”同时成立时，才返回 1.0；否则返回 0.0。函数内部还会通过 print(result, rules) 输出当前结果与规则供调试。该函数未调用其他辅助函数，独立完成判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:31:11",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_correction_105/evaluator_function_labels.json"
+}

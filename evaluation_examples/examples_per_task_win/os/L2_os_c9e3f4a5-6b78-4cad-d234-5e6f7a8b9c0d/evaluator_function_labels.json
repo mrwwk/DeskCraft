@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_c9e3f4a5-6b78-4cad-d234-5e6f7a8b9c0d/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_batch_extract",
+      "lineno": 19
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 6
+    },
+    {
+      "name": "check_os_batch_extract",
+      "lineno": 19
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统环境下基于文件类型的批量提取与分类任务。它接收shell收集器输出的原始文本，将其解析为键值对字典，再与预设规则中的预期值进行逐项精确比对。核心检查对象是各个目标文件或目录所对应的分类结果（或状态标识），主要比较方式为字符串级别的完全相等匹配。只有当rules.checks中所有预期键值对都在实际输出中完全匹配时，才判定任务成功并返回1.0；若任一项不匹配或发生解析异常，则返回0.0。整体采用\"全部满足\"式的二元打分逻辑，无近似匹配、无阈值容忍、无加权累计。",
+    "main_functions": [
+      {
+        "name": "check_os_batch_extract",
+        "lineno": 19,
+        "description": "该函数接收result（shell收集器输出的原始字符串，预期包含多行key=value格式）和rules（包含预期检查规则的字典）两个参数。执行步骤如下：首先调用辅助函数_parse_kv将result解析为字典kv；然后从rules字典中提取键为\"checks\"的子字典；接着遍历checks中的每一个key及其expected值，逐一检查kv中是否存在对应键且其值与expected完全相等。若遍历过程中发现任何一项不匹配，立即返回0.0；若所有键值对均匹配，则返回1.0。此外，整个解析与比对过程被try-except包裹，若发生任何异常则捕获后返回0.0。该逻辑属于严格的\"全部满足\"判定，要求所有检查项同时正确，无部分得分。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 6,
+        "description": "该辅助函数将shell输出的原始字符串按行解析为Python字典。具体逻辑为：若输入为空字符串或None，直接返回空字典；否则按换行符分割为各行，去除每行首尾空白后，判断行内是否包含\"=\"字符。若包含，则以第一个\"=\"为界将行拆分为键k和值v，并对二者分别去除首尾空白后存入结果字典。该函数为主函数check_os_batch_extract提供数据预处理服务，将非结构化的shell输出转换为可供精确匹配的字典结构，是后续键值比对的基础解析器。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:35:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_c9e3f4a5-6b78-4cad-d234-5e6f7a8b9c0d/evaluator_function_labels.json"
+}

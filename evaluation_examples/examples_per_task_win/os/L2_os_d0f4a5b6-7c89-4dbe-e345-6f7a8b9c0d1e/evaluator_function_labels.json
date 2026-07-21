@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_d0f4a5b6-7c89-4dbe-e345-6f7a8b9c0d1e/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_hosts_block",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_hosts_block",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证操作系统中/etc/hosts文件的域名阻断配置是否按任务要求正确完成。它接收shell收集器输出的键值对文本（包含blocked_X、preserved_ok、backup_ok、verify_ok等状态字段），通过解析这些字段并与评测规则中预设的期望值进行严格字符串匹配，来判断配置结果。判定逻辑采用“全满足”式二元评分：只有当rules.checks中声明的所有检查项都在shell输出中找到且值完全匹配时，才返回1.0（成功）；若任意一项不匹配、缺失，或解析过程发生异常，则直接返回0.0（失败）。不存在部分得分、加权或近似匹配。",
+    "main_functions": [
+      {
+        "name": "check_os_hosts_block",
+        "lineno": 30,
+        "description": "该函数是评测/etc/hosts阻断配置的核心入口。它接收两个参数：result为shell收集器输出的原始字符串，rules为包含评测规则的字典。执行步骤如下：首先调用辅助函数_parse_kv将result按行解析为键值对字典；然后从rules中提取checks子字典，遍历其中每一项key与expected值；对每一项使用kv.get(key)获取实际值，并与expected进行严格的相等性比较（字符串级精确匹配，非模糊匹配）；若遍历过程中发现任意一项不匹配，立即返回0.0；若所有检查项均匹配成功，则返回1.0。整个逻辑包裹在try-except中，若解析或比较过程抛出任何异常，函数会记录错误日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该函数负责将shell命令输出的原始文本解析为结构化字典，供check_os_hosts_block使用。它接收output字符串，先判断空值，再按换行符分割为行列表；对每一行去除首尾空白后，检查是否包含等号'='；若存在，则以第一个等号为界分割为键和值，并对键和值分别执行strip()去除空白，最终存入字典返回。该解析器仅处理简单的key=value格式，不处理嵌套、JSON或带引号的值，是连接原始shell输出与后续严格比较逻辑的通用预处理步骤。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:35:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_d0f4a5b6-7c89-4dbe-e345-6f7a8b9c0d1e/evaluator_function_labels.json"
+}

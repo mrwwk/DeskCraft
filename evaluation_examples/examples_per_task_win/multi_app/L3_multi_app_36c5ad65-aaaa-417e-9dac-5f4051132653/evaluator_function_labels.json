@@ -1,0 +1,100 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_36c5ad65-aaaa-417e-9dac-5f4051132653/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 78
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 106
+    },
+    {
+      "name": "check_json",
+      "lineno": 119
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 285
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 313
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 78
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 106
+    },
+    {
+      "name": "check_json",
+      "lineno": 119
+    },
+    {
+      "name": "_multicellrange_containsby",
+      "lineno": 225
+    },
+    {
+      "name": "_match_value_to_rule",
+      "lineno": 229
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 285
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 313
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "本evaluator是一个多维度任务结果验证器，用于综合判定浏览器状态、文本内容、结构化数据文件及Python代码是否符合任务预期。它通过五大独立检查入口分别验证：1）Chrome活动标签页URL（忽略查询参数）是否匹配目标地址；2）文本输出是否同时满足包含指定字符串且不包含禁用字符串；3）JSON/YAML文件是否满足一系列结构化预期规则（如键路径存在、值匹配正则/近似值/区间/电子表格范围等）且不满足任何非预期规则；4）JSON设置文件是否精确包含所有预期键值对；5）Python代码是否能通过指定测试套件的动态加载与执行。各检查项独立评分，成功判定多为布尔式全有或全无（返回1.0或0.0），其中JSON/YAML检查采用逻辑与组合多条规则，Python测试支持按返回值类型归一化到[0,1]区间。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 78,
+        "description": "验证Chrome当前活动标签页是否为预期页面。接收active_tab_info（字典或字符串，含实际URL）和rule（字典，含type和url字段）。当rule['type']为'url'时，分别提取预期URL和实际URL，通过strip_query函数去除查询参数后进行精确字符串比较，相等返回1，不等返回0；若type不是'url'则报错并返回0。该检查对URL参数不敏感，但要求协议、域名、路径完全一致。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 106,
+        "description": "对一段文本结果执行包含与排除双重检查。接收result（字符串）和rules（字典，可选含include列表与exclude列表）。判定逻辑为：result必须同时包含所有include规则中的子字符串，且必须不包含任何exclude规则中的子字符串。两个条件同时满足返回1.0，任一不满足返回0.0。若result为None直接返回0.0。"
+      },
+      {
+        "name": "check_json",
+        "lineno": 119,
+        "description": "对JSON或YAML文件执行结构化规则校验。接收result（待测文件路径）、rules（含expect和unexpect规则列表的字典）及is_yaml标志。首先检查文件存在性并解析为字典；随后遍历expect规则：按rule['key']列表逐级深入字典取值，若遇KeyError或TypeError直接返回0.0，取值成功后调用_match_value_to_rule进行匹配，所有expect规则需逻辑与（全部满足）。再遍历unexpect规则：同样按key路径取值，缺失则value置None，调用_match_value_to_rule后要求结果不满足该规则（即not），所有unexpect规则也需逻辑与。最终metric为True返回1.0，否则0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 285,
+        "description": "验证JSON设置文件是否精确包含一组预期键值对。接收actual（结果文件路径字符串）和expected（字典，内部需含'expected'键，其值为待匹配的键值对字典）。读取actual路径的JSON文件后，逐一遍历expected['expected']中的每一项，检查该键是否存在于实际数据中且值完全相等（==）。所有键值对均匹配返回1.0，任一不匹配或读取失败返回0.0。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 313,
+        "description": "通过动态加载并执行外部测试文件来验证Python代码正确性。接收actual_files（结果文件，函数签名中保留但未在函数体内直接使用）、test_file（测试脚本路径）和options（可选test_function_name，默认为'test'）。流程如下：验证test_file存在；生成唯一模块名，保存原始工作目录与sys.path；切换至test_file所在目录并动态加载模块；获取指定测试函数并执行。对返回值分类处理：布尔型直接映射为1.0/0.0；数值型裁剪到[0,1]区间；其他类型按Python真值判断。加载、执行或清理过程中任何异常均返回0.0，并在finally块中恢复环境与清理sys.modules。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_multicellrange_containsby",
+        "lineno": 253,
+        "description": "判断电子表格范围包含关系。接收subset_candidate（待检查的MultiCellRange）和superset_candidate（父范围MultiCellRange），遍历subset中的每一个CellRange，检查其是否都被superset_candidate包含。全部包含返回True，否则False。专用于_match_value_to_rule中的spreadsheet_range方法，验证某个单元格范围是否落在允许的上下界之间。"
+      },
+      {
+        "name": "_match_value_to_rule",
+        "lineno": 260,
+        "description": "通用值-规则匹配引擎，被check_json的expect/unexpect规则复用。接收value（待匹配值）和rule（含method与ref字段）。根据rule['method']分发处理：1）以're'开头：按re.search正则匹配，支持通过点号拼接flags（如re.IGNORECASE）；2）eq/ne/le/lt/ge/gt：调用operator对应运算符比较value与rule['ref']；3）以'approx:'开头：将value转为浮点数，检查与ref的绝对差是否不超过指定阈值；4）spreadsheet_range：利用_multicellrange_containsby检查value（MultiCellRange）是否被ref[0]包含且被ref[1]包含；5）以'range.'开头：解析method后两位作为左右区间开闭标记（如't e'表示左开右闭），检查value是否在ref[0]和ref[1]之间；6）str_list_eq/str_set_eq：去除引号后按逗号分割，转为list或set比较。若method未实现则抛出NotImplementedError。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:24:52",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_36c5ad65-aaaa-417e-9dac-5f4051132653/evaluator_function_labels.json"
+}

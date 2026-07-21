@@ -1,0 +1,105 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_f86a64e9-03a3-47b1-9ff5-17373016e26a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 65
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 98
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 119
+    },
+    {
+      "name": "check_inkscape_l2_layer_ops",
+      "lineno": 150
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 40
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 48
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 57
+    },
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 65
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 98
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 119
+    },
+    {
+      "name": "check_inkscape_l2_layer_ops",
+      "lineno": 150
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证用户对Inkscape SVG文件执行的图层操作结果。它通过解析SVG文件的XML结构，重点检查三个维度：1）图层可见性——通过读取图层g元素的style属性中display值是否为none来判断；2）图层重命名——通过比对指定id的g元素上inkscape命名空间的label属性与预期名称；3）图层堆叠顺序——通过遍历SVG根节点下的直接子g元素，按文档顺序提取图层label并验证其从下到上的顺序是否与预期列表完全一致。对于单一维度检查，函数返回1.0（完全匹配）或0.0（不匹配或未找到）。对于组合任务check_inkscape_l2_layer_ops，采用严格串联逻辑：必须同时满足顺序、重命名、可见性三项检查，每项都得1.0，最终才返回1.0，任一失败即整体返回0.0。所有检查均以SVG文件路径为输入，使用xml.etree.ElementTree解析，并兼容带命名空间及不带命名空间的属性查找。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_layer_visibility",
+        "lineno": 65,
+        "description": "检查指定label的Inkscape图层的可见性状态。首先调用_parse_svg读取并解析SVG文件，若解析失败则返回0.0。接着在XML树中查找标签为带svg命名空间的g元素，且具备inkscape:groupmode=layer属性，同时要求其inkscape:label等于rule中指定的layer_label。若找到，则提取该元素的style属性字符串，经_parse_style解析为字典后，读取display键的值（默认为inline），当display不等于none时判定为可见。若带命名空间的查找未命中，则退而查找不带命名空间前缀的g元素并执行相同判断。最终，将实际可见性（布尔值）与rule中的expected_visible进行精确比对，一致返回1.0，否则返回0.0；未找到目标图层也返回0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_name",
+        "lineno": 98,
+        "description": "检查指定id的图层是否被重命名为预期label。首先调用_parse_svg解析SVG文件，失败返回0.0。然后通过_find_element_by_id在整棵树中递归遍历所有元素，查找id属性等于rule中layer_id的元素。若未找到返回0.0。找到后，读取该元素上inkscape命名空间的label属性（即inkscape:label），将其与rule中的expected_label进行字符串精确比较。完全相等返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_order",
+        "lineno": 119,
+        "description": "检查图层的堆叠顺序（从下到上）是否与预期一致。首先调用_parse_svg解析SVG文件，失败返回0.0。然后仅遍历SVG根节点root的直接子元素，使用_tag_local获取本地标签名并筛选出标签为g且inkscape:groupmode=layer的元素，按文档顺序收集它们的inkscape:label值形成layers列表。若收集到的图层总数少于rule中expected_order列表的长度，直接返回0.0。随后，从layers中过滤出仅包含在expected_order内的label并保持原有顺序，得到filtered列表。最后比较filtered与expected_order是否完全相等（列表长度、元素值、顺序均一致）。完全匹配返回1.0，否则返回0.0。该检查允许存在不在expected_order中的额外图层，但要求预期图层的相对顺序必须严格一致。"
+      },
+      {
+        "name": "check_inkscape_l2_layer_ops",
+        "lineno": 150,
+        "description": "L2组合任务检查，要求同时满足图层顺序调整、图层重命名和图层可见性切换三项操作。接收包含三个子规则的rule字典：layer_order_check、layer_name_check、visibility_check。依次调用check_inkscape_layer_order、check_inkscape_layer_name、check_inkscape_layer_visibility，分别传入svg_file_path和对应的子规则。判定逻辑为严格串联：只要任一子检查返回值小于1.0，立即返回0.0；仅当三项检查全部返回1.0时，最终才返回1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 24,
+        "description": "将CSS样式字符串解析为Python字典。输入形如fill:#ff0000;stroke:#000的style_str，按分号分割为多个声明，再按冒号分割为键值对，去除空白后存入字典。若输入为空或None则返回空字典。该函数主要用于解析SVG元素的style属性，特别是提取display值以判断图层可见性。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 36,
+        "description": "在已解析的XML元素树中按id属性查找元素。从root开始通过iter()递归遍历所有后代元素，比较每个元素的id属性与传入的element_id，返回第一个匹配的元素；若遍历结束未找到则返回None。该函数为图层重命名检查提供精确的元素定位能力。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 44,
+        "description": "SVG文件读取与解析器。接收svg_file_path，使用xml.etree.ElementTree.parse解析文件，返回(tree, tree.getroot())元组。若解析过程中发生任何异常（如文件不存在或XML格式错误），则捕获异常并返回(None, None)。该函数是所有主函数的前置步骤，为后续检查提供XML树和根节点。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 54,
+        "description": "提取XML元素的本地标签名，去除命名空间前缀。若元素标签tag中包含}，则取}之后的部分；否则直接返回原标签。该函数用于图层顺序检查中，判断根节点直接子元素是否为g标签，而不受SVG命名空间声明方式的影响。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:45:01",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/L2_inkscape_f86a64e9-03a3-47b1-9ff5-17373016e26a/evaluator_function_labels.json"
+}
