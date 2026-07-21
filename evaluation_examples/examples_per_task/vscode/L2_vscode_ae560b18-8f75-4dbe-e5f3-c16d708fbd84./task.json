@@ -86,6 +86,7 @@
     ],
     "func": [
       "check_ui_bundle_required_files",
+      "check_ui_bundle_required_keywords",
       "check_ui_bundle_html_checks",
       "check_ui_bundle_manifest_subset"
     ],
@@ -98,6 +99,19 @@
             "index.html",
             "manifest.json"
           ]
+        }
+      },
+      {
+        "type": "rule",
+        "rules": {
+          "required_file_keywords": {
+            "index.html": [
+              "<title>Launch Badge Kit</title>",
+              ".badge",
+              "background: #f3f4f6",
+              "font-family: Arial, sans-serif"
+            ]
+          }
         }
       },
       {

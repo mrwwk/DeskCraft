@@ -76,7 +76,7 @@
           "expected": {
             "key": "ctrl+alt+r",
             "command": "python.execInTerminal",
-            "when": "editorTextFocus && editorLangId == python"
+            "when": "editorTextFocus && editorLangId == 'python'"
           }
         }
       },

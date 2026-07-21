@@ -46,7 +46,7 @@
     "func": "check_os_file_permissions",
     "result": {
       "type": "vm_command_line",
-      "command": "echo \"perm_serviceA_app=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/app.log 2>/dev/null)\"; echo \"perm_serviceB_error=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/error.log 2>/dev/null)\"; echo \"perm_hidden=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/.hidden/hidden.log 2>/dev/null)\"; echo \"perm_archive_old=$(stat -c '%a' ~/Desktop/perm_lab/archive/old.log 2>/dev/null)\"; echo \"perm_readme=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/readme.txt 2>/dev/null)\"; echo \"perm_run=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/run.sh 2>/dev/null)\"",
+      "command": "echo \"perm_serviceA_app=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/app.log 2>/dev/null)\"; echo \"perm_serviceB_error=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/error.log 2>/dev/null)\"; echo \"perm_hidden=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/.hidden/hidden.log 2>/dev/null)\"; echo \"perm_archive_old=$(stat -c '%a' ~/Desktop/perm_lab/archive/old.log 2>/dev/null)\"; echo \"perm_readme=$(stat -c '%a' ~/Desktop/perm_lab/serviceA/readme.txt 2>/dev/null)\"; echo \"perm_run=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub/run.sh 2>/dev/null)\"; echo \"perm_dir_root=$(stat -c '%a' ~/Desktop/perm_lab 2>/dev/null)\"; echo \"perm_dir_serviceA=$(stat -c '%a' ~/Desktop/perm_lab/serviceA 2>/dev/null)\"; echo \"perm_dir_serviceB=$(stat -c '%a' ~/Desktop/perm_lab/serviceB 2>/dev/null)\"; echo \"perm_dir_serviceB_sub=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/sub 2>/dev/null)\"; echo \"perm_dir_archive=$(stat -c '%a' ~/Desktop/perm_lab/archive 2>/dev/null)\"; echo \"perm_dir_hidden=$(stat -c '%a' ~/Desktop/perm_lab/serviceB/.hidden 2>/dev/null)\"",
       "shell": true
     },
     "expected": {
@@ -58,7 +58,13 @@
           "hidden": "640",
           "archive_old": "755",
           "readme": "666",
-          "run": "700"
+          "run": "700",
+          "dir_root": "755",
+          "dir_serviceA": "755",
+          "dir_serviceB": "755",
+          "dir_serviceB_sub": "755",
+          "dir_archive": "755",
+          "dir_hidden": "755"
         }
       }
     },

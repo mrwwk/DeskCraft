@@ -62,16 +62,17 @@
     "func": "check_include_exclude",
     "result": {
       "type": "vm_command_line",
-      "command": "python3 -c \"import pandas as pd; df = pd.read_excel('/home/user/Desktop/q2_targets.xlsx'); s = df.to_string(); print('PASSED' if 'Zhang Wei' in s else 'FAILED')\""
+      "command": "python3 -c \"import pandas as pd; df=pd.read_excel('/home/user/Desktop/q2_targets.xlsx'); s=df.to_string(); print('PASS' if all(v in s for v in ['Q2 Sales Target', 'Zhang Wei', '1150', '15% growth over Q1']) else 'FAIL')\"",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
         "include": [
-          "PASSED"
+          "PASS"
         ],
         "exclude": [
-          "FAILED"
+          "FAIL"
         ]
       }
     },

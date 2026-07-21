@@ -46,7 +46,7 @@
       },
       {
         "type": "vm_command_line",
-        "command": "ls /home/user/Desktop/logs/",
+        "command": "python3 -c \"from pathlib import Path; p=Path('/home/user/Desktop/logs/app.log'); print('PASS' if p.exists() and p.is_file() and p.stat().st_size==0 else 'FAIL')\"",
         "shell": true
       }
     ],
