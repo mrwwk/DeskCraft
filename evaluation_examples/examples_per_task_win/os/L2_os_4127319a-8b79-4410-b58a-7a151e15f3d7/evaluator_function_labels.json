@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_4127319a-8b79-4410-b58a-7a151e15f3d7/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_php_line_count",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_php_line_count",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证一个 PHP 行数统计任务的执行结果。它通过读取 shell 收集器输出的 key=value 格式文本，检查目标 PHP 文件是否存在（file_exists）以及其内容或行数是否满足要求（content_ok）。只有两个字段同时等于 \"true\" 时才判定任务成功，返回 1.0；任一条件不满足或发生异常则返回 0.0。这是一种严格的二元判定（全部满足）逻辑，不采用加权或累计打分。",
+    "main_functions": [
+      {
+        "name": "check_os_php_line_count",
+        "lineno": 31,
+        "description": "接收 shell 收集器输出的 result 字符串和 rules 字典作为输入。首先调用 _parse_kv 将 result 解析为键值对字典；然后依次检查两个字段：1) file_exists 必须等于 \"true\"，用于确认目标 PHP 文件已存在；2) content_ok 必须等于 \"true\"，用于确认文件内容或行数符合预期要求。只有当这两个条件全部满足时才返回 1.0，否则返回 0.0。若解析或判断过程中发生异常，同样捕获后返回 0.0。注意：参数 rules 在代码中未参与实际判定。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "接收一段 shell 输出字符串，按行分割并解析其中的 key=value 格式。对每一行去除首尾空白后，以第一个等号为界分割键和值，再将键和值分别去除空白，汇总为一个字典返回。如果输入为空字符串或不含等号行，则返回空字典。该函数负责将原始 shell 文本转换为结构化字典，供主函数 check_os_php_line_count 进行字段级判定。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:34:07",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_4127319a-8b79-4410-b58a-7a151e15f3d7/evaluator_function_labels.json"
+}

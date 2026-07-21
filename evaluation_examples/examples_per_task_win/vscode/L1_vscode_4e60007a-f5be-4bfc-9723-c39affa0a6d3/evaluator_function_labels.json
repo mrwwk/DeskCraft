@@ -1,0 +1,191 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_4e60007a-f5be-4bfc-9723-c39affa0a6d3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 34
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 87
+    },
+    {
+      "name": "compare_text_file",
+      "lineno": 163
+    },
+    {
+      "name": "compare_pdf_content",
+      "lineno": 200
+    },
+    {
+      "name": "compare_zip_files",
+      "lineno": 219
+    },
+    {
+      "name": "compare_config",
+      "lineno": 269
+    },
+    {
+      "name": "compare_answer",
+      "lineno": 311
+    },
+    {
+      "name": "is_extension_installed",
+      "lineno": 330
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 343
+    },
+    {
+      "name": "check_python_file_by_gold_file",
+      "lineno": 491
+    },
+    {
+      "name": "check_html_background_image",
+      "lineno": 495
+    },
+    {
+      "name": "compare_result_files",
+      "lineno": 514
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_jsonc_file",
+      "lineno": 9
+    },
+    {
+      "name": "check_json_keybindings",
+      "lineno": 34
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 87
+    },
+    {
+      "name": "compare_text_file",
+      "lineno": 163
+    },
+    {
+      "name": "compare_pdf_content",
+      "lineno": 200
+    },
+    {
+      "name": "compare_zip_files",
+      "lineno": 219
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 252
+    },
+    {
+      "name": "compare_config",
+      "lineno": 269
+    },
+    {
+      "name": "compare_answer",
+      "lineno": 311
+    },
+    {
+      "name": "is_extension_installed",
+      "lineno": 330
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 343
+    },
+    {
+      "name": "check_python_file_by_gold_file",
+      "lineno": 491
+    },
+    {
+      "name": "check_html_background_image",
+      "lineno": 495
+    },
+    {
+      "name": "compare_result_files",
+      "lineno": 514
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 是一个多格式、多场景的通用任务验证器，用于自动判定各类编程、配置与文件操作任务的完成质量。它覆盖的核心对象包括：VS Code 的 keybindings.json 与 settings.json（支持 JSONC 语法）、纯文本文件、ZIP 压缩包（内含普通文件或 PDF）、HTML 样式、Python 代码（通过动态加载外部测试套件执行验证）、通用配置文件以及简单答案字符串。评测逻辑以二元判定为主（返回 1.0 或 0.0），依据任务类型选择不同的比较策略：精确字符串/二进制匹配、JSON 子集包含、前缀通配、数值近似（1e-4 容差）、PDF 文本相似度（SequenceMatcher 比率阈值 0.95）以及动态执行测试函数并按返回值类型归一化打分。总体思路是：读取实际产物与预期基准，经过必要的预处理（空白规范化、大小写转换、JSONC 清洗、PDF 文本提取等），按该场景设定的严格或宽松语义进行逐项比对，全部条件满足则视为成功。",
+    "main_functions": [
+      {
+        "name": "check_json_keybindings",
+        "lineno": 34,
+        "description": "检查 VS Code keybindings.json 风格的快捷键配置。接收 actual（结果文件路径）和 expected（预期字典）。首先依次尝试 direct_load_json 与 skip_first_line_load_json 读取 actual 文件，要求解析结果为 list 类型。若 expected 包含 all_of 或 none_of 键，则遍历 all_of 中每个 binding，使用 _is_subset 判断 data 中是否存在某个字典包含该 binding；再遍历 none_of，确保不存在任何字典包含这些 binding。若 expected 包含 expected 键，则检查 data 中是否存在字典包含该预期 binding。全部满足返回 1.0，任一失败返回 0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 87,
+        "description": "检查 VS Code settings.json 配置。接收 actual（settings.json 文件路径）和 expected（预期字典，通常含 \"expected\" 键）。使用 _parse_jsonc_file 解析 JSONC 格式（容忍尾随逗号和// 注释）。遍历预期键值对：对于 editor.codeActionsOnSave，要求 actual 中对应值为字典，且包含所有预期子键；其中 source.organizeImports 接受 True 或 \"explicit\"。对于 editor.defaultFormatter，若预期值以 * 结尾，则按前缀匹配，依次检查全局作用域和 [python] 语言作用域；否则精确匹配，同样先全局后 [python]。其他键要求 actual 中必须存在且值完全相等。全部通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_text_file",
+        "lineno": 163,
+        "description": "比较两个纯文本文件内容是否完全一致。接收 actual 和 expected（均为文件路径）。依次读取两个文件的全部文本。根据 options：若 ignore_blanks 为 True，则将制表符、换行符替换为空格并压缩连续空白为单个空格；若 ignore_case 为 True，则全部转为小写。预处理后两文本完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_pdf_content",
+        "lineno": 200,
+        "description": "比较两份 PDF 二进制内容的文本相似度。接收 content1、content2（PDF 字节内容）和 text_similarity_threshold。将内容写入临时文件 temp.pdf，使用 PyPDF2.PdfReader 逐页提取文本，拼接后用 difflib.SequenceMatcher 计算相似度比率。返回布尔值表示相似度是否大于等于阈值。该函数通常被 compare_zip_files 在比较压缩包内 PDF 文件时调用。"
+      },
+      {
+        "name": "compare_zip_files",
+        "lineno": 219,
+        "description": "比较两个 ZIP 压缩包的内容一致性。接收 actual 和 expected（均为 zip 文件路径）。首先比较文件列表（namelist 转 set），要求完全一致。然后逐个文件比较内容：若文件名以 .pdf 结尾，调用 compare_pdf_content 进行文本相似度比较，阈值固定为 0.95；其他文件直接进行二进制内容相等比较。任一文件不匹配返回 0.0，全部匹配返回 1.0。"
+      },
+      {
+        "name": "compare_config",
+        "lineno": 269,
+        "description": "检查配置文件内容是否符合预期。接收 actual（文件路径）和 rules（含 \"expected\" 字符串）。读取 actual 文件内容。默认 containment_ok=True（松散/包含语义）：优先将 actual 和 expected 都解析为 JSON，使用 _is_subset 判断 expected_json 是否为 actual_json 的子集；若 JSON 解析失败，回退为字符串包含判断（expected_text.strip() 是否在 actual_text 中）。若 containment_ok=False（严格模式）：先直接字符串相等比较；若失败再尝试 JSON 解析后完全相等比较（不忽略额外键值）。通过返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_answer",
+        "lineno": 311,
+        "description": "对答案字符串进行精确匹配。接收 actual（结果字符串）和 rules（含 \"expected\" 预期字符串）。若 actual 与 rules[\"expected\"] 完全相等返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "is_extension_installed",
+        "lineno": 330,
+        "description": "检查扩展安装列表或输出字符串中是否包含（或不包含）特定内容。接收 actual（字符串）和 rules（含 \"type\" 和 \"expected\"）。若 rules[\"type\"] 为 \"contain\"，判断 rules[\"expected\"] 是否在 actual 中，在则返回 1.0；若为 \"not_contain\"，判断 rules[\"expected\"] 是否不在 actual 中，不在则返回 1.0。其他 type 抛出 NotImplementedError。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 343,
+        "description": "通过动态执行外部 Python 测试套件来验证代码。接收 actual_files（结果文件，本函数中未直接使用）、test_file（测试文件路径）和 options（可含 test_function_name，默认 \"test\"）。验证 test_file 存在后，切换工作目录到测试文件所在目录并临时修改 sys.path，使用 importlib.util 动态加载模块，执行名为 test_function_name 的函数。根据返回值类型处理：bool 类型直接映射为 1.0/0.0；数值类型裁剪到 [0.0, 1.0]；其他类型按 bool 判断。加载、执行过程中任何异常均返回 0.0。finally 中清理临时模块并恢复工作目录与 sys.path。"
+      },
+      {
+        "name": "check_python_file_by_gold_file",
+        "lineno": 491,
+        "description": "该函数目前为空实现（pass），未定义具体的检查逻辑。代码中未明确体现其输入处理与判定规则。"
+      },
+      {
+        "name": "check_html_background_image",
+        "lineno": 495,
+        "description": "检查 HTML 文件中是否通过 style 标签正确设置了指定的背景图片。接收 src_path（HTML 文件路径）和 rule（字典，含 \"value\" 键）。使用 BeautifulSoup 解析 HTML，查找所有 style 标签，检查是否有标签文本包含 background-image: url('rule[\"value\"]') 形式的完整声明。找到匹配返回 1.0，否则返回 0.0。"
+      },
+      {
+        "name": "compare_result_files",
+        "lineno": 514,
+        "description": "比较两个结果文件的内容，支持字符串和数值两种模式。接收 src_path 和 tgt_path。读取并去除首尾空白后，优先尝试将 tgt_content 转为 float：若 tgt_content 是 src_content 的子串，返回 1.0（允许 src 为包含语言描述的超集）；否则将 src_content 也转为 float，比较两者绝对差是否小于 1e-4。若数值转换失败，回退为直接字符串相等比较。满足条件返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_jsonc_file",
+        "lineno": 10,
+        "description": "解析 JSONC 格式文件（如 VS Code settings.json）。接收 filepath，读取文件内容后先尝试使用 json5 库解析；若未安装 json5，则使用正则表达式移除// 行注释（多行模式）以及 } 或 ] 前的尾随逗号，最后使用标准 json.loads 解析。返回解析后的字典。主要服务于 check_json_settings。"
+      },
+      {
+        "name": "_is_subset",
+        "lineno": 253,
+        "description": "递归判断 expected 是否为 actual 的子集。若 expected 为字典，递归检查 expected 中每个键是否存在于 actual 且对应值满足子集关系；若 expected 为列表，要求与 actual 完全相等；其他基础类型要求完全相等。返回布尔值。被 check_json_keybindings 和 compare_config 用于实现松散包含语义。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:42:54",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_4e60007a-f5be-4bfc-9723-c39affa0a6d3/evaluator_function_labels.json"
+}

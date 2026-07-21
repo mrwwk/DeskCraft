@@ -1,0 +1,249 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_f11a0c21-75cc-4d13-8a91-1c01b4d51009/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 98
+    },
+    {
+      "name": "check_ui_bundle_min_file_sizes",
+      "lineno": 117
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 139
+    },
+    {
+      "name": "check_ui_bundle_required_patterns",
+      "lineno": 163
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 187
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 209
+    },
+    {
+      "name": "check_ui_bundle_section_order",
+      "lineno": 269
+    },
+    {
+      "name": "check_ui_bundle_css_declarations",
+      "lineno": 302
+    },
+    {
+      "name": "check_ui_bundle_local_asset_links",
+      "lineno": 351
+    },
+    {
+      "name": "check_ui_bundle_no_remote_image_urls",
+      "lineno": 378
+    },
+    {
+      "name": "check_generative_ui_bundle",
+      "lineno": 405
+    },
+    {
+      "name": "check_ui_previewable_generative_bundle",
+      "lineno": 427
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 431
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_is_subset",
+      "lineno": 36
+    },
+    {
+      "name": "_normalize_ui_bundle_path",
+      "lineno": 53
+    },
+    {
+      "name": "_load_ui_bundle_entries",
+      "lineno": 57
+    },
+    {
+      "name": "_get_ui_bundle_html_soup",
+      "lineno": 72
+    },
+    {
+      "name": "_get_node_document_index",
+      "lineno": 82
+    },
+    {
+      "name": "_extract_css_blocks",
+      "lineno": 89
+    },
+    {
+      "name": "_normalize_compact_text",
+      "lineno": 94
+    },
+    {
+      "name": "check_ui_bundle_required_files",
+      "lineno": 98
+    },
+    {
+      "name": "check_ui_bundle_min_file_sizes",
+      "lineno": 117
+    },
+    {
+      "name": "check_ui_bundle_required_keywords",
+      "lineno": 139
+    },
+    {
+      "name": "check_ui_bundle_required_patterns",
+      "lineno": 163
+    },
+    {
+      "name": "check_ui_bundle_manifest_subset",
+      "lineno": 187
+    },
+    {
+      "name": "check_ui_bundle_html_checks",
+      "lineno": 209
+    },
+    {
+      "name": "check_ui_bundle_section_order",
+      "lineno": 269
+    },
+    {
+      "name": "check_ui_bundle_css_declarations",
+      "lineno": 302
+    },
+    {
+      "name": "check_ui_bundle_local_asset_links",
+      "lineno": 351
+    },
+    {
+      "name": "check_ui_bundle_no_remote_image_urls",
+      "lineno": 378
+    },
+    {
+      "name": "check_generative_ui_bundle",
+      "lineno": 405
+    },
+    {
+      "name": "check_ui_previewable_generative_bundle",
+      "lineno": 427
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 431
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 总体验证两大目标：第一，检查被测任务生成的 UI bundle（一个 ZIP 压缩包）是否在文件结构、内容、HTML 语义、CSS 声明、manifest 配置、本地资源引用及远程图片链接等维度上完全符合预期规则；第二，检查 Chrome 浏览器当前活动标签页是否打开了预期的页面。对 UI bundle 的评测采用严格的串联逻辑——10 项子检查必须全部通过才能得 1.0 分，任一子检查失败即得 0.0 分。比较方式包括：归一化路径后的精确匹配、大小写不敏感子串匹配、正则表达式匹配（re.IGNORECASE | re.DOTALL）、JSON 子集递归比较、HTML DOM 选择器匹配与文档顺序索引比较、CSS 去空白紧凑文本包含匹配，以及 URL 去除查询参数后的精确匹配。",
+    "main_functions": [
+      {
+        "name": "check_ui_bundle_required_files",
+        "lineno": 98,
+        "description": "检查对象：UI bundle ZIP 中是否包含规则指定的必需文件。检查步骤：1) 从 rules 中读取 required_files 列表；2) 调用 _load_ui_bundle_entries 加载 ZIP 内所有条目，并对文件名做 _normalize_ui_bundle_path 归一化；3) 逐个检查 required_files 中的文件名是否出现在归一化后的 ZIP 条目中。判定依据：全部存在返回 1.0；actual 为空、列表为空（返回 1.0）、任一文件缺失或发生异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_min_file_sizes",
+        "lineno": 117,
+        "description": "检查对象：UI bundle ZIP 中指定文件的大小是否达到最小字节阈值。检查步骤：1) 从 rules 中读取 min_file_size_bytes 字典（文件名 -> 最小字节数）；2) 调用 _load_ui_bundle_entries 获取文件大小映射；3) 对每个指定文件检查其是否存在，且 file_sizes 中对应的数值不小于规则阈值。判定依据：全部满足返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、大小不足或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_keywords",
+        "lineno": 139,
+        "description": "检查对象：UI bundle ZIP 中指定文本文件是否包含所有必需关键词。检查步骤：1) 从 rules 中读取 required_file_keywords 字典（文件名 -> 关键词列表）；2) 调用 _load_ui_bundle_entries 提取文本文件内容（对 .html/.css/.js/.json/.md/.txt/.svg 等按 UTF-8 解码）；3) 将文件内容转小写后，逐个检查每个关键词（转小写后）是否为子串。判定依据：全部包含返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、任一关键词缺失或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_required_patterns",
+        "lineno": 163,
+        "description": "检查对象：UI bundle ZIP 中指定文本文件的内容是否匹配所有必需正则模式。检查步骤：1) 从 rules 中读取 required_file_patterns 字典（文件名 -> 模式列表）；2) 调用 _load_ui_bundle_entries 获取文本内容；3) 对每个文件用 re.search 逐个检查模式，标志位为 re.IGNORECASE | re.DOTALL。判定依据：全部匹配返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、任一模式不匹配或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_manifest_subset",
+        "lineno": 187,
+        "description": "检查对象：UI bundle ZIP 中的 manifest.json 是否包含预期的 JSON 子集。检查步骤：1) 从 rules 中读取 expected_manifest 对象；2) 调用 _load_ui_bundle_entries 加载 ZIP，定位 manifest.json（路径经 _normalize_ui_bundle_path 处理）；3) 解析 manifest.json 后，使用 _is_subset 递归判断 expected_manifest 是否为实际 JSON 对象的子集（字典按键递归，列表要求完全相等，标量要求相等）。判定依据：是子集返回 1.0；actual 为空、expected_manifest 为 None（返回 1.0）、manifest.json 缺失、子集检查失败或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_html_checks",
+        "lineno": 209,
+        "description": "检查对象：UI bundle ZIP 中指定 HTML 文件的 DOM 结构与内容是否符合多项细粒度规则。检查步骤：1) 从 rules 中读取 html_checks 字典（文件名 -> 检查项列表）；2) 调用 _load_ui_bundle_entries 与 _get_ui_bundle_html_soup 解析 HTML；3) 逐项处理 check 对象，根据 type 字段执行不同分支：selector_exists（CSS 选择器必须匹配到元素）、selector_count（匹配元素数量必须等于预期值）、selector_text_contains（选择器匹配元素的文本必须包含预期文本，不区分大小写）、selector_attribute_equals（选择器匹配元素的指定属性必须严格等于预期值）、text_present（整个 HTML 文本必须包含预期文本，不区分大小写）。判定依据：所有检查项全部通过返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、解析失败、遇到未知 type 或任一检查失败均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_section_order",
+        "lineno": 269,
+        "description": "检查对象：UI bundle ZIP 中指定 HTML 文件内多个区块是否按预期顺序出现。检查步骤：1) 从 rules 中读取 section_order 字典（文件名 -> CSS 选择器有序列表）；2) 调用 _load_ui_bundle_entries 与 _get_ui_bundle_html_soup 解析 HTML；3) 按列表顺序遍历选择器，对每个匹配节点调用 _get_node_document_index 获取其在 soup.descendants 中的文档索引；4) 要求当前索引严格大于上一个索引，确保顺序递增。判定依据：顺序严格递增返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、任一选择器未匹配或顺序非递增或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_css_declarations",
+        "lineno": 302,
+        "description": "检查对象：UI bundle ZIP 中指定 CSS 文件是否包含预期的选择器及属性声明。检查步骤：1) 从 rules 中读取 css_declarations 字典（文件名 -> 选择器规则列表）；2) 调用 _load_ui_bundle_entries 获取 CSS 文本；3) 对每个 selector_rule，用 _extract_css_blocks 提取该选择器对应的所有 {} 代码块；4) 将代码块做 _normalize_compact_text（去空白转小写）处理后，检查是否同时包含属性名（去空白转小写）以及当 prop_value 不为 None 时包含 \"属性名:属性值\" 的紧凑形式；5) 多个代码块中只要有一个完全满足所有属性要求即算通过。判定依据：全部规则匹配返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、选择器无匹配代码块、属性不匹配或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_local_asset_links",
+        "lineno": 351,
+        "description": "检查对象：UI bundle ZIP 中引用文件所指向的本地资源是否真实存在于该 ZIP 中，且引用路径字符串确实出现在引用文件内容里。检查步骤：1) 从 rules 中读取 local_asset_links 字典（引用文件名 -> 资源路径列表）；2) 调用 _load_ui_bundle_entries 加载 ZIP；3) 对每个资源路径，先检查其归一化路径是否存在于 ZIP 条目中，再检查原始 asset_path 字符串是否出现在引用文件的文本内容中。判定依据：全部满足返回 1.0；actual 为空、字典为空（返回 1.0）、文件缺失、资源缺失、路径未出现在内容中或异常均返回 0.0。"
+      },
+      {
+        "name": "check_ui_bundle_no_remote_image_urls",
+        "lineno": 378,
+        "description": "检查对象：UI bundle ZIP 中的 HTML/CSS/JS 文件是否包含远程图片 URL（http/https）。检查步骤：1) 从 rules 中读取 forbid_remote_image_urls 布尔值（仅当为 True 才执行严格检查）和 image_extensions 列表；2) 调用 _load_ui_bundle_entries 获取文本内容；3) 遍历 .html/.css/.js 文件，若内容中同时出现 http:// 或 https:// 与任一图片扩展名（如 .png/.jpg 等），则判定违规。判定依据：未发现远程图片 URL 返回 1.0；actual 为空、forbid_remote_image_urls 为 False（返回 1.0）或发现远程图片链接返回 0.0；异常也返回 0.0。"
+      },
+      {
+        "name": "check_generative_ui_bundle",
+        "lineno": 405,
+        "description": "检查对象：UI bundle 的综合质量，作为上述所有子检查的串联入口。检查步骤：1) 校验 actual 非空且 rules 为字典；2) 按固定顺序依次调用 10 个 check_ui_bundle_* 子函数：check_ui_bundle_required_files、check_ui_bundle_min_file_sizes、check_ui_bundle_required_keywords、check_ui_bundle_required_patterns、check_ui_bundle_manifest_subset、check_ui_bundle_html_checks、check_ui_bundle_section_order、check_ui_bundle_css_declarations、check_ui_bundle_local_asset_links、check_ui_bundle_no_remote_image_urls。判定依据：所有子函数均返回 1.0 时本函数返回 1.0；任一子函数返回 0.0 则立即返回 0.0。属于严格的‘全部满足’串联逻辑。"
+      },
+      {
+        "name": "check_ui_previewable_generative_bundle",
+        "lineno": 427,
+        "description": "检查对象：可预览的生成式 UI bundle，本质上与 check_generative_ui_bundle 的验证目标完全一致。检查步骤：直接透传 actual、rules 与 options 给 check_generative_ui_bundle。判定依据：完全复用 check_generative_ui_bundle 的判定结果，属于薄封装函数。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 431,
+        "description": "检查对象：Chrome 浏览器当前活动标签页是否为预期页面。检查步骤：1) 接收 active_tab_info（字典或字符串）与 rule（含 type 和 url）；2) 当 match_type 为 \"url\" 时，从 active_tab_info 中提取实际 URL；3) 使用 urllib.parse.urlparse 与 urlunparse 去除 URL 的 query 查询参数；4) 比较去除查询参数后的预期 URL 与实际 URL 是否严格相等。判定依据：URL 匹配（忽略查询参数）返回 1.0；active_tab_info 为空、match_type 不是 \"url\"、或 URL 不匹配均返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 24,
+        "description": "通用递归子集比较器。对字典类型，要求 expected 的每个键都存在于 actual 中且对应值递归满足子集关系；对列表类型，要求 expected 与 actual 完全相等；对其他标量类型，要求直接相等。返回值语义：True 表示 expected 是 actual 的子集。主要服务于 check_ui_bundle_manifest_subset 中对 manifest.json 的嵌套结构比对。"
+      },
+      {
+        "name": "_normalize_ui_bundle_path",
+        "lineno": 37,
+        "description": "路径归一化转换器。功能：去除路径开头的 \"/\"，并将所有反斜杠 \"/\" 替换为正斜杠 \"/\"。返回值语义：归一化后的统一路径字符串。被所有涉及 ZIP 内文件路径匹配的函数复用，确保 Windows 与 Unix 风格路径在比较时一致。"
+      },
+      {
+        "name": "_load_ui_bundle_entries",
+        "lineno": 41,
+        "description": "ZIP 文件读取与解析器。功能：以 zipfile.ZipFile 打开 actual 路径的压缩包，读取所有文件名列表并做归一化映射；提取每个条目的 file_size；对扩展名为 .html/.css/.js/.json/.md/.txt/.svg 的文件，以 UTF-8（errors=\"ignore\"）解码其文本内容。返回值语义：三元组 (normalized_to_raw 映射, file_sizes 字典, text_contents 字典)。是几乎所有 UI bundle 检查函数的基础数据加载入口。"
+      },
+      {
+        "name": "_get_ui_bundle_html_soup",
+        "lineno": 57,
+        "description": "HTML 解析器。功能：从 _load_ui_bundle_entries 返回的 text_contents 中，按归一化文件名查找 HTML 文本，并使用 BeautifulSoup 以 \"html.parser\" 解析为 soup 对象。返回值语义：BeautifulSoup 对象或 None（文件不存在时）。服务于所有涉及 HTML DOM 检查的函数，如 check_ui_bundle_html_checks 和 check_ui_bundle_section_order。"
+      },
+      {
+        "name": "_get_node_document_index",
+        "lineno": 66,
+        "description": "DOM 节点文档位置定位器。功能：遍历 soup.descendants，查找目标 node 在文档深度优先遍历中的整数索引。返回值语义：索引值（从 0 开始）或 -1（未找到）。专用于 check_ui_bundle_section_order，以判断多个选择器匹配节点在 HTML 中的前后顺序。"
+      },
+      {
+        "name": "_extract_css_blocks",
+        "lineno": 73,
+        "description": "CSS 代码块提取器。功能：对给定 css_text，使用正则表达式 re.compile(re.escape(selector) + r\"/s*/{(.*?)/}\", re.IGNORECASE | re.DOTALL) 提取与选择器匹配的所有大括号内部文本列表。返回值语义：匹配到的 CSS 声明块字符串列表（可能为空）。服务于 check_ui_bundle_css_declarations，用于定位特定选择器的样式规则。"
+      },
+      {
+        "name": "_normalize_compact_text",
+        "lineno": 78,
+        "description": "文本紧凑归一化器。功能：使用 re.sub(r\"/s+\", \"\", value.lower()) 去除字符串中所有空白字符并统一转小写。返回值语义：紧凑小写字符串。主要用于 check_ui_bundle_css_declarations，将 CSS 属性名与属性值对转换为无空白形式后进行包含匹配，从而容忍原始 CSS 中的空格与换行差异。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:23:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L2_multi_app_f11a0c21-75cc-4d13-8a91-1c01b4d51009/evaluator_function_labels.json"
+}

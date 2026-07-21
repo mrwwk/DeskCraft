@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_4783cc41-c03c-4e1b-89b4-50658f642bd5/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_dir_hierarchy",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_dir_hierarchy",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个evaluator用于验证目录层级操作任务是否成功完成。它通过解析shell收集器输出的key=value格式文本，将其转换为字典后与预设规则进行精确匹配。核心检查对象包括：1) rules[\"checks\"]中定义的各项键值对检查项是否全部在shell输出中存在且值完全相等；2) 若规则中设置了manifest_match标志，则要求解析后的字典中manifest_match字段的值必须严格等于字符串\"true\"。只有当所有检查项都精确匹配且manifest_match条件（如启用）满足时，才判定任务成功并返回1.0分；任一检查失败、键缺失、值不匹配或发生异常均返回0.0分。这是一种\"全部满足\"式的严格匹配判定逻辑。",
+    "main_functions": [
+      {
+        "name": "check_os_dir_hierarchy",
+        "lineno": 31,
+        "description": "该函数接收shell收集器的原始输出字符串result和评测规则字典rules。首先调用辅助函数_parse_kv将result按行解析为键值对字典kv。随后执行严格匹配检查：第一步，遍历rules.get(\"checks\", {})中的每一个预期键值对，使用kv.get(key)与expected_val进行精确字符串相等比较，若任意一项键缺失或值不相等，立即返回0.0；第二步，若rules字典中存在manifest_match键且其布尔值为真（即rules.get(\"manifest_match\")为真），则进一步检查kv字典中manifest_match键的值是否严格等于字符串\"true\"，若不满足也返回0.0。只有当上述所有检查全部通过时，才返回1.0。此外，整个try块内若触发任何异常，函数将捕获异常、记录错误日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该函数接收一个shell输出字符串，将其按换行符分割成多行，对每一行去除首尾空白后，若包含等号则以第一个等号为界将行分割为键和值，分别去除首尾空白后存入字典。空输入、空行或不包含等号的行会被跳过。最终返回解析后的字典。该函数被check_os_dir_hierarchy用于将原始shell输出转换为结构化键值对数据，以便后续进行精确的字符串匹配检查。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:36:56",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_4783cc41-c03c-4e1b-89b4-50658f642bd5/evaluator_function_labels.json"
+}

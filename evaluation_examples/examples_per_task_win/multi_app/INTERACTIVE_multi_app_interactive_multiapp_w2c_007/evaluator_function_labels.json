@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_007/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_order_tracker_xlsx",
+      "lineno": 7
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_order_tracker_xlsx",
+      "lineno": 7
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证VM中生成的order_tracker.xlsx文件是否按照任务要求在第2行正确填写了所有指定字段。它通过vm_file getter获取xlsx文件的本地路径，利用openpyxl读取活动工作表，然后对expected中指定的单元格（如A2-G2）逐一进行严格比对。考虑到LibreOffice Calc可能将数字存储为int或float，所有单元格的实际值与预期值在比较前均被强制转换为字符串，以避免类型差异导致的误判。判定逻辑为二值式：只有当所有指定单元格的字符串化值完全相等时，才返回1.0表示任务成功；若文件缺失、路径为空、库未安装、工作表无法打开、预期字典为空，或任何一个单元格不匹配，均立即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_order_tracker_xlsx",
+        "lineno": 7,
+        "description": "该主函数接收两个核心输入：result为本地xlsx文件路径（由vm_file getter提供），expected为包含'cells'键的字典，其值映射单元格引用（如A2、B2等）到预期字符串值。检查流程如下：1）前置校验：若result为None或文件不存在，直接返回0.0；2）环境校验：尝试导入openpyxl，若未安装则返回0.0；3）文件解析：使用openpyxl.load_workbook(result, data_only=True)加载工作簿并获取活动工作表(ws = wb.active)，若失败则返回0.0；4）预期提取：从expected字典中获取cells映射，若为空则返回0.0；5）逐格比对：遍历cells中的每个cell_ref与expected_value，读取ws[cell_ref].value作为actual_value，将两者均通过str()转为字符串后进行严格相等比较；6）判定：若任一单元格不匹配或读取异常，立即记录警告并返回0.0；仅当所有单元格完全匹配时，记录成功日志并返回1.0。该函数不存在近似匹配、阈值或加权逻辑，属于严格的全部满足式二值判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:15:20",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_w2c_007/evaluator_function_labels.json"
+}

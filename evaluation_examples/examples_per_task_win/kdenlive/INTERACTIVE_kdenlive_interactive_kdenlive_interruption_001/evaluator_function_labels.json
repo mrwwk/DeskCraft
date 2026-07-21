@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_interruption_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_multi_track_composition",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 273
+    },
+    {
+      "name": "check_kdenlive_render_pip",
+      "lineno": 372
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_multi_track_composition",
+      "lineno": 65
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 179
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 249
+    },
+    {
+      "name": "check_kdenlive_render_custom_resolution",
+      "lineno": 273
+    },
+    {
+      "name": "check_kdenlive_render_pip",
+      "lineno": 372
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 Kdenlive 视频编辑任务的完成质量，核心围绕两类产物展开：一是 `.kdenlive` 项目文件（底层为 MLT XML），二是最终渲染输出的 MP4 视频文件。验证思路为\"项目逻辑 + 渲染硬指标\"联合判定：在项目侧，通过解析 XML 确认多个素材是否被放置在不同轨道（playlist）上，并检查是否应用了 transform/composite 类的合成特效（如 affine、qtblend、composite 等），以验证画中画（PiP）或水印等多轨道合成确实在工程中被构建；在渲染输出侧，通过 ffprobe 读取视频元数据，验证文件非空、视频编码（默认要求 h264）、最低时长（默认 1 秒），以及是否满足指定的宽高分辨率。对于画中画类任务，必须同时满足\"项目文件多轨道合成正确\"和\"渲染文件编码/时长合格\"两项，才判定为成功；对于仅检查渲染分辨率的任务，则只需渲染文件满足编码、时长、分辨率即可。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_multi_track_composition",
+        "lineno": 65,
+        "description": "该函数验证 Kdenlive 项目文件中是否正确搭建了多轨道合成（如画中画或水印）。输入为项目文件路径和 rule 字典，rule 中需包含 main_file（主视频文件名）、overlay_file（叠加视频文件名）和 require_transform（是否要求变换/合成特效，默认为 true）。检查步骤如下：1) 解析项目文件的 MLT XML；2) 遍历所有 producer 与 chain 元素，建立 producer id 到 resource 路径的映射；3) 遍历所有 playlist（排除 id 中包含 bin 的素材箱），通过 entry 元素的 producer 引用查找主文件和叠加文件分别位于哪些 playlist（轨道）中；4) 若任一文件未在时间线 playlist 中找到，直接返回 0.0；5) 若两个文件所在的 playlist 集合完全相同（即在同一轨道），返回 0.0；6) 若 require_transform 为 true，则继续遍历所有 filter 和 transition 元素，通过 _get_mlt_service 提取服务名，检查是否命中预设的 transform_services 列表（affine、qtblend、composite、movit.overlay、frei0r.composition、cairoblend、frei0r.cairoblend），若未找到任何合成特效，返回 0.0；7) 全部通过则返回 1.0。"
+      },
+      {
+        "name": "check_kdenlive_render_custom_resolution",
+        "lineno": 273,
+        "description": "该函数验证渲染输出的 MP4 文件是否满足指定的编码、时长和分辨率要求。输入为渲染文件路径和 rule 字典，rule 中可包含 min_duration（默认 1.0 秒）、expected_codec（默认 h264）、expected_width 和 expected_height。检查步骤如下：1) 确认文件存在且大小不为 0；2) 调用 ffprobe 以 JSON 格式输出视频流与封装格式信息，超时时间为 30 秒；3) 在 streams 中定位 codec_type 为 video 的流；4) 比较 codec_name 是否包含 expected_codec（不区分大小写），不匹配则返回 0.0；5) 若 rule 中指定了 expected_width，比较 video_stream 中的 width 字段，必须精确相等，否则返回 0.0；6) 若 rule 中指定了 expected_height，比较 video_stream 中的 height 字段，必须精确相等，否则返回 0.0；7) 提取时长：优先取 video_stream 的 duration，否则取 format 的 duration，必须大于等于 min_duration，否则返回 0.0；8) 全部通过则返回 1.0。"
+      },
+      {
+        "name": "check_kdenlive_render_pip",
+        "lineno": 372,
+        "description": "该函数是画中画（PiP）渲染任务的组合验证器，要求\"渲染输出合格\"与\"项目多轨道合成正确\"两项全部满足。输入 result_paths 可以是列表（multi:true 配置下，第 0 项为 MP4 路径，第 1 项为项目文件路径）或单个字符串（仅 MP4）。检查步骤如下：1) 调用 _extract_result_paths 分离出 render_path 和 project_path；2) 调用 _verify_render_output 检查渲染文件是否存在、非空、编码和时长是否符合 rule，若返回失败则记录错误并返回 0.0；3) 从 rule 中提取 main_file、overlay_file、require_transform 构造 comp_rule，调用 check_kdenlive_multi_track_composition 检查项目文件是否满足多轨道合成要求，若结果小于 1.0 则返回 0.0；4) 两项均通过则返回 1.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 16,
+        "description": "该辅助函数用于从 MLT XML 元素（filter 或 transition）中提取 mlt_service 值，以判断特效/转场类型。它优先检查元素的直接属性 mlt_service；若不存在，则遍历该元素下所有名为 property 的子元素，查找 name 属性等于 mlt_service 的项并返回其文本内容。若均未找到则返回 None。该函数被 check_kdenlive_multi_track_composition 在扫描合成特效时调用。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 38,
+        "description": "该辅助函数用于从 MLT XML 元素（如 producer、chain）的子 property 元素中，按 name 属性匹配提取特定属性的文本值。例如用于提取 producer 的 resource 路径。若未找到对应 property 则返回 None。该函数在构建 producer id 到资源路径映射时被调用。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 185,
+        "description": "该辅助函数通过 ffprobe 对渲染后的 MP4 文件进行通用硬指标检查。它先确认文件存在且非空，然后执行 ffprobe -show_streams -show_format 获取 JSON 元数据，解析后检查：1) 是否存在视频流；2) 视频编码名是否包含 expected_codec（默认 h264，不区分大小写）；3) 视频时长是否不小于 min_duration（默认 1.0 秒，优先取视频流 duration，其次取 format duration）。返回值为 (bool, str) 元组，bool 表示是否通过，str 为错误信息（通过时为空串）。该函数被 check_kdenlive_render_pip 直接调用，其检查逻辑与 check_kdenlive_render_custom_resolution 中的编码/时长检查部分高度一致。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 245,
+        "description": "该辅助函数用于从评测框架传入的 result_paths 中分离出渲染文件路径和项目文件路径。若 result_paths 为列表（对应 multi:true 结果配置），则第 0 项作为 render_path，第 1 项作为 project_path；若为单个字符串，则视为 render_path，project_path 为 None。返回 (render_path, project_path) 元组。该函数被 check_kdenlive_render_pip 调用，以兼容单文件与多文件结果配置。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:51:03",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/INTERACTIVE_kdenlive_interactive_kdenlive_interruption_001/evaluator_function_labels.json"
+}

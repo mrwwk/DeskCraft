@@ -1,0 +1,65 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_1f9b6bcc-bcc6-4c23-b874-c79a4ec0c81a/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 78
+    },
+    {
+      "name": "compare_config",
+      "lineno": 123
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_keybindings",
+      "lineno": 25
+    },
+    {
+      "name": "check_json_settings",
+      "lineno": 78
+    },
+    {
+      "name": "_is_subset",
+      "lineno": 106
+    },
+    {
+      "name": "compare_config",
+      "lineno": 123
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证 VS Code 相关配置任务的完成度，核心检查对象是用户实际生成的配置文件（如 keybindings.json、settings.json 或其他 JSON 配置文件）。它通过读取实际文件内容，与期望规则进行比对，主要采用 JSON 子集匹配、快捷键绑定存在性检查、键值对严格相等检查以及文本包含/严格相等检查等方式。评分采用二元制（1.0 或 0.0），要求被检查的所有键值对、绑定项或配置片段全部满足条件才能得满分，任一条件不满足即返回 0.0。根据任务类型不同，分别验证快捷键绑定列表、设置字典项以及通用配置文本/JSON 结构。",
+    "main_functions": [
+      {
+        "name": "check_json_keybindings",
+        "lineno": 25,
+        "description": "该函数用于检查 VS Code 的 keybindings.json 文件是否包含期望的快捷键绑定。它接收 actual（实际文件路径字符串）和 expected（期望规则字典）作为输入。首先，它会依次尝试两种 JSON 加载方式：直接加载（direct_load_json）和跳过第一行后加载（skip_first_line_load_json），以兼容可能带注释头的文件；如果两种方法都无法得到 list 类型的数据，则直接返回 0.0。随后，它定义了一个内部判断 contains_binding，利用 _is_subset 检查某一条期望绑定是否在实际绑定列表的某个元素中存在。若 expected 中包含 all_of 字段，则要求列表中每一条绑定都必须存在，任一缺失返回 0.0；若包含 none_of 字段，则要求列表中每一条绑定都必须不存在，任一存在返回 0.0；否则检查单个 expected_binding 是否存在，存在返回 1.0，不存在返回 0.0。"
+      },
+      {
+        "name": "check_json_settings",
+        "lineno": 78,
+        "description": "该函数用于检查 VS Code 的 settings.json 文件是否包含期望的设置键值对。它接收 actual（实际文件路径字符串）和 expected（期望规则字典，内部应包含键 'expected'）作为输入。如果 actual 为空，直接返回 0.。它打开 actual 路径对应的 JSON 文件并解析为字典 data，然后提取 expected['expected'] 作为期望字典 expect。接着遍历 expect 中的每一对 key 和 value，检查 key 是否存在于 data 中且对应的值与 value 严格相等（==）。只要有一对键值缺失或值不匹配，立即返回 0.0；全部匹配成功则返回 1.0。"
+      },
+      {
+        "name": "compare_config",
+        "lineno": 123,
+        "description": "该函数用于对通用配置文件进行宽松或严格的文本/JSON 比对。它接收 actual（实际文件路径字符串）、rules（规则字典，内含 'expected' 字段）和 options 作为输入。如果 actual 为空或 rules 中无 expected_text，返回 0.0。它读取 actual 文件的完整文本，并根据 options 中的 containment_ok（默认为 True）选择检查模式。在宽松模式（containment_ok=True）下，优先尝试将实际文本和期望文本都解析为 JSON，然后调用 _is_subset 判断期望 JSON 是否是实际 JSON 的子集；若 JSON 解析失败，则回退到子字符串包含检查，判断 expected_text.strip() 是否存在于 actual_text 中；任一通过即返回 1.0，否则 0.0。在严格模式（containment_ok=False）下，先判断文本完全相等，再尝试 JSON 完全相等（json.loads 后 ==，不忽略额外键），任一通过返回 1.0，否则 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_is_subset",
+        "lineno": 103,
+        "description": "这是一个递归式的通用子集比较器，用于判断 expected 是否是 actual 的子结构。若 expected 为 dict，则要求 actual 也为 dict，并递归检查 expected 中的每一个键值对是否都在 actual 中存在且满足子集关系；若 expected 为 list，则要求与 actual 完全相等（==）；对于其他基本类型，同样要求完全相等（==）。该函数被 check_json_keybindings（用于判断单条快捷键绑定是否匹配列表中的某元素）和 compare_config（用于判断期望 JSON 是否为实际 JSON 的子集）复用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:52:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L3_vscode_1f9b6bcc-bcc6-4c23-b874-c79a4ec0c81a/evaluator_function_labels.json"
+}

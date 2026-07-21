@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_e1a5b6c7-8d90-4ecf-f456-7a8b9c0d1e2f/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_systemd_timer_basic",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_systemd_timer_basic",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证基于systemd的定时器(timer)与服务(service)单元创建任务是否完成。它通过解析shell收集器输出的键值对文本，检查服务单元文件、定时器单元文件的状态，以及定时器是否已被启用(enable)和激活(active)。核心检查对象为result字符串中的service_file_ok、timer_file_ok、timer_enabled、timer_active等字段。若rules中未显式指定checks，则默认要求前四个字段全部等于字符串\"true\"；若rules提供了checks字典，则按自定义键值对逐一精确比对。判定逻辑为\"全部满足\"：所有被检查字段必须完全匹配预期值才返回1.0，任一字段不匹配或发生异常即返回0.0。",
+    "main_functions": [
+      {
+        "name": "check_os_systemd_timer_basic",
+        "lineno": 31,
+        "description": "该主函数接收shell收集器输出的result字符串与评测规则rules字典。执行步骤如下：1) 调用辅助函数_parse_kv将result解析为字典；2) 从rules中获取checks配置；3) 若checks为空或未配置，则强制检查service_file_ok、timer_file_ok、timer_enabled、timer_active四个键是否全部等于\"true\"；4) 若checks非空，则遍历其中每一对key与expected，要求解析后的kv字典中对应键的值必须与expected完全相等；5) 全部匹配成功返回1.0，任一项不匹配立即返回0.0；6) 若解析或遍历过程中抛出异常，捕获后记录错误日志并返回0.0。整个判定基于精确字符串相等比较，无近似匹配或阈值容错。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该辅助函数接收一段shell输出字符串，将其按行分割，对包含\"=\"的每一行以第一个等号为界分割为键和值，并去除首尾空白，最终汇总为字典返回。若输入为空字符串或None，则直接返回空字典。该函数为check_os_systemd_timer_basic提供基础解析能力，将原始键值对文本转换为可供精确比对的标准字典结构。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:36:15",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_e1a5b6c7-8d90-4ecf-f456-7a8b9c0d1e2f/evaluator_function_labels.json"
+}

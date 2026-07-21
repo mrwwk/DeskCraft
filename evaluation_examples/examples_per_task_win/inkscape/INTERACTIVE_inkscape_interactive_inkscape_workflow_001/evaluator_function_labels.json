@@ -1,0 +1,149 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_workflow_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 92
+    },
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 125
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 158
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 179
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 210
+    },
+    {
+      "name": "check_interactive_inkscape_ii06",
+      "lineno": 221
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_style",
+      "lineno": 27
+    },
+    {
+      "name": "_normalize_color",
+      "lineno": 40
+    },
+    {
+      "name": "_find_element_by_id",
+      "lineno": 59
+    },
+    {
+      "name": "_get_style_prop",
+      "lineno": 67
+    },
+    {
+      "name": "_parse_svg",
+      "lineno": 75
+    },
+    {
+      "name": "_tag_local",
+      "lineno": 84
+    },
+    {
+      "name": "check_inkscape_fill_color",
+      "lineno": 92
+    },
+    {
+      "name": "check_inkscape_layer_visibility",
+      "lineno": 125
+    },
+    {
+      "name": "check_inkscape_layer_name",
+      "lineno": 158
+    },
+    {
+      "name": "check_inkscape_layer_order",
+      "lineno": 179
+    },
+    {
+      "name": "check_inkscape_export_file_exists",
+      "lineno": 210
+    },
+    {
+      "name": "check_interactive_inkscape_ii06",
+      "lineno": 221
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Inkscape交互式工作流任务的完成状态。核心检查对象是SVG文件（XML文档结构）以及命令行输出字符串。它通过解析SVG的DOM树，检查特定元素的填充颜色、图层的可见性、图层的重命名情况以及图层的堆叠顺序（从下到上）。对于颜色检查，支持内联style属性和直接属性，并对text元素会级联检查其子tspan元素；对于图层检查，通过识别inkscape命名空间下的groupmode=\"layer\"和label属性来定位图层。此外，还通过比对命令行输出来确认导出文件是否存在。各单项检查采用硬匹配（完全相等）方式，返回1.0或0.0；组合检查（如check_interactive_inkscape_ii06）采用“全部满足”的短路逻辑，任一子项失败即整体失败。成功判定的总体思路是：SVG内部状态与rule字典中的预期值在结构和属性上完全一致。",
+    "main_functions": [
+      {
+        "name": "check_inkscape_fill_color",
+        "lineno": 92,
+        "description": "接收svg_file_path和rule字典（含element_id与expected_fill）。先调用_parse_svg解析SVG，若失败返回0.0。通过_find_element_by_id定位目标元素，若不存在返回0.0。调用_get_style_prop获取fill属性值；若目标为text元素且自身无fill，则遍历其tspan子元素继续查找。最终通过_normalize_color规范化实际颜色与expected_fill，两者完全相等返回1.0，否则0.0。当预期为'none'时，要求实际也必须为'none'。"
+      },
+      {
+        "name": "check_inkscape_layer_visibility",
+        "lineno": 125,
+        "description": "接收svg_file_path和rule字典（含layer_label与expected_visible，默认True）。解析SVG后，遍历所有带svg命名空间的g元素，检查其inkscape:groupmode是否为layer且inkscape:label是否匹配layer_label。解析该元素的style属性中的display值，默认inline，若为none则不可见。实际可见性与expected_visible完全匹配返回1.0，否则0.0。若带命名空间未找到，还会退化为无命名空间前缀再次遍历检查。"
+      },
+      {
+        "name": "check_inkscape_layer_name",
+        "lineno": 158,
+        "description": "接收svg_file_path和rule字典（含layer_id与expected_label）。解析SVG后，通过_find_element_by_id按layer_id找到图层元素，读取其inkscape:label属性值，与expected_label进行字符串完全匹配，相等返回1.0，否则0.0；元素不存在也返回0.0。"
+      },
+      {
+        "name": "check_inkscape_layer_order",
+        "lineno": 179,
+        "description": "接收svg_file_path和rule字典（含expected_order列表，表示从下到上的图层标签顺序）。解析SVG后，仅检查root的直接子元素中tag为g且inkscape:groupmode等于layer的元素，按文档顺序提取其inkscape:label。若提取到的图层总数少于expected_order长度，直接返回0.0。否则过滤出仅包含expected_order中标签的子序列，若该子序列与expected_order完全相等返回1.0，否则0.0。"
+      },
+      {
+        "name": "check_inkscape_export_file_exists",
+        "lineno": 210,
+        "description": "接收result_str（通常为vm_command_line的标准输出）和rule字典（含expected，默认\"OK\"）。对result_str和expected分别strip后做字符串完全相等比较，相等返回1.0，否则0.0。用于验证导出文件是否真实存在。"
+      },
+      {
+        "name": "check_interactive_inkscape_ii06",
+        "lineno": 221,
+        "description": "接收svg_file_path和rule字典，该字典可包含layer_order_check、layer_name_check、visibility_check、fill_check四个子规则。按固定顺序依次调用check_inkscape_layer_order、check_inkscape_layer_name、check_inkscape_layer_visibility、check_inkscape_fill_color。每个子检查返回值若小于1.0则立即返回0.0（短路逻辑）。所有子检查全部通过返回1.0。属于“全部满足”的组合判定模式。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_style",
+        "lineno": 25,
+        "description": "接收CSS样式字符串（如\"fill:#ff0000;stroke:#000\"），按分号分割后解析为key-value字典，忽略空值。服务于所有需要读取元素style属性的检查，被_get_style_prop直接调用。"
+      },
+      {
+        "name": "_normalize_color",
+        "lineno": 38,
+        "description": "接收颜色字符串，进行规范化：转小写；3位十六进制（#f00）扩展为6位（#ff0000）；8位十六进制（#rrggbbaa）截断为6位（#rrggbb）；保留'none'关键字；其余命名颜色原样返回。空值返回None。用于统一颜色格式后再比较，被check_inkscape_fill_color调用。"
+      },
+      {
+        "name": "_find_element_by_id",
+        "lineno": 57,
+        "description": "接收XML根节点和element_id，通过root.iter()遍历所有后代元素，匹配id属性。返回找到的元素或None。被check_inkscape_fill_color和check_inkscape_layer_name调用。"
+      },
+      {
+        "name": "_get_style_prop",
+        "lineno": 65,
+        "description": "接收XML元素和属性名prop。先读取元素的style属性并通过_parse_style解析为字典，若字典中存在该属性则返回；否则回退到读取元素的直接属性（如elem.get(prop)）。被check_inkscape_fill_color用于获取fill值。"
+      },
+      {
+        "name": "_parse_svg",
+        "lineno": 73,
+        "description": "接收svg_file_path，使用xml.etree.ElementTree.parse解析SVG文件，成功返回(tree, root)，任何异常返回(None, None)。是所有需要读取SVG文件的主函数的入口。"
+      },
+      {
+        "name": "_tag_local",
+        "lineno": 82,
+        "description": "接收XML元素，若tag包含命名空间前缀（如\"{http://...}text\"），则截取}后的本地标签名返回。用于check_inkscape_fill_color中判断元素是否为text，以及check_inkscape_layer_order中筛选g元素。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:38:27",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/inkscape/INTERACTIVE_inkscape_interactive_inkscape_workflow_001/evaluator_function_labels.json"
+}

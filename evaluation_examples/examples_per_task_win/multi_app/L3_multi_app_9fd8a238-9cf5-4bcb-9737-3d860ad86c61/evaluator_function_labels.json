@@ -1,0 +1,78 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_9fd8a238-9cf5-4bcb-9737-3d860ad86c61/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json",
+      "lineno": 84
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 187
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 329
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 371
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_match_value_to_rule",
+      "lineno": 34
+    },
+    {
+      "name": "check_json",
+      "lineno": 84
+    },
+    {
+      "name": "check_python_file_by_test_suite",
+      "lineno": 187
+    },
+    {
+      "name": "is_expected_active_tab_approximate",
+      "lineno": 329
+    },
+    {
+      "name": "check_include_exclude",
+      "lineno": 371
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证组合任务 portfolio_site_handoff_yaml_and_script_fix 的完成质量，从四个独立维度进行刚性检查：1）配置文件维度：读取并解析 _config.yml（YAML格式），校验其中特定键值是否满足预期规则且不含禁止内容；2）代码正确性维度：通过外部 test.py 测试套件对 build_contact.py 进行动态单元测试，依据测试函数返回值判定脚本修复是否通过；3）浏览器状态维度：检查 Chrome 当前活动标签页的 URL 是否与预期地址一致（忽略查询参数）；4）文本内容维度：校验 MIGRATION_DONE.txt 中是否包含指定的必须文本且不包含禁止文本。四个指标各自返回 0.0 或 1.0（测试指标可能返回 [0,1] 之间的归一化数值），整体任务完成要求各指标均达到成功标准，属于多维度联合判定模式。",
+    "main_functions": [
+      {
+        "name": "check_json",
+        "lineno": 84,
+        "description": "该函数接收一个文件路径 result、规则字典 rules 和布尔标志 is_yaml。首先检查 result 路径是否存在，不存在直接返回 0.0；随后按 is_yaml 指示使用 yaml.safe_load 或 json.load 解析文件内容，若解析失败或 YAML 为空也返回 0.0。接着遍历 rules['expect'] 列表：对每条规则，按照 r['key'] 列表逐级深入解析后的字典结构提取目标值，并调用辅助函数 _match_value_to_rule 进行匹配，所有 expect 规则必须全部满足；再遍历 rules['unexpect'] 列表：同样按 key 路径提取值，要求这些值不能匹配对应规则（即禁止出现的内容必须不出现）。任一 expect 失败或任一 unexpect 命中都会导致返回 0.0，全部通过则返回 1.0。"
+      },
+      {
+        "name": "check_python_file_by_test_suite",
+        "lineno": 187,
+        "description": "该函数接收 actual_files（待检文件列表，实际校验逻辑由 test_file 驱动）、test_file（测试脚本路径）和 options。从 options 中获取 test_function_name，默认为 'test'。先校验 test_file 是否存在且为普通文件；随后将工作目录切换到 test_file 所在目录，并临时将该目录插入 sys.path 首位；使用 importlib.util.spec_from_file_location 动态加载测试模块，执行模块代码后，获取指定名称的测试函数并调用。对测试返回值进行分类处理：若为 bool 则直接映射为 1.0/0.0；若为 int/float 则裁剪归一化到 [0.0, 1.0]；其他类型先转 bool 再映射。若模块加载、函数获取或执行过程中发生任何异常，均返回 0.0。最后在 finally 块中清理临时模块、恢复原始工作目录和 sys.path。"
+      },
+      {
+        "name": "is_expected_active_tab_approximate",
+        "lineno": 329,
+        "description": "该函数接收 active_tab_info（字典或字符串形式的活动标签页信息）和 rule（匹配规则）。当前仅支持 rule['type'] == 'url' 的分支：从 rule 中提取 expected_url，从 active_tab_info 中提取 actual_url（若为字典则取 'url' 键）。使用 urlparse 解析两个 URL，并通过 _replace(query='') 去除查询参数，随后比较净 URL 字符串是否完全相等。相等返回 1.0，不相等返回 0.0。若 active_tab_info 为空或 type 不支持，也返回 0.0。"
+      },
+      {
+        "name": "check_include_exclude",
+        "lineno": 371,
+        "description": "该函数接收 result（待检查的文本字符串）和 rules（包含 'include' 与 'exclude' 键的字典）。首先检查 result 是否为 None，是则返回 0.0。然后执行双重校验：所有 rules['include'] 列表中的字符串必须都存在于 result 中；同时所有 rules['exclude'] 列表中的字符串必须都不存在于 result 中。两个条件同时满足返回 1.0，任一不满足返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_match_value_to_rule",
+        "lineno": 49,
+        "description": "通用规则匹配引擎，接收一个待匹配值 value 和一个规则字典 rule（必须包含 'method' 和 'ref' 字段）。根据 method 字段分发不同比较逻辑：若 method 以 're' 开头，则使用 re.search 进行正则匹配，支持通过点号拼接 re. 标志位（如 re.IGNORECASE）；若 method 为 eq/ne/le/lt/ge/gt，则使用 operator 模块对应操作符比较 value 与 rule['ref']；若 method 以 'approx:' 开头，则提取阈值并将 value 与 rule['ref'] 做浮点绝对差比较；若 method 以 'range.' 开头，则解析第 6、7 位字符作为左右边界开闭标记（如 'range.te' 表示左开右闭区间），检查 value 是否落在 rule['ref'] 区间内；若 method 为 str_list_eq 或 str_set_eq，则将 value 按逗号分割并去除引号后转为 list 或 set 与参考值比较。返回布尔值表示是否匹配。该函数被 check_json 复用，用于对解析后的 YAML/JSON 数据执行具体的键值规则校验。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:26:26",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/L3_multi_app_9fd8a238-9cf5-4bcb-9737-3d860ad86c61/evaluator_function_labels.json"
+}

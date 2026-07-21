@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_progressive_103/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_accessibility",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_accessibility",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证操作系统无障碍辅助功能的最终配置状态是否同时满足四项硬性指标。它通过解析 shell 收集器输出的键值对文本，提取文本缩放比例（text_scale）、光标尺寸（cursor_size）、放大镜启用状态（mag_enabled）和放大镜放大倍数（mag_factor），并与 rules 中给定的阈值进行数值比较和字符串精确匹配。判定采用“全部满足”的与逻辑：只有当四项指标全部达标（文本缩放不低于阈值、光标尺寸不低于阈值、放大镜已启用且放大倍数严格大于阈值）时才视为任务成功，返回 1.0；任一指标未达标或解析过程发生异常，即返回 0.0。",
+    "main_functions": [
+      {
+        "name": "check_os_accessibility",
+        "lineno": 31,
+        "description": "接收 shell 收集器输出的原始字符串 result 以及包含阈值的 rules 字典。首先调用辅助函数 _parse_kv 将 result 解析为字典；随后依次提取并转换四个关键字段：text_scale（转为 float）、cursor_size（转为 int）、mag_enabled（保留字符串）、mag_factor（转为 float）。接着按顺序执行四项严格检查：1）text_scale 必须大于等于 rules 中 min_text_scale（默认 1.2）；2）cursor_size 必须大于等于 rules 中 min_cursor_size（默认 48）；3）mag_enabled 必须精确等于字符串 \"true\"；4）mag_factor 必须严格大于 rules 中 min_mag_factor（默认 1.5）。四项检查为“全部满足”的与逻辑，全部通过则返回 1.0，任一项失败或在类型转换、取值过程中触发异常，则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 16,
+        "description": "接收 shell 输出的原始字符串，按行解析其中包含 \"=\" 的键值对。对每一行去除首尾空白后，以第一个等号为界分割键和值，并分别去除首尾空白，构建字典返回；若输入为空或 None 则返回空字典。该函数服务于主函数 check_os_accessibility 的数据预处理阶段，负责将 shell 命令输出的 text_scale=...、cursor_size=...、mag_enabled=...、mag_factor=... 等行转换为结构化字典，供后续类型转换与阈值比较使用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:32:25",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/INTERACTIVE_os_interactive_os_progressive_103/evaluator_function_labels.json"
+}

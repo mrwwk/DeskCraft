@@ -1,0 +1,92 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L1_calc_fb0f694e-fc10-46f9-9fcd-169630844996/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "compare_csv",
+      "lineno": 185
+    },
+    {
+      "name": "compare_table",
+      "lineno": 240
+    },
+    {
+      "name": "compare_conference_city_in_order",
+      "lineno": 762
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_sheet_idx",
+      "lineno": 45
+    },
+    {
+      "name": "_load_sheet",
+      "lineno": 95
+    },
+    {
+      "name": "_safe_read_file",
+      "lineno": 127
+    },
+    {
+      "name": "compare_csv",
+      "lineno": 185
+    },
+    {
+      "name": "compare_table",
+      "lineno": 240
+    },
+    {
+      "name": "_normalize_city_string",
+      "lineno": 750
+    },
+    {
+      "name": "compare_conference_city_in_order",
+      "lineno": 762
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证桌面办公场景中的表格处理任务结果，核心判定依据是结果文件（xlsx或csv）与预期文件（或规则）的一致性。对于Excel文件，通过compare_table支持多维度联合检查：工作表名称、单元格内部数值（精度可控）、打印文本、模糊匹配（含字符过滤、大小写忽略、阈值相似度）、迷你图、图表、样式（含条件格式）、冻结窗格、缩放比例、数据验证、行列属性、筛选器、数据透视表及特定单元格属性。所有检查规则采用“全部满足”的严格与逻辑（AND），任一规则失败即整体判0分。对于CSV文件，compare_csv采用逐行文本比对，支持多预期文件的“任一满足”逻辑（OR）及严格/忽略大小写模式。对于会议城市列表，compare_conference_city_in_order按顺序提取结果文件C2:C22单元格，与预期列表进行标准化后的子串模糊匹配，要求全部位置按序匹配。总体而言，该evaluator兼顾精确匹配与容错匹配，覆盖表格内容、格式、结构及元数据的全方位验证。",
+    "main_functions": [
+      {
+        "name": "compare_csv",
+        "lineno": 185,
+        "description": "接收result（结果CSV文件路径）、expected（预期CSV文件路径或路径列表）及options选项。首先调用_safe_read_file读取结果文件的所有行；若expected为单个字符串则转为列表。依次遍历每个预期文件，同样读取后根据options处理：若strict为False则对每行strip；若ignore_case为True则转为小写。将处理后的结果行列表与预期行列表进行完全相等比较，任一预期文件匹配成功即返回1.0，全部不匹配或读取失败返回0.0。"
+      },
+      {
+        "name": "compare_table",
+        "lineno": 240,
+        "description": "接收result（结果xlsx路径）、expected（预期xlsx路径，可为None）及options（含rules规则列表）。首先用openpyxl和pandas加载结果文件，预期文件可选加载。构造parse_idx偏函数用于解析sheet索引（如\"RI0\"、\"ENSheet1\"等）。遍历options[\"rules\"]并根据r[\"type\"]分发处理：sheet_name比较工作表名称列表是否完全相等；sheet_data用pandas DataFrame按precision（默认4位小数）四舍五入后通过equals比较；sheet_print导出CSV文本行后比较，支持ignore_case；sheet_fuzzy对指定range的单元格逐格进行预处理（normalization替换、trim_leadings/trim_trailings截断、ignore_chars过滤、ignore_case转小写）后，按includes/included_by/fuzzy_match（threshold默认85）/exact_match判定；sparkline/chart/style/freeze/zoom/data_validation/row_props/col_props/filter/pivot_table分别调用对应load_xxx辅助函数或比较Worksheet属性；check_cell读取指定coordinate单元格的值或样式属性，通过_match_value_to_rule验证规则。所有规则的metric进行逻辑与累积（passes = passes and metric），中途失败即提前退出，最终返回float(passes)，即全部通过为1.0否则0.0。"
+      },
+      {
+        "name": "compare_conference_city_in_order",
+        "lineno": 762,
+        "description": "接收actual_city_list_path（结果xlsx文件路径）和expected_city（字典，键\"expected\"对应预期城市列表）。使用openpyxl打开结果文件的活动工作表，读取C2:C22范围内的单元格值构成实际城市列表。按索引顺序遍历，对每个实际城市调用_normalize_city_string标准化（去重音、去标点、转小写）；预期项可为字符串或字符串列表（多候选）。检查是否存在候选标准化后的字符串非空且为实际标准化字符串的子串，若任一位置无匹配则记录日志并返回0.0。全部按序匹配成功返回1.0，过程中异常也返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_sheet_idx",
+        "lineno": 37,
+        "description": "解析sheet索引标识符，支持整数（按result的sheet列表索引）、\"RI{数字}\"（result按索引取名称）、\"RN{名称}\"（result按名称）、\"EI{数字}\"（expected按索引取名称）、\"EN{名称}\"（expected按名称）。返回应读取的(book, index)元组，供_load_sheet和各类load_xxx函数定位具体工作表。"
+      },
+      {
+        "name": "_load_sheet",
+        "lineno": 74,
+        "description": "根据book类型加载指定index的sheet。若book为str路径，尝试读取\"{book}-{index}.csv\"文件并返回行列表（去除尾部空行）；若为pd.ExcelFile，返回指定sheet的DataFrame；若为openpyxl.Workbook，返回指定名称的Worksheet。加载失败返回None。被sheet_data、sheet_print、freeze、zoom、data_validation、check_cell等检查逻辑复用。"
+      },
+      {
+        "name": "_safe_read_file",
+        "lineno": 108,
+        "description": "安全读取文本文件，依次尝试utf-8、utf-8-sig、latin-1、windows-1252、gbk、cp1251、iso-8859-1编码，成功则返回行列表；全部失败则以utf-8 with errors='replace'作为最后手段读取。供compare_csv和_load_sheet的CSV分支使用，解决不同编码导致的读取失败问题。"
+      },
+      {
+        "name": "_normalize_city_string",
+        "lineno": 737,
+        "description": "对输入值进行字符串标准化：先执行NFKD Unicode规范化，去除组合重音符号，再用正则将非字母数字字符替换为空格，最后转小写并strip。返回标准化后的字符串，专用于compare_conference_city_in_order中的容错子串匹配，实现忽略大小写、标点和重音的 tolerant matching。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:47:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/calc/L1_calc_fb0f694e-fc10-46f9-9fcd-169630844996/evaluator_function_labels.json"
+}

@@ -1,0 +1,48 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_4bd9519c-41fe-486f-8fc7-45d966d46f1b/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_blender_text_content",
+      "lineno": 41
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_blender_output",
+      "lineno": 20
+    },
+    {
+      "name": "_find_object",
+      "lineno": 33
+    },
+    {
+      "name": "check_blender_text_content",
+      "lineno": 41
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 总体用于验证 Blender 任务中特定文本对象（Text Object）的最终文字内容是否完全符合任务要求。它依赖外部 Blender 检查脚本（如 check_text.py 或 check_object.py）运行后产生的 JSON 标准输出作为评测依据。核心检查对象是场景中指定名称的文本对象，主要比较方式为对文本字符串进行精确相等比对（严格匹配 `body` 或 `text_body` 字段）。成功判定的总体思路是：先确保命令输出能被正确解析为 JSON，再按两种可能的数据格式定位目标对象，最后验证其实际文本内容与规则中的 `expected_text` 完全一致；只有全部环节通过才返回 1.0，任何解析失败、对象缺失或文本不符均返回 0.0，不存在部分得分或模糊匹配。",
+    "main_functions": [
+      {
+        "name": "check_blender_text_content",
+        "lineno": 41,
+        "description": "该主函数用于验证 Blender 场景中指定文本对象的文字内容。它接收 `command_output`（来自 Blender 检查脚本的标准输出，通常为 JSON 格式）和 `rule`（评测规则字典，必须包含 `object_name` 和 `expected_text` 字段）。执行流程如下：首先调用 `_parse_blender_output` 将命令输出解析为 Python 字典；若解析失败或输出为空，直接返回 0.0。接着提取规则中的目标对象名和预期文本。然后尝试两种数据格式进行查找：第一种是 `check_text.py` 格式，直接以 `object_name` 作为键从结果字典中取值；若未找到，则回退到第二种 `check_object.py` 格式，调用 `_find_object` 在 `objects` 数组中按名称精确匹配对象。找到对象后，依次检查 `body` 字段（check_text.py 格式）或 `text_body` 字段（check_object.py 格式）是否与 `expected_text` 完全相等。若完全匹配则返回 1.0，表示成功；若对象不存在、字段缺失或文本不一致，则记录警告并返回 0.0。整个过程采用严格的精确字符串匹配，不存在近似匹配或阈值容错。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_blender_output",
+        "lineno": 20,
+        "description": "该辅助函数负责将 Blender 检查脚本打印的原始命令输出转换为 Python 字典。它先判断输出是否为空或仅包含空白字符，若是则记录错误并返回 None；否则尝试使用 `json.loads` 对输出进行解析。若遇到 `JSONDecodeError` 或 `ValueError`，则记录错误日志及原始输出内容，并返回 None。该函数是主评测函数的数据预处理入口，确保后续所有字段比对都基于结构化的 JSON 数据。"
+      },
+      {
+        "name": "_find_object",
+        "lineno": 31,
+        "description": "该辅助函数专门用于处理 `check_object.py` 脚本输出的 JSON 结构。它接收解析后的结果字典 `result` 和目标对象名称 `name`，在 `result[\"objects\"]` 列表中遍历每个对象，通过精确匹配 `obj[\"name\"]` 字段来定位目标对象。若找到则返回该对象字典，否则返回 None。该函数服务于主评测逻辑中的回退查找分支，用于兼容 check_object.py 格式的输出。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 14:34:28",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/blender/L1_blender_4bd9519c-41fe-486f-8fc7-45d966d46f1b/evaluator_function_labels.json"
+}

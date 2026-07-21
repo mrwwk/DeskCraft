@@ -1,0 +1,55 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_35253b65-1c19-4304-8aa4-6884b8218fc0/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_active_tab",
+      "lineno": 59
+    },
+    {
+      "name": "is_shortcut_on_desktop",
+      "lineno": 82
+    },
+    {
+      "name": "compare_urls",
+      "lineno": 173
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定 Chrome 浏览器相关任务的完成状态，核心验证目标分为两类：一是确认 Chrome 当前活动标签页是否已打开预期的 URL；二是确认桌面是否存在符合指定名称（Name）或执行命令（Exec）的快捷方式文件。对于 URL 比对，采用归一化逻辑：自动补全缺失的协议头（默认 http://）、统一小写、去除单独的 www 子域名、忽略顶级域名后缀差异（如 .com 与 .com.sg 视为同一主域名），并可选择是否保留查询参数与锚点。对于桌面快捷方式，直接解析文件内容文本，提取 Name= 或 Exec= 行进行精确匹配或双向包含匹配（不区分大小写）。两个主检查项各自独立返回 0.0 或 1.0 的离散分数，任一检查项失败即该项得 0 分，不存在加权累计逻辑。",
+    "main_functions": [
+      {
+        "name": "is_expected_active_tab",
+        "lineno": 59,
+        "description": "接收 active_tab_info（当前 Chrome 活动标签信息，类型可为字典或字符串）与 rule（匹配规则字典）。首先判空：若 active_tab_info 为假值则直接返回 0.0。当 rule['type'] 为 'url' 时，从 active_tab_info 中提取 actual_url（若为字典则取 'url' 键，否则直接取该字符串），与 rule['url'] 中的 expected_url 一同传入 compare_urls 进行归一化比较。若 compare_urls 返回 True 则得 1.0，否则得 0.0。若 rule['type'] 为其他未支持的类型，记录错误日志并返回 0.0。"
+      },
+      {
+        "name": "is_shortcut_on_desktop",
+        "lineno": 82,
+        "description": "接收 shortcuts（桌面快捷方式字典，键为文件路径，值为文件内容字符串）与 rule（规则字典）。遍历所有快捷方式文件内容，按 rule['type'] 分支处理：若 type 为 'name'，在内容中查找 'Name=' 开头的行，先尝试 exact_match（即 'Name=' + expected_name + '/n' 的精确包含），若失败则提取 actual_name 与 expected_name 进行精确字符串比对，或双向不区分大小写的包含检查（expected_name 在 actual_name 中，或反之）；若 type 为 'exec'，同理查找 'Exec=' 开头的行，对 expected_exec 与 actual_exec 进行精确匹配或双向包含匹配。任一分支中一旦匹配成功即返回 1.0，全部遍历结束仍未匹配则返回 0.0。若 type 为 'url'、'id' 或其他值，抛出 TypeError 表示暂不支持。"
+      },
+      {
+        "name": "compare_urls",
+        "lineno": 173,
+        "description": "接收 url1、url2 两个 URL 字符串，以及可选参数 full（默认 True，控制是否保留 URL 的 params、query 与 fragment）。首先处理 None：仅当两者同时为 None 时才认为相等，否则任一为 None 即返回 False。对于缺失协议头的 URL 自动补全 'http://'。使用 tldextract 提取域名并统一小写，去除单独的 'www' 子域名，且忽略 suffix（顶级域及国家代码域差异被抹平，如 'airbnb.com' 与 'airbnb.com.sg' 归一化后 netloc 同为 'airbnb'）。路径中的根斜杠 '/' 被规约为空串。根据 full 的值决定是否保留 params、query、fragment。最终将两个 URL 重新组装为字符串后进行精确相等比较，返回布尔值。该函数通常被 is_expected_active_tab 调用以判定活动标签页 URL 是否符合预期。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:07:51",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_35253b65-1c19-4304-8aa4-6884b8218fc0/evaluator_function_labels.json"
+}

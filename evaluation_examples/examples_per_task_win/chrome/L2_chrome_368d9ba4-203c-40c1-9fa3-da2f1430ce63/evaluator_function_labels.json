@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_368d9ba4-203c-40c1-9fa3-da2f1430ce63/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 50
+    },
+    {
+      "name": "check_direct_json_object",
+      "lineno": 82
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器相关任务的完成状态，采用二元打分机制（0.0或1.0）。它主要检查两类核心对象：一是浏览器当前活动标签页的URL地址，二是任务产生的JSON格式数据（如页面状态、API返回、本地存储内容等）。对于URL，要求所有预设的正则表达式模式必须在目标URL中全部匹配成功（逻辑与关系）；对于JSON对象，根据配置执行精确字段值比对或包含关系检查，所有指定字段必须完全符合预期。任一检查失败即返回0.0，全部通过则返回1.0。",
+    "main_functions": [
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 50,
+        "description": "该函数负责检查浏览器URL是否符合预期模式。接收result参数（可以是字符串URL或包含'url'键的字典）和rules参数（包含'expected'键，其值为正则表达式模式列表）。执行步骤如下：首先判断result是否为空，为空则直接返回0.0；接着从result中提取URL字符串，若格式非法（既非字符串也非含'url'的字典）则返回0.0；然后从rules['expected']获取patterns列表，使用re.search对每个pattern在URL中进行搜索匹配；遍历过程中只要有一个pattern未匹配成功，立即返回0.0；仅当所有pattern全部匹配成功时，才返回1.0。判定依据为“全部正则模式必须均在URL中命中”，属于严格的逻辑与关系。"
+      },
+      {
+        "name": "check_direct_json_object",
+        "lineno": 82,
+        "description": "该函数负责直接比对JSON对象的内容。接收result参数（字符串或已解析的字典）和rules参数（包含'expected'、'expect_in_result'、'ignore_list_order'等配置）。执行步骤如下：若result为字符串，先去除首尾空白，将单引号替换为双引号，再用json.loads解析为字典；若result为None则返回0.0；随后检查rules['expected']中是否存在值为'__EVALUATION_FAILED__'的字段，存在则返回0.0；接着读取expect_in_result标志（默认False）。若expect_in_result为False（精确匹配模式）：遍历expected的所有键，若rules中设置ignore_list_order为True，则对预期列表和实际列表排序后比较，否则直接比较字段值，任一字段不匹配即返回0.0，全部相等返回1.0。若expect_in_result为True（包含匹配模式）：遍历expected的所有键，若预期值为列表，则检查实际值（列表或字符串）是否包含/等于其中任意一个预期值；若预期值为字符串，则检查实际字符串是否包含该子串；不支持其他类型，任一条件不满足返回0.0，全部满足返回1.0。任何异常捕获后均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:07:57",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_368d9ba4-203c-40c1-9fa3-da2f1430ce63/evaluator_function_labels.json"
+}

@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_13584542-872b-42d8-b299-866967b5c3ef/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_terminal_size",
+      "lineno": 26
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 13
+    },
+    {
+      "name": "check_os_terminal_size",
+      "lineno": 26
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证终端大小持久化任务是否完成，核心关注两个硬性条件：1) 原始~/.bashrc是否已备份（backup_ok）；2) ~/.bashrc中是否正确写入了stty终端尺寸配置（bashrc_ok）。由于vm_command_line运行在非GUI shell环境中，stty size的实时回显（size_ok）不可靠，因此evaluator将其作为best-effort参考，不作为硬性判定条件。成功判定采用\"全部满足\"逻辑：shell收集器输出的result字符串中，backup_ok和bashrc_ok必须同时为\"true\"，才返回满分1.0；任一条件不满足或解析异常即返回0.0。其中bashrc_ok的底层检查支持参数顺序互换，即同时接受\"stty rows 46 cols 140\"和\"stty cols 140 rows 46\"两种写法。",
+    "main_functions": [
+      {
+        "name": "check_os_terminal_size",
+        "lineno": 26,
+        "description": "该主函数接收shell收集器输出的result字符串和期望尺寸规则rules字典（如{\"rows\": \"46\", \"cols\": \"140\"}，但代码中未直接读取rules的具体值）。执行步骤如下：1) 调用_parse_kv将result按key=value格式解析为字典；2) 检查backup_ok字段是否等于\"true\"，若否直接返回0.0；3) 检查bashrc_ok字段是否等于\"true\"，若否直接返回0.0；4) size_ok字段虽可能被解析，但被明确忽略，不作为判定条件。最终判定依据是\"backup_ok与bashrc_ok必须同时为true\"的联合逻辑，全部满足返回1.0，任一失败或发生异常返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 10,
+        "description": "该辅助函数接收一段shell输出字符串，按行分割后，对包含\"=\"的每一行以第一个等号为界切分为键和值，并去除首尾空白字符，最终组装成字典返回。若输入为空或None，则返回空字典。该函数为check_os_terminal_size提供数据预处理服务，将shell收集器的key=value行文本转换为结构化字典，以便后续按backup_ok、bashrc_ok等键名进行精确取值判断。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:33:53",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_13584542-872b-42d8-b299-866967b5c3ef/evaluator_function_labels.json"
+}

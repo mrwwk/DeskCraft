@@ -1,0 +1,144 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00006-0006-4000-8000-000000000006-L3/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 60
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 78
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "check_annotation_callout_count",
+      "lineno": 276
+    },
+    {
+      "name": "check_l3_camera_detail_pack_complete",
+      "lineno": 353
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_image_dimensions",
+      "lineno": 23
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 60
+    },
+    {
+      "name": "check_jpeg_format",
+      "lineno": 78
+    },
+    {
+      "name": "_resolve_region_bbox",
+      "lineno": 103
+    },
+    {
+      "name": "_edge_density",
+      "lineno": 132
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 139
+    },
+    {
+      "name": "check_text_in_region_keywords",
+      "lineno": 217
+    },
+    {
+      "name": "check_annotation_callout_count",
+      "lineno": 276
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 320
+    },
+    {
+      "name": "_check_color_tone_consistency",
+      "lineno": 328
+    },
+    {
+      "name": "check_l3_camera_detail_pack_complete",
+      "lineno": 353
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "这个 evaluator 用于验证 L3-6 相机细节三图包任务（camera detail 3-image pack task）的最终完成状态。任务要求产出五类核心产物：三张 1600×1600 像素的 JPEG 导出图（分别对应主视图 main_jpg、特写图 closeup_jpg、规格图 specs_jpg）、一张保留完整图层结构的 XCF 源文件，以及一张用于对比标注的原始图 src_path。评测逻辑采用严格的「全或无」二进制聚合模式：通过 check_l3_camera_detail_pack_complete 依次执行 14 项独立检查，包括文件存在性、JPEG 格式合法性、图像尺寸容差（±5 像素）、三张图之间的全局色调一致性（mean delta 阈值分别为 40 和 45）、规格图上的标注呼出数量（至少 3 个独立变化簇）、规格图指定区域（top_left、center、bottom_right）的文字边缘密度（≥0.006）及 OCR 关键词（LENS、SENSOR、ISO）命中情况，以及 XCF 文件中必须包含 Main_View、Closeup_View、Specs_View 三个图层（顺序不限）。所有子检查的结果由 _all_binary_checks_pass 汇总，仅当每一项均返回 1 时，最终得分才为 1.0，否则整体判为 0.0。",
+    "main_functions": [
+      {
+        "name": "check_image_dimensions",
+        "lineno": 23,
+        "description": "接收 image_path、expected_width、expected_height（可选）及 tolerance（默认 5）。首先验证文件是否存在，随后使用 PIL.Image.open 读取图像并获取宽高。若 expected_height 为 None，则仅判断宽度；否则要求宽度与高度均与期望值之差的绝对值不超过 tolerance。满足条件返回 1，否则返回 0。任何文件缺失或读取异常也返回 0。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 60,
+        "description": "接收 file_path，调用 os.path.isfile 判断路径是否为真实文件。若 file_path 为 None 或文件不存在，返回 0；存在则返回 1。"
+      },
+      {
+        "name": "check_jpeg_format",
+        "lineno": 78,
+        "description": "接收 image_path，先检查文件是否存在，再用 PIL.Image.open 打开图像，读取其 format 属性。仅当 img.format 严格等于字符串 JPEG 时返回 1，其他格式或异常均返回 0。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 139,
+        "description": "接收 xcf_path 与 rule 字典（必须包含 layers 列表，可选 ordered 布尔值，默认 False）。首先检查文件存在性并验证文件头是否为 b'gimp xcf'。优先尝试使用 gimpformats 库解析 XCF，提取所有非空图层名；若解析失败则回退到二进制内容搜索，查找每个预期图层名的 UTF-8 字节位置。无论哪种方式，都必须确保 expected_layers 中所有名称均被找到；若 ordered 为 True，则额外要求这些名称在文件中的出现位置（或图层顺序）呈递增排列。任一图层缺失或顺序错误返回 0，全部满足返回 1。"
+      },
+      {
+        "name": "check_text_in_region_keywords",
+        "lineno": 217,
+        "description": "接收 image_path 与 rule 字典（包含 regions 列表、可选 keywords 列表、min_edge_density 默认 0.008、edge_threshold 默认 40.0）。先将图像转为灰度图，然后对每个 region 调用 _resolve_region_bbox 裁剪对应区域，再使用 _edge_density 计算该区域的边缘密度。若任一区域的边缘密度低于 min_edge_density，立即返回 0。若 rule 中提供了 keywords，则尝试导入 pytesseract 对整图进行 OCR，将识别结果归一化（用正则/s+ 合并空白并转小写）后，检查每个 keyword 是否都被包含；若 OCR 不可用或失败，仅记录 warning，不因此直接判负（仍依赖前面的边缘密度检查）。所有区域密度达标且关键词全部命中（如有）时返回 1。"
+      },
+      {
+        "name": "check_annotation_callout_count",
+        "lineno": 276,
+        "description": "接收 src_path、tgt_path 与 min_callouts（默认 3）。将两张图均转为灰度图；若尺寸不一致，将 src 缩放到 tgt 的尺寸。计算两图差值（diff > 20 视为变化像素），并截取上部 85% 区域作为 ROI。使用 skimage.measure.label 与 regionprops 提取二值变化图中的连通区域，过滤掉面积小于 80 像素或大于 ROI 总面积 8% 的噪声或全屏变化块。统计剩余有效连通区域的数量，当且仅当数量大于等于 min_callouts 时返回 1，否则返回 0。"
+      },
+      {
+        "name": "check_l3_camera_detail_pack_complete",
+        "lineno": 353,
+        "description": "接收 result_paths 列表，要求其为列表且长度不少于 5。按顺序解包为 main_jpg、closeup_jpg、specs_jpg、xcf_path、src_path。依次执行 14 项二进制检查并收集分数：三个 JPG 的文件存在性（check_file_exists 执行 3 次）、JPEG 格式验证（check_jpeg_format 执行 3 次）、尺寸验证 1600×1600（check_image_dimensions 执行 3 次）、main 与 closeup 的色调一致性（_check_color_tone_consistency，max_mean_delta=40.0）、main 与 specs 的色调一致性（_check_color_tone_consistency，max_mean_delta=45.0）、specs_jpg 相对于 src_path 的标注数量（check_annotation_callout_count，min_callouts=3）、specs_jpg 的文字区域与关键词检查（check_text_in_region_keywords，regions 为 [top_left, center, bottom_right]，keywords 为 [LENS, SENSOR, ISO]，min_edge_density=0.006）、以及 XCF 图层结构检查（check_xcf_layers_structure，layers 为 [Main_View, Closeup_View, Specs_View]，ordered=False）。最后调用 _all_binary_checks_pass 对这 14 个分数进行汇总，仅当所有分数均大于等于 1.0 时返回 1.0，否则返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_resolve_region_bbox",
+        "lineno": 101,
+        "description": "接收图像 width、height 与 region_name，将粗粒度区域名称（如 top_left、center、bottom 等）映射为具体的像素边界框 (x0, y0, x1, y1)。例如 center 返回图像中心 1/2 区域，top 返回顶部 1/4 区域。若 region_name 为空或无法识别，默认返回整张图像范围。该函数为 check_text_in_region_keywords 提供区域裁剪坐标。"
+      },
+      {
+        "name": "_edge_density",
+        "lineno": 127,
+        "description": "接收灰度图 numpy 数组 gray_array 与 edge_threshold（默认 40.0）。分别计算图像在 x 轴与 y 轴方向的梯度绝对值，求和得到边缘强度图，然后统计强度超过 edge_threshold 的像素所占比例（均值）并返回。该数值用于衡量区域内是否存在足够密集的文字或线条边缘，是 check_text_in_region_keywords 判断区域是否含文字的核心依据。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 341,
+        "description": "接收 scores 列表，过滤掉 None 值后将其余项转为浮点数。仅当列表非空且所有有效分数均大于等于 1.0 时返回 1.0，否则返回 0.0。这是 check_l3_camera_detail_pack_complete 的最终聚合器，实现「全部通过才成功」的严格逻辑。"
+      },
+      {
+        "name": "_check_color_tone_consistency",
+        "lineno": 347,
+        "description": "接收 image_a_path、image_b_path 与 max_mean_delta（默认 35.0）。将两图均转为 RGB 模式后，分别计算全图 RGB 三通道的像素均值，再求两均值向量绝对差的平均值 delta。若 delta 小于等于 max_mean_delta，认为两图全局色调一致，返回 1；否则返回 0。该函数被 check_l3_camera_detail_pack_complete 调用，用于验证三张导出图之间的色彩连贯性。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:19:01",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/L3_gimp_a3b00006-0006-4000-8000-000000000006-L3/evaluator_function_labels.json"
+}

@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_b4d8e9f0-1a23-4fbc-c789-0d1e2f3a4b5c/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_systemd_custom_service",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_systemd_custom_service",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证自定义systemd服务与定时器的完整生命周期是否按预期配置。根据代码中的文档说明，其关注对象涵盖服务文件、定时器文件、启用与激活状态、ExecStart命令、定时器调度计划及日志输出等。具体评测方式是将shell命令返回的多行key=value格式文本，通过辅助函数解析为字典后，与rules.checks中预定义的期望键值对进行精确字符串匹配。只有当所有检查项的键和值都完全相等时，才返回1.0判定任务成功；若任一项不匹配或解析/比较过程发生异常，则返回0.0。这是一种全部满足即通过、任一失败即零分的严格评分方式。",
+    "main_functions": [
+      {
+        "name": "check_os_systemd_custom_service",
+        "lineno": 31,
+        "description": "该函数接收参数result（字符串，预期为包含多行key=value的shell输出）和rules（字典）。首先调用辅助函数_parse_kv将result逐行解析为字典，其中键和值通过行内第一个等号分割，并去除首尾空白字符得到。随后从rules字典中提取checks字段（若不存在则默认为空字典），遍历该字典中的每一个期望键key与期望值expected，使用kv.get(key)与expected进行精确相等比较。若所有检查项均完全匹配，则返回1.0；一旦发现任一不匹配，立即返回0.0。此外，整个流程被try-except结构包裹，若解析或比较过程中抛出任何异常，函数会记录错误日志并返回0.0。其判定逻辑为全有或全无：必须全部满足才得分，否则零分。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该函数负责将shell输出的原始字符串解析为Python字典。具体步骤为：若输入为空或空字符串，直接返回空字典；否则按换行符分割字符串，对每一行去除首尾空白后，检查是否包含等号。若包含，则以第一个等号为界将行分割为键和值，再分别去除首尾空白，存入结果字典后返回。该函数服务于check_os_systemd_custom_service，用于预处理systemd相关命令（如systemctl status、查看服务文件内容等）返回的key=value格式文本，将其结构化以便主函数进行逐项精确匹配。返回值语义为：从原始shell输出中提取的所有键值对映射，键和值均为去除空白后的字符串。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:37:35",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_b4d8e9f0-1a23-4fbc-c789-0d1e2f3a4b5c/evaluator_function_labels.json"
+}

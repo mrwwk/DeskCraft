@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_5812b315-e7bd-4265-b51f-863c02174c28/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_sftp_user",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_sftp_user",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证SFTP-only用户是否被正确创建且拥有恰当的权限配置。其核心检查对象是shell收集器回传的一组key=value格式状态标志（如group_ok、user_ok、home_ok、shell_ok、home_perm_ok、upload_perm_ok等）。主要比较方式为严格字符串相等匹配：若rules字典中显式提供了\"checks\"自定义规则，则按自定义键值对逐一比对；否则按默认字段清单要求所有值均为\"true\"。成功判定采用\"全部满足\"的与逻辑——任一字段缺失、不符或不为预期值即判定失败返回0.0，全部通过则返回1.0。",
+    "main_functions": [
+      {
+        "name": "check_os_sftp_user",
+        "lineno": 31,
+        "description": "该函数接收shell收集器输出的result字符串与评测规则rules字典。首先调用辅助函数_parse_kv将原始文本解析为键值对字典kv。随后进入分支判断：若rules中存在\"checks\"字段且非空，则遍历该字典内所有自定义key与expected值，要求kv中对应key的值与expected严格相等，全部相等返回1.0，任一不符立即返回0.0；若rules中无\"checks\"字段，则按默认清单依次检查kv中的\"group_ok\"、\"user_ok\"、\"home_ok\"、\"shell_ok\"、\"home_perm_ok\"、\"upload_perm_ok\"六个字段是否全部等于字符串\"true\"，全部满足返回1.0，任一缺失或不为\"true\"返回0.0。若解析或比较过程中抛出异常，函数捕获后记录错误日志并返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 18,
+        "description": "该辅助函数将shell输出的多行key=value文本转换为Python字典。具体步骤为：若输入为空或None则直接返回空字典；否则去除首尾空白后按换行符切分，对每一行再去除首尾空白，并以第一个等号为界分割键和值，分别strip空白字符后存入字典。该函数被check_os_sftp_user调用，用于把原始shell输出预处理为结构化数据，供后续严格相等比较使用。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:36:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L3_os_5812b315-e7bd-4265-b51f-863c02174c28/evaluator_function_labels.json"
+}

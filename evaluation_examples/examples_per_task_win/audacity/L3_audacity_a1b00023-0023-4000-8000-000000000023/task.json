@@ -1,0 +1,90 @@
+{
+  "id": "a1b00023-0023-4000-8000-000000000023",
+  "snapshot": "audacity",
+  "instruction": "There is one unwanted part in this long recording, and I also want a small silent break with smoother edges. Open/home/user/Documents/long_test.wav, delete 40s-50s, insert 5 seconds of silence at 20s, apply fade-in to the first 3 seconds and fade-out to the last 3 seconds, export to/home/user/Documents/exports/complex_edit.wav, and save the project",
+  "source": "https://manual.audacityteam.org/man/tutorial_editing_an_existing_file.html",
+  "difficulty": "L3",
+  "config": [
+    {
+      "type": "upload_file",
+      "parameters": {
+        "files": [
+          {
+            "local_path": "assets/wav/long_test.wav",
+            "path": "/home/user/Documents/long_test.wav"
+          }
+        ]
+      }
+    },
+    {
+      "type": "launch",
+      "parameters": {
+        "command": [
+          "/usr/bin/audacity",
+          "/home/user/Documents/long_test.wav"
+        ]
+      }
+    },
+    {
+      "type": "sleep",
+      "parameters": {
+        "seconds": 3
+      }
+    }
+  ],
+  "trajectory": "trajectories/",
+  "related_apps": [
+    "audacity"
+  ],
+  "evaluator": {
+    "postconfig": [],
+    "func": [
+      "check_audio_complex_edit_content",
+      "check_project_file_exists"
+    ],
+    "conj": "and",
+    "result": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/exports/complex_edit.wav",
+        "dest": "complex_edit.wav"
+      },
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/long_test.aup3",
+        "dest": "long_test.aup3"
+      }
+    ],
+    "expected": [
+      {
+        "type": "vm_file",
+        "path": "/home/user/Documents/long_test.wav",
+        "dest": "reference_long_test.wav"
+      },
+      {
+        "type": "rule",
+        "rules": {}
+      }
+    ],
+    "options": [
+      {
+        "expected_duration": 55.0,
+        "duration_tolerance": 0.5,
+        "silence_start": 20.0,
+        "silence_duration": 5.0,
+        "delete_start": 40.0,
+        "delete_end": 50.0,
+        "fade_in_duration": 3.0,
+        "fade_out_duration": 3.0,
+        "max_silence_rms_db": -40.0,
+        "correlation_threshold": 0.999999,
+        "max_normalized_rmse": 0.001
+      },
+      null
+    ],
+    "file": "evaluator.py"
+  },
+  "proxy": false,
+  "fixed_ip": false,
+  "possibility_of_env_change": "low"
+}

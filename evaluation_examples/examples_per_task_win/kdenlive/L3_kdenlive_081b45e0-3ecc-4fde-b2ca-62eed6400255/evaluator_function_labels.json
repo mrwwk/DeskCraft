@@ -1,0 +1,79 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_081b45e0-3ecc-4fde-b2ca-62eed6400255/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_title_text",
+      "lineno": 65
+    },
+    {
+      "name": "check_kdenlive_render_title_video_title",
+      "lineno": 233
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_get_mlt_service",
+      "lineno": 21
+    },
+    {
+      "name": "_get_property_value",
+      "lineno": 48
+    },
+    {
+      "name": "check_kdenlive_title_text",
+      "lineno": 65
+    },
+    {
+      "name": "_verify_render_output",
+      "lineno": 139
+    },
+    {
+      "name": "_extract_result_paths",
+      "lineno": 209
+    },
+    {
+      "name": "check_kdenlive_render_title_video_title",
+      "lineno": 233
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Kdenlive视频编辑任务的完成质量，核心验证两大方面：一是渲染输出的MP4视频文件必须在格式、编码和时长上满足要求；二是Kdenlive项目文件(.kdenlive)中必须包含指定的标题文本。具体而言，evaluator通过ffprobe检测MP4文件是否存在、非空、包含视频流、视频编码符合预期（如h264）、且时长达到最低阈值；同时解析项目文件的MLT XML结构，定位mlt_service为\"kdenlivetitle\"的producer或chain元素，提取其xmldata属性（内嵌SVG XML），检查其中是否包含预期的标题文字。最终判定采用\"全部满足\"的严格逻辑：渲染文件检查和所有标题文本检查必须同时通过，任一环节失败即判定任务未完成。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_title_text",
+        "lineno": 65,
+        "description": "该函数专门检查.kdenlive项目文件中是否包含指定文字的标题剪辑。检查对象：项目文件路径project_file_path与规则rule（含expected_text字段）。检查步骤：1) 验证文件存在性；2) 使用ET.parse解析MLT XML，遍历所有producer元素，通过_get_mlt_service获取mlt_service值，筛选出等于\"kdenlivetitle\"的元素；3) 对该元素调用_get_property_value提取\"xmldata\"属性（内容为SVG XML字符串），先对xmldata进行大小写不敏感的字符串包含匹配（expected_text.lower() in xmldata.lower()）；4) 若字符串匹配未命中，则尝试将xmldata作为SVG XML二次解析（ET.fromstring），遍历所有SVG元素，检查elem.text或elem.tail是否包含目标文本；5) 若producer中未找到，继续以同样逻辑遍历chain元素。判定依据：只要任意一个标题producer或chain的SVG数据中包含expected_text，即返回1.0；遍历完毕仍未找到，或发生XML解析错误、文件缺失等异常，则返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_render_title_video_title",
+        "lineno": 233,
+        "description": "该函数是复合评测入口，用于验证\"带标题的视频渲染\"任务的整体结果。检查对象：result_paths（支持multi:true的列表格式[output.mp4, project.kdenlive]，也支持单路径字符串）与rule（含min_duration、expected_codec、expected_titles等字段）。检查步骤：1) 调用_extract_result_paths从result_paths中分离出MP4渲染路径（render_path）和项目文件路径（project_path）；2) 调用_verify_render_output对MP4文件进行渲染质量验证，检查文件存在且非空、包含视频流、codec_name包含expected_codec（默认\"h264\"）、时长不小于min_duration（默认5.0秒）；3) 从rule获取expected_titles列表，对每个标题文字依次调用check_kdenlive_title_text(project_path, {\"expected_text\": title_text})进行项目文件内的标题核查。判定依据：采用\"全部满足\"的串联逻辑——_verify_render_output必须返回成功，且expected_titles中的每一个标题都必须在项目文件中被找到（每个都返回1.0），函数才返回1.0；若渲染验证失败、或任意一个标题未找到、或发生异常，立即返回0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_get_mlt_service",
+        "lineno": 20,
+        "description": "该函数用于从MLT XML元素（producer或chain）中解析mlt_service标识值。读取逻辑分两步：先直接读取元素的\"mlt_service\"属性；若属性不存在，则遍历该元素的所有子property元素，查找name属性等于\"mlt_service\"的property，返回其文本内容。返回值语义：字符串形式的mlt_service值，或None。该函数被check_kdenlive_title_text复用，用于识别哪些producer/chain是kdenlivetitle类型标题剪辑。"
+      },
+      {
+        "name": "_get_property_value",
+        "lineno": 44,
+        "description": "该函数用于从MLT XML元素的子property元素中按名称提取属性值。具体做法：遍历element.findall(\"property\")，匹配prop.get(\"name\") == property_name（如\"xmldata\"），返回第一个匹配property的文本内容。返回值语义：字符串形式的属性值，或None。该函数被check_kdenlive_title_text复用，用于提取标题剪辑内嵌的SVG XML数据（xmldata）。"
+      },
+      {
+        "name": "_verify_render_output",
+        "lineno": 131,
+        "description": "该函数通过调用系统ffprobe命令对渲染后的MP4文件进行技术质量验证。读取与解析：构造ffprobe命令（-print_format json -show_streams -show_format），通过subprocess.run执行并解析标准输出的JSON。比较与检查项包括：1) 文件存在且大小非零；2) 解析streams列表，确认存在codec_type为\"video\"的视频流；3) 比较视频流的codec_name（转小写后）是否包含expected_codec（默认\"h264\"）；4) 从video_stream或format_info中读取duration，转换为浮点数后判断是否大于等于min_duration（默认1.0秒）。返回值语义：(bool, str)元组，第一个值表示是否全部通过，第二个值为空字符串或错误描述。该函数被check_kdenlive_render_title_video_title调用，作为渲染文件合格性的核心判定器。"
+      },
+      {
+        "name": "_extract_result_paths",
+        "lineno": 188,
+        "description": "该函数是输入路径的格式适配器，用于统一处理result_paths的不同传入形式。逻辑：若result_paths为列表（对应multi:true结果配置），则取第0项作为render_path（MP4文件路径），第1项作为project_path（.kdenlive项目文件路径）；若result_paths为字符串（单文件结果），则整个字符串作为render_path，project_path设为None。返回值语义：(render_path, project_path)元组。该函数被check_kdenlive_render_title_video_title调用，负责在复合检查前分离视频文件与项目文件路径。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:09:59",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L3_kdenlive_081b45e0-3ecc-4fde-b2ca-62eed6400255/evaluator_function_labels.json"
+}

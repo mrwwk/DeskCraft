@@ -1,0 +1,86 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_bde97a2f-56de-4c6c-acd6-3aec3d25caff/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "enable_debug_logging",
+      "lineno": 26
+    },
+    {
+      "name": "get_all_text_shapes",
+      "lineno": 36
+    },
+    {
+      "name": "compare_pptx_files",
+      "lineno": 60
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于对两个PowerPoint文件（预期结果与实际输出）进行深度逐层比对，判定二者在结构、内容、格式及特殊布局上是否一致，最终返回1（完全匹配）或0（任一差异即失败）。它通过python-pptx库加载两份.pptx文件，采用严格的“一票否决”策略：首先比较幻灯片总数；随后逐幻灯片检查背景色、备注文本、形状总数；再逐形状比较位置与尺寸（支持默认0.5%相对容差的近似匹配，通过is_approximately_equal实现）、文本内容（strip后精确匹配）、表格结构（行列数、单元格段落与run级别格式）、段落对齐（None视为LEFT）、缩进级别、字体属性（名称、大小、粗体、斜体、颜色RGB、下划线、删除线）以及项目符号（通过XML解析提取并容忍level的None与'0'差异，忽略颜色差异）。此外，它还支持通过options开关多种特殊检查，如标题/表格/图片的特定位置约束、高度修改、图片尺寸、GROUP内文本形状对齐等。默认情况下绝大多数常规检查项开启，任何一项不匹配将立即返回0，全部通过方可返回1。",
+    "main_functions": [
+      {
+        "name": "enable_debug_logging",
+        "lineno": 26,
+        "description": "该函数为调试日志的启用开关。它检查全局debug_logger是否已设置DEBUG级别及StreamHandler，若无则添加一个带格式化字符串的流处理器，用于在控制台输出详细的比对过程日志。它本身不执行任何评测逻辑，仅在compare_pptx_files的enable_debug为True时被调用，为人工排查失败原因提供逐幻灯片、逐形状、逐run的差异明细。"
+      },
+      {
+        "name": "get_all_text_shapes",
+        "lineno": 36,
+        "description": "该函数接收一个slide对象，通过内部嵌套的extract_text_shapes递归函数，遍历slide.shapes以及GROUP类型shape内部的shapes，收集所有同时具备text和text_frame属性的shape，最终返回一个扁平化的文本shape列表。其核心作用是暴露嵌套在GROUP内部的文本容器，使compare_pptx_files能够在常规slide.shapes遍历之外，额外对这些文本shape进行对齐方式等检查，避免遗漏组合图形中的文本格式差异。"
+      },
+      {
+        "name": "compare_pptx_files",
+        "lineno": 60,
+        "description": "该函数是评测核心入口，接收file1_path（预期文件）、file2_path（实际文件）及options关键字参数。执行流程如下：1）使用Presentation加载两个PPTX；2）若enable_debug为True则调用enable_debug_logging输出比对日志；3）若examine_number_of_slides为True且幻灯片数量不等，立即返回0；4）逐幻灯片遍历，依次调用get_slide_background_color比对背景色、调用get_slide_notes比对备注文本（strip后精确匹配）；5）获取所有文本形状（含GROUP内）并检查形状总数是否一致；6）逐形状比对：先执行examine_title_bottom_position、examine_table_bottom_position、examine_right_position、examine_top_position、examine_shape_for_shift_size等特殊位置规则，再执行examine_shape（默认开启）对left/top/width/height进行近似相等检查（容差默认0.005），若此处失败会直接return 0，因此若任务需要检查examine_modify_height，必须显式将examine_shape设为False，否则后者永远不会被执行；7）对表格shape（MSO_SHAPE_TYPE.TABLE）深度比较行列数、单元格段落数、run数及run级字体颜色/粗体/斜体/下划线；8）对文本shape比较strip后的全文、段落数、逐段落的alignment（None视为PP_ALIGN.LEFT）、level、run数（空段落通过nonempty_runs归一化）、逐run的字体名称/大小/粗体（None与False等价）/斜体（None与False等价）/颜色RGB/下划线（None与True不等价）/删除线；9）通过_extract_bullets与_compare_bullets_with_tolerance检查项目符号；10）最后对text_shapes1与text_shapes2进行额外的文本内容与alignment检查。上述任一检查失败立即返回0，全部通过返回1。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "is_approximately_equal",
+        "lineno": 74,
+        "description": "该函数是通用数值近似比较器，接收val1、val2及可选tolerance（默认从外层options的approximately_tolerance获取，缺省0.005）。判定逻辑为：若两值绝对相等或同时为0则返回True；若仅其一为0则返回False；否则计算相对误差abs(val1-val2)/max(abs(val1),abs(val2))，当误差不超过tolerance时返回True。它被compare_pptx_files广泛用于比较形状的位置（left、top）和尺寸（width、height），以容忍浮点或单位转换导致的微小差异。"
+      },
+      {
+        "name": "nonempty_runs",
+        "lineno": 85,
+        "description": "该函数接收一个段落对象para，过滤掉其中r.text为None或strip后为空的run，仅返回包含可见文本的run列表。其核心作用是“归一化”空段落的run数量，避免预期文件与实际文件中空段落分别包含0个run和1个空run时被误判为结构不一致。它被compare_pptx_files在比较段落run数前调用，适用于普通文本shape和表格单元格内的段落。"
+      },
+      {
+        "name": "get_slide_background_color",
+        "lineno": 116,
+        "description": "该函数接收slide对象，读取slide.background.fill.type：若值为1（直接填充）则返回fill.fore_color.rgb；若值为5（继承母版）则进一步读取slide.slide_layout.slide_master.background.fill并返回其前景色rgb；其他情况返回None。它被compare_pptx_files用于逐幻灯片背景色比对，当examine_background_color为True时，任何差异都会导致返回0。"
+      },
+      {
+        "name": "get_slide_notes",
+        "lineno": 130,
+        "description": "该函数接收slide对象，尝试读取slide.notes_slide.notes_text_frame.text，若无备注则返回None。返回结果会在compare_pptx_files中被strip后用于精确字符串比较。当examine_note为True时，备注文本的任何差异都会导致评测返回0。"
+      },
+      {
+        "name": "_extract_bullets",
+        "lineno": 420,
+        "description": "该函数接收一个run的XML blob（utf-8解码后的字符串），使用xml.etree.ElementTree解析，遍历命名空间a:p下的段落，提取a:pPr中的lvl属性、buChar字符、buClr/a:srgbClr颜色值，并拼接段落内所有a:t节点的文本。仅保留text.strip()非空的段落，最终返回(lvl, char, text, color)元组列表。它是项目符号检查的基础解析器，被compare_pptx_files在examine_bullets为True时调用，用于从底层OpenXML数据中提取结构化的项目符号信息。"
+      },
+      {
+        "name": "_compare_bullets_with_tolerance",
+        "lineno": 450,
+        "description": "该函数接收两组由_extract_bullets生成的项目符号列表，进行带容忍度的比较：首先比较长度；然后逐对比较文本内容与项目符号字符是否完全一致；对lvl进行归一化（None视为'0'）后再比较；颜色差异则被显式忽略（注释说明不比较颜色）。若全部通过返回True，否则返回False。它被compare_pptx_files用于判定项目符号是否匹配，是文本格式检查链的最后一环。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:32:49",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/impr/L3_impr_bde97a2f-56de-4c6c-acd6-3aec3d25caff/evaluator_function_labels.json"
+}

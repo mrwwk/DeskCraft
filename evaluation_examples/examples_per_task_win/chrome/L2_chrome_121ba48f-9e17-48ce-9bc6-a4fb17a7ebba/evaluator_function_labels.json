@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_121ba48f-9e17-48ce-9bc6-a4fb17a7ebba/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "is_added_to_steam_cart",
+      "lineno": 7
+    },
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "is_added_to_steam_cart",
+      "lineno": 7
+    },
+    {
+      "name": "is_expected_url_pattern_match",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证Chrome浏览器环境下任务执行后的页面状态与导航结果。它通过检查浏览器活动标签页（active_tab_info）的两类核心信息来判定任务是否完成：一是页面文本内容（content字段）中是否完整包含指定的商品名称或关键词条目（主要用于验证Steam购物车等场景），二是当前页面URL是否完全匹配一组预期的正则表达式模式。两个检查维度均采用严格的0/1评分机制，即所有指定条件必须全部满足才能返回1.0（成功），任一条件不满足即返回0.0（失败）。检查对象直接依赖于外部传入的活动标签页信息字典或URL字符串，无需额外读取本地文件。",
+    "main_functions": [
+      {
+        "name": "is_added_to_steam_cart",
+        "lineno": 7,
+        "description": "该函数接收active_tab_info（当前活动标签页信息字典）和rule（评测规则字典）作为输入。首先检查active_tab_info是否存在且有效；随后从rule中提取items列表（预期应出现在页面中的商品或文本条目）；接着从active_tab_info中读取content字段（即页面文本内容）。函数通过遍历items列表，逐一检查每个item字符串是否都存在于content中。判定依据为：若所有item均在页面内容中找到，则返回1.0；若active_tab_info缺失、content为空、items为空，或任一item未在content中出现，则立即返回0.0。该函数用于验证Steam购物车等页面是否成功添加了指定商品，采用“全部满足”的硬性判定逻辑，无近似匹配或容错阈值。"
+      },
+      {
+        "name": "is_expected_url_pattern_match",
+        "lineno": 31,
+        "description": "该函数接收result（当前页面URL信息，可以是字符串URL或包含'url'键的字典）和rules（评测规则字典）作为输入。首先对result进行格式校验与URL提取：若result为字符串则直接使用，若为字典则提取其'url'字段，否则返回0.0。随后从rules的\"expected\"键中获取正则表达式模式列表。函数遍历所有pattern，使用re.search逐一检查每个正则模式是否在结果URL中匹配。判定依据为：只有当所有预期正则模式均能在URL中找到匹配时，才返回1.0；若result为空、格式非法、expected模式列表为空，或任一pattern匹配失败，则立即返回0.0。该函数采用严格的“全部满足”逻辑，要求URL必须同时通过所有正则规则的检验。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 15:07:12",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/chrome/L2_chrome_121ba48f-9e17-48ce-9bc6-a4fb17a7ebba/evaluator_function_labels.json"
+}

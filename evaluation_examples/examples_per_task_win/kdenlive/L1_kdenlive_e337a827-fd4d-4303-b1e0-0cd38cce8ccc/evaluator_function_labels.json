@@ -1,0 +1,42 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_e337a827-fd4d-4303-b1e0-0cd38cce8ccc/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_kdenlive_snapshot_exists",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_file_exists",
+      "lineno": 75
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_kdenlive_snapshot_exists",
+      "lineno": 21
+    },
+    {
+      "name": "check_kdenlive_file_exists",
+      "lineno": 75
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于Kdenlive的L1快照与项目保存任务，总体验证两大核心产物是否成功生成。第一，检查Videos/目录下快照PNG文件的数量是否达到rule中规定的最小值（默认至少1个），通过解析shell命令输出字符串中的数字进行计数比对。第二，检查保存的.kdenlive项目文件是否成功落盘、文件非空，且默认情况下验证其是否为格式良好的XML文件（可通过rule中的valid_xml关闭XML校验）。两个主函数各自独立执行、独立打分，均返回1.0表示该单项检查通过，0.0表示失败；任务的整体完成度取决于调用方如何组合这两个函数的得分。",
+    "main_functions": [
+      {
+        "name": "check_kdenlive_snapshot_exists",
+        "lineno": 21,
+        "description": "接收shell命令输出字符串command_output（例如执行`ls *.png | wc -l`后的结果）和rule字典。首先读取rule中的min_count（默认为1）。若command_output为None，直接返回0.0判失败。接着将输出转为字符串并去除空白，优先尝试将整个字符串转为整数作为文件数量；若失败，则使用正则表达式r'/d+'提取输出中的第一个数字序列作为count。若仍无法提取任何数字，则记录错误并返回0.0。最后将解析出的count与min_count进行数值比较：当count >= min_count时返回1.0，否则返回0.0。任何异常捕获后均返回0.0。"
+      },
+      {
+        "name": "check_kdenlive_file_exists",
+        "lineno": 75,
+        "description": "接收.kdenlive项目文件路径project_file_path（由vm_file getter提供）和rule字典。首先检查project_file_path是否为None或该路径在磁盘上不存在，若满足任一条件则返回0.0。再使用os.path.getsize检查文件大小是否为0字节，空文件判失败并返回0.0。随后从rule中读取valid_xml（默认为True）。若开启XML校验，调用xml.etree.ElementTree.parse解析该文件，并检查返回的根节点root是否为None；若解析过程中抛出ET.ParseError或root为None，则记录错误并返回0.0。若文件存在、非空且XML校验通过（或无需校验），则返回1.0。任何外层异常捕获后均返回0.0。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:04:12",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/kdenlive/L1_kdenlive_e337a827-fd4d-4303-b1e0-0cd38cce8ccc/evaluator_function_labels.json"
+}

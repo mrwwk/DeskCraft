@@ -1,0 +1,165 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_perfume_listing_workflow_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "has_transparency",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 35
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 72
+    },
+    {
+      "name": "check_transparency_exists",
+      "lineno": 97
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 122
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 159
+    },
+    {
+      "name": "check_subject_scale_and_center",
+      "lineno": 237
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 300
+    },
+    {
+      "name": "check_l2_perfume_listing_complete",
+      "lineno": 375
+    },
+    {
+      "name": "check_interactive_gimp_perfume_listing_complete",
+      "lineno": 405
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "has_transparency",
+      "lineno": 23
+    },
+    {
+      "name": "check_image_dimensions",
+      "lineno": 35
+    },
+    {
+      "name": "check_png_format",
+      "lineno": 72
+    },
+    {
+      "name": "check_transparency_exists",
+      "lineno": 97
+    },
+    {
+      "name": "check_file_exists",
+      "lineno": 122
+    },
+    {
+      "name": "_build_foreground_mask",
+      "lineno": 140
+    },
+    {
+      "name": "check_xcf_layers_structure",
+      "lineno": 159
+    },
+    {
+      "name": "check_subject_scale_and_center",
+      "lineno": 237
+    },
+    {
+      "name": "check_soft_shadow_presence",
+      "lineno": 300
+    },
+    {
+      "name": "_all_binary_checks_pass",
+      "lineno": 367
+    },
+    {
+      "name": "check_l2_perfume_listing_complete",
+      "lineno": 375
+    },
+    {
+      "name": "check_interactive_gimp_perfume_listing_complete",
+      "lineno": 405
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该evaluator用于验证GIMP交互式任务\"perfume_listing\"（香水商品透明底图制作）的最终完成质量。它要求用户产出两个核心产物：一张1200×1200像素的透明背景PNG商品图，以及保留图层结构的XCF源文件。评测采用严格的\"全或无\"二进制判定逻辑：对PNG依次检查文件存在性、格式是否为PNG、是否存在透明通道、尺寸是否达标、商品主体是否占据合理画面比例且水平居中、主体下方是否存在柔和阴影；对XCF检查是否包含\"Product\"、\"Shadow\"、\"Guide_BG\"三个图层（不要求顺序）。以上7项检查必须全部通过，evaluator才返回1.0（成功），任一失败即返回0.0（失败）。",
+    "main_functions": [
+      {
+        "name": "has_transparency",
+        "lineno": 23,
+        "description": "检查PIL图像对象是否包含实际透明像素。若图像模式为RGBA，提取alpha通道并检查是否存在任何小于255的像素值；若模式为P且info中包含transparency键，也视为有透明。返回布尔值。该函数被check_transparency_exists调用，用于判定PNG是否真正存在透明区域而非仅带有alpha通道。"
+      },
+      {
+        "name": "check_image_dimensions",
+        "lineno": 35,
+        "description": "验证指定图片文件的宽高是否匹配预期值。使用PIL打开图像，计算实际宽度与expected_width的绝对差，若不超过tolerance（默认5像素）则宽度通过；若提供了expected_height，则同样检查高度。只有宽高均满足容差时才返回1，否则返回0。在perfume任务中被调用以验证PNG是否为1200×1200。"
+      },
+      {
+        "name": "check_png_format",
+        "lineno": 72,
+        "description": "验证文件是否为有效PNG格式。使用PIL打开图像后，检查img.format是否等于字符串'PNG'。若文件不存在或读取失败则返回0。用于确保最终交付图像是PNG格式而非其他扩展名。"
+      },
+      {
+        "name": "check_transparency_exists",
+        "lineno": 97,
+        "description": "验证图片文件中是否存在透明区域。调用PIL打开图像，再调用has_transparency检查alpha通道。若图像包含透明像素（alpha<255）或调色板模式带有透明索引，则返回1，否则返回0。用于确认商品图背景已被抠除或透明化。"
+      },
+      {
+        "name": "check_file_exists",
+        "lineno": 122,
+        "description": "最基础的文件存在性检查。使用os.path.isfile判断给定路径是否为文件。若路径为None或文件不存在返回0，存在返回1。用于确认PNG和XCF等结果文件已实际生成。"
+      },
+      {
+        "name": "check_xcf_layers_structure",
+        "lineno": 159,
+        "description": "检查GIMP的XCF源文件是否包含指定的图层结构。rule参数中layers为必须存在的图层名列表，ordered控制是否要求顺序一致。实现分为两层：优先尝试用gimpformats库解析XCF，提取所有图层名并检查是否包含全部expected_layers；若ordered为True，还要求这些图层在文件中的出现顺序与列表顺序一致（索引递增）。若gimpformats解析失败或不可用，则回退到二进制字节搜索，在文件内容中查找每个图层名的UTF-8编码字节串位置，同样支持ordered校验。文件必须以b'gimp xcf'开头才被视为有效XCF。全部满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_subject_scale_and_center",
+        "lineno": 237,
+        "description": "检查商品主体在画面中的占比和居中程度。首先调用_build_foreground_mask构建前景遮罩（优先使用alpha通道，否则使用非白像素）；然后计算前景像素的包围盒bbox。要求bbox高度占整图高度的比例在min_height_ratio与max_height_ratio之间（默认0.65-0.85），且bbox中心与图像中心的水平偏差比例不超过center_tolerance_ratio（默认0.12），垂直偏差放宽至该值的1.8倍以内。在perfume任务中采用更严格的参数（高度比0.68-0.84，中心容忍0.14）。全部满足返回1，否则返回0。"
+      },
+      {
+        "name": "check_soft_shadow_presence",
+        "lineno": 300,
+        "description": "检查商品主体下方是否存在柔和阴影。将图像转为RGBA，以alpha>180的像素作为前景，确定主体底部边界y1。在y1下方划定一个搜索带（高度至少8像素或图像高度的1/5），水平方向向左右扩展主体宽度的1/8（至少10像素）。在该区域内统计半透明像素（alpha在alpha_low到alpha_high之间，默认20-220）所占比例。若比例低于min_shadow_ratio（默认0.01），则启用回退逻辑：检查该区域内是否存在非纯白、平均亮度<220且饱和度<20的灰黑色像素，视为白色背景上的不透明阴影。任一方式达到阈值即返回1，否则返回0。"
+      },
+      {
+        "name": "check_l2_perfume_listing_complete",
+        "lineno": 375,
+        "description": "综合评测入口，采用\"全通过\"的二进制评分机制。要求result_paths为长度至少3的列表，依次取png_path、xcf_path、_src_path。然后顺序执行7项独立检查：1) check_file_exists(png_path) — PNG存在；2) check_png_format(png_path) — PNG格式；3) check_transparency_exists(png_path) — 存在透明；4) check_image_dimensions(png_path, 1200, 1200) — 尺寸1200×1200（容差5像素）；5) check_subject_scale_and_center(png_path, {min_height_ratio:0.68, max_height_ratio:0.84, center_tolerance_ratio:0.14}) — 主体占比与居中；6) check_soft_shadow_presence(png_path, {min_shadow_ratio:0.008}) — 底部柔和阴影；7) check_xcf_layers_structure(xcf_path, {layers:[\"Product\",\"Shadow\",\"Guide_BG\"], ordered:False}) — XCF包含三个指定图层（不要求顺序）。将7个0/1结果收集为scores，调用_all_binary_checks_pass。仅当所有检查均为1时返回1.0，否则返回0.0。"
+      },
+      {
+        "name": "check_interactive_gimp_perfume_listing_complete",
+        "lineno": 405,
+        "description": "交互式任务的包装器/入口函数。直接透传result_paths给check_l2_perfume_listing_complete，不做任何额外处理，返回值与其完全一致。用于适配交互式评测框架的调用约定。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_build_foreground_mask",
+        "lineno": 143,
+        "description": "为商品图构建粗略的前景遮罩，服务于主体占比与居中检查。将图像统一转为RGBA模式。若alpha通道中存在任何小于250的像素，说明图像带有透明信息，此时以alpha>alpha_threshold（默认40）作为前景mask；否则退回到基于颜色的判断，将RGB三通道并非全部大于white_threshold（默认245）的像素视为前景。返回二维布尔numpy数组。"
+      },
+      {
+        "name": "_all_binary_checks_pass",
+        "lineno": 363,
+        "description": "二进制检查聚合器。接收scores列表，过滤掉None值后，要求所有有效分数均大于等于1.0才返回1.0；若列表为空或存在任何低于1.0的分数，则返回0.0。该函数实现了perfume任务的\"全或无\"判定逻辑，被check_l2_perfume_listing_complete用于最终打分。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 15:11:42",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/gimp/INTERACTIVE_gimp_interactive_gimp_perfume_listing_workflow_001/evaluator_function_labels.json"
+}

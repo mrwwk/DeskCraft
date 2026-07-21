@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_001/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_include_exclude",
+      "lineno": 36
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定任务 INTERACTIVE_multi_app_interactive_multiapp_c2w_001 的输出结果是否满足严格的内容合规要求。其核心检查对象是一个字符串 result，评测依据是外部传入的 rules 字典中的 include（必须包含的子串列表）和 exclude（必须排除的子串列表）。检查方式为精确子串匹配：result 必须同时包含所有 include 项，且不能包含任何 exclude 项。若 result 为 None，直接判定失败；若任一 include 子串缺失或任一 exclude 子串出现，也判定失败。成功判定采用非此即彼的二值机制，只有双重要求全部满足时才返回 1 分，否则返回 0 分。",
+    "main_functions": [
+      {
+        "name": "check_include_exclude",
+        "lineno": 36,
+        "description": "该函数接收 result（待验证的字符串）和 rules（规则字典）作为输入，返回 float 类型的分数。执行步骤如下：1）若 result 为 None，直接返回 0.0；2）打印 result 与 rules 的内容；3）从 rules 中取出 include 列表（键名为 include，默认为空列表）和 exclude 列表（键名为 exclude，默认为空列表）；4）使用 all(r in result for r in include) 检查 result 是否包含所有必须出现的子串；5）使用 all(r not in result for r in exclude) 检查 result 是否不包含任何禁止出现的子串；6）仅当步骤 4 和步骤 5 同时成立时返回 1.0，否则返回 0.0。该函数是严格的二值判定器，无近似匹配、无部分得分。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:12:20",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/multi_app/INTERACTIVE_multi_app_interactive_multiapp_c2w_001/evaluator_function_labels.json"
+}

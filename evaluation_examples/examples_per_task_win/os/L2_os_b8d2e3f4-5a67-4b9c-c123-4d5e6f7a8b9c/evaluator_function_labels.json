@@ -1,0 +1,39 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_b8d2e3f4-5a67-4b9c-c123-4d5e6f7a8b9c/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_os_disk_cleanup",
+      "lineno": 31
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "_parse_kv",
+      "lineno": 18
+    },
+    {
+      "name": "check_os_disk_cleanup",
+      "lineno": 31
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于验证磁盘清理（disk cleanup）任务的执行结果。它通过读取 shell 收集器输出的 key=value 格式文本，并与任务规则中预设的检查项进行精确比对，来判断任务是否成功完成。核心检查对象是 result 字符串中解析出的各个键值对，主要比较方式为字符串精确相等（==）匹配。成功判定的总体思路为：从 rules 字典中提取名为 \"checks\" 的子字典，要求实际结果中每一个预期键对应的值都必须与预期值完全一致；只有全部检查项均满足时才返回 1.0，若任意一项不匹配或在处理过程中发生异常，则返回 0.0。这是一种严格的“全部满足”式通过/失败评分逻辑。",
+    "main_functions": [
+      {
+        "name": "check_os_disk_cleanup",
+        "lineno": 31,
+        "description": "该函数接收 result（shell 收集器输出的原始文本字符串）与 rules（包含预期检查规则的字典）作为输入。其测试逻辑如下：首先调用辅助函数 _parse_kv 将 result 解析为字典；随后从 rules 中获取键为 \"checks\" 的子字典；接着遍历该子字典中的每一个 key 与 expected 值，使用精确相等判断比对解析后字典中对应键的实际值；若存在任意一项不匹配，立即返回 0.0；若所有检查项均完全匹配，则返回 1.0。整个判定采用“全部满足”原则。此外，函数通过 try-except 包裹核心逻辑，若解析或比对过程中抛出任何异常，将记录错误日志并返回 0.0。"
+      }
+    ],
+    "helper_functions": [
+      {
+        "name": "_parse_kv",
+        "lineno": 17,
+        "description": "该函数负责将 shell 输出的原始文本转换为可供比对的字典数据结构。具体流程为：若输出为空或不存在，直接返回空字典；否则按换行符分割文本，对每行去除首尾空白后，仅保留包含 \"=\" 的行；对每行以第一个等号为界分割为键和值，并分别去除首尾空白，最终存入字典返回。该解析器通常被磁盘清理类检查复用，用于标准化 shell 命令返回的 key=value 格式结果，以便主函数进行逐项精确匹配。"
+      }
+    ]
+  },
+  "created_at": "2026-07-01 16:35:06",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/os/L2_os_b8d2e3f4-5a67-4b9c-c123-4d5e6f7a8b9c/evaluator_function_labels.json"
+}

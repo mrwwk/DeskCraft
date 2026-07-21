@@ -1,0 +1,29 @@
+{
+  "filepath": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_7c4cc09e-7a92-40dd-8338-b2286535c4ed/evaluator.py",
+  "main_function_candidates": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    }
+  ],
+  "all_top_level_functions": [
+    {
+      "name": "check_json_settings",
+      "lineno": 25
+    }
+  ],
+  "source_was_condensed": false,
+  "label": {
+    "overall_validation": "该 evaluator 用于判定 VS Code 配置类任务的完成度。其核心验证逻辑是：读取任务执行后生成的 JSON 配置文件（通常为 settings.json 或类似 VS Code 工作区配置），检查文件能否被正常解析，并验证其中是否精确包含一组预期的键值对。比较方式为严格的逐键值完全相等匹配（==），不接受近似值、类型隐式转换或部分匹配。评分采用二元制：仅当文件存在、JSON 合法、且预期字典中的每一个键都在实际 JSON 中存在且值完全一致时，返回 1.0（成功）；若文件路径为空、读取失败、解析异常、缺少任意预期键或任意值不相等，则返回 0.0（失败）。这是一种\"全有或全无\"的精确匹配判定策略。",
+    "main_functions": [
+      {
+        "name": "check_json_settings",
+        "lineno": 25,
+        "description": "该主函数是评测的入口，负责验证实际 JSON 配置文件是否符合预期设置。它接收两个参数：actual 为字符串，表示实际结果 JSON 文件的绝对或相对路径；expected 为字典，其中必须包含键 \"expected\"，其值为待验证的配置项字典。函数依次执行以下检查：首先判断 actual 是否为空，若为空直接返回 0.0；随后尝试打开该路径文件并使用 json.load 解析为 Python 字典，若文件不存在或 JSON 格式非法则捕获异常并返回 0.0；接着从 expected['expected'] 提取预期键值对；最后遍历所有预期项，逐一检查实际解析出的 data 字典中是否存在对应 key 且 data[key] 与预期 value 完全相等（使用 != 判断）。遍历过程中一旦发现某个键缺失或值不匹配，立即返回 0.0；只有全部键值对均精确匹配成功，才返回 1.0。该函数不涉及近似匹配、顺序检查或嵌套对象的递归比较，仅做顶层键值的严格相等判定。"
+      }
+    ],
+    "helper_functions": []
+  },
+  "created_at": "2026-07-01 16:44:38",
+  "output_path": "/apdcephfs_sh2/share_300000800/user/jackwkwang/long-horizon-tasks/DeskCraft/evaluation_examples/examples_per_task/vscode/L1_vscode_7c4cc09e-7a92-40dd-8338-b2286535c4ed/evaluator_function_labels.json"
+}
