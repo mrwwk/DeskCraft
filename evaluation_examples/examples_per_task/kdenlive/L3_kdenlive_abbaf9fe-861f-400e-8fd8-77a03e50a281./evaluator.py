@@ -388,3 +388,57 @@ def check_kdenlive_render_speed_ramp(result_paths, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_speed_ramp error: {e}")
         return 0.0
+
+
+def check_kdenlive_render_speed_ramp_precise(result_paths, rule):
+    try:
+        if check_kdenlive_render_speed_ramp(result_paths, rule) < 1.0:
+            return 0.0
+        render_path, project_path = _extract_result_paths(result_paths)
+        if project_path is None or not os.path.exists(project_path):
+            return 0.0
+        source_file = rule.get('source_file', '')
+        split_time = float(rule.get('split_time', 3.0))
+        split_tolerance = float(rule.get('split_tolerance', 0.75))
+        tree = ET.parse(project_path)
+        root = tree.getroot()
+        profile = root.find('.//profile')
+        fps = 25.0
+        if profile is not None:
+            try:
+                fps = float(profile.get('frame_rate_num', profile.get('frame_rate', '25'))) / float(profile.get('frame_rate_den', '1'))
+            except Exception:
+                pass
+        producer_ids = set()
+        for elem in list(root.iter('producer')) + list(root.iter('chain')):
+            elem_id = elem.get('id', '')
+            resource = _get_property_value(elem, 'resource')
+            if elem_id and resource and source_file in resource:
+                producer_ids.add(elem_id)
+        starts = []
+        for playlist in root.iter('playlist'):
+            playlist_id = playlist.get('id', '')
+            if 'bin' in playlist_id.lower():
+                continue
+            current_pos_frames = 0.0
+            for child in playlist:
+                if child.tag == 'blank':
+                    try:
+                        current_pos_frames += float(child.get('length', '0'))
+                    except ValueError:
+                        pass
+                    continue
+                if child.tag != 'entry':
+                    continue
+                producer_ref = child.get('producer', '')
+                try:
+                    duration = float(child.get('out', '0')) - float(child.get('in', '0')) + 1.0
+                except ValueError:
+                    duration = 0.0
+                if producer_ref in producer_ids:
+                    starts.append(current_pos_frames / fps if fps else current_pos_frames)
+                current_pos_frames += duration
+        return 1.0 if any(start > 0.01 and abs(start - split_time) <= split_tolerance for start in starts) else 0.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_render_speed_ramp_precise error: {e}")
+        return 0.0

@@ -165,3 +165,30 @@ def check_kdenlive_render_custom_resolution(result_file_path, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_custom_resolution error: {e}")
         return 0.0
+
+def check_kdenlive_title_text(project_file_path, rule):
+    try:
+        if project_file_path is None or not os.path.exists(project_file_path):
+            logger.error(f"Project file not found: {project_file_path}")
+            return 0.0
+        expected_text = rule.get("expected_text", "")
+        if not expected_text:
+            return 0.0
+        tree = ET.parse(project_file_path)
+        root = tree.getroot()
+        for producer in root.iter("producer"):
+            service = _get_mlt_service(producer)
+            if service and service.lower() == "kdenlivetitle":
+                xmldata = _get_property_value(producer, "xmldata")
+                if xmldata and expected_text.lower() in xmldata.lower():
+                    return 1.0
+        for chain in root.iter("chain"):
+            service = _get_mlt_service(chain)
+            if service and service.lower() == "kdenlivetitle":
+                xmldata = _get_property_value(chain, "xmldata")
+                if xmldata and expected_text.lower() in xmldata.lower():
+                    return 1.0
+        return 0.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_title_text error: {e}")
+        return 0.0

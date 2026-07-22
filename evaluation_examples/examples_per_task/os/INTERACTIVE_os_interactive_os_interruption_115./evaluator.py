@@ -117,3 +117,11 @@ def check_manifest(manifest_path, expected=None, **options):
 
     logger.info("manifest.txt validation passed")
     return 1.0
+
+
+def check_include_exclude(result: str, rules: dict) -> float:
+    if result is None:
+        return 0.0
+    include = rules.get('include', [])
+    exclude = rules.get('exclude', [])
+    return 1.0 if all(token in result for token in include) and all(token not in result for token in exclude) else 0.0

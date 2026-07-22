@@ -115,3 +115,26 @@ def check_kdenlive_render_custom_resolution(result_file_path, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_custom_resolution error: {e}")
         return 0.0
+
+
+def check_kdenlive_render_and_project_resolution(result_paths, rule):
+    try:
+        if not isinstance(result_paths, list) or len(result_paths) < 2:
+            return 0.0
+        render_path, project_path = result_paths[0], result_paths[1]
+        if check_kdenlive_render_custom_resolution(render_path, rule) < 1.0:
+            return 0.0
+        if project_path is None or not os.path.exists(project_path):
+            return 0.0
+        root = ET.parse(project_path).getroot()
+        profile = root.find('.//profile')
+        if profile is None:
+            return 0.0
+        expected_width = int(rule.get('expected_width', 0) or 0)
+        expected_height = int(rule.get('expected_height', 0) or 0)
+        actual_width = int(profile.get('width', '0') or 0)
+        actual_height = int(profile.get('height', '0') or 0)
+        return 1.0 if actual_width == expected_width and actual_height == expected_height else 0.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_render_and_project_resolution error: {e}")
+        return 0.0
