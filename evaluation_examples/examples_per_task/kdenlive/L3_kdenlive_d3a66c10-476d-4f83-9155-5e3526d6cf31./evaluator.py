@@ -3733,3 +3733,114 @@ def check_kdenlive_render_color_grading(result_paths, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_color_grading error: {e}")
         return 0.0
+
+
+def check_kdenlive_render_audio_mix_precise(result_paths, rule):
+    try:
+        if check_kdenlive_render_audio_mix(result_paths, rule) < 1.0:
+            return 0.0
+        render_path, project_path = _extract_result_paths(result_paths)
+        if project_path is None or not os.path.exists(project_path):
+            return 0.0
+        sound_effect_file = rule.get('sound_effect_file', '')
+        expected_track_type = rule.get('sound_effect_track_type', 'audio')
+        expected_track_number = int(rule.get('sound_effect_track_number', 2) or 2)
+        expected_start = float(rule.get('sound_effect_start', 2.0))
+        tolerance = float(rule.get('sound_effect_tolerance', 0.5))
+        tree = ET.parse(project_path)
+        root = tree.getroot()
+        playlists = {pl.get('id', ''): pl for pl in root.iter('playlist') if pl.get('id')}
+        profile = root.find('.//profile')
+        fps = 25.0
+        if profile is not None:
+            try:
+                fps = float(profile.get('frame_rate_num', profile.get('frame_rate', '25'))) / float(profile.get('frame_rate_den', '1'))
+            except Exception:
+                pass
+        producer_resources = {}
+        for elem in list(root.iter('producer')) + list(root.iter('chain')):
+            elem_id = elem.get('id', '')
+            resource = _get_property_value(elem, 'resource')
+            if elem_id and resource:
+                producer_resources[elem_id] = resource
+        def resolve_playlist_ids(prod_ref, visited=None):
+            if not prod_ref:
+                return set()
+            if visited is None:
+                visited = set()
+            if prod_ref in visited:
+                return set()
+            visited.add(prod_ref)
+            if prod_ref in playlists:
+                return {prod_ref}
+            for tractor in root.iter('tractor'):
+                if tractor.get('id', '') == prod_ref:
+                    result = set()
+                    for track in tractor.findall('track'):
+                        result |= resolve_playlist_ids(track.get('producer', ''), visited)
+                    return result
+            return set()
+        main_tractor = None
+        for tractor in root.iter('tractor'):
+            clipname = _get_property_value(tractor, 'kdenlive:clipname')
+            if clipname and 'sequence' in clipname.lower():
+                main_tractor = tractor
+                break
+        if main_tractor is None:
+            tractors = list(root.iter('tractor'))
+            if tractors:
+                main_tractor = tractors[-1]
+        track_map = {}
+        if main_tractor is not None:
+            audio_num = 0
+            video_num = 0
+            for track in main_tractor.findall('track'):
+                prod_ref = track.get('producer', '')
+                if not prod_ref or 'black' in prod_ref.lower():
+                    continue
+                resolved = resolve_playlist_ids(prod_ref)
+                if not resolved:
+                    continue
+                is_audio = any(playlists.get(pid) is not None and _get_property_value(playlists.get(pid), 'kdenlive:audio_track') is not None for pid in resolved)
+                if is_audio:
+                    audio_num += 1
+                    assigned = ('audio', audio_num)
+                else:
+                    video_num += 1
+                    assigned = ('video', video_num)
+                for pid in resolved:
+                    track_map[pid] = assigned
+        for playlist in root.iter('playlist'):
+            playlist_id = playlist.get('id', '')
+            if 'bin' in playlist_id.lower():
+                continue
+            assigned = track_map.get(playlist_id)
+            current_pos_frames = 0.0
+            for child in playlist:
+                if child.tag == 'blank':
+                    try:
+                        current_pos_frames += float(child.get('length', '0'))
+                    except ValueError:
+                        pass
+                    continue
+                if child.tag != 'entry':
+                    continue
+                producer_ref = child.get('producer', '')
+                resource = producer_resources.get(producer_ref, '')
+                if not resource:
+                    for elem_id, res in producer_resources.items():
+                        if elem_id in producer_ref:
+                            resource = res
+                            break
+                try:
+                    duration = float(child.get('out', '0')) - float(child.get('in', '0')) + 1.0
+                except ValueError:
+                    duration = 0.0
+                start_sec = current_pos_frames / fps if fps else current_pos_frames
+                if resource and sound_effect_file in resource and assigned == (expected_track_type, expected_track_number) and abs(start_sec - expected_start) <= tolerance:
+                    return 1.0
+                current_pos_frames += duration
+        return 0.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_render_audio_mix_precise error: {e}")
+        return 0.0

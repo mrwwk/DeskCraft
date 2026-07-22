@@ -75,7 +75,7 @@
     "func": "exact_match",
     "result": {
       "type": "vm_command_line",
-      "command": "python -c \"from pathlib import Path; import zipfile; base=Path('/home/user/Desktop/ui_release_202'); z=base/'final_bundle.zip'; ok=(base/'package/card.png').exists() and (base/'package/chart.png').exists() and not (base/'package/draft_old.png').exists() and (base/'config/tokens.json').exists() and z.exists(); names=set();\nif ok:\n names=set(zipfile.ZipFile(z).namelist());\n req={'package/card.png','package/chart.png','config/tokens.json'}; bad=any(name.endswith('draft_old.png') for name in names); ok=ok and req.issubset(names) and not bad;\nprint('PASS' if ok else 'FAIL')\"",
+      "command": "python -c \"from pathlib import Path; import zipfile; base=Path('/home/user/Desktop/ui_release_202'); z=base/'final_bundle.zip'; ok=(base/'package/card.png').exists() and (base/'package/chart.png').exists() and not (base/'package/draft_old.png').exists() and not (base/'package/tokens.json').exists() and (base/'config/tokens.json').exists() and z.exists(); names=set();\nif ok:\n names=set(zipfile.ZipFile(z).namelist());\n required={'package/card.png','package/chart.png','config/tokens.json'}; bad=('package/tokens.json' in names) or any(name.endswith('draft_old.png') for name in names); ok=ok and required.issubset(names) and not bad;\nprint('PASS' if ok else 'FAIL')\"",
       "shell": true
     },
     "expected": {

@@ -42,8 +42,8 @@
     "postconfig": [],
     "func": [
       "check_kdenlive_import_multiple_files",
-      "check_kdenlive_add_to_timeline",
-      "check_kdenlive_add_to_timeline",
+      "check_kdenlive_clip_on_specific_track",
+      "check_kdenlive_clip_on_specific_track",
       "check_kdenlive_clip_group"
     ],
     "conj": "and",
@@ -83,13 +83,17 @@
       {
         "type": "rule",
         "rules": {
-          "expected_file": "6533277-hd_1920_1080_24fps.mp4"
+          "expected_file": "6533277-hd_1920_1080_24fps.mp4",
+          "expected_track_type": "video",
+          "expected_track_number": 1
         }
       },
       {
         "type": "rule",
         "rules": {
-          "expected_file": "mixkit-fast-rocket-whoosh-1714.wav"
+          "expected_file": "mixkit-fast-rocket-whoosh-1714.wav",
+          "expected_track_type": "audio",
+          "expected_track_number": 1
         }
       },
       {

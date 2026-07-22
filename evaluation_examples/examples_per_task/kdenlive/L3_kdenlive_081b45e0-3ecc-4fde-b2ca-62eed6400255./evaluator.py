@@ -279,3 +279,26 @@ def check_kdenlive_render_title_video_title(result_paths, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_title_video_title error: {e}")
         return 0.0
+
+
+def check_kdenlive_render_title_video_title_precise(result_paths, rule):
+    try:
+        if check_kdenlive_render_title_video_title(result_paths, rule) < 1.0:
+            return 0.0
+        render_path, project_path = _extract_result_paths(result_paths)
+        root, parse_err = _load_project_xml(project_path)
+        if root is None:
+            logger.error(f"Project file load failed: {parse_err}")
+            return 0.0
+        transition_type = (rule.get('transition_type', 'luma') or 'luma').lower()
+        min_transitions = int(rule.get('min_transitions', 1) or 1)
+        count = 0
+        for elem in list(root.iter('transition')) + list(root.iter('link')):
+            service = (_get_mlt_service(elem) or '').lower()
+            kdenlive_id = (_get_property_value(elem, 'kdenlive_id') or '').lower()
+            if service == transition_type or transition_type in kdenlive_id:
+                count += 1
+        return 1.0 if count >= min_transitions else 0.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_render_title_video_title_precise error: {e}")
+        return 0.0
