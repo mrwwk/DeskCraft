@@ -49,21 +49,22 @@
     "os"
   ],
   "evaluator": {
-    "func": "check_manifest",
+    "func": "check_include_exclude",
     "file": "evaluator.py",
     "result": {
-      "type": "vm_file",
-      "path": "/home/user/Desktop/press_pick/manifest.txt",
-      "dest": "manifest.txt"
+      "type": "vm_command_line",
+      "command": "python -c \"from pathlib import Path; import hashlib; out=Path('/home/user/Desktop/press_pick'); allowed=['event/a.jpg','event/stage/speaker.jpg']; files=sorted(str(p.relative_to(out)) for p in out.rglob('*.jpg')) if out.exists() else []; manifest=(out/'manifest.txt').read_text(encoding='utf-8').strip() if (out/'manifest.txt').exists() else ''; lines=[]; ok=(files==allowed); bad=(out/'event/private/vip.jpg').exists() or (out/'event/stage/speaker_raw.jpg').exists();\nfor rel in allowed:\n p=out/rel; ok=ok and p.exists(); lines.append(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {rel}');\nprint('PASS' if ok and not bad and manifest=='\\n'.join(lines) else 'FAIL')\"",
+      "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
-        "expected_entries": [
-          ["53188f5b4d938b4796d5422ca6b354a2bd749efd5000653c9f0b282ac77cf646", "event/a.jpg"],
-          ["268879c9f7daa1a81f1c2087e5d95805eddbcfe9e95bc0a7d92be62e0ce9183e", "event/stage/speaker.jpg"]
+        "include": [
+          "PASS"
         ],
-        "forbidden_patterns": ["private", "_raw"]
+        "exclude": [
+          "FAIL"
+        ]
       }
     }
   },

@@ -3761,3 +3761,124 @@ def check_kdenlive_render_color_grading(result_paths, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_color_grading error: {e}")
         return 0.0
+
+
+def check_kdenlive_consecutive_wipe_sequence(project_file_path, rule):
+    try:
+        if project_file_path is None or not os.path.exists(project_file_path):
+            return 0.0
+        expected_files = rule.get('expected_files', [])
+        transition_type = (rule.get('transition_type', 'composite') or 'composite').lower()
+        transition_id = (rule.get('transition_id', 'wipe') or 'wipe').lower()
+        max_gap_seconds = float(rule.get('max_gap_seconds', 1.0))
+        if len(expected_files) != 2:
+            return 0.0
+        tree = ET.parse(project_file_path)
+        root = tree.getroot()
+        playlists = {pl.get('id', ''): pl for pl in root.iter('playlist') if pl.get('id')}
+        profile = root.find('.//profile')
+        fps = 25.0
+        if profile is not None:
+            try:
+                fps = float(profile.get('frame_rate_num', profile.get('frame_rate', '25'))) / float(profile.get('frame_rate_den', '1'))
+            except Exception:
+                pass
+        producer_resources = {}
+        for elem in list(root.iter('producer')) + list(root.iter('chain')):
+            elem_id = elem.get('id', '')
+            resource = _get_property_value(elem, 'resource')
+            if elem_id and resource:
+                producer_resources[elem_id] = resource
+        def resolve_playlist_ids(prod_ref, visited=None):
+            if not prod_ref:
+                return set()
+            if visited is None:
+                visited = set()
+            if prod_ref in visited:
+                return set()
+            visited.add(prod_ref)
+            if prod_ref in playlists:
+                return {prod_ref}
+            for tractor in root.iter('tractor'):
+                if tractor.get('id', '') == prod_ref:
+                    result = set()
+                    for track in tractor.findall('track'):
+                        result |= resolve_playlist_ids(track.get('producer', ''), visited)
+                    return result
+            return set()
+        main_tractor = None
+        for tractor in root.iter('tractor'):
+            clipname = _get_property_value(tractor, 'kdenlive:clipname')
+            if clipname and 'sequence' in clipname.lower():
+                main_tractor = tractor
+                break
+        if main_tractor is None:
+            tractors = list(root.iter('tractor'))
+            if tractors:
+                main_tractor = tractors[-1]
+        v1_playlists = []
+        if main_tractor is not None:
+            video_num = 0
+            for track in main_tractor.findall('track'):
+                prod_ref = track.get('producer', '')
+                if not prod_ref or 'black' in prod_ref.lower():
+                    continue
+                resolved = resolve_playlist_ids(prod_ref)
+                if not resolved:
+                    continue
+                is_audio = any(playlists.get(pid) is not None and _get_property_value(playlists.get(pid), 'kdenlive:audio_track') is not None for pid in resolved)
+                if is_audio:
+                    continue
+                video_num += 1
+                if video_num == 1:
+                    v1_playlists.extend(sorted(resolved))
+        order_ok = False
+        for playlist_id in v1_playlists:
+            playlist = playlists.get(playlist_id)
+            if playlist is None:
+                continue
+            current_pos_frames = 0.0
+            matches = []
+            for child in playlist:
+                if child.tag == 'blank':
+                    try:
+                        current_pos_frames += float(child.get('length', '0'))
+                    except ValueError:
+                        pass
+                    continue
+                if child.tag != 'entry':
+                    continue
+                producer_ref = child.get('producer', '')
+                resource = producer_resources.get(producer_ref, '')
+                if not resource:
+                    for elem_id, res in producer_resources.items():
+                        if elem_id in producer_ref:
+                            resource = res
+                            break
+                try:
+                    duration = float(child.get('out', '0')) - float(child.get('in', '0')) + 1.0
+                except ValueError:
+                    duration = 0.0
+                matched = next((name for name in expected_files if resource and name in resource), None)
+                if matched:
+                    matches.append((matched, current_pos_frames, current_pos_frames + duration))
+                current_pos_frames += duration
+            for first, second in zip(matches, matches[1:]):
+                if first[0] == expected_files[0] and second[0] == expected_files[1]:
+                    gap_seconds = abs(second[1] - first[2]) / fps if fps else abs(second[1] - first[2])
+                    if gap_seconds <= max_gap_seconds:
+                        order_ok = True
+                        break
+            if order_ok:
+                break
+        if not order_ok:
+            return 0.0
+        for elem in list(root.iter('transition')) + list(root.iter('link')):
+            service = (_get_mlt_service(elem) or '').lower()
+            kdenlive_id = (_get_property_value(elem, 'kdenlive_id') or '').lower()
+            if service == transition_type and transition_id in kdenlive_id:
+                return 1.0
+        return 0.0
+    except Exception as e:
+        logger.error(f'check_kdenlive_consecutive_wipe_sequence error: {e}')
+        return 0.0
