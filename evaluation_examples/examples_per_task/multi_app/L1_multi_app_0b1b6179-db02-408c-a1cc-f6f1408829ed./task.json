@@ -46,7 +46,7 @@
       },
       {
         "type": "vm_command_line",
-        "command": "cat /home/user/Desktop/applied_editor_spec.txt",
+        "command": "python3 -c \"from pathlib import Path; p=Path('/home/user/Desktop/applied_editor_spec.txt'); s=p.read_text(encoding='utf-8').strip() if p.exists() else ''; expected=Path('/home/user/.team_editor_spec').read_text(encoding='utf-8').strip(); print('PASS' if s==expected else 'FAIL')\"",
         "shell": true
       }
     ],
@@ -65,10 +65,11 @@
         "type": "rule",
         "rules": {
           "include": [
-            "tabSize=3",
-            "fontSize=13"
+            "PASS"
           ],
-          "exclude": []
+          "exclude": [
+            "FAIL"
+          ]
         }
       }
     ],

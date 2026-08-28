@@ -44,20 +44,17 @@
     "func": "check_include_exclude",
     "result": {
       "type": "vm_command_line",
-      "command": "ls /home/user/Desktop/Archive 2>/dev/null | sort | tr '\\n' ' '",
+      "command": "python -c \"from pathlib import Path; base=Path('/home/user/Desktop/Archive'); names=sorted(p.name for p in base.iterdir()) if base.exists() else []; print('PASS' if names==['North','South'] else 'FAIL')\"",
       "shell": true
     },
     "expected": {
       "type": "rule",
       "rules": {
         "include": [
-          "North",
-          "South"
+          "PASS"
         ],
         "exclude": [
-          "Q1",
-          "Q2",
-          "Q3"
+          "FAIL"
         ]
       }
     },

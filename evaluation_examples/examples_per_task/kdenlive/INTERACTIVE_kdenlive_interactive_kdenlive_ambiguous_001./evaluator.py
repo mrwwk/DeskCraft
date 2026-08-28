@@ -348,3 +348,28 @@ def check_kdenlive_transition(project_file_path, expected=None, **options):
     except Exception as e:
         logger.error(f"check_kdenlive_transition error: {e}")
         return 0.0
+
+def check_kdenlive_import_video(project_file_path, rule):
+    try:
+        if project_file_path is None or not os.path.exists(project_file_path):
+            logger.error(f"Project file not found: {project_file_path}")
+            return 0.0
+        expected_file = rule.get("expected_file", "")
+        if not expected_file:
+            return 0.0
+        root, parse_err = _load_project_xml(project_file_path)
+        if root is None:
+            logger.error(f"Project file load failed: {parse_err}")
+            return 0.0
+        for producer in root.iter("producer"):
+            resource = _get_property_value(producer, "resource")
+            if resource and expected_file in resource:
+                return 1.0
+        for chain in root.iter("chain"):
+            resource = _get_property_value(chain, "resource")
+            if resource and expected_file in resource:
+                return 1.0
+        return 0.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_import_video error: {e}")
+        return 0.0

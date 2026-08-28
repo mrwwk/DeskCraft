@@ -37,7 +37,7 @@
   ],
   "evaluator": {
     "postconfig": [],
-    "func": "check_kdenlive_add_to_timeline",
+    "func": "check_kdenlive_clip_on_specific_track",
     "file": "evaluator.py",
     "result": {
       "type": "vm_file",
@@ -47,7 +47,9 @@
     "expected": {
       "type": "rule",
       "rules": {
-        "expected_file": "6533277-hd_1920_1080_24fps.mp4"
+        "expected_file": "6533277-hd_1920_1080_24fps.mp4",
+        "expected_track_type": "video",
+        "expected_track_number": 1
       }
     }
   },

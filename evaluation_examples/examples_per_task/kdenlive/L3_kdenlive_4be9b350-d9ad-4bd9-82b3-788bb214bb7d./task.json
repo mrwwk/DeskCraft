@@ -44,8 +44,7 @@
     "func": [
       "check_kdenlive_render_with_audio",
       "check_kdenlive_import_multiple_files",
-      "check_kdenlive_clip_position",
-      "check_kdenlive_clip_position"
+      "check_kdenlive_clip_layouts_precise"
     ],
     "file": "evaluator.py",
     "conj": "and",
@@ -54,11 +53,6 @@
         "type": "vm_file",
         "path": "/home/user/Videos/output.mp4",
         "dest": "output.mp4"
-      },
-      {
-        "type": "vm_file",
-        "path": "/home/user/Videos/project.kdenlive",
-        "dest": "project.kdenlive"
       },
       {
         "type": "vm_file",
@@ -91,17 +85,22 @@
       {
         "type": "rule",
         "rules": {
-          "source_file": "15368811_1920_1080_30fps.mp4",
-          "start_time": 0.0,
-          "tolerance": 300.0
-        }
-      },
-      {
-        "type": "rule",
-        "rules": {
-          "source_file": "804c6281f9d23fa77df71776a6cca3c2.mp3",
-          "start_time": 0.0,
-          "tolerance": 300.0
+          "clips": [
+            {
+              "source_file": "15368811_1920_1080_30fps.mp4",
+              "start_time": 0.0,
+              "tolerance": 0.5,
+              "expected_track_type": "video",
+              "expected_track_number": 1
+            },
+            {
+              "source_file": "804c6281f9d23fa77df71776a6cca3c2.mp3",
+              "start_time": 0.0,
+              "tolerance": 0.5,
+              "expected_track_type": "audio",
+              "expected_track_number": 1
+            }
+          ]
         }
       }
     ],

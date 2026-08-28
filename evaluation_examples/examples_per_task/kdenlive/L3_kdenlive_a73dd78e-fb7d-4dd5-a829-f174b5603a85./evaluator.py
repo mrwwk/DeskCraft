@@ -320,3 +320,129 @@ def check_kdenlive_render_pip(result_paths, rule):
     except Exception as e:
         logger.error(f"check_kdenlive_render_pip error: {e}")
         return 0.0
+
+
+def check_kdenlive_render_pip_precise(result_paths, rule):
+    try:
+        render_path, project_path = _extract_result_paths(result_paths)
+        if check_kdenlive_render_mp4(render_path, rule) < 1.0:
+            return 0.0
+        if project_path is None or not os.path.exists(project_path):
+            return 0.0
+        tree = ET.parse(project_path)
+        root = tree.getroot()
+        playlists = {pl.get('id', ''): pl for pl in root.iter('playlist') if pl.get('id')}
+        producer_resources = {}
+        for elem in list(root.iter('producer')) + list(root.iter('chain')):
+            elem_id = elem.get('id', '')
+            resource = _get_property_value(elem, 'resource')
+            if elem_id and resource:
+                producer_resources[elem_id] = resource
+        def parse_rect(rect_str):
+            if not rect_str:
+                return None
+            value_part = rect_str.strip().split(';')[-1]
+            if '=' in value_part:
+                value_part = value_part.split('=', 1)[1]
+            parts = value_part.split()
+            if len(parts) < 4:
+                return None
+            try:
+                return tuple(float(parts[i]) for i in range(4))
+            except ValueError:
+                return None
+        def resolve_playlist_ids(prod_ref, visited=None):
+            if not prod_ref:
+                return set()
+            if visited is None:
+                visited = set()
+            if prod_ref in visited:
+                return set()
+            visited.add(prod_ref)
+            if prod_ref in playlists:
+                return {prod_ref}
+            for tractor in root.iter('tractor'):
+                if tractor.get('id', '') == prod_ref:
+                    result = set()
+                    for track in tractor.findall('track'):
+                        result |= resolve_playlist_ids(track.get('producer', ''), visited)
+                    return result
+            return set()
+        main_tractor = None
+        for tractor in root.iter('tractor'):
+            clipname = _get_property_value(tractor, 'kdenlive:clipname')
+            if clipname and 'sequence' in clipname.lower():
+                main_tractor = tractor
+                break
+        if main_tractor is None:
+            tractors = list(root.iter('tractor'))
+            if tractors:
+                main_tractor = tractors[-1]
+        track_map = {}
+        if main_tractor is not None:
+            video_num = 0
+            audio_num = 0
+            for track in main_tractor.findall('track'):
+                prod_ref = track.get('producer', '')
+                if not prod_ref or 'black' in prod_ref.lower():
+                    continue
+                resolved = resolve_playlist_ids(prod_ref)
+                if not resolved:
+                    continue
+                is_audio = any(playlists.get(pid) is not None and _get_property_value(playlists.get(pid), 'kdenlive:audio_track') is not None for pid in resolved)
+                if is_audio:
+                    audio_num += 1
+                    assigned = ('audio', audio_num)
+                else:
+                    video_num += 1
+                    assigned = ('video', video_num)
+                for pid in resolved:
+                    track_map[pid] = assigned
+        def playlists_for_file(file_name):
+            found = set()
+            for playlist in root.iter('playlist'):
+                playlist_id = playlist.get('id', '')
+                if 'bin' in playlist_id.lower():
+                    continue
+                for entry in playlist.findall('entry'):
+                    producer_ref = entry.get('producer', '')
+                    resource = producer_resources.get(producer_ref, '')
+                    if not resource:
+                        for elem_id, res in producer_resources.items():
+                            if elem_id in producer_ref:
+                                resource = res
+                                break
+                    if resource and file_name in resource:
+                        found.add(playlist_id)
+                        break
+            return found
+        main_file = rule.get('main_file', '')
+        overlay_file = rule.get('overlay_file', '')
+        main_ok = any(track_map.get(pid) == ('video', 1) for pid in playlists_for_file(main_file))
+        overlay_ok = any(track_map.get(pid) == ('video', 2) for pid in playlists_for_file(overlay_file))
+        if not main_ok or not overlay_ok:
+            return 0.0
+        profile = root.find('.//profile')
+        width = int(profile.get('width', '1920')) if profile is not None else 1920
+        height = int(profile.get('height', '1080')) if profile is not None else 1080
+        expected_w = width / 2.0
+        expected_h = height / 2.0
+        rect_values = None
+        services = {'affine', 'qtblend', 'composite', 'movit.overlay', 'frei0r.composition', 'cairoblend', 'frei0r.cairoblend'}
+        for elem in list(root.iter('filter')) + list(root.iter('transition')):
+            service = (_get_mlt_service(elem) or '').lower()
+            if service in services:
+                rect_values = parse_rect(_get_property_value(elem, 'rect'))
+                if rect_values is not None:
+                    break
+        if rect_values is None:
+            return 0.0
+        x, y, w, h = rect_values
+        if abs(x) > width * 0.1 or abs(y) > height * 0.1:
+            return 0.0
+        if abs(w - expected_w) > width * 0.05 or abs(h - expected_h) > height * 0.05:
+            return 0.0
+        return 1.0
+    except Exception as e:
+        logger.error(f"check_kdenlive_render_pip_precise error: {e}")
+        return 0.0

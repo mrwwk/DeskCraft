@@ -51,7 +51,7 @@
     "func": "exact_match",
     "result": {
       "type": "vm_command_line",
-      "command": "python -c \"from pathlib import Path; final=Path('/home/user/Desktop/Projects/AprilPitch_Final'); archive=Path('/home/user/Desktop/Projects/Archive'); brand=Path('/home/user/Pictures/BrandAssets'); desk=Path('/home/user/Desktop'); ok=final.exists() and (final/'client_brief.docx').exists() and not (final/'quote.xlsx').exists() and archive.exists() and (archive/'quote.xlsx').exists() and brand.exists() and (brand/'logo.png').exists() and not any((desk/name).exists() for name in ['client_brief.docx','quote.xlsx','logo.png']) and not Path('/home/user/Desktop/Projects/AprilPitch').exists(); print('PASS' if ok else 'FAIL')\"",
+      "command": "python -c \"from pathlib import Path; final=Path('/home/user/Desktop/Projects/AprilPitch_Final'); archive=Path('/home/user/Desktop/Projects/Archive'); brand=Path('/home/user/Pictures/BrandAssets'); desk=Path('/home/user/Desktop'); ok=final.exists() and (final/'client_brief.docx').exists() and not (final/'quote.xlsx').exists() and not (final/'logo.png').exists() and archive.exists() and (archive/'quote.xlsx').exists() and brand.exists() and (brand/'logo.png').exists() and not any((desk/name).exists() for name in ['client_brief.docx','quote.xlsx','logo.png']) and not Path('/home/user/Desktop/Projects/AprilPitch').exists(); print('PASS' if ok else 'FAIL')\"",
       "shell": true
     },
     "expected": {

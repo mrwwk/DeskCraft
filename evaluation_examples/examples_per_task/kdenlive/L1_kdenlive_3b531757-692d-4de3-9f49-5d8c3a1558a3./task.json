@@ -37,7 +37,7 @@
   ],
   "evaluator": {
     "postconfig": [],
-    "func": "check_kdenlive_clip_position",
+    "func": "check_kdenlive_clip_position_on_specific_track",
     "result": {
       "type": "vm_file",
       "path": "/home/user/Videos/project.kdenlive",
@@ -48,7 +48,9 @@
       "rules": {
         "source_file": "6533277-hd_1920_1080_24fps.mp4",
         "start_time": 5.0,
-        "tolerance": 0.5
+        "tolerance": 0.5,
+        "expected_track_type": "video",
+        "expected_track_number": 1
       }
     },
     "file": "evaluator.py"
